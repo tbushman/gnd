@@ -1,0 +1,74 @@
+- var marked = marked
+div.grid-left
+
+div.grid-mid
+	if (imgindex)
+		if (type === 'image')
+			img(src= contentData.properties.media[imgindex].image)
+		else
+			embed(src= contentData.properties.media[imgindex].image, width="100%", height="100%")
+
+div.grid-right
+	if (infowindow === 'edit')
+		include docedit.pug
+	else
+		if (index >= 0)
+			div.grid-container.inner
+				div.grid-header
+					each imag, i in contentData.properties.media
+						a.thumbnail.gallery(href="")
+							img(src=""+imag.image+"")
+					p.tb-font-s #{contentData.properties.place} 
+						span.tb-font-s | 
+						span.tb-font-s #{moment(contentData.properties.time.begin).format('MMM DD, YYYY, hh:mm')} 
+						span.tb-font-s – 
+						span.tb-font-s #{moment(contentData.properties.time.end).format('MMM DD, YYYY, hh:mm')}	
+					p.tb-font-s.hideoverlap #{contentData.properties.label}
+				div.grid-left(style="padding: 6px 0 0 6px;")
+					a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit blog entry")
+						i.fa.fa-edit
+				div.grid-right
+					p.tb-font-xl #{contentData.properties.title}
+					p.tb-font-s
+						!= md(contentData.properties.description)
+					
+				div.grid-footer
+					
+		else
+			each entry, k in doc.content
+				a.tb-font-m(style="color: "+doc.css.primary+"", href="/"+doc.pagetitle+"", title="Go to "+doc.pagetitle+"") #{doc.pagetitle}
+				if (loggedin && loggedin === doc.publishers[0].username)
+					div(style="padding: 10px 0 0 10px")
+						a.tb-font-m(style="margin: 6px 0 0 6px;z-index: 0;", href="/api/editcontent/"+menuData.urltitle+"/"+doc.pageindex+"/"+index+"", title="Edit "+doc.pagetitle+"")
+							i.fa.fa-edit
+				br
+				span.tb-font-s #{entry.properties.place} 
+				span.tb-font-s | 
+				span.tb-font-s #{moment(entry.properties.time.begin).format('MMM DD, YYYY, hh:mm')} 
+				span.tb-font-s – 
+				span.tb-font-s #{moment(entry.properties.time.end).format('MMM DD, YYYY, hh:mm')}	
+				p.tb-font-s.hideoverlap #{entry.properties.label}
+				p.tb-font-xs.hideoverlap
+					!= md(entry.properties.description)
+					span &nbsp ...
+				if (entry.properties.media.length > 0)
+					div.thumbnail.gallery(id= entry.pageindex, name= entry._id + "@all_" + entry.pageindex)
+						img(src= entry.properties.media[0].thumb)
+					div#hide
+						if (entry.properties.media[0].name === '')
+							span.tb-font-xxs &nbsp
+						else
+							span.tb-font-xxs #{entry.properties.media[0].name}
+						if (entry.properties.media[0].caption === '')
+							span.tb-font-xs &nbsp
+						else
+							span.tb-font-xs #{entry.properties.media[0].caption}
+
+						div.ms-ListItem-actions
+							if (entry.properties.media[0].url)
+								div.ms-ListItem-action
+									a(href= entry.properties.media[0].url, target="_blank")
+										i.ms-Icon.ms-Icon--link
+				hr(style="color: "+doc.css.primary+"")
+		
+div.grid-footer

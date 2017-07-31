@@ -1,0 +1,64 @@
+extends layout
+block page
+	- var menu = 'login'
+block content
+	div#select(class= type)
+		div.menu(class= type)
+			div.topRight(style="background-image:url('"+imageUrl+"')")
+				div.blogname appTitle
+			div.topLeft(style="background-image:url('"+imageUrl+"')")
+		div.grid-container
+			div.grid-header
+				p.tb-font-xl Choose a nickname for your Chef: 
+			div.grid-left
+			div.grid-mid
+				div.avatar.avatar-lg
+					img(src="images/avatars/avatar_1.svg")
+			div.grid-right
+				div.input-field#response
+					label.ms-Label Page Title
+					input.ms-TextField-field(type="text", name="pagetitle", id="pagetitle")
+					a.btn.waves-effect.waves-light(role="button") Check availability
+					hr
+				div#registersection(style="display: none")
+					p.tb-font-xl Create a basic profile
+					form#form(enctype="multipart/form-data", method="POST", action="/register", style="margin-bottom: 50px")
+						input(type="hidden", name="pagetitle", id="pagetitle2")
+						input#svgurl(type="hidden", name="svg")
+						input#avatarurl(type="hidden", name="avatar")
+						input#resumeurl(type="hidden", name="resume")
+						div.tb-u-100
+							div.input-field
+								label.ms-Label Username
+								input.ms-TextField-field.is-required(type="text", name="username", maxlength="40")
+							div.input-field
+								label.ms-Label Email
+								input.ms-TextField-field.is-required(type="email", name="email")
+							div.input-field.is-required
+								label.ms-Label Password
+								input.ms-TextField-field.is-required(type="password", name="password")
+						p
+						button.btn.waves-effect.waves-light#submitregister(type="submit", ariaDescription="Register") Register
+				div.tb-u-100
+					#info #{info}
+	script(type="text/javascript").
+		
+		$('#pagetitle').on('blur', function(e){
+			//e.preventDefault();
+			var check = $(this).val();
+			var url = check.replace(' ', '_');
+			$.post('/'+check).done(function(result){
+				if (result === 'Available') {
+					$('#append').remove(); 
+					$('#response').append('<p class="tb-font-m" id="append">Available</p>');
+					$.post('/reserve/'+check+'');
+					$('#loginsection').css('display', 'block');
+					$('#registersection').css('display', 'block')
+					$('#pagetitle2').val(check);
+					
+				} else {
+					$('#append').remove(); 
+					$('#response').append('<p class="tb-font-m" id="append">That blog name is taken.</p>')
+				}
+			})
+		})

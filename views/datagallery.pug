@@ -1,0 +1,52 @@
+div.grid-left
+	
+div.grid-mid
+	if (imgindex)
+		if (type === 'image')
+			img(src= img)
+		else
+			embed(src= img, width="100%", height="100%")
+
+div.grid-right
+	if (infowindow === 'edit')
+		include dataedit.pug
+	else
+		each entry, i in data
+			div.grid-container.inner
+				a.grid-header(href="/"+entry.pagetitle+"")
+					p.tb-font-l #{entry.pagetitle}
+				div.grid-left
+					if (entry.content[entry.content.length-1].properties.media.length > 0)
+						div.thumbnail.gallery(id= entry.pageindex, name= entry._id + "@all_" + entry.pageindex)
+							div.actions
+								//if (entry.content[entry.content.length-1].properties.media[0].url)
+								span.tb-font-s by 
+								br
+								span.tb-font-xxs #{entry.publishers[0].username}
+							img(src= entry.content[entry.content.length-1].properties.media[0].thumb)
+						div#hide
+							if (entry.content[entry.content.length-1].properties.media[0].name !== '')
+								span.tb-font-xxs #{entry.content[entry.content.length-1].properties.media[0].name}
+
+
+				div.grid-right
+					p.tb-font-xs #{entry.content[entry.content.length-1].properties.place} 
+						span.tb-font-xs | 
+						if (moment(entry.content[entry.content.length-1].properties.time.begin).format('MMM DD, YYYY, hh:mm') !== moment(entry.content[entry.content.length-1].properties.time.end).format('MMM DD, YYYY, hh:mm'))
+							span.tb-font-xs #{moment(entry.content[entry.content.length-1].properties.time.begin).format('MMM DD, YYYY, hh:mm')} 
+							span.tb-font-xs – 
+							span.tb-font-xs #{moment(entry.content[entry.content.length-1].properties.time.end).format('MMM DD, YYYY, hh:mm')}	
+						else
+							span.tb-font-xs #{moment(entry.content[entry.content.length-1].properties.time.end).format('MMM DD, YYYY, hh:mm')}	
+
+					p.tb-font-m.hideoverlap #{entry.content[entry.content.length-1].properties.label}
+					p.tb-font-s.hideoverlap
+						!= md(entry.content[entry.content.length-1].properties.description)
+						span &nbsp ...
+				div.grid-footer
+					if (entry.content[entry.content.length-1].properties.media[0].caption === '')
+						span.tb-font-xs &nbsp
+					else
+						span.tb-font-xs #{entry.content[entry.content.length-1].properties.media[0].caption}
+
+			hr(style="color: "+entry.css.primary+"")

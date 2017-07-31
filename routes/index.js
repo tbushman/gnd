@@ -1,0 +1,645 @@
+var express = require('express');
+var passport = require('passport');
+var router = express.Router();
+var url = require('url');
+var fs = require('fs');
+var path = require('path');
+var moment = require("moment");
+var async = require("async");
+var multer = require('multer');
+var mkdirp = require('mkdirp');
+var spawn = require("child_process").spawn;
+var dotenv = require('dotenv');
+var Publisher = require('../models/publishers.js');
+var Page = require('../models/pages.js');
+var publishers = path.join(__dirname, '/../public/images');
+var request = require('request');
+var marked = require('marked');
+var upload = multer();
+
+
+dotenv.load();
+
+
+//middleware
+function ensureAuthenticated(req, res, next) {
+	if (req.isAuthenticated()) {
+		return next();
+	}
+	return res.redirect('/login');
+}
+
+function ensurePage(req, res, next) {
+	Page.findOne({pagetitle: ''+req.params.pagetitle+''}, function(err, page) {
+	    if (err) {
+	      return next(err);
+	    }
+	 	if (!err && page === null) {
+			return res.redirect('/')
+		}
+		console.log('user here')
+		return next(page);
+
+	});
+}
+
+function ensureUserId(req, res, next) {
+	Publisher.findOne({_id: req.params.userid}, function(err, user) {
+		if (err) {
+				return next(err);
+			}
+		if (user) {
+			return next();
+	    } else {
+				return res.redirect('/')
+			}
+	});
+}
+
+function ensureUser(req, res, next) {
+	Page.findOne({pageindex: parseInt(req.params.pageindex, 10)}, function(err, page) {
+		if (err) {
+			return next(err);
+		}
+
+		for (var i in page.publishers) {
+			if (JSON.stringify(page.publishers[i].username) === JSON.stringify(req.app.locals.loggedin)) {
+				return next();
+			} else {
+
+			}
+		}
+		var outputPath = url.parse(req.url).pathname;
+		return res.render('login', {route: outputPath})
+	});
+}
+
+//if logged in, go to your own profile
+//if not, go to global profile (home)
+router.get('/', function (req, res) {
+	if (req.app.locals.loggedin !== undefined) {
+		delete req.app.locals.pageTitle;
+		if (req.isAuthenticated()) {
+			req.app.locals.userId = req.user._id;
+			req.app.locals.loggedin = req.user.username;
+			req.app.locals.username = req.user.username;
+			return res.redirect('/home')
+		} else {
+			return res.redirect('/home');
+		}
+
+
+	} else {
+		delete req.app.locals.pageTitle;
+		return res.redirect('/home')
+	}
+});
+
+router.get('/register', function(req, res) {
+    return res.render('register', {info: 'Thank you', action: 'login' } );
+});
+
+
+router.post('/register*', upload.array(), function(req, res, next) {
+	if (!req.body.pagetitle) {
+		//upload.array() has not yet been fs-ed.
+		return res.render('register', {info: 'You must provide a nickname.'})
+	}
+	var pagetitle = encodeURIComponent(req.body.pagetitle);
+	Publisher.find({}, function(err, data){
+		if (err) {
+			return next(err)
+		}
+		var userindex = data.length;
+		Publisher.register(new Publisher({ username : req.body.username, email: req.body.email, userindex: userindex, avatar: '/images/avatars/avatar_1.svg' }), req.body.password, function(err, user) {
+			if (err) {
+				return res.render('register', {info: "Sorry. That username already exists. Try again."});
+			}
+			req.app.locals.username = req.body.username;
+			passport.authenticate('local')(req, res, function () {
+				Publisher.findOne({username: req.body.username}, function(error, doc){
+					if (error) {
+						return next(error)
+					}
+					req.app.locals.user = req.user;
+					req.app.locals.userId = doc._id;
+					req.app.locals.loggedin = doc.username;
+					return res.redirect('/api/publish/'+pagetitle+'')
+				})
+			});
+		});
+	})
+});
+
+router.post('/reserve/:pagetitle', function(req, res, next){
+	req.app.locals.pageTitle = decodeURIComponent(req.params.pagetitle);
+	console.log('this blog name: '+ req.app.locals.pageTitle);
+	return next();
+})
+
+router.get('/login', function(req, res, next){
+	return res.render('login', {
+		user: req.user
+	});
+});
+
+router.post('/login', upload.array(), passport.authenticate('local'), function(req, res, next) {
+	/*console.log('req.user._id: '+req.user._id)
+	req.app.locals.userId = req.user._id;*/
+	delete req.app.locals.pageTitle;
+	req.app.locals.loggedin = req.body.username;
+	req.app.locals.username = req.body.username;
+	if (req.body.pagetitle) {
+		var pagetitle = encodeURIComponent(req.body.pagetitle);
+		req.app.locals.pageTitle = pagetitle;
+		console.log('adding :'+pagetitle+' to '+req.app.locals.loggedin+'\'s collection')
+		return res.redirect('/api/publish/'+pagetitle+'')
+	} else {
+		return res.redirect('/')
+	}
+
+});
+
+router.get('/logout', function(req, res) {
+
+	req.app.locals.username = null;
+	req.app.locals.userId = null;
+	req.app.locals.zoom = null;
+	req.app.locals.loggedin = null;
+	delete req.app.locals.pageTitle;
+	req.logout();
+	if (req.user || req.session) {
+		req.user = null;
+		req.session.destroy(function(err){
+			if (err) {
+				req.session = null;
+				return next(err);
+			} else {
+				req.session = null;
+				return res.redirect('/');
+			}
+		});
+	} else {
+		return res.redirect('/');
+	}
+});
+
+router.get('/home', function(req, res, next) {
+	//todo test null vs delete
+	delete req.app.locals.pageTitle;
+
+	var info;
+	// Get data
+	async.waterfall([
+		function(next){
+
+			Page.find({}, function(err, data){
+				if (err) {
+					next(err)
+				}
+
+				if (!err && data.length === 0){
+					//if no publisher in system
+					return res.redirect('/register')
+				}
+				next(null, data)
+			})
+		}
+	], function(err, data) {
+		if (err) {
+			console.log(err)
+			return next(err)
+		}
+		var index = 0
+
+		var datarray = [];
+		for (var l in data) {
+			datarray.push(data[l])
+		}
+		if (req.isAuthenticated()) {
+			return res.render('publish', {
+				type: 'blog',
+				infowindow: 'root',
+				loggedin: req.app.locals.loggedin,
+				data: datarray,
+				index: index,
+				info: info
+			})
+		} else {
+			return res.render('publish', {
+				type: 'blog',
+				infowindow: 'root',
+				data: datarray,
+				index: index,
+				info: info
+			})
+		}
+	})
+})
+
+router.post('/:pagetitle', function(req, res, next){
+	Page.find({pagetitle: decodeURIComponent(req.params.pagetitle)}, function(error, pages){
+		if (error) {
+			return next(error)
+		}
+		console.log('these records of taken blog names: '+pages)
+		if (!error && pages.length > 0) {
+			return res.send('This blog name is taken.')
+		}
+		return res.send('Available')
+
+	})
+})
+
+router.get('/:pagetitle', ensurePage, function (page, req, res, next) {
+	//check if pos1 is username
+	//view user profile
+	var pagetitle = decodeURIComponent(req.params.pagetitle)
+	var urltitle = pagetitle.split(' ').join('_');
+	Page.find({}, function(err, data) {
+		if (err) {
+			return next(err)
+		}
+		Page.findOne({urltitle: urltitle}, function(error, doc){
+			if (error) {
+				return next(error)
+			}
+			if (!err && doc !== undefined && doc !== null) {
+				var info;
+				var index = doc.content[doc.content.length-1].index;
+				var datarray = [];
+				for (var l in data) {
+					datarray.push(data[l])
+				}
+				if (req.isAuthenticated()) {
+					return res.render('publish', {
+						username: doc.username,
+						pageindex: doc.pageindex,
+						type: 'blog',
+						infowindow: 'intro',
+						loggedin: req.app.locals.loggedin,
+						index: index,
+						doc: doc,
+						data: datarray,
+						info: info
+					})
+				} else {
+					return res.render('publish', {
+						username: doc.username,
+						pageindex: doc.pageindex,
+						type: 'blog',
+						infowindow: 'intro',
+						index: index,
+						doc: doc,
+						data: datarray,
+						info: info
+					})
+				}
+				
+			} else {
+				return res.redirect('/home')
+			}
+		})
+	})
+});
+
+router.all('/:urltitle/:pageindex/:index', function(req, res, next){
+	var outputPath = url.parse(req.url).pathname;
+	var urltitle = req.params.urltitle;
+	var pageindex = parseInt(req.params.pageindex, 10);
+	var index = parseInt(req.params.index, 10);
+	//delete req.app.locals.imgindex;
+	Page.findOne({urltitle: urltitle, content: {$elemMatch: {index: index}}}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		Page.find({}, function(error, data) {
+			if (error) {
+				return next(error)
+			}
+			/*var imgs = [];
+			var imgindexes = []
+			for (var i in doc.content[index].properties.media) {
+				if (doc.content[index].properties.media !== '') {
+					imgs.push(doc.content[index].properties.media[i].image)
+					imgindexes.push(i)
+				}
+			}*/
+			//req.app.locals.imgindex = imgindexes[0];
+
+			req.app.locals.index = index;
+			var datarray = [];
+			for (var l in data) {
+				datarray.push(data[l])
+			}
+
+			if (req.isAuthenticated()) {
+				//if (req.user._id === userid) {
+					return res.render('publish', {
+						index: index,
+						loggedin: req.app.locals.loggedin,
+						type: 'blog',
+						infowindow: 'doc',
+						username: doc.username,
+						pageindex: doc.pageindex,
+						data: datarray,
+						doc: doc,
+						info: ':)'
+					})
+
+			} else {
+				return res.render('publish', {
+					index: index,
+					type: 'blog',
+					infowindow: 'doc',
+					username: doc.username,
+					pageindex: doc.pageindex,
+					data: datarray,
+					doc: doc,
+					info: ':)'
+				})
+			}
+		})
+	})
+
+})
+
+//todo expand
+//currently only searches publisher
+router.all('/search/:term', function(req, res, next){
+	var term = req.params.term;
+	var regex = new RegExp(term);
+	console.log(regex)
+	Page.find({pagetitle: { $regex: regex }}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		if (!err && doc === null) {
+			return ('none')
+		}
+		return res.json(doc)
+	})
+})
+
+//every edit-access api checks auth
+router.all('/api/*', ensureAuthenticated)
+
+router.get('/api/publish*', function(req, res, next) {
+	var outputPath = url.parse(req.url).pathname;
+	var pagetitle = req.params[0].split('/')[1];
+	var urltitle = pagetitle.replace(' ', '_');
+	req.app.locals.user = req.user;
+	req.app.locals.loggedin = req.user.username;
+
+	async.waterfall([
+		function(cb) {
+			Page.find({}, function(err, data) {
+				if (err) {
+					return next(err)
+				}
+				var infowindow, index;
+				
+				pageindex = data.length;
+				//dummy automatic first content entry
+				var page = new Page({
+					pageindex: pageindex,
+					pagetitle: pagetitle,
+					urltitle: urltitle,
+					content: [ {
+						//index: 0,
+						properties: {
+							pid: pageindex,
+							user: req.app.locals.user._id,
+							title: 'Edit Title',
+							label: 'First Post',
+							description: 'Edit Body',
+							media: [ ]
+						}
+					} ],
+					publishers: [{
+						_id: req.app.locals.user._id,
+						userindex: 0,
+						username: req.app.locals.user.username,
+						email: req.app.locals.user.email,
+						avatar: req.app.locals.user.avatar
+					}]
+				})
+				if (!err && data.length === 0) {
+					infowindow = 'doc';
+					index = 0;
+					req.app.locals.index = index;
+					page.save(function(error){
+						if (error) {
+							return next(error)
+						} else {
+							Page.find({}, function(er, data){
+								if (er) {
+									next(er)
+								}
+								req.app.locals.pageId = page._id;
+								//req.app.locals.pageTitle = doc.pagetitle;
+								req.app.locals.userId = req.app.locals.user._id;
+								cb(null, data, page, pageindex, infowindow)
+							})
+						}
+					})
+				} else {
+					Page.find({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(er, pages){
+						if (er) {
+							return next(er)
+						}
+
+						var infowindow, pageindex;
+						if (pages.length === 0) {
+							if (pagetitle === 'null' || pagetitle === null) {
+								infowindow = 'dashboard';
+								cb(null, data, false, pageindex, infowindow)
+							} else {
+								
+								
+							}
+						} else {
+							if (pagetitle === 'null' || pagetitle === null) {
+								pageindex = pages[pages.length-1].pageindex;
+								infowindow = 'dashboard';
+								cb(null, data, false, pageindex, infowindow)
+							} else {
+								infowindow = 'doc'
+								Page.find({urltitle: urltitle}, function(err, docs){
+									if (err) {
+										cb(err)
+									}
+									if (docs.length > 0) {
+										pageindex = parseInt(pages[pages.length-1].pageindex, 10);
+										pageId = pagearray[pages.length-1]._id;
+										Page.findOne({_id: pageId}, function(er, doc){
+											if (er) {
+												cb(er)
+											}
+											if (!er && doc === null) {
+												return res.redirect('/home')
+											}
+											index = doc.content.length - 1;
+											cb(null, data, doc, pageindex, infowindow)
+										})
+									} else {
+										return res.redirect('/api/publish/'+null)
+									}
+								})
+							}
+						}
+					})
+				}
+				
+			})
+		}
+	], function(err, data, doc, pageindex, infowindow){
+		if (err) {
+			return next(err)
+		}
+		return res.render('publish', {
+			type: 'blog',
+			infowindow: infowindow,
+			loggedin: req.app.locals.loggedin,
+			username: req.app.locals.user.username,
+			pageindex: pageindex,
+			index: doc.content.length-1,
+			data: [].map.call(data, function(d){return d}),
+			doc: doc,
+			info: info
+		})
+	})
+})
+
+router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res, next) {
+	var index = parseInt(req.params.index, 10);
+	var pageindex = parseInt(req.params.pageindex, 10)
+	Page.deleteOne(
+		{pageindex: pageindex},
+		{$pull:{content:{index:index}}},
+		{multi: false, new: true}, function(err, doc) {
+			if (err) {
+				return next(err)
+			}
+			Page.update({pageindex: pageindex, 'content.index':{$gte:index}}, {$inc:{'content.$.index': -1}}, function(er, pu){
+				if (er) {
+					return next(er)
+				}
+				Page.find({'publishers.username': req.app.locals.loggedin}, function(error, data){
+					if (error) {
+						return next(error)
+					}
+					var datarray = [];
+					for (var l in data) {
+						datarray.push(data[l])
+					}
+					return res.render('publish', {
+						type: 'blog',
+						infowindow: 'dashboard',
+						loggedin: req.app.locals.loggedin,
+						username: req.app.locals.username,
+						pageindex: doc.pageindex,
+						index: 0,
+						data: datarray,
+						info: 'Deleted'
+					})
+				})
+			})
+		}
+	)
+})
+
+router.get('/api/editcontent/:pageindex/:index', ensureUser, function(req, res, next){
+	var index = parseInt(req.params.index, 10);
+	Page.findOne({pageindex: parseInt(req.params.pageindex, 10)}, function(error, doc){
+		if (error) {
+			return next(error)
+		}
+		Page.find({}, function(er, data){
+			if (er) {
+				return next(er)
+			}
+			var datarray = [];
+			for (var l in data) {
+				datarray.push(data[l])
+			}
+			return res.render('publish', {
+				type: 'map',
+				infowindow: 'edit',
+				loggedin: req.app.locals.loggedin,
+				username: req.app.locals.username,
+				pageindex: doc.pageindex,
+				index: doc.content.length-1,
+				doc: doc,
+				data: datarray,
+				info: 'Edit your entry.'
+			})
+		})
+	})
+})
+
+router.post('/api/editcontent/:pageindex/:index', upload.array(), function(req, res, next){
+	var outputPath = url.parse(req.url).pathname;
+	console.log(outputPath)
+	var index = parseInt(req.params.index, 10);
+	var title = req.body.title;
+	var label = req.body.label;
+	var description = req.body.description;
+	var body = req.body;
+
+	Page.findOne({pageindex: parseInt(req.params.pageindex, 10)}, function(err, pub) {
+		if (err) {
+			return next(err)
+		}
+		var id = pub._id;
+		var pageindex = parseInt(pub.pageindex, 10)
+		var keys = Object.keys(body);
+		var entry = {
+			index: index,
+			properties: {
+				_id: id,
+				pid: pageindex,
+				user: req.app.locals.userId,
+				title: body.title,
+				label: body.label,
+				description: body.description,
+				media: []
+			}
+		}
+		entry = JSON.parse(JSON.stringify(entry))
+		var key = 'content.$'
+		var push = {$set: {}};
+		push.$set[key] = entry;
+
+		var key2 = 'content.$.properties.media';
+		var set = {$set: {}};
+		set.$set[key2] = entrymedia;
+		Page.findOneAndUpdate({pageindex: pageindex, content: {$elemMatch: {index: index}}}, push, {safe: true, new: true, upsert: false}, function(error, doc){
+			if (error) {
+				return next(error)
+			}
+			Page.find({}, function(err, data){
+				if (err) {
+					return next(err)
+				}
+				var datarray = [];
+				for (var l in data) {
+					datarray.push(data[l])
+				}
+				return res.render('publish', {
+					type: 'blog',
+					infowindow: 'doc',
+					loggedin: req.app.locals.loggedin,
+					pagetitle: doc.pagetitle,
+					pageindex: doc.pageindex,
+					index: index,
+					doc: doc,
+					data: datarray,
+					info: ':)'
+				})
+			})
+		});
+	})
+})
+
+module.exports = router;

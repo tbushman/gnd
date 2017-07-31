@@ -1,0 +1,111 @@
+div.grid-container.inner
+	div.grid-header
+		p#info.tb-font-s(width="100%")
+	div.grid-right
+		//(style="float: left;")
+		form#form.tb-u-100(enctype="multipart/form-data", method="POST", action="/api/editcontent/"+doc.pageindex+"/"+index+"", style="margin-bottom: 50px")
+			input(type="hidden", id="lat", name="lat", value= doc.content[index].geometry.coordinates[1])
+			input(type="hidden", id="lng", name="lng", value= doc.content[index].geometry.coordinates[0])
+			a#editform.ms-Button(href="#", role="button")
+				span.ms-Button-label Edit Time / Place
+			
+			#formshow(style="display: "+display+"")
+				div.tb-u-100.ms-TextField
+					label.ms-Label Title
+					input.ms-TextField-field(type="text", name="title", value= doc.content[index].properties.title)
+				div.tb-u-100.ms-TextField
+					label.ms-Label Label
+					input.ms-TextField-field(type="text", name="label", value= doc.content[index].properties.label)
+				div.tb-u-100.ms-TextField
+					label.ms-Label Place
+					input.ms-TextField-field(type="text", name="place", value= doc.content[index].properties.place)
+				div.tb-u-100.ms-TextField
+					label.ms-Label Link
+					input.ms-TextField-field(type="text", name="linkurl", value= doc.content[index].properties.link.url)
+				div.tb-u-100.ms-TextField
+					label.ms-Label Caption
+					input.ms-TextField-field(type="text", name="linkcaption", value= doc.content[index].properties.link.caption)
+				div.tb-u-100.ms-DatePicker
+					div.ms-TextField(style="width: 100%")
+						label.ms-Label Begin date
+						input.ms-TextField-field#input_date1(type="text", name="datebegin", value= doc.content[index].properties.time.begin)
+				div.tb-u-100.ms-DatePicker
+					if (doc.content[index].properties.current && doc.content[index].properties.current === true)
+						div.ms-TextField.is-disabled(style="width: 100%")
+							label.ms-Label End date
+							input.ms-TextField-field#input_date2(type="text", name="dateend", value="")
+					else
+						div.ms-TextField(style="width: 100%")
+							label.ms-Label End date
+							input.ms-TextField-field#input_date2(type="text", name="dateend", value= doc.content[index].properties.time.end)
+				div.tb-u-100.div.ms-ChoiceField
+					if (doc.content[index].properties.current && doc.content[index].properties.current === true)
+						input(id="current", type="checkbox", checked="true", aria-checked="true", class="ms-ChoiceField-input", name="current")
+					else
+						input(id="current", type="checkbox", aria-checked="false", class="ms-ChoiceField-input", name="current")
+					label.ms-ChoiceField-field(for="current")
+						span.ms-label Featured post
+			div.tb-u-100
+				p.tb-font-xl #{doc.content[index].properties.place}
+			//-
+				don't need
+			
+				a#closepanel
+					i.ms-Icon.ms-Icon--x
+			
+			div#mediashow.tb-u-100
+				
+				
+				each item, i in doc.content[index].properties.media
+					div.tb-u-100.spacer#resize
+						div.thumbnail(href="#", id= item.index, name= doc.content[index]._id)
+							img(src= item.thumb)
+						input(type="hidden", name="thumb"+i+"", value= item.thumb)
+						if (item.image === "")
+							input(type="hidden", name="img"+i+"", value= item.iframe)
+						else
+							input(type="hidden", name="img"+i+"", value= item.image)
+					div.tb-u-100
+						div.tb-u-100#hide
+							div.ms-TextField
+								label.ms-Label Image Title
+								input.ms-TextField-field(type="text", name="img"+i+"_name", value= item.name)
+							div.ms-TextField
+								label.ms-Label Image Caption
+								textarea.ms-TextField-field(type="text", name="img"+i+"_caption", value= item.caption, placeholder= item.caption)
+							div.ms-TextField
+								label.ms-Label Image URL
+								input.ms-TextField-field(type="text", name="img"+i+"_url", value= item.url)
+				div.ms-u-xl12
+					p.tb-font-s Add media
+					input.ms-Button#media(type="file")
+				div.ms-u-xl12#appendcanvas
+				p
+					
+			div#layoutshow.tb-u-100.spacer
+				if (infowindow === 'edit')
+					p.tb-font-xl Blog Text  
+					div.ms-TextField(class="ms-Grid-col ms-u-"+colsize+"")
+						label.ms-Label Uses Markdown 
+							span | 
+							a(href="https://help.github.com/articles/basic-writing-and-formatting-syntax/", target="_blank") Help
+						textarea.ms-TextField-field#inputtext(type="text", name="description", value= doc.content[index].properties.description, placeholder= doc.content[index].properties.description)
+					div(class="ms-Grid-col ms-u-"+colsize+"")
+						span.tb-font-s#previewtext #{doc.content[index].properties.description}
+							
+				
+							
+							
+								
+								
+			div.tb-u-100
+				button.ms-Button.ms-Button--primary.tb-u-100.block.spacer(type="submit", ariaDescription="Submit Feature to map")
+					span.ms-Button-label Submit
+		p.tb-font-xs#info
+		div.tb-u-33
+			a.ms-Button.ms-Button--alert#deletefeature.tb-u-100(href="#", role="button")
+				span.ms-Button-label Delete Post
+				span.tb-font-s(style="display: none") This cannot be undone. Continue?
+		div.tb-u-33
+			a.ms-Button.tb-u-100(href="/", role="button")
+				span.ms-Button-label.tb-u-100 Cancel

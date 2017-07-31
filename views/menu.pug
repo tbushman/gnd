@@ -1,0 +1,71 @@
+div.menu(class= type)
+	div.topRight(style="background-image:url('"+imageUrl+"')")
+		div.overtext #{menuData.pagetitle}
+		div.blogname #{menuData.content[index].properties.title}
+	div.topLeft(style="background-image:url('"+imageUrl+"')")
+
+div.grid-container
+	div.grid-header.mainHeader
+		//#app(style="pointer-events:none;display: inline-block;float: left;margin: 0 auto;width: auto;position: absolute;z-index: 50;height: 33.2%;")
+
+		a.mainmenu(href="#", title="Menu")
+			img.i(src="http://pu.bli.sh/images/menu_button.svg")
+
+		div.dropdown
+			//
+				div.submenu
+					a#mySearch.ui
+						i.fa.fa-search
+					input(type="search", placeholder="search")
+			a.submenu.drop(href="/timeline/"+menuData.pageindex+"/"+(menuData.content.length-1)+"/"+infowindow+"/"+zoom+"/"+lat+"/"+lng+"/"+tlstatus+"", title="View on timeline")
+				.ui
+					i.fa.fa-clock-o(class= tlstatus ? "active" : "")
+				span.tb-font-l Timeline
+			a.submenu.drop(href="/map/"+menuData.urltitle+"/"+menuData.pageindex+"/"+(menuData.content.length-1)+"/"+infowindow+"/"+zoom+"/"+lat+"/"+lng+"/"+mapstatus+"", title="View on map")
+				.ui
+					i.fa.fa-map-marker(class= mapstatus ? "active" : "")
+				span.tb-font-l Map
+
+			a.submenu.drop(href="/")
+				.ui
+					i.fa.fa-home
+				span.tb-font-l Home
+			if (loggedin)
+				a.submenu.drop(href="/api/publish/"+ null +"")
+					.ui
+						i.fa.fa-user-o
+					span.tb-font-l My Pages
+				if (menuData.publishers[0].username === loggedin)
+					a.submenu.drop(href="/api/initlayout/"+ menuData.urltitle +"")
+						.ui
+							i.fa.fa-pencil-square-o
+						span.tb-font-l Edit Layout
+					a.submenu.drop(href="/api/addfeature/"+menuData.pageindex+"/6/"+contentData.geometry.coordinates[1]+"/"+contentData.geometry.coordinates[0]+"")
+						.ui
+							i.fa.fa-file-text-o
+						span.tb-font-l Write Here
+				a.submenu.drop(href="/logout")
+					.ui
+						i.fa.fa-sign-out
+					span.tb-font-l Log out
+				
+			else
+				a.submenu.drop(href="/login") 
+					.ui
+						i.fa.fa-sign-in
+					span.tb-font-l Login
+				
+				a.submenu.drop(href="/register") 
+					.ui
+						i.fa.fa-id-card-o
+					span.tb-font-l Register
+		div.pullquote
+			if (contentData.properties.media[contentData.properties.media.length-1].caption)
+				span.tb-font-xl.hang #{(contentData.properties.emoji?contentData.properties.emoji:"ⱡ")}
+				span.tb-font-xxl #{contentData.properties.media[contentData.properties.media.length-1].caption}
+				a(href="#"+contentData.properties.media[contentData.properties.media.length-1].index+"")
+					//span.tb-font-xl.over ⟫
+	if (doc)
+		include docgallery.pug
+	else
+		include datagallery.pug
