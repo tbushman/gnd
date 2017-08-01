@@ -11,8 +11,9 @@ div.grid-container
 		a.mainmenu(href="#", title="Menu")
 			img.i(src="http://pu.bli.sh/images/menu_button.svg")
 
-		div.dropdown
-			//
+		//-
+			div.dropdown
+			
 				div.submenu
 					a#mySearch.ui
 						i.fa.fa-search
@@ -60,6 +61,46 @@ div.grid-container
 					span.tb-font-xxl #{contentData.media[contentData.media.length-1].caption}
 					a(href="#"+contentData.media[contentData.media.length-1].index+"")
 						//span.tb-font-xl.over ⟫
+	
+	div.grid-left
+		#wrapper
+			div#tlmodules
+				div.module(href="/")
+					.ui
+						i.fa.fa-home
+					span.tb-font-l Home
+				if (loggedin)
+					if (menuData.publishers[0].username === loggedin)
+						a.module.drop(href="/api/publish")
+							.ui
+								i.fa.fa-user-o
+							span.tb-font-l School
+						each module, j in menuData.content
+							if (j === menuData.content[index].index)
+								a.module.focus.drop(class= tltype, href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "" )
+									.ui
+										img(src="/images/avatars/avatar_1.svg")
+									span.tb-font-l #{menuData.content[index].label}
+							else
+								a.module.drop(href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "")
+									.ui
+										img(src="/images/avatars/avatar_1.svg")
+									span.tb-font-l #{menuData.content[index].label}
+						div.module(href="/logout")
+							.ui
+								i.fa.fa-sign-out
+							span.tb-font-l Log out
+				else
+					a.module(href="/login") 
+						.ui
+							i.fa.fa-sign-in
+						span.tb-font-l Login
+					
+					a.module(href="/register") 
+						.ui
+							i.fa.fa-id-card-o
+						span.tb-font-l Register
+				
 	if (doc)
 		include docgallery.pug
 	else

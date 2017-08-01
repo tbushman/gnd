@@ -5,6 +5,7 @@
 	--panelheight: 85%; 
 	--fontname: 'Open Sans'; 
 	--thumbwidth: 70px; 
+	--iconwidth: 32px;
 	--windowmenu: 115%; 
 	--nowindowmenu: 15%; 
 } 
@@ -18,15 +19,47 @@ body {
 	padding: 0;
 	overflow: hidden;
 }
+
+input, textarea {
+  line-height: normal;
+	background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #9e9e9e;
+  border-radius: 0;
+  outline: none;
+  height: 3rem;
+  width: 100%;
+  font-size: 1rem;
+  margin: 0 0 20px 0;
+  padding: 0;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  -webkit-box-sizing: content-box;
+          box-sizing: content-box;
+  -webkit-transition: all 0.3s;
+transition: all 0.3s;
+}
+button, a[role="button"] {
+	border: 0;
+  font-style: normal;
+  font-size: inherit;
+  text-transform: inherit;
+	background: none;
+	cursor: pointer;
+	background-color: var(--primary);
+	padding: 8px;
+}
+
 circle {
 	pointer-events: auto;
 	cursor: grab;
 }
 i, .i {
-	width: 22px;
-	height: 22px;
-	font-size: 22px;
-
+	width: calc(var(--thumbwidth)/2);
+	height: calc(var(--thumbwidth)/2);
+	font-size: calc(var(--thumbwidth)/2);
+	float: left;
+	margin: 0 auto;
 }
 .avatar {
 	max-width: 250px;
@@ -153,8 +186,8 @@ div.map .pullquote .tb-font-xxl {
 	height: var(--panelheight);
 	width: 100%;
 	display: grid;
-	grid-template-columns: var(--thumbwidth) minmax(-webkit-max-content, 0px) minmax(100%, 180px);
-	grid-template-columns: var(--thumbwidth) minmax(max-content, 0px) minmax(100%, 180px);
+	grid-template-columns: auto minmax(-webkit-max-content, 0px) minmax(100%, 180px);
+	grid-template-columns: auto minmax(max-content, 0px) minmax(100%, 180px);
 	grid-template-rows:  auto auto auto;
 	background-color: rgba(255,255,255,0);
 	background-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 0, rgba(255, 255, 255, 0) calc(var(--thumbwidth) / 2), rgba(255, 255, 255, 0.9) calc(var(--thumbwidth) / 2));
@@ -254,13 +287,14 @@ div.map .grid-header.mainHeader {
 a.grid-header:hover {
 	color: var(--secondary);
 }
-.grid-left, #tl {
+.grid-left {
 	position: relative;
 	grid-area: sideleft;
 	overflow: hidden;
 	pointer-events: none;
 	background-color: rgba(255,255,255,0);
 	background-color: rgba(255,255,255,0.5);
+	min-width: var(--thumbwidth);
 	/*background-image: radial-gradient(circle at 30px 0, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 0.5) 19px);*/
 }
 @supports not (display:grid) {
@@ -548,76 +582,65 @@ div.dropdown {
 		left: var(--thumbwidth);
 	}*/
 }
-.submenu {
-	height: 100%;
-	pointer-events: auto;
-	display: inline-block;
-	position: relative;
-	padding: 0;
-	width: calc(100% - 2px);
-	margin: 0;
-}
-.submenu:hover {
-	background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 1)),  color-stop(rgba(244, 245, 246, 0.9)), to(rgba(255, 255, 255, 0.1)));
-	background: linear-gradient(to right, rgba(255, 255, 255, 1),  rgba(244, 245, 246, 0.9), rgba(255, 255, 255, 0.1));
-	background-repeat: no-repeat;
-	cursor: pointer;
-	pointer-events: auto;
-}
-.submenu.drop {
-	padding: 0 8px;
-	width: auto;
-	max-width: calc(100% + 50px);
-	min-width: calc(100% - 10px);
-	margin: 0 0 0 -8px;
-}
-.submenu input {
-	position: relative;
-	display: none;
-	outline: none;
-	border:1px solid #dbdbdb;
-	left: 0;
-	width: calc(100% - 2px);
-	bottom: auto;
-	background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0.2)), to(rgba(244, 245, 246, 1)));
-	background: linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(244, 245, 246, 1));
-	background-color: rgba(255,255,255,0.7);
-	pointer-events: auto;
-	padding: 8px 0 8px 10px;
-	right: 0;
-	margin: 0 0 0 -8px;
-	line-height: 1.9em;
-	
-}
-.submenu input:focus {
-	display: inline-block;
-}
-.submenu .ui {
-	width: 16.666%;
-	display: inline-block;
-	margin-left: -48px;
-	float: left;
-	text-align: center;
-	height: 2em;
-}
-.submenu .ui i.fa {
-	font: normal normal normal 22px/1.9 FontAwesome;
-	padding: 0 8px 0 3px;
+.module {
 	width: 100%;
+	float: left;
+	right: 0;
+	padding: 19px 0 0 0;
+	min-width: var(--thumbwidth);
+	-webkit-box-sizing: border-box;
+	        box-sizing: border-box;
+	pointer-events: auto;
+	background-color: var(--secondary);
+	display: inline-block;
+	margin: 0 auto;
+	height: auto;
+	min-height: var(--thumbwidth);
 }
-.submenu:hover .ui i.fa, .submenu:focus .ui i.fa {
+.module input:focus {
+	display: inline-block;
+}
+.module .ui {
+	display: inline-block;
+	margin: 0 auto;
+	float: left;
+	width: var(--thumbwidth);
+}
+.module .ui i.fa {
+	width: 100%;
+	text-align: center;
+	font: normal normal normal var(--iconwidth)/1 FontAwesome;
+}
+.module .ui img {
+	height: var(--thumbwidth);
+	text-align: center;
+	margin: 0 auto;
+	display: inherit;
+
+}
+.module:hover .ui i.fa, .module:focus .ui i.fa {
 	color: var(--primary);
 }
-.submenu.active .ui i.fa {
+.module.active .ui i.fa {
 	color: var(--primary);
 }
-.submenu span {
-	max-width: 66%;
-  line-height: 2em;
-	display: none;
+
+.module > span {
+	text-align: left;
+	display: inline-block;
 	height: 1.9em;
+	float: left;
+	text-transform: uppercase;
+	letter-spacing: 0.09em;
+	padding: 7px 0 4px 4px;
+	color: #555;
+	text-shadow: 0 0 2px #fff;
+	-moz-text-shadow: 0 0 2px #fff;
+	-webkit-text-shadow: 0 0 2px #fff;
+	z-index:1;
+	margin: 0 auto;
 }
-.submenu:hover span, .submenu:hover input {
+.module:hover span {
 	display: inline-block;
 }
 #mySearch {
@@ -668,18 +691,17 @@ div.dropdown {
 	cursor: grab;
 	display: inline-block;
 	margin-top: 0;
+	top: var(--nowindowheight);
 }
-.module {
-	position: absolute;
-	float: right;
+/*.module {
+	float: left;
 	right: 0;
 	padding: 19px 0 0 0;
-	width: var(--thumbwidth);
+	min-width: var(--thumbwidth);
 	-webkit-box-sizing: border-box;
 	        box-sizing: border-box;
 	pointer-events: auto;
 	background-color: var(--secondary);
-	/*border: 1px #fff solid;*/
 	display: inline-block;
 	margin: 0 auto;
 	height: auto;
@@ -693,11 +715,12 @@ div.dropdown {
 	letter-spacing: 0.09em;
 	padding: 7px 0 4px 4px;
 	color: #555;
-	/*white-space: nowrap;*/
 	text-shadow: 0 0 2px #fff;
 	-moz-text-shadow: 0 0 2px #fff;
 	-webkit-text-shadow: 0 0 2px #fff;
 	z-index:1;
+	margin: 0 auto;
+	display: inline-block;
 }
 .module > .overlay {
 	min-width: 100%;
@@ -715,7 +738,6 @@ div.dropdown {
 	z-index: 5;
 }
 .module.focus {
-	/*background-image: radial-gradient(circle 20px at 29px 0, rgba(255, 255, 255, 0) 99%, var(--secondary) 99%);*/
 	background-color: var(--secondary);
 	background-repeat: no-repeat;
 }
@@ -725,13 +747,17 @@ div.dropdown {
 }
 .focus:hover {
 	z-index: 1;
-}
-#tlmodules, #tllabels {
+}*/
+#tlmodules {
 	min-height: 1px;
-	width: 100%;
+	width: var(--thumbwidth);
 	-webkit-box-sizing: border-box;
 	        box-sizing: border-box;
 	float: left;
+}
+#tlmodules.active {
+	width: auto;
+	min-width: 250px;
 }
 .hovertext {
 	-ms-transform: rotate(90deg);
