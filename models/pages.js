@@ -1,6 +1,5 @@
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-	Content = require('./content.js');
+	Schema = mongoose.Schema;
 	
 
 var Page = new Schema({
@@ -16,32 +15,26 @@ var Page = new Schema({
 		trim: true
 	},
 	content: [ {
-  	index: {
-      type: Number,
-      unique: true,
-      default: 0
-    },
-  	properties: {
-  		pid: Number,
-  		label: String,
-  		user: String,
-  		title: String,
-  		description: String,
-  		media: [
-  			{
-  				index: Number,
-  				name: String,
-  				image: String,
-  				iframe: String,
-  				thumb: String,
-  				caption: String
-  			}
-  		]		
-  	}
-  } ],
+		index: Number,
+		pid: Number,
+		label: String,
+		title: String,
+		description: String,
+		current: Boolean,
+		media: [
+			{
+				index: Number,
+				name: String,
+				image: String,
+				iframe: String,
+				thumb: String,
+				caption: String
+			}
+		]
+	} ],
 	publishers: []
 	
 }, { collection: 'pages' });
 
-
+//Page.index({ 'content.$.index': 1 }, { unique: true, dropDups: true });
 module.exports = mongoose.model('Page', Page);

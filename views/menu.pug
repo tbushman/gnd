@@ -1,7 +1,7 @@
 div.menu(class= type)
 	div.topRight(style="background-image:url('"+imageUrl+"')")
 		div.overtext #{menuData.pagetitle}
-		div.blogname #{menuData.content[index].properties.title}
+		div.blogname #{menuData.content[index].title}
 	div.topLeft(style="background-image:url('"+imageUrl+"')")
 
 div.grid-container
@@ -17,33 +17,27 @@ div.grid-container
 					a#mySearch.ui
 						i.fa.fa-search
 					input(type="search", placeholder="search")
-			a.submenu.drop(href="/timeline/"+menuData.pageindex+"/"+(menuData.content.length-1)+"/"+infowindow+"/"+zoom+"/"+lat+"/"+lng+"/"+tlstatus+"", title="View on timeline")
-				.ui
-					i.fa.fa-clock-o(class= tlstatus ? "active" : "")
-				span.tb-font-l Timeline
-			a.submenu.drop(href="/map/"+menuData.urltitle+"/"+menuData.pageindex+"/"+(menuData.content.length-1)+"/"+infowindow+"/"+zoom+"/"+lat+"/"+lng+"/"+mapstatus+"", title="View on map")
-				.ui
-					i.fa.fa-map-marker(class= mapstatus ? "active" : "")
-				span.tb-font-l Map
-
 			a.submenu.drop(href="/")
 				.ui
 					i.fa.fa-home
 				span.tb-font-l Home
+
 			if (loggedin)
-				a.submenu.drop(href="/api/publish/"+ null +"")
+				if (menuData.publishers[0].username === loggedin)
+					a.submenu.drop(href="/ingredients/"+menuData.pageindex+"/"+contentData.index+"/"+infowindow+"/"+tlstatus+"", title="View pantry")
+						.ui
+							i.fa.fa-clock-o(class= tlstatus ? "active" : "")
+						span.tb-font-l My pantry
+
+					a.submenu.drop(href="/api/addfeature/"+menuData.pageindex+"")
+						.ui
+							i.fa.fa-shopping-basket
+						span.tb-font-l Get groceries
+				a.submenu.drop(href="/api/publish")
 					.ui
 						i.fa.fa-user-o
 					span.tb-font-l My Pages
-				if (menuData.publishers[0].username === loggedin)
-					a.submenu.drop(href="/api/initlayout/"+ menuData.urltitle +"")
-						.ui
-							i.fa.fa-pencil-square-o
-						span.tb-font-l Edit Layout
-					a.submenu.drop(href="/api/addfeature/"+menuData.pageindex+"/6/"+contentData.geometry.coordinates[1]+"/"+contentData.geometry.coordinates[0]+"")
-						.ui
-							i.fa.fa-file-text-o
-						span.tb-font-l Write Here
+
 				a.submenu.drop(href="/logout")
 					.ui
 						i.fa.fa-sign-out
@@ -60,11 +54,12 @@ div.grid-container
 						i.fa.fa-id-card-o
 					span.tb-font-l Register
 		div.pullquote
-			if (contentData.properties.media[contentData.properties.media.length-1].caption)
-				span.tb-font-xl.hang #{(contentData.properties.emoji?contentData.properties.emoji:"ⱡ")}
-				span.tb-font-xxl #{contentData.properties.media[contentData.properties.media.length-1].caption}
-				a(href="#"+contentData.properties.media[contentData.properties.media.length-1].index+"")
-					//span.tb-font-xl.over ⟫
+			//-
+				if (contentData.media[contentData.media.length-1].caption)
+					span.tb-font-xl.hang #{(contentData.emoji?contentData.emoji:"ⱡ")}
+					span.tb-font-xxl #{contentData.media[contentData.media.length-1].caption}
+					a(href="#"+contentData.media[contentData.media.length-1].index+"")
+						//span.tb-font-xl.over ⟫
 	if (doc)
 		include docgallery.pug
 	else

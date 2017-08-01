@@ -7,22 +7,10 @@ html
 		link(rel="stylesheet", href="/stylesheets/leaflet.css")
 		link(rel="stylesheet", href="/stylesheets/default.css", type="text/css")
 		link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css")
-
-		if (doc)
-			style(type="text/css") #{doc.css.string}
-			if (doc.css.font.a.name)
-				link(href="https://fonts.googleapis.com/css?family="+doc.css.font.a.name.split(' ').join('+')+"", rel="stylesheet")
-				link(href="https://fonts.googleapis.com/css?family="+doc.css.font.b.name.split(' ').join('+')+"", rel="stylesheet")
-				link(href="https://fonts.googleapis.com/css?family="+doc.css.font.c.name.split(' ').join('+')+"", rel="stylesheet")
-			else
-				link(href="https://fonts.googleapis.com/css?family="+doc.css.font.name.split(' ').join('+')+"", rel="stylesheet")
-		else
-			if (data)
-				style(type="text/css") #{data[0].css.string}
-			link(href="https://fonts.googleapis.com/css?family=Roboto", rel="stylesheet")
+		link(href="https://fonts.googleapis.com/css?family=Roboto", rel="stylesheet")
 		
 		script(type="text/javascript", src="/scripts/jquery.min.js")
-		script(type="text/javascript", src="/scripts/jquery-ui.min.js")
+		//script(type="text/javascript", src="/scripts/jquery-ui.min.js")
 		script(type="text/javascript", src="/scripts/leaflet.js")
 		script(type="text/javascript", src="/scripts/marked.min.js")
 		script(src="https://use.fontawesome.com/b9a4978394.js")

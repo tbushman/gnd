@@ -13,31 +13,32 @@ block content
 			- var pageIndex = pageindex
 			- var menuData = data[pageindex]
 		else
-			- var pageIndex = false
-			if (data[data.length-1].content[data[data.length-1].content.length-1].properties.media[0] !== undefined)
+			- var pageIndex = data[data.length-1].pageindex
+			if (data[data.length-1].content[data[data.length-1].content.length-1].media[0] !== undefined)
 				- var menuData = data[data.length-1]
 			else
 				- var menuData = data[0]
 	if (index)
 		- var contentData = menuData.content[index]
-		- var imageUrl = contentData.properties.media[contentData.properties.media.length-1].image
+		- var imageUrl = contentData.media[contentData.media.length-1].image
 	else
-		if (menuData.content[menuData.content.length-1].properties.media[0] !== undefined)
+		if (menuData.content[menuData.content.length-1].media[0] !== undefined)
 			- var index = menuData.content[menuData.content.length-1].index
 			- var contentData = menuData.content[menuData.content.length-1]
-			- var imageUrl = contentData.properties.media[0].image
+			- var imageUrl = contentData.media[0].image
 		else
-			if (menuData.content[menuData.content.length-1].properties.media[menuData.content[menuData.content.length-1].properties.media.length-1] !== undefined)
+			if (menuData.content[menuData.content.length-1].media[menuData.content[menuData.content.length-1].media.length-1] !== undefined)
 				- var index = menuData.content[menuData.content.length-1].index
 				- var contentData = menuData.content[menuData.content.length-1]
-				- var imageUrl = contentData.properties.media[contentData.properties.media.length-1].image
+				- var imageUrl = contentData.media[contentData.media.length-1].image
 			else
 				- var index = 0
 				- var contentData = menuData.content[0]
-				if (contentData.properties.media[0] !== undefined)
-					- var imageUrl = contentData.properties.media[0].image
+				if (contentData.media[0] !== undefined)
+					- var imageUrl = contentData.media[0].image
 				else
 					- var imageUrl = ""
+	input(type="hidden", value= pageIndex, id="pageindex")
 		//-
 			navigation
 	div#select(class= type)
@@ -47,15 +48,15 @@ block content
 		initiate map + event listeners
 	script(type="text/javascript").
 		const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-		var data = `#{data}`
-		var pageindex = '#{pageindex}'
-		pageindex = parseInt(pageindex, 10)
-		console.log('this pageindex'+pageindex)
+		var data = `'#{data}'`
+		/*var pageindex = '#{pageindex}'*/
+		var pageIndex; 
 		
 		$(document).ready(function(){
-			
+			pageIndex = parseInt(document.getElementById('pageindex').value, 10);
+			console.log('this pageindex'+pageIndex)
 			var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
-			$('.grid-header.mainHeader').css('height', topmargin + 30 + 'px');
+			$('.grid-header.mainHeader').css('height', (topmargin + 30) + 'px');
 			$('textarea').each(function(){
 				var text;
 				if ($(this).val()) {
@@ -68,11 +69,6 @@ block content
 				} 
 			});
 			
-			if (window.location.pathname.split('/')[2] === 'addfeature' || window.location.pathname.split('/')[2] === 'editcontent') {
-				//if in edit mode
-				$('#tl').hide();
-				$('#arrows').hide();
-			}
 			$('.list > .ms-Panel-main').css({display: 'none'})
 			$('.list').removeClass('is-open')
 			$('.list').css({display: 'none'})
@@ -103,7 +99,7 @@ block content
 			e.stopPropagation();
 		});
 		//search
-		$(document).on('change', '#mySearch', function(e){
+		/*$(document).on('change', '#mySearch', function(e){
 			e.preventDefault();
 			$('.searchbox').slideUp(100);
 			$('.searchbox').remove();
@@ -122,29 +118,24 @@ block content
 					$('.searchbox').append('<a class="drop ms-Grid-col ms-u-sm12" href="/'+response[i].username+'"><span class="ms-font-l">'+response[i].username+'</span></a>')
 				}
 			})
-		})
+		})*/
 				
 		//gallery
 		$(document).on('click', 'a.thumbnail', function(e){
 			e.preventDefault()
 			var imgindex = $(this).attr('id')
 			var userid = $(this).attr('name').split('@')[0]
-			//zoom = map.getZoom();
-			//var center = map.getCenter()
-			//var lat = center.lat;
-			//var lng = center.lng;
-			
 			if ($(this).hasClass('gallery')) {
 				var windex = $(this).attr('name').split('@')[1];
 				//var index = windex.split('all_')[1];
-				$.post('/gallery/'+pageid+'/'+windex+'/'+imgindex+'/'+#{zoom}+'/'+#{lat}+'/'+#{lng}+'', function(){
-					window.location.href = '/gallery/'+pageid+'/'+windex+'/'+imgindex+'/'+#{zoom}+'/'+#{lat}+'/'+#{lng}+'#scrollto_'+index+'@'+imgindex+''
+				$.post('/gallery/'+pageid+'/'+windex+'/'+imgindex+'', function(){
+					window.location.href = '/gallery/'+pageid+'/'+windex+'/'+imgindex+'/#scrollto_'+index+'@'+imgindex+''
 				})
 			} else {
 				var windex = $(this).attr('name').split('@')[1];
 				
-				$.post('/gallery/'+pageid+'/'+windex+'/'+imgindex+'/'+#{zoom}+'/'+#{lat}+'/'+#{lng}+'', function(){
-					window.location.href = '/gallery/'+pageid+'/'+windex+'/'+imgindex+'/'+#{zoom}+'/'+#{lat}+'/'+#{lng}+''
+				$.post('/gallery/'+pageid+'/'+windex+'/'+imgindex+'', function(){
+					window.location.href = '/gallery/'+pageid+'/'+windex+'/'+imgindex+''
 				})
 			}
 			return false;
@@ -234,7 +225,7 @@ block content
 		$(document).on('click', '#deletefeature', function(){
 
 			if ($('#deletefeature span').css('display') === 'block') {
-				$(this).attr("href", "/api/deletefeature/"+#{pageindex}+"/"+#{index}+"");
+				$(this).attr("href", "/api/deletefeature/"+pageIndex+"/"+#{index}+"");
 			} else {
 				$('#deletefeature span').css('display', 'block')
 			}
@@ -259,19 +250,20 @@ block content
 			}
 		})
 		//live update of 'layout' / wip
-		//-
-			$('#inputtext').on('mouseup', function(e){
+		/*
+				$('#inputtext').on('mouseup', function(e){
+						
+					var whole = e.target.value.split("")
+					var selObj = window.getSelection();
+					console.log(selObj.toString());
+					var selRange = selObj.getRangeAt(0)
+					console.log(selRange)
+					var select = selObj.toString();
 					
-				var whole = e.target.value.split("")
-				var selObj = window.getSelection();
-				console.log(selObj.toString());
-				var selRange = selObj.getRangeAt(0)
-				console.log(selRange)
-				var select = selObj.toString();
-				
-				whole.splice(selObj.focusOffset, selObj.length, "<span class='highlight'>"+select+"</span>");
-				$('#previewtext').html(marked(whole.join("")))
-			})
+					whole.splice(selObj.focusOffset, selObj.length, "<span class='highlight'>"+select+"</span>");
+					$('#previewtext').html(marked(whole.join("")))
+				})
+		*/
 		$('#inputtext').on('keyup', function(e){
 			$('#previewtext').html(marked(e.target.value))
 		});
@@ -281,200 +273,3 @@ block content
 			}
 		})
 		
-		//media editor (canvas)
-		var counter; 
-		var uploadurl;
-		var index;
-		var img;
-		var ifdata;
-		var pagedata = $('#pagedata').val();
-		if (datalength > 0) {
-			ifdata = 1;
-		} else {
-			ifdata = -1;
-		}
-		
-		
-		$(document).on('change', '#media', function(e){
-			e.preventDefault();
-			if (counter === undefined){
-				counter = medialength;
-			}
-			if (window.location.pathname.split('/')[2] === 'addfeature') {
-				index = #{index} + 1
-			} else {
-				index = #{index}
-			}
-			$('#appendcanvas').prepend('<div class="ms-ListItem-image spacer" style="margin: 10px 10px 10px 0"><canvas id="canvas'+counter+'"></canvas></div><div class="ms-Grid-row"><img id="return'+counter+'"></img><input type="hidden" id="inputthumb'+counter+'" name="thumb'+counter+'"></input><input type="hidden" id="inputimg'+counter+'" name="img'+counter+'"></input></div><div class="ms-Grid-row"><div class="ms-Grid-col ms-u-sm12"><div class="ms-TextField"><label class="ms-Label"> Image Title </label><input class="ms-TextField-field" type="text" name="img'+counter+'_name"></input></div><div class="ms-TextField"><label class="ms-Label"> Image Caption </label><textarea class="ms-TextField-field" type="text" name="img'+counter+'_caption"></textarea></div><div class="ms-TextField"><label class="ms-Label"> Image URL </label><input class="ms-TextField-field" type="text" name="img'+counter+'_url"></input></div></div>')
-			setTimeout(function(){
-				processImage()	
-			}, 200)
-					
-		});
-		
-		function processImage() {
-			
-			var dataurl = null;
-			var filesToUpload = document.getElementById('media').files;
-			var file = filesToUpload[0];
-			var imagefile = file.type;
-			console.log(file.name)
-			var imageTypes= ["image/jpeg","image/png","image/jpg"];
-			if(imageTypes.indexOf(imagefile) == -1) {
-				if (imagefile == "application/pdf") {
-					var fd = new FormData();
-
-					fd.append("img", file);
-					var urltitle = $('#urltitle').val();
-					uploadurl = '/api/uploadmedia/'+urltitle+'/'+index+'/'+counter+'/pdf';
-
-					console.log(uploadurl)
-					$.ajax({
-						url: uploadurl,
-						type: 'POST',
-						data: fd,
-						processData: false,
-						contentType: false,
-						success: function(response) { 
-							
-							$('#inputthumb'+counter+'').val('/images/publish_logo_sq.svg')
-							$('#inputimg'+counter+'').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''))
-							$('#canvas'+counter+'').parent().append('<img src="/images/publish_logo_sq.svg"></img>');
-							$('#canvas'+counter+'').remove();
-							countUp(counter)
-						}
-					})
-				} else {
-					$("#info").html("<span class='msg-error'>Please Select A valid Image File</span><br /><span>Only jpeg, jpg, png, and pdf types allowed</span>");
-					return false;
-				}
-				
-			} else {
-				img = document.getElementById('return'+counter+'');
-				var reader = new FileReader();
-			
-				reader.onloadend = function(e) {
-					var maxWidth = 1200 ;
-					var maxHeight = 1200 ;
-					img.src = e.target.result;
-					img.onload = function () {
-
-						$('#media').val('')
-						var w = img.width;
-						var h = img.height;
-						var can = $('#canvas'+counter+'')[0];
-						checkImage(can, w, h, maxWidth, maxHeight)
-					}
-				}
-				reader.readAsDataURL(file);
-			}
-		}
-		
-		function reSize(can, w, h, maxWidth, maxHeight){
-			can.height = h*0.75;
-			can.width = w*0.75;
-
-			var can2 = document.createElement('canvas');
-			can2.width = w*0.75;
-			can2.height = h*0.75;
-			var ctx2 = can2.getContext('2d');
-
-			ctx2.drawImage(img, 0, 0, w*0.75, h*0.75);
-			var ctx = can.getContext('2d');
-			ctx.drawImage(can2, 0, 0, w*0.75, h*0.75, 0, 0, w*0.75, h*0.75);
-			w = w*0.75;
-			h = h*0.75;
-			img.width = w;
-			img.height = h;
-			checkImage(can, w, h, maxWidth, maxHeight)
-		}
-		function checkImage(can, w, h, maxWidth, maxHeight) {
-			
-			
-			if (h > maxHeight) {
-				console.log('half')
-				reSize(can, w, h, maxWidth, maxHeight)
-			} else {
-				if (maxHeight === 200) {
-					drawThumb(can, w, h)
-				} else {
-					drawImage(can, w, h)
-				}						
-			}						
-		}	
-			
-		function drawImage(can, w, h) {
-			can.height = h;
-			can.width = w;
-			var ctx = can.getContext('2d');
-			ctx.drawImage(img, 0, 0, w, h);
-			if (!HTMLCanvasElement.prototype.toBlob) {
-				Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-					value: function (callback, type, quality) {
-
-						var binStr = atob( this.toDataURL(type, quality).split(',')[1] ),
-							len = binStr.length,
-							arr = new Uint8Array(len);
-
-						for (var i = 0; i < len; i++ ) {
-							arr[i] = binStr.charCodeAt(i);
-						}
-
-						callback( new Blob( [arr], {type: type || 'image/png'} ) );
-					}
-				});
-			}
-			can.toBlob(function(blob) {
-				var fd = new FormData();
-				
-				fd.append("img", blob);
-				var urltitle = $('#urltitle').val();
-				
-				uploadurl = '/api/uploadmedia/'+urltitle+'/'+index+'/'+counter+'/jpeg';
-
-				console.log(blob)
-				console.log(uploadurl)
-				$.ajax({
-					url: uploadurl,
-					type: 'POST',
-					data: fd,
-					processData: false,
-					contentType: false,
-					success: function(response) { 
-						img.src = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
-						img.onload = function () {
-							$('#inputimg'+counter+'').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''))
-							var can = $('#canvas'+counter+'')[0];
-							var maxWidth = 200 ;
-							var maxHeight = 200 ;								
-							var w = img.width;
-							var h = img.height;
-							checkImage(can, w, h, maxWidth, maxHeight)
-						}
-					}
-				})
-			}, 'image/jpeg', 0.95);
-		}
-		function drawThumb(can, w, h) {
-			can.height = h;
-			can.width = w;
-			var ctx = can.getContext('2d');
-			ctx.drawImage(img, 0, 0, w, h);
-			dataurl = can.toDataURL("image/jpeg", 0.8);
-			setTimeout(function(){
-				
-				$('#inputthumb'+counter+'').val(dataurl.replace(/data:image\/jpeg;base64,/, ''))
-				countUp(parseInt(counter, 10))
-								
-			}, 100)
-		}
-		function countUp(count) {
-			if ((count+1) - medialength === 3) {
-				$('#media').css('display: none')
-				return false;
-			} else {
-				count++;
-				counter = count;
-			}
-			
-		}

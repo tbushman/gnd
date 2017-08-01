@@ -14,7 +14,6 @@ var Publisher = new Schema({
 	},
 	password: String,
 	email: String,
-	content: [  ],
 	avatar: String
 	
 }, { collection: 'publishers' });

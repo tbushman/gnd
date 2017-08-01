@@ -19,6 +19,7 @@ var Publisher = require('./models/publishers');
 var Page = require('./models/pages');
 var async = require('async');
 var Content = require('./models/content');
+var favicon = require('serve-favicon');
 mongoose.Promise = promise;
 dotenv.load();
 
@@ -42,7 +43,7 @@ passport.deserializeUser(function(id, done) {
 
 var store = new MongoDBStore(
 	{
-		uri: 'mongodb://localhost/session_pu',
+		uri: 'mongodb://localhost/session_sfusd',
         collection: 'mySessions'
 	}
 )
@@ -70,7 +71,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.locals.appTitle = 'SFUSD Design';
-//app.use(favicon(path.join(__dirname, 'public/img', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public/img', 'favicon.ico')));
 app.locals.moment = require('moment');
 app.locals.$ = require('jquery');
 app.locals.fs = require('fs');
@@ -85,6 +86,12 @@ app.use('/', routes);
 app.use(function (err, req, res, next) {
 
 	console.log(err.stack)
+	req.app.locals.username = null;
+	req.app.locals.userId = null;
+	req.app.locals.zoom = null;
+	req.app.locals.loggedin = null;
+	delete req.app.locals.pageTitle;
+	req.logout();
 	res.status(err.status || 500).send({
 	    message: err.message,
 	    error: err.status
@@ -98,8 +105,11 @@ app.use(function (req, res, next) {
 
 var uri = process.env.DEVDB;
 
-mongoose.connect(uri, {authMechanism: 'ScramSHA1'});
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+var promise = mongoose.connect(uri, { useMongoClient: true }/*, {authMechanism: 'ScramSHA1'}*/);
+promise.then(function(db){
+	db.on('error', console.error.bind(console, 'connection error:'));
+})
+//var db = mongoose.connection;
+
 
 module.exports = app;
