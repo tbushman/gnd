@@ -288,7 +288,7 @@ a.grid-header:hover {
 	color: var(--secondary);
 }
 .grid-left {
-	position: relative;
+	position: static;
 	grid-area: sideleft;
 	overflow: hidden;
 	pointer-events: none;
@@ -478,7 +478,7 @@ div.dashboard .menu {
 	width: 100%;
 	height: var(--nowindowmenu);
 }
-div.topRight {
+#canvas.topRight {
 	position: fixed;
 	font-family: var(--bfontname), sans-serif;
 	font-size: 2vh;	
@@ -491,7 +491,8 @@ div.topRight {
 	bottom: auto;
 	height: 100%;
 	color: var(--secondary);
-	pointer-events: none;
+	
+	/*pointer-events: none;*/
 	padding: calc(var(--nowindowmenu)/3.7) 11px 11px 0;
 	background-color: rgba(255,255,255,0);
 	background-attachment: fixed;
@@ -549,7 +550,7 @@ a.mainmenu {
 	position: absolute;
 	top: -10px;
 	/*top: calc(var(--windowmenu) - 15px);*/
-	left: calc(var(--thumbwidth) / 3);
+	left: calc(var(--thumbwidth) / 4);
 	right: auto;
 	bottom: auto;
 	height: auto;
@@ -567,8 +568,7 @@ a.mainmenu {
 	}
 }
 div.dropdown {
-	padding: 21px 0 0 0;
-	margin: 5px 0;
+	margin: var(--iconwidth) 0;
 	/*background: radial-gradient(ellipse at 0 50%, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));*/
 	background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 1)),  to(rgba(255, 255, 255, 0.3)));
 	background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.3));
@@ -612,7 +612,7 @@ div.dropdown {
 	font: normal normal normal var(--iconwidth)/1 FontAwesome;
 }
 .module .ui img {
-	height: var(--thumbwidth);
+	width: 2em;
 	text-align: center;
 	margin: 0 auto;
 	display: inherit;
@@ -627,7 +627,7 @@ div.dropdown {
 
 .module > span {
 	text-align: left;
-	display: inline-block;
+	display: none;
 	height: 1.9em;
 	float: left;
 	text-transform: uppercase;
@@ -640,7 +640,7 @@ div.dropdown {
 	z-index:1;
 	margin: 0 auto;
 }
-.module:hover span {
+.module:hover span, .module:focus span, .module.selected span {
 	display: inline-block;
 }
 #mySearch {
@@ -686,7 +686,9 @@ div.dropdown {
 	height: auto;
 	min-height: 100%;
 	position: absolute;
+	width: auto;
 	min-width: var(--thumbwidth);
+	max-width: 100%;
 	cursor: -webkit-grab;
 	cursor: grab;
 	display: inline-block;
@@ -755,9 +757,13 @@ div.dropdown {
 	        box-sizing: border-box;
 	float: left;
 }
-#tlmodules.active {
+#tlmodules:hover {
+	width: 250px;
+}
+#tlmodules:focus, #tlmodules .module.selected, #tlmodules .module:focus {
 	width: auto;
 	min-width: 250px;
+	background-color: #fff;
 }
 .hovertext {
 	-ms-transform: rotate(90deg);
@@ -800,9 +806,10 @@ div.dropdown {
 	margin-bottom: -19px;
 	white-space: nowrap;
 }
-.module.hover > .time {
-	color: #fff;
+.module.dropdown:hover, .module.dropdown:focus {
+	background-color: #fff;
 }
+
 #tllabels {
 	height: 100%;
 }
@@ -880,7 +887,8 @@ div.dropdown {
 	color: rgba(244,245,246,0.9);
 }
 .actions .tb-font-xxs {
-	letter-spacing: 0.1vw;
+	letter-spacing: 0.1em;
+	line-height: calc(var(--thumbwidth)/2.5);
 }
 #closepanel {
 	position: fixed;

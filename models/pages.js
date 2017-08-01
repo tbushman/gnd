@@ -21,16 +21,8 @@ var Page = new Schema({
 		title: String,
 		description: String,
 		current: Boolean,
-		media: [
-			{
-				index: Number,
-				name: String,
-				image: String,
-				iframe: String,
-				thumb: String,
-				caption: String
-			}
-		]
+		substrates: [],
+		filling: []
 	} ],
 	publishers: []
 	

@@ -11,17 +11,17 @@ div.grid-right
 			a.grid-header(href="/"+entry.pagetitle+"")
 				p.tb-font-l #{entry.pagetitle}
 			div.grid-left
-				if (entry.content[entry.content.length-1].media.length > 0)
+				if (entry.content[entry.content.length-1].substrates.length > 0)
 					div.thumbnail.gallery(id= entry.pageindex, name= entry._id + "@all_" + entry.pageindex)
 						div.actions
-							//if (entry.content[entry.content.length-1].media[0].url)
+							//if (entry.content[entry.content.length-1].substrates[0].url)
 							span.tb-font-s by 
 							br
 							span.tb-font-xxs #{entry.publishers[0].username}
-						img(src= entry.content[entry.content.length-1].media[0].thumb)
+						img(src= entry.content[entry.content.length-1].substrates[0].thumb)
 					div#hide
-						if (entry.content[entry.content.length-1].media[0].name !== '')
-							span.tb-font-xxs #{entry.content[entry.content.length-1].media[0].name}
+						if (entry.content[entry.content.length-1].substrates[0].name !== '')
+							span.tb-font-xxs #{entry.content[entry.content.length-1].substrates[0].name}
 
 
 			div.grid-right

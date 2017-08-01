@@ -457,11 +457,16 @@ router.get('/api/publish', function(req, res, next) {
 								index: 0,
 								pid: data.length,
 								user: req.app.locals.user._id,
-								title: 'Edit Title',
-								label: 'First Post',
-								description: 'Edit Body',
+								title: 'Peanut Butter and Jelly',
+								label: 'Sandwich',
+								description: 'My first sandwich',
 								current: true,
-								media: [ ]
+								substrates: [ 
+									thestore.substrates[0]
+								],
+								filling: [ 
+									thestore.filling[0]
+								]
 							} ],
 							publishers: [{
 								_id: req.app.locals.user._id,

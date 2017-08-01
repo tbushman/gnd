@@ -1,14 +1,16 @@
 div.menu(class= type)
-	div.topRight(style="background-image:url('"+imageUrl+"')")
+	canvas#canvas.topRight
+	//(style="background-image:url('"+imageUrl+"')")
 		div.overtext #{menuData.pagetitle}
 		div.blogname #{menuData.content[index].title}
-	div.topLeft(style="background-image:url('"+imageUrl+"')")
+	div.topLeft
+	//(style="background-image:url('"+imageUrl+"')")
 
 div.grid-container
 	div.grid-header.mainHeader
 		//#app(style="pointer-events:none;display: inline-block;float: left;margin: 0 auto;width: auto;position: absolute;z-index: 50;height: 33.2%;")
 
-		a.mainmenu(href="#", title="Menu")
+		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="http://pu.bli.sh/images/menu_button.svg")
 
 		//-
@@ -56,47 +58,49 @@ div.grid-container
 					span.tb-font-l Register
 		div.pullquote
 			//-
-				if (contentData.media[contentData.media.length-1].caption)
+				if (contentData.substrates[contentData.substrates.length-1].caption)
 					span.tb-font-xl.hang #{(contentData.emoji?contentData.emoji:"ⱡ")}
-					span.tb-font-xxl #{contentData.media[contentData.media.length-1].caption}
-					a(href="#"+contentData.media[contentData.media.length-1].index+"")
+					span.tb-font-xxl #{contentData.substrates[contentData.substrates.length-1].caption}
+					a(href="#"+contentData.substrates[contentData.substrates.length-1].index+"")
 						//span.tb-font-xl.over ⟫
 	
 	div.grid-left
 		#wrapper
-			div#tlmodules
-				div.module(href="/")
+			div#tlmodules.dropdown
+				a.module(href="/", title="home")
 					.ui
 						i.fa.fa-home
 					span.tb-font-l Home
 				if (loggedin)
 					if (menuData.publishers[0].username === loggedin)
-						a.module.drop(href="/api/publish")
+						a.module.dropdown(title="inventory")
 							.ui
 								i.fa.fa-user-o
-							span.tb-font-l School
+							span.tb-font-l Create
 						each module, j in menuData.content
 							if (j === menuData.content[index].index)
-								a.module.focus.drop(class= tltype, href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "" )
-									.ui
-										img(src="/images/avatars/avatar_1.svg")
-									span.tb-font-l #{menuData.content[index].label}
-							else
-								a.module.drop(href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "")
-									.ui
-										img(src="/images/avatars/avatar_1.svg")
-									span.tb-font-l #{menuData.content[index].label}
-						div.module(href="/logout")
+								each ing, k in menuData.content[index].substrates
+									a.module.focus.drop(class= tltype, href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "" )
+										.ui
+											img(src="/images/avatars/avatar_1.svg")
+										span.tb-font-l #{ing.name}
+								each ing, l in menuData.content[index].filling
+									a.module.focus.drop(class= tltype, href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "" )
+										.ui
+											img(src="/images/avatars/avatar_1.svg")
+										span.tb-font-l #{ing.name}
+
+						a.module(href="/logout", title="logout")
 							.ui
 								i.fa.fa-sign-out
 							span.tb-font-l Log out
 				else
-					a.module(href="/login") 
+					a.module(href="/login", title="login") 
 						.ui
 							i.fa.fa-sign-in
 						span.tb-font-l Login
 					
-					a.module(href="/register") 
+					a.module(href="/register", title="register") 
 						.ui
 							i.fa.fa-id-card-o
 						span.tb-font-l Register

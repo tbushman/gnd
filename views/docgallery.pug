@@ -3,9 +3,9 @@
 div.grid-mid
 	if (imgindex)
 		if (type === 'image')
-			img(src= contentData.media[imgindex].image)
+			img(src= contentData.substrates[imgindex].image)
 		else
-			embed(src= contentData.media[imgindex].image, width="100%", height="100%")
+			embed(src= contentData.substrates[imgindex].image, width="100%", height="100%")
 
 div.grid-right
 	if (infowindow === 'edit')
@@ -14,7 +14,7 @@ div.grid-right
 		if (index >= 0)
 			div.grid-container.inner
 				div.grid-header
-					each imag, i in contentData.media
+					each imag, i in contentData.substrates
 						a.thumbnail.gallery(href="")
 							img(src=""+imag.image+"")
 					p.tb-font-s.hideoverlap #{contentData.label}
@@ -40,23 +40,23 @@ div.grid-right
 				p.tb-font-xs.hideoverlap
 					!= md(entry.description)
 					span &nbsp ...
-				if (entry.media.length > 0)
+				if (entry.substrates.length > 0)
 					div.thumbnail.gallery(id= entry.pageindex, name= entry._id + "@all_" + entry.pageindex)
-						img(src= entry.media[0].thumb)
+						img(src= entry.substrates[0].thumb)
 					div#hide
-						if (entry.media[0].name === '')
+						if (entry.substrates[0].name === '')
 							span.tb-font-xxs &nbsp
 						else
-							span.tb-font-xxs #{entry.media[0].name}
-						if (entry.media[0].caption === '')
+							span.tb-font-xxs #{entry.substrates[0].name}
+						if (entry.substrates[0].caption === '')
 							span.tb-font-xs &nbsp
 						else
-							span.tb-font-xs #{entry.media[0].caption}
+							span.tb-font-xs #{entry.substrates[0].caption}
 
 						div.ms-ListItem-actions
-							if (entry.media[0].url)
+							if (entry.substrates[0].url)
 								div.ms-ListItem-action
-									a(href= entry.media[0].url, target="_blank")
+									a(href= entry.substrates[0].url, target="_blank")
 										i.ms-Icon.ms-Icon--link
 				hr(style="color: "+doc.css.primary+"")
 		
