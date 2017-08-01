@@ -1,12 +1,5 @@
 - var marked = marked
 
-div.grid-mid
-	if (imgindex)
-		if (type === 'image')
-			img(src= contentData.substrates[imgindex].image)
-		else
-			embed(src= contentData.substrates[imgindex].image, width="100%", height="100%")
-
 div.grid-right
 	if (infowindow === 'edit')
 		include docedit.pug

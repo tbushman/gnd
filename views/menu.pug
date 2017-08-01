@@ -1,6 +1,5 @@
 div.menu(class= type)
-	canvas#canvas.topRight
-	//(style="background-image:url('"+imageUrl+"')")
+	canvas#canvas.topRight(style="background-image:url('/images/backgrounds/lvl_"+1+".svg')")
 		div.overtext #{menuData.pagetitle}
 		div.blogname #{menuData.content[index].title}
 	div.topLeft
@@ -82,7 +81,7 @@ div.grid-container
 								each ing, k in menuData.content[index].substrates
 									a.module.focus.drop(class= tltype, href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "" )
 										.ui
-											img(src="/images/avatars/avatar_1.svg")
+											img(src="/images/ingredients/substrate_"+k+".svg")
 										span.tb-font-l #{ing.name}
 								each ing, l in menuData.content[index].filling
 									a.module.focus.drop(class= tltype, href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "" )

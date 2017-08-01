@@ -80,8 +80,10 @@ block content
 		
 		//drop-down event listener
 		$(document).on('click', 'a.dropdown', function (e) { 
+			//e.preventDefault();
 			var that, main;
 			if ($(this).hasClass('mainmenu')) {
+				$('.menu').css('height', 'var(--nowindowmenu)')
 				that = $('#tlmodules.dropdown');
 				main = true;
 			} else {
@@ -109,7 +111,7 @@ block content
 					$('.grid-header.mainHeader').css('height', topmargin + 30 + 'px');
 				}, 210);
 			}
-			e.stopPropagation();
+			//e.stopPropagation();
 		});
 		//search
 		/*$(document).on('change', '#mySearch', function(e){
@@ -384,7 +386,7 @@ block content
 
 		function PointerHandler(event) {
 		    event.preventDefault();
-
+				console.log(event.type)
 		    if (event.type == "pointerdown" && event.button === 0)
 		        mousePressed = true;
 
@@ -423,7 +425,6 @@ block content
 		function MouseHandler(event) {
 		    if (event.type == "mousedown" && event.button === 0)
 		        mousePressed = true;
-
 		    if (mousePressed && event.button === 0) {
 		        var fakeTouch = {
 		            identifier : 10,

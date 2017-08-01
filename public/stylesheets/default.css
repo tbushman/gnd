@@ -6,7 +6,7 @@
 	--fontname: 'Open Sans'; 
 	--thumbwidth: 70px; 
 	--iconwidth: 32px;
-	--windowmenu: 115%; 
+	--windowmenu: 85%; 
 	--nowindowmenu: 15%; 
 } 
 
@@ -183,8 +183,8 @@ div.map .pullquote .tb-font-xxl {
 	font-size: calc(.8vw + .8vh + 1vmin);
 }
 .grid-container {
-	height: var(--panelheight);
-	width: 100%;
+	height: auto;
+	width: auto;
 	display: grid;
 	grid-template-columns: auto minmax(-webkit-max-content, 0px) minmax(100%, 180px);
 	grid-template-columns: auto minmax(max-content, 0px) minmax(100%, 180px);
@@ -198,27 +198,28 @@ div.map .pullquote .tb-font-xxl {
 		"sideleft footer footer";
 	position: -webkit-sticky;
 	position: sticky;
-	bottom: calc( - var(--nowindowmenu));
+	bottom: calc(var(--nowindowmenu) - var(--panelheight));
+	top: auto;
+	min-height: var(--panelheight);
 	background-color: tomato;
 }
 @supports not (display:grid) {
 	.grid-container {
-		display: block;
+		display: inline-block;
 		position: relative;
-		bottom: 0;
-		top: 0;
+		bottom: auto;
+		top: auto;
 		height: var(--panelheight);
 	}
 }
 @supports not (position:sticky) {
 	.grid-container {
-		display: block;
+		display: inline-block;
 		position: relative;
-		bottom: 0;
-		top: 0;
+		bottom: auto;
+		top: auto;
 		height: var(--panelheight);
 		overflow-y: scroll; 
-		position: absolute;
 	}
 }
 .grid-container.inner {
@@ -341,7 +342,6 @@ a.grid-header:hover {
 	overflow: hidden;
 	overflow-y: scroll;
 	line-height: calc(var(--thumbheight)/3);
-	max-height: 100%;
 	min-height: calc(var(--panelheight) - 220px);
 	max-width: calc(100% - var(--thumbwidth));
 	min-width: 0;
@@ -350,6 +350,9 @@ a.grid-header:hover {
 .grid-container.inner > .grid-right {
 	width: calc(100% - var(--thumbwidth));
 	background-color: blue;
+	min-height: var(--windowmenu);
+	bottom: auto;
+	top: 0;
 }
 @supports not (display:grid) {
 	.grid-right {
@@ -463,12 +466,12 @@ div.menu {
 }
 div.blog > .menu {
 	display: block;
-	bottom: calc(- var(--nowindowmenu));
+	bottom: var(--nowindowmenu);
 	position: -webkit-sticky;
 	position: sticky;
 	pointer-events: auto;
 	width: 100%;
-	height: var(--windowmenu);
+	/*height: var(--windowmenu);*/
 	overflow: hidden;
 	/*z-index: 1;*/
 }
@@ -479,7 +482,7 @@ div.dashboard .menu {
 	height: var(--nowindowmenu);
 }
 #canvas.topRight {
-	position: fixed;
+	position: static;
 	font-family: var(--bfontname), sans-serif;
 	font-size: 2vh;	
 	font-weight: 700;
@@ -497,7 +500,7 @@ div.dashboard .menu {
 	background-color: rgba(255,255,255,0);
 	background-attachment: fixed;
 	background-image:url('');
-	background-position: center center;
+	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
 	-webkit-transition: background-image 1.3s ease-in-out;
@@ -559,12 +562,16 @@ a.mainmenu {
 }
 @supports not(display:grid) {
 	a.mainmenu {
-		left: -41px;
+		position: fixed;
+		left: calc( - var(--thumbwidth) * 0.5);
+		top: var(--thumbwidth);
 	}
 }
 @supports not(position:sticky) {
 	a.mainmenu {
-		left: -41px;
+		position: fixed;
+		left: calc( - var(--thumbwidth) * 0.5);
+		top: var(--thumbwidth);
 	}
 }
 div.dropdown {
@@ -1089,20 +1096,22 @@ a.username:hover > .ms-font-l {
 }
 
 @media (min-height: 600px) {
-	:root { 
-		--panelheight: calc(100% - calc(15% * 0.8)); 
-		--windowmenu: calc(100% + calc(15 * 0.8)); 
-		--nowindowmenu: calc(15% * 0.8); 
-	}
+	/*:root { 
+		--primary: #BAD80A; 
+		--secondary: #C5E3F7; 
+		--panelheight: 85%; 
+		--fontname: 'Open Sans'; 
+		--thumbwidth: 70px; 
+		--iconwidth: 32px;
+		--windowmenu: 85%; 
+		--nowindowmenu: 15%; 
+	}*/
 	div.map {
 		overflow-y: hidden;
 	}
 }
 @media (min-width: 640px) and (orientation: landscape) {
-	div.map {
-		left: calc(50% - calc(var(--thumbwidth) / 2));
-		overflow-y: hidden;
-	}
+	
 
 	#select.map .menu {
 		-webkit-mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 0, rgba(255, 255, 255, 0) calc(var(--thumbwidth) / 2), rgba(255, 255, 255, 1) calc(var(--thumbwidth) / 2));
