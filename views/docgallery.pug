@@ -12,8 +12,9 @@ div.grid-right
 							img(src=""+imag.image+"")
 					p.tb-font-s.hideoverlap #{contentData.label}
 				div.grid-left(style="padding: 6px 0 0 6px;")
-					a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit blog entry")
-						i.fa.fa-edit
+					if (loggedin && loggedin === doc.publishers[0].username)
+						a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit blog entry")
+							i.fa.fa-edit
 				div.grid-right
 					p.tb-font-xl #{contentData.title}
 					p.tb-font-s

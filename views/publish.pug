@@ -1,18 +1,18 @@
 extends layout
 block page
-	if (username)
-		- var menu = 'profile'
-	else
-		- var menu = 'home'
+	
 block content
 	if (doc)
+		- var menu = 'doc'
 		- var menuData = doc
 		- var pageIndex = pageindex
 	else
 		if (pageindex)
+			- var menu = 'doc'
 			- var pageIndex = pageindex
 			- var menuData = data[pageindex]
 		else
+			- var menu = 'home'
 			- var pageIndex = data[data.length-1].pageindex
 			if (data[data.length-1].content[data[data.length-1].content.length-1].substrates[0] !== undefined)
 				- var menuData = data[data.length-1]
@@ -42,14 +42,27 @@ block content
 		//-
 			navigation
 	div#select(class= type)
-		include menu.pug
-	
+		div.menu(class= type)
+			canvas#canvas.canvas.topRight(style="background-image:url('/images/backgrounds/lvl_"+index+".svg')")
+				div.overtext #{menuData.pagetitle}
+				div.blogname #{menuData.content[index].title}
+			div.topLeft
+		
+		div.grid-container
+
+			include menu.pug
+			if (doc)
+				include docgallery.pug
+			else
+				include datagallery.pug
+
 	//-
 		initiate map + event listeners
 	script(type="text/javascript").
 		const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 		var data = `'#{data}'`
 		/*var pageindex = '#{pageindex}'*/
+		var mainmenu = document.getElementsByClassName('menu')[0];
 		var pageIndex; 
 		
 		$(document).ready(function(){
@@ -75,8 +88,21 @@ block content
 			$('div.dropdown').slideUp(100);
 			$('.drop').slideUp(100);
 			$('.selected').removeClass('selected');
-			InitializeApp();
+			InitializeApp()
 		})
+		
+		$(document).on('click', 'canvas', function(e){
+			if ($('.grid-container').hasClass('selected')) {
+				//				e.preventDefault();
+				//				InitializeApp();
+				$('.menu').css('height', 'var(--windowmenu)');
+				$('div.dropdown').slideUp(100);
+				$('.drop').slideUp(100);
+				$('.selected').removeClass('selected');
+			} else {
+				//				InitializeApp();
+			}
+		});
 		
 		//drop-down event listener
 		$(document).on('click', 'a.dropdown', function (e) { 
@@ -97,10 +123,12 @@ block content
 					$(that).next('.drop').slideUp(100);
 				}
 				$(that).removeClass("selected");
+				$('.grid-container').removeClass('selected');
 				var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
 				$('.grid-header.mainHeader').css('height', topmargin + 30 + 'px');
 			} else {
 				$(that).addClass('selected');
+				$('.grid-container').addClass('selected');
 				if (main) {
 					$(that).slideDown(200);
 				} else {
@@ -113,27 +141,6 @@ block content
 			}
 			//e.stopPropagation();
 		});
-		//search
-		/*$(document).on('change', '#mySearch', function(e){
-			e.preventDefault();
-			$('.searchbox').slideUp(100);
-			$('.searchbox').remove();
-			var term = $(e.target).val();
-			console.log(term)
-			$.get('/search/'+term+'').done(function(response){
-				console.log(response)
-				
-				$(e.target).parent().append('<div id="dropdown" class="searchbox"></div>')
-				if (response == 'none') {
-					$('.searchbox').slideDown(200);
-					$('.searchbox').append('<p class="drop ms-Grid-col ms-u-sm12">No pu.bli.sher by that name</p>')
-				}
-				for (var i in response) {
-					$('.searchbox').slideDown(200);
-					$('.searchbox').append('<a class="drop ms-Grid-col ms-u-sm12" href="/'+response[i].username+'"><span class="ms-font-l">'+response[i].username+'</span></a>')
-				}
-			})
-		})*/
 				
 		//gallery
 		$(document).on('click', 'a.thumbnail', function(e){
@@ -156,27 +163,6 @@ block content
 			return false;
 		});
 		
-		//Timeline hovers
-		/*$('.module').mouseleave(function(){
-			$(this).children('.hovertext').remove();
-			//$(this).children('p').remove();
-			$(this).children('.overlay').remove();
-			$('.module').removeClass('hover')
-			if ($(this).css('z-index') > 0) {
-				$(this).css('z-index', '1')
-			}
-		});
-		$('.module').mouseenter(function(){
-			var title = $(this).attr('title');
-			var name = $(this).attr('name');
-			$('.module').removeClass('hover');
-			$(this).addClass('hover');
-			$(this).prepend('<span class="ms-font-xs ms-fontWeight-light hovertext" style="text-align: left">'+title+'</span>')
-			//$(this).append('<p class="ms-font-xs ms-fontWeight-light" style="text-align: left">'+name+'</p><div class="overlay"></div>')
-			if ($(this).css('z-index') > 0) {
-				$(this).css('z-index', '2')
-			}
-		});*/
 		var datalength = #{data.length};
 		var doc = `#{JSON.stringify(doc)}`;
 		var lMarker;
@@ -196,10 +182,6 @@ block content
 				lMarker.dragging.enable();
 				console.log(lMarker)
 				beginFeatureDrag();
-				//$('#map').css('display: block;')
-								//$('#select > div.menu').removeClass('map');
-				//$('#select > div.menu').addClass('map');
-				//document.getElementsByClassName('menu blog').className = `#{type} menu`
 			} else {
 				document.getElementById('select').className = 'blog';
 				document.getElementsByClassName('menu')[0].className = 'menu blog'
@@ -209,11 +191,6 @@ block content
 				$('#editform > span').html('Show Feature details');
 				lMarker.dragging.disable();
 				endFeatureDrag();
-				//$('#map').css('display: none');
-				//$('#select > div.menu').removeClass('map');
-				//$('div.menu').addClass('blog');
-
-				//document.getElementsByClassName('menu '+#{type}).className = 'menu'
 			}
 		})
 		$(document).on('click', '#editmedia', function(){
@@ -307,6 +284,7 @@ block content
 		    InitializeCanvas();
 
 		    var elem = document.getElementById("canvas");
+				
 		    if (window.PointerEvent && !pointerEventDisabledMode) {
 		        console.log("Adding PointerEvent listeners");
 		        ["pointerdown", "pointermove", "pointerup"].forEach(function(e) {
@@ -387,6 +365,7 @@ block content
 		function PointerHandler(event) {
 		    event.preventDefault();
 				console.log(event.type)
+				
 		    if (event.type == "pointerdown" && event.button === 0)
 		        mousePressed = true;
 
@@ -420,6 +399,9 @@ block content
 
 		    if (event.type == "pointerup")
 		        mousePressed = false;
+				
+				if (mainmenu.classList.contains('selected'))
+					mousePressed = false;
 		}
 
 		function MouseHandler(event) {
@@ -439,12 +421,23 @@ block content
 
 		    if (event.type == "mouseup")
 		        mousePressed = false;
+				
+				if (mainmenu.classList.contains('selected')) {
+					console.log('selected menu')
+					mousePressed = false;
+				}
+					
 		}
 
 		function TouchHandler(event) {
 		    event.preventDefault();
-		    for (var i = 0; i < event.changedTouches.length; i++)
-		        drawTouch(event.changedTouches[i], event.type, false);
+				
+				if (!mainmenu.classList.contains('selected')) {
+					for (var i = 0; i < event.changedTouches.length; i++)
+			        drawTouch(event.changedTouches[i], event.type, false);
+				}
+					
+		    
 		}
 
 		function drawTouch(touch, eventType, coalesced) {

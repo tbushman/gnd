@@ -2,24 +2,10 @@ extends layout
 block page
 	- var menu = 'login'
 block content
+	div.menu(class= type)
+		
+		div.topLeft
+		div.topRight
 	div.grid-container
-		div.grid-header
-			p.tb-font-xl Enter username and password
-		div.grid-mid
-			div.tb-u-100
-				
-				
-				form(enctype="multipart/form-data", method="POST", action="/login")
-					div.input-field
-						label.ms-Label Username
-						input.ms-TextField-field(type="text", name="username")
-					div.input-field
-						label.ms-Label Password
-						input.ms-TextField-field(type="password", name="password")
-					p
-					button.btn.waves-effect.waves-light(type="submit", ariaDescription="Log in") Log in
-				p
-				hr
-				
-				p.tb-font-xl First time here?
-				a.btn.waves-effect.waves-light(href="/register", role="button", ariaDescription="Register") Register
+		include menu.pug
+		include datagallery.pug

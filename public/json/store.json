@@ -2,7 +2,7 @@
 	"substrates": [
 		{
 			"name": "bread",
-			"image": "/images/ingredients/substrates/ingredient0.jpg",
+			"image": "/images/ingredients/ingredient_0.svg",
 			"description": "...",
 			"info" : {
 				"safety": "gluten",
@@ -14,7 +14,7 @@
 		},
 		{
 			"name": "rice",
-			"image": "/images/ingredients/substrates/ingredient1.jpg",
+			"image": "/images/ingredients/ingredient_1.svg",
 			"description": "...",
 			"info" : {
 				"safety": false,
@@ -23,7 +23,7 @@
 		},
 		{
 			"name": "nori",
-			"image": "/images/ingredients/substrates/ingredient2.jpg",
+			"image": "/images/ingredients/ingredient_2.svg",
 			"description": "...",
 			"info" : {
 				"safety": false,
@@ -34,7 +34,7 @@
 	"filling": [
 		{
 			"name": "jelly",
-			"image": "/images/ingredients/filling/ingredient0.jpg",
+			"image": "/images/ingredients/ingredient_0.svg",
 			"description": "...",
 			"info" : {
 				"safety": false,
@@ -43,7 +43,7 @@
 		},
 		{
 			"name": "peanut butter",
-			"image": "/images/ingredients/filling/ingredient1.jpg",
+			"image": "/images/ingredients/ingredient_1.svg",
 			"description": "...",
 			"info" : {
 				"safety": "nuts",
@@ -54,7 +54,7 @@
 		},
 		{
 			"name": "cream cheese",
-			"image": "/images/ingredients/filling/ingredient2.jpg",
+			"image": "/images/ingredients/ingredient_2.svg",
 			"description": "...",
 			"info" : {
 				"safety": "dairy",
@@ -65,9 +65,20 @@
 		},
 		{
 			"name": "tofu",
-			"image": "/images/ingredients/filling/ingredient3.jpg",
+			"image": "/images/ingredients/ingredient_3.svg",
 			"description": "...",
 			"info" : {
+				"safety": false,
+				"alt": [ ]
+			}
+		}
+	],
+	"tools": [
+		{
+			"name": "butterknife",
+			"image": "/images/tools/lvl_0.svg",
+			"description": "...",
+			"info": {
 				"safety": false,
 				"alt": [ ]
 			}

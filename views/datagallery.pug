@@ -1,27 +1,74 @@
-div.grid-right
-	each entry, i in data
-		div.grid-container.inner
-			a.grid-header(href="/"+entry.pagetitle+"")
-				p.tb-font-l #{entry.pagetitle}
-			div.grid-left
-				if (entry.content[entry.content.length-1].substrates.length > 0)
-					div.thumbnail.gallery(id= entry.pageindex, name= entry._id + "@all_" + entry.pageindex)
-						div.actions
-							//if (entry.content[entry.content.length-1].substrates[0].url)
-							span.tb-font-s by 
-							br
-							span.tb-font-xxs #{entry.publishers[0].username}
-						img(src= entry.content[entry.content.length-1].substrates[0].thumb)
-					div#hide
-						if (entry.content[entry.content.length-1].substrates[0].name !== '')
-							span.tb-font-xxs #{entry.content[entry.content.length-1].substrates[0].name}
+if (menu === 'login')
+	div.grid-right
+		div.tb-u-100
+			form(enctype="multipart/form-data", method="POST", action="/login")
+				div.input-field
+					label.ms-Label Username
+					input.ms-TextField-field(type="text", name="username")
+				div.input-field
+					label.ms-Label Password
+					input.ms-TextField-field(type="password", name="password")
+				p
+				button.btn.waves-effect.waves-light(type="submit", ariaDescription="Log in") Log in
+			p
+			hr
+			
+			p.tb-font-xl First time here?
+			a.btn.waves-effect.waves-light(href="/register", role="button", ariaDescription="Register") Register
+if (menu === 'register')
+	div.grid-right
+		p.tb-font-xl Choose a nickname for your Chef:
+		div.input-field#response
+			label.ms-Label Page Title
+			input.ms-TextField-field(type="text", name="pagetitle", id="pagetitle")
+			a.btn.waves-effect.waves-light(role="button") Check availability
+			hr
+		div#registersection(style="display: none")
+			p.tb-font-xl Create a basic profile
+			form#form(enctype="multipart/form-data", method="POST", action="/register", style="margin-bottom: 50px")
+				input(type="hidden", name="pagetitle", id="pagetitle2")
+				input#svgurl(type="hidden", name="svg")
+				input#avatarurl(type="hidden", name="avatar")
+				input#resumeurl(type="hidden", name="resume")
+				div.tb-u-100
+					div.input-field
+						label.ms-Label Username
+						input.ms-TextField-field.is-required(type="text", name="username", maxlength="40")
+					div.input-field
+						label.ms-Label Email
+						input.ms-TextField-field.is-required(type="email", name="email")
+					div.input-field.is-required
+						label.ms-Label Password
+						input.ms-TextField-field.is-required(type="password", name="password")
+				p
+				button.btn.waves-effect.waves-light#submitregister(type="submit", ariaDescription="Register") Register
+		div.tb-u-100
+			#info #{info}
+if (menu === 'home')
+	div.grid-right
+		each entry, i in data
+			div.grid-container.inner
+				a.grid-header(href="/"+entry.pagetitle+"")
+					p.tb-font-l #{entry.pagetitle}
+				div.grid-left
+					if (entry.content[entry.content.length-1].substrates.length > 0)
+						div.thumbnail.gallery(id= entry.pageindex, name= entry._id + "@all_" + entry.pageindex)
+							div.actions
+								//if (entry.content[entry.content.length-1].substrates[0].url)
+								span.tb-font-s by 
+								br
+								span.tb-font-xxs #{entry.publishers[0].username}
+							img(src= entry.content[entry.content.length-1].substrates[0].thumb)
+						div#hide
+							if (entry.content[entry.content.length-1].substrates[0].name !== '')
+								span.tb-font-xxs #{entry.content[entry.content.length-1].substrates[0].name}
 
 
-			div.grid-right
-				p.tb-font-m.hideoverlap #{entry.content[entry.content.length-1].label}
-				p.tb-font-s.hideoverlap
-					!= md(entry.content[entry.content.length-1].description)
-					span &nbsp ...
-			div.grid-footer
-				
-		hr
+				div.grid-right
+					p.tb-font-m.hideoverlap #{entry.content[entry.content.length-1].label}
+					p.tb-font-s.hideoverlap
+						!= md(entry.content[entry.content.length-1].description)
+						span &nbsp ...
+				div.grid-footer
+					
+			hr

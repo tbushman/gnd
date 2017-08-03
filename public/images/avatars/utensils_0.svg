@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="lvl_x5F_0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="300px" height="372px" viewBox="0 0 300 372" enable-background="new 0 0 300 372" xml:space="preserve">
+<path fill="#939598" d="M281.219,174.037H27.277c-9.383,0-16.99,6.61-16.99,14.763s7.607,14.761,16.99,14.761h113.925
+	c6.104,0,11.455-2.796,14.451-6.995l0.042-0.137c2.895-4.548,8.473-7.629,14.879-7.629v-0.001h110.645
+	c4.691,0,8.494-3.304,8.494-7.381C289.713,177.342,285.91,174.037,281.219,174.037z"/>
+<g>
+	<defs>
+		<path id="SVGID_1_" d="M281.219,168.44H27.277c-9.383,0-16.99,7.608-16.99,16.993c0,9.383,7.607,16.989,16.99,16.989h113.925
+			c6.104,0,11.455-3.218,14.451-8.051l0.042-0.158c2.895-5.234,8.473-8.78,14.879-8.78v-0.001h110.645
+			c4.691,0,8.494-3.804,8.494-8.496C289.713,172.245,285.91,168.44,281.219,168.44z"/>
+	</defs>
+	<clipPath id="SVGID_2_">
+		<use xlink:href="#SVGID_1_"  overflow="visible"/>
+	</clipPath>
+	<rect x="-15" y="160.371" clip-path="url(#SVGID_2_)" fill="#EDEEEE" width="326" height="20.666"/>
+	<rect x="-15" y="181.037" clip-path="url(#SVGID_2_)" fill="#F1F2F2" width="326" height="26"/>
+	<polygon clip-path="url(#SVGID_2_)" fill="#DADBDC" points="67.673,225.072 -45.668,225.072 2.728,179.772 116.069,179.772 	"/>
+	<polygon clip-path="url(#SVGID_2_)" fill="#BFC1C3" points="75.769,226.371 65.97,226.371 114.366,181.07 124.165,181.07 	"/>
+	<polygon clip-path="url(#SVGID_2_)" fill="#FFFFFF" points="178.452,180.371 168.653,180.371 217.049,135.07 226.848,135.07 	"/>
+	<rect x="-7" y="174.037" clip-path="url(#SVGID_2_)" fill="#FFFFFF" width="318" height="6"/>
+	<polygon clip-path="url(#SVGID_2_)" fill="#C9CACC" points="361,185.431 155.695,194.213 161.785,183.837 168.103,179.431 
+		361,179.431 	"/>
+	<path clip-path="url(#SVGID_2_)" fill="none" stroke="#000000" stroke-miterlimit="10" d="M281.219,168.44H27.277
+		c-9.383,0-16.99,7.608-16.99,16.993c0,9.383,7.607,16.989,16.99,16.989h113.925c6.104,0,11.455-3.218,14.451-8.051l0.042-0.158
+		c2.895-5.234,8.473-8.78,14.879-8.78v-0.001h110.645c4.691,0,8.494-3.804,8.494-8.496
+		C289.713,172.245,285.91,168.44,281.219,168.44z"/>
+</g>
+</svg>

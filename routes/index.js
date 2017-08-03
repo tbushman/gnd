@@ -38,7 +38,7 @@ function ensurePage(req, res, next) {
 			return res.redirect('/')
 		}
 		console.log('user here')
-		return next(page);
+		return next();
 
 	});
 }
@@ -61,14 +61,16 @@ function ensureUser(req, res, next) {
 		if (err) {
 			return next(err);
 		}
-
-		for (var i in page.publishers) {
+		if (page.publishers[0].username === req.app.locals.loggedin) {
+			return next();
+		}
+		/*for (var i in page.publishers) {
 			if (JSON.stringify(page.publishers[i].username) === JSON.stringify(req.app.locals.loggedin)) {
-				return next();
+				
 			} else {
 
 			}
-		}
+		}*/
 		var outputPath = url.parse(req.url).pathname;
 		return res.render('login', {route: outputPath})
 	});
@@ -294,7 +296,7 @@ router.post('/:pagetitle', function(req, res, next){
 	})
 })
 
-router.get('/:pagetitle', ensurePage, function (page, req, res, next) {
+router.get('/:pagetitle', ensurePage, function (req, res, next) {
 	//check if pos1 is username
 	//view user profile
 	var pagetitle = decodeURIComponent(req.params.pagetitle)
@@ -466,6 +468,9 @@ router.get('/api/publish', function(req, res, next) {
 								],
 								filling: [ 
 									thestore.filling[0]
+								],
+								tools: [
+									thestore.tools[0]
 								]
 							} ],
 							publishers: [{
@@ -562,12 +567,15 @@ router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res
 	)
 })
 
-router.get('/api/editcontent/:pageindex/:index', ensureUser, function(req, res, next){
+router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(req, res, next){
+	var outputPath = url.parse(req.url).pathname;
+	console.log(outputPath)
 	var index = parseInt(req.params.index, 10);
 	Page.findOne({pageindex: parseInt(req.params.pageindex, 10)}, function(error, doc){
 		if (error) {
 			return next(error)
 		}
+		console.log(doc)
 		Page.find({}, function(er, data){
 			if (er) {
 				return next(er)
@@ -577,9 +585,9 @@ router.get('/api/editcontent/:pageindex/:index', ensureUser, function(req, res, 
 				datarray.push(data[l])
 			}
 			return res.render('publish', {
-				type: 'map',
+				type: 'blog',
 				infowindow: 'edit',
-				loggedin: req.app.locals.loggedin,
+				loggedin: req.app.locals.loggedin ? req.app.locals.loggedin : false,
 				pageindex: doc.pageindex,
 				index: doc.content.length-1,
 				doc: doc,

@@ -233,7 +233,7 @@ div.map .pullquote .tb-font-xxl {
 		"sideleft mid sideright"
 		"footer footer footer";
 	height: auto;
-	position: relative;
+	/*position: relative;*/
 	background-color: red;
 }
 @supports not (display:grid) {
@@ -481,7 +481,7 @@ div.dashboard .menu {
 	width: 100%;
 	height: var(--nowindowmenu);
 }
-#canvas.topRight {
+.canvas.topRight {
 	position: static;
 	font-family: var(--bfontname), sans-serif;
 	font-size: 2vh;	
@@ -563,14 +563,14 @@ a.mainmenu {
 @supports not(display:grid) {
 	a.mainmenu {
 		position: fixed;
-		left: calc( - var(--thumbwidth) * 0.5);
+		/*left: calc( var(--thumbwidth) * 0.5);*/
 		top: var(--thumbwidth);
 	}
 }
 @supports not(position:sticky) {
 	a.mainmenu {
 		position: fixed;
-		left: calc( - var(--thumbwidth) * 0.5);
+		/*left: calc( var(--thumbwidth) * 0.5);*/
 		top: var(--thumbwidth);
 	}
 }

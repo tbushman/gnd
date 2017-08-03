@@ -1,46 +1,55 @@
 extends layout
 block page
-	- var menu = 'login'
+	- var menu = 'register'
 block content
-	div#select(class= type)
-		div.menu(class= type)
-			div.topRight(style="background-image:url('"+imageUrl+"')")
-				div.blogname appTitle
-			div.topLeft(style="background-image:url('"+imageUrl+"')")
+	div#select(class="blog")
+		div.menu(class="blog")
+			div.topLeft
+			div.canvas.topRight(style="background-image:url('/images/avatars/avatar_"+2+".svg')")
+				div.overtext sandwich
+				div.blogname School
+				
 		div.grid-container
-			div.grid-header
-				p.tb-font-xl Choose a nickname for your Chef: 
-			div.grid-left
-			div.grid-mid
-				div.avatar.avatar-lg
-					img(src="/images/avatars/avatar_1.svg")
-			div.grid-right
-				div.input-field#response
-					label.ms-Label Page Title
-					input.ms-TextField-field(type="text", name="pagetitle", id="pagetitle")
-					a.btn.waves-effect.waves-light(role="button") Check availability
-					hr
-				div#registersection(style="display: none")
-					p.tb-font-xl Create a basic profile
-					form#form(enctype="multipart/form-data", method="POST", action="/register", style="margin-bottom: 50px")
-						input(type="hidden", name="pagetitle", id="pagetitle2")
-						input#svgurl(type="hidden", name="svg")
-						input#avatarurl(type="hidden", name="avatar")
-						input#resumeurl(type="hidden", name="resume")
-						div.tb-u-100
-							div.input-field
-								label.ms-Label Username
-								input.ms-TextField-field.is-required(type="text", name="username", maxlength="40")
-							div.input-field
-								label.ms-Label Email
-								input.ms-TextField-field.is-required(type="email", name="email")
-							div.input-field.is-required
-								label.ms-Label Password
-								input.ms-TextField-field.is-required(type="password", name="password")
-						p
-						button.btn.waves-effect.waves-light#submitregister(type="submit", ariaDescription="Register") Register
-				div.tb-u-100
-					#info #{info}
+			include menu.pug
+			include datagallery.pug
+		//-
+			div.menu(class= type)
+				div.topRight
+				div.topLeft
+			div.grid-container
+				div.grid-header
+					p.tb-font-xl Choose a nickname for your Chef: 
+				div.grid-left
+				div.grid-mid
+					//div.avatar.avatar-lg
+						//img(src="/images/avatars/avatar_1.svg")
+				div.grid-right
+					div.input-field#response
+						label.ms-Label Page Title
+						input.ms-TextField-field(type="text", name="pagetitle", id="pagetitle")
+						a.btn.waves-effect.waves-light(role="button") Check availability
+						hr
+					div#registersection(style="display: none")
+						p.tb-font-xl Create a basic profile
+						form#form(enctype="multipart/form-data", method="POST", action="/register", style="margin-bottom: 50px")
+							input(type="hidden", name="pagetitle", id="pagetitle2")
+							input#svgurl(type="hidden", name="svg")
+							input#avatarurl(type="hidden", name="avatar")
+							input#resumeurl(type="hidden", name="resume")
+							div.tb-u-100
+								div.input-field
+									label.ms-Label Username
+									input.ms-TextField-field.is-required(type="text", name="username", maxlength="40")
+								div.input-field
+									label.ms-Label Email
+									input.ms-TextField-field.is-required(type="email", name="email")
+								div.input-field.is-required
+									label.ms-Label Password
+									input.ms-TextField-field.is-required(type="password", name="password")
+							p
+							button.btn.waves-effect.waves-light#submitregister(type="submit", ariaDescription="Register") Register
+					div.tb-u-100
+						#info #{info}
 	script(type="text/javascript").
 		
 		$('#pagetitle').on('blur', function(e){
@@ -61,4 +70,50 @@ block content
 					$('#response').append('<p class="tb-font-m" id="append">That blog name is taken.</p>')
 				}
 			})
+		});
+		$(document).on('click', '.canvas', function(e){
+			if ($('#tlmodules').hasClass('selected')) {
+				//				e.preventDefault();
+				//				InitializeApp();
+				$('.menu').css('height', 'var(--windowmenu)');
+				$('div.dropdown').slideUp(100);
+				$('.drop').slideUp(100);
+				$('.selected').removeClass('selected');
+			} else {
+				//				InitializeApp();
+			}
 		})
+		$(document).on('click', 'a.dropdown', function (e) { 
+			//e.preventDefault();
+			var that, main;
+			if ($(this).hasClass('mainmenu')) {
+				$('.menu').css('height', 'var(--nowindowmenu)')
+				that = $('#tlmodules.dropdown');
+				main = true;
+			} else {
+				that = this;
+				main = false;
+			}
+			if ($(that).hasClass('selected')) {
+				if (main) {
+					$(that).slideUp(100);
+				} else {
+					$(that).next('.drop').slideUp(100);
+				}
+				$(that).removeClass("selected");
+				var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
+				$('.grid-header.mainHeader').css('height', topmargin + 30 + 'px');
+			} else {
+				$(that).addClass('selected');
+				if (main) {
+					$(that).slideDown(200);
+				} else {
+					$(that).next('.drop').slideDown(200);
+				}
+				setTimeout(function(){
+					var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
+					$('.grid-header.mainHeader').css('height', topmargin + 30 + 'px');
+				}, 210);
+			}
+			//e.stopPropagation();
+		});
