@@ -22,7 +22,8 @@ var Page = new Schema({
 		description: String,
 		current: Boolean,
 		substrates: [],
-		filling: []
+		filling: [],
+		image: String
 	} ],
 	publishers: []
 	

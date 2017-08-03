@@ -13,11 +13,55 @@ var dotenv = require('dotenv');
 var Publisher = require('../models/publishers.js');
 var Page = require('../models/pages.js');
 var Content = require('../models/content.js');
-var publishers = path.join(__dirname, '/../public/images');
+var publishers = path.join(__dirname, '/../../..');
 var request = require('request');
 var marked = require('marked');
 var upload = multer();
 var thestore = require('../public/json/store.json');
+var storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		Page.findOne({pageindex: req.params.pageindex}, function(err, doc){
+			if (err) {
+				console.log(err)
+			}
+			var p = ''+publishers+'/pu/publishers/sfusd/'+ doc.urltitle +'/images/full/'+req.params.index+''
+			var q = ''+publishers+'/pu/publishers/sfusd/'+ doc.urltitle +'/images/thumbs/'+req.params.index+''
+
+			fs.access(p, function(err) {
+
+				if (err && err.code === 'ENOENT') {
+					mkdirp(p, function(err){
+						if (err) {
+							console.log("err", err);
+						}
+						console.log('created folder: '+ p)
+						mkdirp(q, function(err){
+							if (err) {
+								console.log("err", err);
+							}
+							console.log('created folder: '+ q)
+							cb(null, p)
+						})
+					})
+				} else {
+					if (err && err.code === 'EACCESS') {
+						console.log('permission error: '+err)
+						cb(err)
+					} else {
+						cb(null, p)
+
+					}
+				}
+			})
+		})
+	},
+	filename: function (req, file, cb) {
+		cb(null, file.fieldname + '_' + req.params.index + '.png')
+		
+  }
+})
+
+var uploadmedia = multer({ storage: storage })
 dotenv.load();
 
 
@@ -567,6 +611,11 @@ router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res
 	)
 })
 
+router.all('/api/uploadmedia/:pageindex/:index', uploadmedia.single('img'), function(req, res, next){
+	console.log('uploaded: '+req.file.path)
+		return res.status(200).send(req.file.path)
+})
+
 router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath)
@@ -614,26 +663,23 @@ router.post('/api/editcontent/:pageindex/:index', upload.array(), function(req, 
 		var id = pub._id;
 		var pageindex = parseInt(pub.pageindex, 10)
 		var keys = Object.keys(body);
+		
 		var entry = {
 			index: index,
-			properties: {
-				_id: id,
-				pid: pageindex,
-				user: req.app.locals.userId,
-				title: body.title,
-				label: body.label,
-				description: body.description,
-				media: []
-			}
+			pid: pageindex,
+			label: body.label,
+			title: body.title,
+			description: body.description,
+			current: true,
+			substrates: pub.content[index].substrates,
+			filling: pub.content[index].filling,
+			image: ''
 		}
 		entry = JSON.parse(JSON.stringify(entry))
 		var key = 'content.$'
 		var push = {$set: {}};
 		push.$set[key] = entry;
 
-		var key2 = 'content.$.media';
-		var set = {$set: {}};
-		set.$set[key2] = entrymedia;
 		Page.findOneAndUpdate({pageindex: pageindex, content: {$elemMatch: {index: index}}}, push, {safe: true, new: true, upsert: false}, function(error, doc){
 			if (error) {
 				return next(error)
