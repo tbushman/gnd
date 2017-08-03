@@ -1,6 +1,7 @@
 {
 	"substrates": [
 		{
+			"index": 0,
 			"name": "bread",
 			"image": "/images/ingredients/ingredient_0.svg",
 			"description": "...",
@@ -13,6 +14,7 @@
 			}
 		},
 		{
+			"index": 1,
 			"name": "rice",
 			"image": "/images/ingredients/ingredient_1.svg",
 			"description": "...",
@@ -22,6 +24,7 @@
 			}
 		},
 		{
+			"index": 2,
 			"name": "nori",
 			"image": "/images/ingredients/ingredient_2.svg",
 			"description": "...",
@@ -33,6 +36,7 @@
 	],
 	"filling": [
 		{
+			"index": 0,
 			"name": "jelly",
 			"image": "/images/ingredients/ingredient_0.svg",
 			"description": "...",
@@ -42,6 +46,7 @@
 			}
 		},
 		{
+			"index": 1,
 			"name": "peanut butter",
 			"image": "/images/ingredients/ingredient_1.svg",
 			"description": "...",
@@ -53,6 +58,7 @@
 			}
 		},
 		{
+			"index": 2,
 			"name": "cream cheese",
 			"image": "/images/ingredients/ingredient_2.svg",
 			"description": "...",
@@ -64,6 +70,7 @@
 			}
 		},
 		{
+			"index": 3,
 			"name": "tofu",
 			"image": "/images/ingredients/ingredient_3.svg",
 			"description": "...",
@@ -75,6 +82,7 @@
 	],
 	"tools": [
 		{
+			"index": 0,
 			"name": "butterknife",
 			"image": "/images/tools/lvl_0.svg",
 			"description": "...",

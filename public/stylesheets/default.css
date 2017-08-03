@@ -414,9 +414,9 @@ div.blogname {
 .hideoverlap {
 	white-space: nowrap;
 }
-div.map {
+div.draw {
 	overflow: hidden;
-	overflow-y: scroll;
+	overflow-y: hidden;
 	margin: 0;
 	position: absolute;
 	height: 50%;
@@ -481,7 +481,7 @@ div.dashboard .menu {
 	width: 100%;
 	height: var(--nowindowmenu);
 }
-.canvas.topRight {
+.canvas.topRight, .maincanvas.topRight {
 	position: static;
 	font-family: var(--bfontname), sans-serif;
 	font-size: 2vh;	
@@ -495,7 +495,7 @@ div.dashboard .menu {
 	height: 100%;
 	color: var(--secondary);
 	
-	/*pointer-events: none;*/
+	pointer-events: none;
 	padding: calc(var(--nowindowmenu)/3.7) 11px 11px 0;
 	background-color: rgba(255,255,255,0);
 	background-attachment: fixed;
@@ -509,6 +509,24 @@ div.dashboard .menu {
 	-o-transition: background-image 1.3s ease-in-out;
 	-webkit-transition: background-image .3s ease-in-out;
 	transition: background-image .3s ease-in-out;
+	z-index: -1;
+	
+}
+.canvas.layer {
+	position: fixed;
+	background-attachment: initial;
+	background-image: none;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: var(--thumbwidth);
+	height: auto;
+	width: auto;
+	margin: 0;
+	padding: 0;
+	display: inline-block;
+	z-index: 0;
+	pointer-events: none;
 }
 div.menu > div.topLeft {
 	padding: 10px 0 0 0;

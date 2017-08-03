@@ -15,8 +15,9 @@ div.grid-container.inner
 				textarea.ms-TextField-field#inputtext(type="text", name="description", value= contentData.description, placeholder= contentData.description)
 			div.tb-u-100
 				span.tb-font-s#previewtext #{contentData.description}
+			input(type="hidden", id="inputimg", name="img")
 			div.tb-u-100
-				button.ms-Button.ms-Button--primary.tb-u-100.block.spacer(type="submit", ariaDescription="Submit Feature to map")
+				button.ms-Button.ms-Button--primary.tb-u-100.block.spacer(type="submit", ariaDescription="Save this Sandwich")
 					span.ms-Button-label Submit
 		p.tb-font-xs#info
 		div.tb-u-33

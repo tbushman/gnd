@@ -44,6 +44,7 @@ if (menu === 'register')
 				button.btn.waves-effect.waves-light#submitregister(type="submit", ariaDescription="Register") Register
 		div.tb-u-100
 			#info #{info}
+			
 if (menu === 'home')
 	div.grid-right
 		each entry, i in data
@@ -66,8 +67,9 @@ if (menu === 'home')
 
 				div.grid-right
 					p.tb-font-m.hideoverlap #{entry.content[entry.content.length-1].label}
-					p.tb-font-s.hideoverlap
-						!= md(entry.content[entry.content.length-1].description)
+					if (entry.content[entry.content.length-1].description)
+						p.tb-font-s.hideoverlap
+							!= md(entry.content[entry.content.length-1].description)
 						span &nbsp ...
 				div.grid-footer
 					

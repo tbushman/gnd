@@ -613,7 +613,7 @@ router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res
 
 router.all('/api/uploadmedia/:pageindex/:index', uploadmedia.single('img'), function(req, res, next){
 	console.log('uploaded: '+req.file.path)
-		return res.status(200).send(req.file.path)
+	return res.status(200).send(req.file.path)
 })
 
 router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(req, res, next){
@@ -634,20 +634,112 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 				datarray.push(data[l])
 			}
 			return res.render('publish', {
-				type: 'blog',
+				type: 'draw',
 				infowindow: 'edit',
 				loggedin: req.app.locals.loggedin ? req.app.locals.loggedin : false,
 				pageindex: doc.pageindex,
 				index: doc.content.length-1,
 				doc: doc,
 				data: datarray,
-				info: 'Edit your entry.'
+				info: 'Edit your entry.',
+				save: true
 			})
 		})
 	})
 })
 
-router.post('/api/editcontent/:pageindex/:index', upload.array(), function(req, res, next){
+router.post('/api/selectlayer/:urltitle/:pageindex/:index/:type/:layer', upload.array(), function(req, res, next){
+	delete req.app.locals.layer;
+	var index = parseInt(req.params.index, 10);
+	var layer = parseInt(req.params.layer, 10);
+	var urltitle = req.params.urltitle;
+	req.app.locals.index = index;
+	req.app.locals.layer = layer;
+	//,,, ... current = true ,,, or similar . ,,,
+	async.waterfall([
+		
+		function(next){
+			Page.findOne({urltitle: urltitle, content: {$elemMatch: {index: index}}}, function(err, doc){
+				if (err) {
+					return next(err)
+				}
+				var ings = doc.content[index][''+req.params.type+''];
+				var antiings = doc.content[index][''+!req.params.type+''];
+				
+				var find = {
+					urltitle: urltitle,
+					content: {}
+					
+				}
+				var findkey = 'content.'+index+'.'+req.params.type+'.current'
+				find.content[findkey] = true; 
+				var set = {$set:{}};
+				var key = 'content.$.'+req.params.type+'.'+0+'.current'
+				var set1 = {$set:{}};
+				var key1 = 'content.$.'+req.params.type+'.'+layer+'.current'
+				set.$set[key] = false;
+				set1.$set[key1] = true;
+				Page.update(find, set, {safe: true, new: true, upsert: false}, function(er, data){
+					if (er) {
+						return next(er)
+					}
+					Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set1, {safe: true, new: true, upsert: false}, function(error, doc){
+						if (error) {
+							return next(error)
+						}
+						/*var othercats = doc.content[index];
+						var keys = Object.keys(othercats)
+						console.log(othercats)
+						for (var i = 0; i < keys.length; i++) {
+							if (Array.isArray(othercats[keys[i]])) {
+								for (var j = 0; j < othercats[keys[i]].length; j++)
+								var set2 = {$set:{}};
+								var key2 = 'content.$.'+keys[i]+'.'+j+'.current'
+								set2.$set[key2] = false;
+
+								Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set2, {safe: true, new: true, upsert: false}, function(errr, two){
+									if (errr) {
+										return next(errr)
+									}
+									next(null, )
+								})
+							}
+							
+						}*/
+						next(null, data, doc, index, layer)
+					})
+				})
+				
+			})
+		}
+	], function(err, data, doc, index, layer) {
+		if (err) {
+			return next(err)
+		}
+		var datarray = [];
+		for (var l in data) {
+			datarray.push(data[l])
+		}
+		return res.render('publish', {
+			type: 'draw',
+			infowindow: 'edit',
+			loggedin: req.app.locals.loggedin,
+			pagetitle: doc.pagetitle,
+			pageindex: doc.pageindex,
+			index: index,
+			doc: doc,
+			data: datarray,
+			info: ':)',
+			save: true
+		})
+		
+	})
+	
+	
+	
+})
+
+router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath)
 	var index = parseInt(req.params.index, 10);
@@ -663,7 +755,51 @@ router.post('/api/editcontent/:pageindex/:index', upload.array(), function(req, 
 		var id = pub._id;
 		var pageindex = parseInt(pub.pageindex, 10)
 		var keys = Object.keys(body);
-		
+		var substrates = pub.content[index].substrates;
+		var filling = pub.content[index].filling;
+		var thissub = false;
+		var subind;
+		var thisfill = false;
+		var fillind;
+		for (var q = 0; q < substrates.length; q++) {
+			if (keys.indexOf(substrates[q].name) !== -1) {
+				thissub = substrates[q];
+				subind = substrates[q].index;
+			}
+		}
+		for (var r = 0; r < filling.length; r++) {
+			if (keys.indexOf(filling[r].name) !== -1) {
+				thisfill = filling[r];
+				fillind = filling[r].index;
+			}
+		}
+		if (thissub || thisfill) {
+			if (thissub) {
+				substrates[subind].image = body["img_sub_"+subind+""] 
+			}
+			if (thisfill) {
+				filling[filling].image = body["img_fil_"+fillind+""]
+			}
+		} else {
+			for (var i = 0; i < thestore.substrates.length; i++) {
+				for (var j = 0; j < keys.length; j++) {
+					if (thestore.substrates[i].name === keys[j]) {
+						var newentry = thestore.substrates[i];
+						newentry.image = body["img_sub_"+i+""]
+						substrates.push(newentry)
+					}
+				}		
+			}
+			for (var l = 0; l < thestore.filling.length; l++) {
+				for (var m = 0; m < keys.length; m++) {
+					if (thestore.filling[l].name === keys[m]) {
+						var newentry = thestore.filling[l];
+						newentry.image = body["img_fil_"+l+""]
+						filling.push(newentry)
+					}
+				}
+			}
+		}
 		var entry = {
 			index: index,
 			pid: pageindex,
@@ -671,9 +807,9 @@ router.post('/api/editcontent/:pageindex/:index', upload.array(), function(req, 
 			title: body.title,
 			description: body.description,
 			current: true,
-			substrates: pub.content[index].substrates,
-			filling: pub.content[index].filling,
-			image: ''
+			substrates: substrates,
+			filling: filling,
+			image: body["img"] ? body["img"] : ""
 		}
 		entry = JSON.parse(JSON.stringify(entry))
 		var key = 'content.$'
@@ -694,14 +830,15 @@ router.post('/api/editcontent/:pageindex/:index', upload.array(), function(req, 
 				}
 				return res.render('publish', {
 					type: 'blog',
-					infowindow: 'doc',
+					infowindow: 'edit',
 					loggedin: req.app.locals.loggedin,
 					pagetitle: doc.pagetitle,
 					pageindex: doc.pageindex,
 					index: index,
 					doc: doc,
 					data: datarray,
-					info: ':)'
+					info: ':)',
+					save: true
 				})
 			})
 		});

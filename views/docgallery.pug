@@ -17,8 +17,7 @@ div.grid-right
 							i.fa.fa-edit
 				div.grid-right
 					p.tb-font-xl #{contentData.title}
-					p.tb-font-s
-						!= md(contentData.description)
+					p.tb-font-s #{contentData.description}
 					
 				div.grid-footer
 					
@@ -31,8 +30,8 @@ div.grid-right
 							i.fa.fa-edit
 				br
 				p.tb-font-s.hideoverlap #{entry.label}
-				p.tb-font-xs.hideoverlap
-					!= md(entry.description)
+				if (entry.description)
+					p.tb-font-xs.hideoverlap #{entry.description}
 					span &nbsp ...
 				if (entry.substrates.length > 0)
 					div.thumbnail.gallery(id= entry.pageindex, name= entry._id + "@all_" + entry.pageindex)

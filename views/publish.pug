@@ -43,7 +43,12 @@ block content
 			navigation
 	div#select(class= type)
 		div.menu(class= type)
-			canvas#canvas.canvas.topRight(style="background-image:url('/images/backgrounds/lvl_"+index+".svg')")
+			
+			each sub, i in contentData.substrates
+				canvas.canvas.layer.topRight(id="canvas_sub_"+i+"", style="background-color:rgba(255,255,255,0);")
+			each fil, j in contentData.filling
+				canvas.canvas.layer.topRight(id="canvas_fil_"+j+"", style="background-color:rgba(255,255,255,0);")
+			canvas.maincanvas.topRight(id="canvas", style="background-image:url('/images/backgrounds/lvl_"+index+".svg');")
 				div.overtext #{menuData.pagetitle}
 				div.blogname #{menuData.content[index].title}
 			div.topLeft
@@ -276,11 +281,18 @@ block content
 		var scale = 1;
 		var mousePressed = false;
 		var drawCoalesced = false;
+		var canvasWidth, canvasHeight;
 		function InitializeApp() {
 				InitializeCanvas();
 
 				var elem = document.getElementById("canvas");
-				
+				canvasWidth = elem.width;
+				canvasHeight = elem.height;
+				var layers = document.getElementsByClassName('layer');
+				for (var i in layers) {
+					layers[i].width = canvasWidth;
+					layers[i].height = canvasHeight;
+				}
 				if (window.PointerEvent && !pointerEventDisabledMode) {
 						console.log("Adding PointerEvent listeners");
 						["pointerdown", "pointermove", "pointerup"].forEach(function(e) {
@@ -355,7 +367,7 @@ block content
 						elem.style.width = window.screen.width + "px";
 						elem.style.height = window.screen.height + "px";
 				}
-				$('#select').prepend('<button id="save" style="z-index: 9999;position: absolute;">save</button>');
+				//$('#select').prepend('<button id="save" style="z-index: 9999;position: absolute;">save</button>');
 
 		}
 		function PointerHandler(event) {
@@ -582,16 +594,7 @@ block content
 					processData: false,
 					contentType: false,
 					success: function(response) { 
-						img.src = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
-						img.onload = function () {
-							$('#inputimg'+counter+'').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''))
-							var can = $('#canvas'+counter+'')[0];
-							var maxWidth = 200 ;
-							var maxHeight = 200 ;								
-							var w = img.width;
-							var h = img.height;
-							checkImage(can, w, h, maxWidth, maxHeight)
-						}
+						$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
 					}
 				})
 			}, 'image/png'/*, 0.95*/);

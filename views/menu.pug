@@ -1,8 +1,12 @@
 div.grid-header.mainHeader
 	//#app(style="pointer-events:none;display: inline-block;float: left;margin: 0 auto;width: auto;position: absolute;z-index: 50;height: 33.2%;")
 
-	a.dropdown.mainmenu(href="#", title="Menu")
-		img.i(src="http://pu.bli.sh/images/menu_button.svg")
+	if (save)
+		a.mainmenu(href="#", title="Save")
+			i.fa.fa-check
+	else
+		a.dropdown.mainmenu(href="#", title="Menu")
+			img.i(src="http://pu.bli.sh/images/menu_button.svg")
 
 	//-
 		div.dropdown
@@ -68,19 +72,29 @@ div.grid-left
 						a.module.dropdown(title="inventory")
 							.ui
 								i.fa.fa-user-o
-							span.tb-font-l Create
+							span.tb-font-l Edit
+					
 						each module, j in menuData.content
 							if (j === menuData.content[index].index)
 								each ing, k in menuData.content[index].substrates
-									a.module.focus.drop(class= tltype, href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "" )
+									
+									a.module.focus.drop(href="#", onclick="document.getElementById('form_sub"+k+"').submit();")
 										.ui
 											img(src="/images/ingredients/substrate_"+k+".svg")
 										span.tb-font-l #{ing.name}
+
+										form(id="form_sub"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/substrate/"+k+"")
+											input(type="hidden", value="1", name= ing.name)
+											input(type="hidden", id="inputimg_sub_"+k+"", name="img_sub_"+k+"", value= ing.image)
+
 								each ing, l in menuData.content[index].filling
-									a.module.focus.drop(class= tltype, href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "" )
+									a.module.focus.drop(href="#", onclick="document.getElementById('form_fil"+l+"').submit();")
 										.ui
-											img(src="/images/avatars/avatar_1.svg")
+											img(src="/images/ingredients/filling_"+l+".svg")
 										span.tb-font-l #{ing.name}
+										form(id="form_fil"+l+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/substrate/"+l+"")
+											input(type="hidden", value="1", name= ing.name)
+											input(type="hidden", id="inputimg_fil_"+l+"", name="img_fil_"+l+"", value= ing.image)
 
 						a.module(href="/logout", title="logout")
 							.ui
