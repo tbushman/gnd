@@ -198,7 +198,7 @@ div.draw .pullquote .tb-font-xxl {
 		"sideleft footer footer";
 	position: -webkit-sticky;
 	position: sticky;
-	bottom: calc(var(--nowindowmenu) - var(--panelheight));
+	bottom: 0;
 	top: auto;
 	min-height: var(--panelheight);
 	background-color: tomato;
@@ -222,10 +222,20 @@ div.draw .pullquote .tb-font-xxl {
 		overflow-y: scroll; 
 	}
 }
+
+.grid-container.blog {
+	top: var(--nowindowmenu);
+	position: absolute;
+	width: 100%;
+}
+
+.grid-container.draw {
+	top: var(--windowmenu);
+	position: absolute;
+}
+
 .grid-container.inner {
 	height: auto;
-	/*grid-template-columns: var(--thumbwidth) minmax(-webkit-max-content, 0px) minmax(100%, 180px);
-	grid-template-columns: var(--thumbwidth) minmax(calc(100% - (var(--thumbwidth) * 2)), 0px) minmax(100%, 180px);*/
 	grid-template-columns: var(--thumbwidth) auto minmax(100%, 180px);
 	background-image: none;
 	grid-template-areas:
@@ -233,7 +243,6 @@ div.draw .pullquote .tb-font-xxl {
 		"sideleft mid sideright"
 		"footer footer footer";
 	height: auto;
-	/*position: relative;*/
 	background-color: red;
 }
 @supports not (display:grid) {
@@ -414,19 +423,7 @@ div.blogname {
 .hideoverlap {
 	white-space: nowrap;
 }
-/*div.draw {
-	overflow: hidden;
-	overflow-y: hidden;
-	margin: 0;
-	position: absolute;
-	height: 50%;
-	display: block;
-	right: 0;
-	left: 0;
-	top: 50%;
-	bottom: 0;
-}*/
-div.blog, div.draw {
+.topRight.blog, .topRight.draw {
 	overflow-y: scroll;
 	overflow-x: hidden;
 	margin: 0;
@@ -448,57 +445,18 @@ div.dashboard {
 	display: block;
 	pointer-events: none;
 }
-div.menu {
-	-webkit-mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 100%, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
-	mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 100%, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
+#select.blog {
+	height: auto;
 }
-#select.map .menu {
+div.menu.blog {
 	display: inline-block;
-	pointer-events: none;
-	width: 100%;
-	height: var(--thumbwidth);
-	overflow: hidden;	
-	-webkit-mask-image: radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
-	mask-image: radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
-	position: static;
-	overflow: hidden;
-	
-}
-div.blog > .menu {
-	display: block;
-	bottom: var(--nowindowmenu);
+	bottom: var(--thumbwidth);
+	top: 0;
 	position: -webkit-sticky;
 	position: sticky;
 	pointer-events: auto;
 	width: 100%;
-	/*height: var(--windowmenu);*/
-	overflow: hidden;
-	/*z-index: 1;*/
 }
-div.dashboard .menu {
-	display: inline-block;
-	pointer-events: none;
-	width: 100%;
-	height: var(--nowindowmenu);
-}
-/*.canvas.topRight,*/ 
-/*.canvas {
-	position: fixed;
-	background-attachment: initial;
-	background-image: none;
-	background-color:rgba(255,255,255,0);
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: var(--thumbwidth);
-	height: auto;
-	width: auto;
-	margin: 0;
-	padding: 0;
-	display: inline-block;
-	z-index: 0;
-	pointer-events: none;
-}*/
 .topRight {
 	position: fixed;
 	font-family: var(--bfontname), sans-serif;
@@ -560,17 +518,27 @@ div.menu > div.topLeft {
 /*div.map .menu .topLeft, */div.map .menu .topRight {
 	position: static;
 }
-div.map .menu .topLeft {
+div.blog .menu .topRight {
 	position: static;
 }
-div.draw .menu .topRight .overtext {
+div.blog .menu .overtext {
 	position: fixed;
-	top: 11px;
+	top: calc(var(--thumbwidth)/6);
 	left: var(--thumbwidth);
 }
-div.draw .menu .topRight .blogname {
+div.blog .menu .blogname {
 	position: fixed;
-	top: 22px;
+	top: calc(var(--thumbwidth)/2);
+	left: var(--thumbwidth);
+}
+div.draw .menu .overtext {
+	position: fixed;
+	top: calc(var(--thumbwidth)/6);
+	left: var(--thumbwidth);
+}
+div.draw .menu .blogname {
+	position: fixed;
+	top: calc(var(--thumbwidth)/2);
 	left: var(--thumbwidth);
 }
 a.mainmenu {

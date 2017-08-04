@@ -29,6 +29,13 @@ block content
 			navigation
 	div#select(class= type)
 		div.menu(class= type)
+			div.overtext #{menuData.pagetitle}
+			div.blogname
+				if (contentData.filling.length > 1)
+					span #{contentData.filling[1].name}
+					span  and  
+				span #{contentData.filling[0].name}
+
 			if (drawtype)
 				if (drawtype === "substrates")
 					each sub, i in contentData.substrates
@@ -37,11 +44,9 @@ block content
 					each fil, j in contentData.filling
 						canvas.canvas.layer.topRight(id="canvas_fil_"+j+"", style=(layer === j ? "display: inline-block;" : "display: none;"))
 			canvas.maincanvas.topRight(id="canvas", style="background-image:url('/images/backgrounds/lvl_"+index+".svg');")
-				div.overtext #{menuData.pagetitle}
-				div.blogname #{menuData.content[index].title}
 			div.topLeft
 		
-		div.grid-container
+		div.grid-container(class=(drawtype ? "draw" : type))
 
 			include menu.pug
 			if (doc)
