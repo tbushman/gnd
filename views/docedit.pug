@@ -2,7 +2,7 @@ div.grid-container.inner
 	div.grid-right
 		p#info.tb-font-s(width="100%")
 		//(style="float: left;")
-		form#form.tb-u-100(enctype="multipart/form-data", method="POST", action="/api/editcontent/"+doc.pageindex+"/"+index+"", style="margin-bottom: 50px")
+		form#form.tb-u-100(enctype="multipart/form-data", method="POST", action="/api/editcontent/"+doc.urltitle+"/"+doc.pageindex+"/"+index+"", style="margin-bottom: 50px")
 			div.tb-u-100.ms-TextField
 				label.ms-Label Title
 				input.ms-TextField-field(type="text", name="title", value= contentData.title)
@@ -17,8 +17,8 @@ div.grid-container.inner
 				span.tb-font-s#previewtext #{contentData.description}
 			input(type="hidden", id="inputimg", name="img")
 			div.tb-u-100
-				button.ms-Button.ms-Button--primary.tb-u-100.block.spacer(type="submit", ariaDescription="Save this Sandwich")
-					span.ms-Button-label Submit
+				button.ms-Button.ms-Button--primary.tb-u-100.block.spacer(id="submit", type="submit", ariaDescription="Save this Sandwich")
+					span.ms-Button-label Save
 		p.tb-font-xs#info
 		div.tb-u-33
 			a.ms-Button.ms-Button--alert#deletefeature.tb-u-100(href="#", role="button")

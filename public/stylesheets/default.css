@@ -18,6 +18,9 @@ body {
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	position: absolute;
 }
 
 input, textarea {
@@ -158,10 +161,6 @@ i.fa.active {
 		left: var(--thumbwidth);
 	}
 }
-div.draw .pullquote {
-	top: 50%;
-	overflow: hidden;
-}
 .pullquote > a > .over {
 	font-weight: 200;
 	pointer-events: auto;
@@ -177,11 +176,13 @@ div.draw .pullquote {
 .pullquote .tb-font-xxl {
 	color: rgba(211, 212, 213, 1);
 }
-div.draw .pullquote .tb-font-xxl {
-	margin-top: 15px;
-	position: inherit;
-	font-size: calc(.8vw + .8vh + 1vmin);
+
+#select {
+	height: 100%;
+	display: block;
+	width: 100%;
 }
+
 .grid-container {
 	height: auto;
 	width: auto;
@@ -198,7 +199,7 @@ div.draw .pullquote .tb-font-xxl {
 		"sideleft footer footer";
 	position: -webkit-sticky;
 	position: sticky;
-	bottom: 0;
+	bottom: calc(var(--thumbwidth) - var(--windowmenu));
 	top: auto;
 	min-height: var(--panelheight);
 	background-color: tomato;
@@ -206,24 +207,30 @@ div.draw .pullquote .tb-font-xxl {
 @supports not (display:grid) {
 	.grid-container {
 		display: inline-block;
-		position: relative;
-		bottom: auto;
+		position: absolute;
 		top: auto;
 		height: var(--panelheight);
 	}
+	.grid-container.draw {
+		top: var(--windowmenu);
+	}
+
 }
 @supports not (position:sticky) {
 	.grid-container {
 		display: inline-block;
-		position: relative;
-		bottom: auto;
+		position: absolute;
 		top: auto;
 		height: var(--panelheight);
 		overflow-y: scroll; 
 	}
+	.grid-container.draw {
+		top: var(--windowmenu);
+	}
+
 }
 
-.grid-container.blog {
+/*.grid-container.blog {
 	top: var(--nowindowmenu);
 	position: absolute;
 	width: 100%;
@@ -232,10 +239,13 @@ div.draw .pullquote .tb-font-xxl {
 .grid-container.draw {
 	top: var(--windowmenu);
 	position: absolute;
-}
+}*/
+
 
 .grid-container.inner {
 	height: auto;
+	/*grid-template-columns: var(--thumbwidth) minmax(-webkit-max-content, 0px) minmax(100%, 180px);
+	grid-template-columns: var(--thumbwidth) minmax(calc(100% - (var(--thumbwidth) * 2)), 0px) minmax(100%, 180px);*/
 	grid-template-columns: var(--thumbwidth) auto minmax(100%, 180px);
 	background-image: none;
 	grid-template-areas:
@@ -243,6 +253,7 @@ div.draw .pullquote .tb-font-xxl {
 		"sideleft mid sideright"
 		"footer footer footer";
 	height: auto;
+	/*position: relative;*/
 	background-color: red;
 }
 @supports not (display:grid) {
@@ -285,10 +296,6 @@ div.draw .pullquote .tb-font-xxl {
 		left:0;
 		right:0;
 	}
-}
-div.map .grid-header.mainHeader {
-	max-height: 0;
-	background-color: grey;
 }
 .grid-header.mainHeader {
 	max-width: calc(100% - var(--thumbwidth));
@@ -423,13 +430,24 @@ div.blogname {
 .hideoverlap {
 	white-space: nowrap;
 }
-.topRight.blog, .topRight.draw {
+div.map {
+	overflow: hidden;
+	overflow-y: scroll;
+	margin: 0;
+	position: absolute;
+	height: 50%;
+	display: block;
+	right: 0;
+	left: 0;
+	top: 50%;
+	bottom: 0;
+}
+div.blog {
 	overflow-y: scroll;
 	overflow-x: hidden;
 	margin: 0;
 	position: absolute;
 	height: 100%;
-	display: block;
 	right: 0;
 	left: 0;
 }
@@ -445,20 +463,51 @@ div.dashboard {
 	display: block;
 	pointer-events: none;
 }
-#select.blog {
-	height: auto;
+div.menu {
+	-webkit-mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 100%, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
+	mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 100%, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
+	display: block;
+	bottom: var(--nowindowmenu);
+	/*position: -webkit-sticky;
+	position: sticky;*/
+	position: relative;
+	pointer-events: auto;
+	width: 100%;
+	/*height: var(--windowmenu);*/
+	overflow: hidden;
+	height: 100%;
 }
-div.menu.blog {
+#select.map .menu {
 	display: inline-block;
-	bottom: var(--thumbwidth);
-	top: 0;
+	pointer-events: none;
+	width: 100%;
+	height: var(--thumbwidth);
+	overflow: hidden;	
+	-webkit-mask-image: radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
+	mask-image: radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
+	position: static;
+	overflow: hidden;
+	
+}
+div.blog > .menu {
+	display: block;
+	bottom: var(--nowindowmenu);
 	position: -webkit-sticky;
 	position: sticky;
 	pointer-events: auto;
 	width: 100%;
+	/*height: var(--windowmenu);*/
+	overflow: hidden;
+	/*z-index: 1;*/
+}
+div.dashboard .menu {
+	display: inline-block;
+	pointer-events: none;
+	width: 100%;
+	height: var(--nowindowmenu);
 }
 .topRight {
-	position: fixed;
+	position: absolute;
 	font-family: var(--bfontname), sans-serif;
 	font-size: 2vh;	
 	font-weight: 700;
@@ -467,12 +516,17 @@ div.menu.blog {
 	top: 0;
 	left: 0;
 	right: 0;
-	bottom: var(--thumbwidth);
+	bottom: auto;
+	height: 100%;
 	color: var(--secondary);
 	
-	pointer-events: none;
+	/*pointer-events: none;*/
 	padding: calc(var(--nowindowmenu)/3.7) 11px 11px 0;
 	background-color: rgba(255,255,255,0);
+	z-index: 0;
+}
+.maincanvas.topRight {
+	display: block;
 	background-attachment: fixed;
 	background-image:url('');
 	background-position: center;
@@ -484,13 +538,10 @@ div.menu.blog {
 	-o-transition: background-image 1.3s ease-in-out;
 	-webkit-transition: background-image .3s ease-in-out;
 	transition: background-image .3s ease-in-out;
-	z-index: -1;
 }
-.layer {
-	z-index: 0;
-	background: none;
-	background-image: none;
-	background-attachment: none;
+
+.layer.topRight {
+	display: block;
 }
 div.menu > div.topLeft {
 	padding: 10px 0 0 0;
@@ -518,18 +569,8 @@ div.menu > div.topLeft {
 /*div.map .menu .topLeft, */div.map .menu .topRight {
 	position: static;
 }
-div.blog .menu .topRight {
+div.map .menu .topLeft {
 	position: static;
-}
-div.blog .menu .overtext {
-	position: fixed;
-	top: calc(var(--thumbwidth)/6);
-	left: var(--thumbwidth);
-}
-div.blog .menu .blogname {
-	position: fixed;
-	top: calc(var(--thumbwidth)/2);
-	left: var(--thumbwidth);
 }
 div.draw .menu .overtext {
 	position: fixed;
@@ -538,7 +579,7 @@ div.draw .menu .overtext {
 }
 div.draw .menu .blogname {
 	position: fixed;
-	top: calc(var(--thumbwidth)/2);
+	top: calc(var(--thumbwidth)/2.5);
 	left: var(--thumbwidth);
 }
 a.mainmenu {
@@ -1113,7 +1154,3 @@ a.username:hover > .ms-font-l {
 }
 @media (min-width: 1024px) and (orientation: landscape) {
 }
-
-
-
-

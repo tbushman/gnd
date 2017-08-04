@@ -2,7 +2,7 @@ div.grid-header.mainHeader
 	//#app(style="pointer-events:none;display: inline-block;float: left;margin: 0 auto;width: auto;position: absolute;z-index: 50;height: 33.2%;")
 
 	if (save)
-		a.mainmenu(href="#", title="Save")
+		a.mainmenu(href="#", title="Save", id="save")
 			i.fa.fa-check
 	else
 		a.dropdown.mainmenu(href="#", title="Menu")
@@ -64,46 +64,47 @@ div.grid-left
 		div#tlmodules.dropdown
 			a.module(href="/", title="home")
 				.ui
-					i.fa.fa-home
+					img(src="/images/icons/home.svg")
 				span.tb-font-l Home
 			if (loggedin)
 				if (menuData)
 					if (menuData.publishers[0].username === loggedin)
-						a.module.dropdown(title="inventory")
-							.ui
-								i.fa.fa-user-o
-							span.tb-font-l Edit
-					
-						each module, j in menuData.content
-							if (j === menuData.content[index].index)
-								each ing, k in menuData.content[index].substrates
-									
-									a.module.focus.drop(href="#", onclick="document.getElementById('form_sub"+k+"').submit();")
-										.ui
-											img(src="/images/ingredients/substrate_"+k+".svg")
-										span.tb-font-l #{ing.name}
+						if (doc)
+							a.module.dropdown(title="edit")
+								.ui
+									img(src="/images/icons/edit.svg")
+								span.tb-font-l Edit
+						
+							each module, j in menuData.content
+								if (j === menuData.content[index].index)
+									each ing, k in menuData.content[index].substrates
+										
+										a.module.focus.drop(href="#", onclick="document.getElementById('form_sub"+k+"').submit();")
+											.ui
+												img(src="/images/icons/substrate_"+k+".svg")
+											span.tb-font-l #{ing.name}
 
-										form(id="form_sub"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/substrates/"+k+"")
-											input(type="hidden", value="1", name= ing.name)
-											input(type="hidden", id="inputimg_sub_"+k+"", name="img_sub_"+k+"", value= ing.image)
+											form(id="form_sub"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/substrates/"+k+"")
+												input(type="hidden", value="1", name= ing.name)
+												input(type="hidden", id="inputimg_sub_"+k+"", name="img_sub_"+k+"", value= ing.image)
 
-								each ing, l in menuData.content[index].filling
-									a.module.focus.drop(href="#", onclick="document.getElementById('form_fil"+l+"').submit();")
-										.ui
-											img(src="/images/ingredients/filling_"+l+".svg")
-										span.tb-font-l #{ing.name}
-										form(id="form_fil"+l+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/filling/"+l+"")
-											input(type="hidden", value="1", name= ing.name)
-											input(type="hidden", id="inputimg_fil_"+l+"", name="img_fil_"+l+"", value= ing.image)
+									each ing, l in menuData.content[index].filling
+										a.module.focus.drop(href="#", onclick="document.getElementById('form_fil"+l+"').submit();")
+											.ui
+												img(src="/images/icons/filling_"+l+".svg")
+											span.tb-font-l #{ing.name}
+											form(id="form_fil"+l+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/filling/"+l+"")
+												input(type="hidden", value="1", name= ing.name)
+												input(type="hidden", id="inputimg_fil_"+l+"", name="img_fil_"+l+"", value= ing.image)
 
 						a.module(href="/logout", title="logout")
 							.ui
-								i.fa.fa-sign-out
+								img(src="/images/icons/logout.svg")
 							span.tb-font-l Log out
 			else
 				a.module(href="/login", title="login") 
 					.ui
-						i.fa.fa-sign-in
+						img(src="/images/icons/login.svg")
 					span.tb-font-l Login
 				
 				a.module(href="/register", title="register") 
