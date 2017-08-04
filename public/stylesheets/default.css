@@ -158,7 +158,7 @@ i.fa.active {
 		left: var(--thumbwidth);
 	}
 }
-div.map .pullquote {
+div.draw .pullquote {
 	top: 50%;
 	overflow: hidden;
 }
@@ -177,7 +177,7 @@ div.map .pullquote {
 .pullquote .tb-font-xxl {
 	color: rgba(211, 212, 213, 1);
 }
-div.map .pullquote .tb-font-xxl {
+div.draw .pullquote .tb-font-xxl {
 	margin-top: 15px;
 	position: inherit;
 	font-size: calc(.8vw + .8vh + 1vmin);
@@ -414,7 +414,7 @@ div.blogname {
 .hideoverlap {
 	white-space: nowrap;
 }
-div.draw {
+/*div.draw {
 	overflow: hidden;
 	overflow-y: hidden;
 	margin: 0;
@@ -425,8 +425,8 @@ div.draw {
 	left: 0;
 	top: 50%;
 	bottom: 0;
-}
-div.blog {
+}*/
+div.blog, div.draw {
 	overflow-y: scroll;
 	overflow-x: hidden;
 	margin: 0;
@@ -481,18 +481,35 @@ div.dashboard .menu {
 	width: 100%;
 	height: var(--nowindowmenu);
 }
-.canvas.topRight, .maincanvas.topRight {
-	position: static;
+/*.canvas.topRight,*/ 
+/*.canvas {
+	position: fixed;
+	background-attachment: initial;
+	background-image: none;
+	background-color:rgba(255,255,255,0);
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: var(--thumbwidth);
+	height: auto;
+	width: auto;
+	margin: 0;
+	padding: 0;
+	display: inline-block;
+	z-index: 0;
+	pointer-events: none;
+}*/
+.topRight {
+	position: fixed;
 	font-family: var(--bfontname), sans-serif;
 	font-size: 2vh;	
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.4em;
 	top: 0;
-	left: var(--thumbwidth);
+	left: 0;
 	right: 0;
-	bottom: auto;
-	height: 100%;
+	bottom: var(--thumbwidth);
 	color: var(--secondary);
 	
 	pointer-events: none;
@@ -510,23 +527,12 @@ div.dashboard .menu {
 	-webkit-transition: background-image .3s ease-in-out;
 	transition: background-image .3s ease-in-out;
 	z-index: -1;
-	
 }
-.canvas.layer {
-	position: fixed;
-	background-attachment: initial;
-	background-image: none;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: var(--thumbwidth);
-	height: auto;
-	width: auto;
-	margin: 0;
-	padding: 0;
-	display: inline-block;
+.layer {
 	z-index: 0;
-	pointer-events: none;
+	background: none;
+	background-image: none;
+	background-attachment: none;
 }
 div.menu > div.topLeft {
 	padding: 10px 0 0 0;
@@ -557,12 +563,12 @@ div.menu > div.topLeft {
 div.map .menu .topLeft {
 	position: static;
 }
-div.map .menu .topRight .overtext {
+div.draw .menu .topRight .overtext {
 	position: fixed;
 	top: 11px;
 	left: var(--thumbwidth);
 }
-div.map .menu .topRight .blogname {
+div.draw .menu .topRight .blogname {
 	position: fixed;
 	top: 22px;
 	left: var(--thumbwidth);

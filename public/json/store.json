@@ -5,6 +5,7 @@
 			"name": "bread",
 			"image": "/images/ingredients/ingredient_0.svg",
 			"description": "...",
+			"current": false,
 			"info" : {
 				"safety": "gluten",
 				"alt": [
@@ -18,6 +19,7 @@
 			"name": "rice",
 			"image": "/images/ingredients/ingredient_1.svg",
 			"description": "...",
+			"current": false,
 			"info" : {
 				"safety": false,
 				"alt": [ ]
@@ -28,6 +30,7 @@
 			"name": "nori",
 			"image": "/images/ingredients/ingredient_2.svg",
 			"description": "...",
+			"current": false,
 			"info" : {
 				"safety": false,
 				"alt": [ ]
@@ -40,6 +43,7 @@
 			"name": "jelly",
 			"image": "/images/ingredients/ingredient_0.svg",
 			"description": "...",
+			"current": false,
 			"info" : {
 				"safety": false,
 				"alt": [ ]
@@ -50,6 +54,7 @@
 			"name": "peanut butter",
 			"image": "/images/ingredients/ingredient_1.svg",
 			"description": "...",
+			"current": false,
 			"info" : {
 				"safety": "nuts",
 				"alt": [
@@ -62,6 +67,7 @@
 			"name": "cream cheese",
 			"image": "/images/ingredients/ingredient_2.svg",
 			"description": "...",
+			"current": false,
 			"info" : {
 				"safety": "dairy",
 				"alt": [
@@ -74,6 +80,7 @@
 			"name": "tofu",
 			"image": "/images/ingredients/ingredient_3.svg",
 			"description": "...",
+			"current": false,
 			"info" : {
 				"safety": false,
 				"alt": [ ]
@@ -86,6 +93,7 @@
 			"name": "butterknife",
 			"image": "/images/tools/lvl_0.svg",
 			"description": "...",
+			"current": false,
 			"info": {
 				"safety": false,
 				"alt": [ ]

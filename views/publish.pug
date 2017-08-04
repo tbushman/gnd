@@ -22,32 +22,20 @@ block content
 		- var contentData = menuData.content[index]
 		- var imageUrl = contentData.substrates[contentData.substrates.length-1].image
 	else
-		if (menuData.content[menuData.content.length-1].substrates[0] !== undefined)
-			- var index = menuData.content[menuData.content.length-1].index
-			- var contentData = menuData.content[menuData.content.length-1]
-			- var imageUrl = contentData.substrates[0].image
-		else
-			if (menuData.content[menuData.content.length-1].substrates[menuData.content[menuData.content.length-1].substrates.length-1] !== undefined)
-				- var index = menuData.content[menuData.content.length-1].index
-				- var contentData = menuData.content[menuData.content.length-1]
-				- var imageUrl = contentData.substrates[contentData.substrates.length-1].image
-			else
-				- var index = 0
-				- var contentData = menuData.content[0]
-				if (contentData.substrates[0] !== undefined)
-					- var imageUrl = contentData.substrates[0].image
-				else
-					- var imageUrl = ""
+		- var contentData = menuData.content[menuData.content.length-1]
+		- var index = contentData.index
 	input(type="hidden", value= pageIndex, id="pageindex")
 		//-
 			navigation
 	div#select(class= type)
 		div.menu(class= type)
-			
-			each sub, i in contentData.substrates
-				canvas.canvas.layer.topRight(id="canvas_sub_"+i+"", style="background-color:rgba(255,255,255,0);")
-			each fil, j in contentData.filling
-				canvas.canvas.layer.topRight(id="canvas_fil_"+j+"", style="background-color:rgba(255,255,255,0);")
+			if (drawtype)
+				if (drawtype === "substrates")
+					each sub, i in contentData.substrates
+						canvas.canvas.layer.topRight(id="canvas_sub_"+i+"", style=(layer === i ? "display: inline-block;" : "display: none;"))
+				if (drawtype === "filling")
+					each fil, j in contentData.filling
+						canvas.canvas.layer.topRight(id="canvas_fil_"+j+"", style=(layer === j ? "display: inline-block;" : "display: none;"))
 			canvas.maincanvas.topRight(id="canvas", style="background-image:url('/images/backgrounds/lvl_"+index+".svg');")
 				div.overtext #{menuData.pagetitle}
 				div.blogname #{menuData.content[index].title}

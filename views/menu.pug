@@ -83,7 +83,7 @@ div.grid-left
 											img(src="/images/ingredients/substrate_"+k+".svg")
 										span.tb-font-l #{ing.name}
 
-										form(id="form_sub"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/substrate/"+k+"")
+										form(id="form_sub"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/substrates/"+k+"")
 											input(type="hidden", value="1", name= ing.name)
 											input(type="hidden", id="inputimg_sub_"+k+"", name="img_sub_"+k+"", value= ing.image)
 
@@ -92,7 +92,7 @@ div.grid-left
 										.ui
 											img(src="/images/ingredients/filling_"+l+".svg")
 										span.tb-font-l #{ing.name}
-										form(id="form_fil"+l+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/substrate/"+l+"")
+										form(id="form_fil"+l+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/filling/"+l+"")
 											input(type="hidden", value="1", name= ing.name)
 											input(type="hidden", id="inputimg_fil_"+l+"", name="img_fil_"+l+"", value= ing.image)
 

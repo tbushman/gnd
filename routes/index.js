@@ -655,64 +655,59 @@ router.post('/api/selectlayer/:urltitle/:pageindex/:index/:type/:layer', upload.
 	var urltitle = req.params.urltitle;
 	req.app.locals.index = index;
 	req.app.locals.layer = layer;
-	//,,, ... current = true ,,, or similar . ,,,
 	async.waterfall([
 		
 		function(next){
-			Page.findOne({urltitle: urltitle, content: {$elemMatch: {index: index}}}, function(err, doc){
+			Page.findOne({urltitle: urltitle, content: {$elemMatch: {index: index}}}, function(err, pub){
 				if (err) {
 					return next(err)
 				}
-				var ings = doc.content[index][''+req.params.type+''];
-				var antiings = doc.content[index][''+!req.params.type+''];
+				/*var ings = pub.content[index][''+req.params.type+''];
+				var antiings = pub.content[index][''+!req.params.type+''];
 				
-				var find = {
-					urltitle: urltitle,
-					content: {}
-					
-				}
-				var findkey = 'content.'+index+'.'+req.params.type+'.current'
-				find.content[findkey] = true; 
+				
+				var findkey = 'content.$.'+req.params.type+'.current'
+				//find.content[findkey] = true; 
 				var set = {$set:{}};
-				var key = 'content.$.'+req.params.type+'.'+0+'.current'
-				var set1 = {$set:{}};
-				var key1 = 'content.$.'+req.params.type+'.'+layer+'.current'
-				set.$set[key] = false;
-				set1.$set[key1] = true;
-				Page.update(find, set, {safe: true, new: true, upsert: false}, function(er, data){
-					if (er) {
-						return next(er)
-					}
-					Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set1, {safe: true, new: true, upsert: false}, function(error, doc){
+				var key = 'content.0.'+req.params.type+'.$.current'
+				
+				set.$set[key] = true;
+				
+				Page.findOne({pageindex: pub.pageindex}).then(function(data1){
+					if (!data1) return;
+					data1.content[index]['substrates'].forEach(function(e){
+						for (var i = 0; i < e.length; i++) {
+							if (e[i].current) {
+								e[i].current = false;
+							}
+						}
+					})
+					data1.content[index]['filling'].forEach(function(e){
+						for (var i = 0; i < e.length; i++) {
+							if (e[i].current) {
+								e[i].current = false;
+							}
+						}
+					})
+					var set1 = {$set:{}};
+					var key1 = 'content.'+index+'.'+req.params.type+'.'+layer+'.current';
+					set1.$set[key1] = true;
+					console.log(set1)
+					Page.update({urltitle: urltitle}, set1, {safe: true, new: true, upsert: false}, function(error, doc){
 						if (error) {
 							return next(error)
-						}
-						/*var othercats = doc.content[index];
-						var keys = Object.keys(othercats)
-						console.log(othercats)
-						for (var i = 0; i < keys.length; i++) {
-							if (Array.isArray(othercats[keys[i]])) {
-								for (var j = 0; j < othercats[keys[i]].length; j++)
-								var set2 = {$set:{}};
-								var key2 = 'content.$.'+keys[i]+'.'+j+'.current'
-								set2.$set[key2] = false;
-
-								Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set2, {safe: true, new: true, upsert: false}, function(errr, two){
-									if (errr) {
-										return next(errr)
-									}
-									next(null, )
-								})
-							}
-							
 						}*/
-						next(null, data, doc, index, layer)
-					})
-				})
-				
+						Page.find({}, function(errrr, data){
+							if (errrr) {
+								return next(errrr)
+							}
+							next(null, data, pub, index, req.params.type, layer)
+						})
+					//})
+				//})
 			})
 		}
-	], function(err, data, doc, index, layer) {
+	], function(err, data, doc, index, drawtype, layer) {
 		if (err) {
 			return next(err)
 		}
@@ -722,6 +717,8 @@ router.post('/api/selectlayer/:urltitle/:pageindex/:index/:type/:layer', upload.
 		}
 		return res.render('publish', {
 			type: 'draw',
+			drawtype: drawtype,
+			layer: layer,
 			infowindow: 'edit',
 			loggedin: req.app.locals.loggedin,
 			pagetitle: doc.pagetitle,
@@ -732,11 +729,7 @@ router.post('/api/selectlayer/:urltitle/:pageindex/:index/:type/:layer', upload.
 			info: ':)',
 			save: true
 		})
-		
 	})
-	
-	
-	
 })
 
 router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), function(req, res, next){
