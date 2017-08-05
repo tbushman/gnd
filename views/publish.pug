@@ -48,15 +48,11 @@ block content
 					span #{contentData.filling[0].name}
 
 				
-			if (type === 'draw')
-				if (drawtype === "substrates")
-					each sub, i in contentData.substrates
-						if (layer === i)
-							canvas.canvas.layer.topRight(id="canvas_substrates_"+i+"", style="z-index: "+i+"; cursor: grab;")
-				if (drawtype === "filling")
-					each fil, j in contentData.filling
-						if (layer === j)
-							canvas.canvas.layer.topRight(id="canvas_filling_"+j+"", style="z-index: "+j+"; cursor: url('/images/icons/edit.png');")
+			if (contentData[drawtype])
+				each sub, i in contentData[drawtype]
+					if (layer === i)
+						canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+i+"", style="z-index: "+i+"; cursor: grab;")
+
 			canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/lvl_"+index+".svg');")
 			div.topLeft
 		
@@ -116,8 +112,9 @@ block content
 			
 			$('.list > .ms-Panel-main').css({display: 'none'})
 			$('.list').removeClass('is-open')
-			$('.list').css({display: 'none'})
-			$('div.dropdown').slideUp(100);
+			$('.list').css({display: 'none'});
+			
+			$('.dropdown').not('.mainmenu').slideUp(100);
 			$('.drop').slideUp(100);
 			$('.selected').removeClass('selected');
 			drawtype = '#{drawtype}'
@@ -134,7 +131,7 @@ block content
 				//				e.preventDefault();
 				//				InitializeApp();
 				$('.menu').css('height', 'var(--windowmenu)');
-				$('div.dropdown').slideUp(100);
+				$('.dropdown').not('.mainmenu').slideUp(100);
 				$('.drop').slideUp(100);
 				$('.selected').removeClass('selected');
 			} else {
@@ -142,8 +139,9 @@ block content
 			}
 		});
 		//drop-down event listener
-		$(document).on('click', 'a.dropdown', function (e) { 
+		$(document).on('click', '.dropdown', function (e) { 
 			//e.preventDefault();
+			console.log(e.target)
 			var that, main;
 			if ($(this).hasClass('mainmenu')) {
 				$('.menu').css('height', 'var(--nowindowmenu)')

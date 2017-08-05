@@ -7,14 +7,15 @@ div.grid-right
 		if (index >= 0)
 			div.grid-container.inner
 				div.grid-header
-					each entry, i in contentData[drawtype]
-						if (Array.isArray(entry))
-							each imag, j in entry
-								a.thumbnail.gallery(href="")
-									img(src=""+imag.image+"")
-						if (contentData.info !== undefined)
-							p.tb-font-s.hideoverlap About
-								span #{contentData.info[contentData.level].name}
+					if (contentData[drawtype])
+						each entry, i in contentData[drawtype]
+							if (Array.isArray(entry))
+								each imag, j in entry
+									a.thumbnail.gallery(href="")
+										img(src=""+imag.image+"")
+							if (contentData.info !== undefined)
+								p.tb-font-s.hideoverlap About
+									span #{contentData.info[contentData.level].name}
 				div.grid-left(style="padding: 6px 0 0 6px;")
 					if (loggedin && loggedin === menuData.publishers[0].username && menuData.content.length > 0)
 						a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit sandwich")

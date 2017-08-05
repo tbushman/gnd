@@ -25,27 +25,29 @@ div.grid-left
 									img(src="/images/icons/edit.svg")
 								span.tb-font-l Edit
 						
-							each module, j in menuData.content
-								if (j === menuData.content[index].index)
-									if (menuData.content[index][drawtype])
-										each ing, k in menuData.content[index][drawtype]
-											
-											a.module.focus.drop(href="#", onclick="document.getElementById('form_"+drawtype+"_"+k+"').submit();")
-												.ui
-													img(src="/images/icons/"+drawtype+"_"+k+".svg")
-												span.tb-font-l #{ing.name}
-
-												form(id="form_"+drawtype+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/"+drawtype+"/"+k+"")
-													input(type="hidden", value="1", name= ing.name)
-													input(type="hidden", id="inputimg_"+drawtype+"_"+k+"", name= ing.name, value= ing.image)
-									else
-										- var catKeys = Object.keys(menuData.content[index])
-										each cat, c in menuData.content[index]
-											if (Array.isArray(cat))
+								each module, j in menuData.content
+									if (j === module.index)
+										if (module[drawtype])
+											each ing, k in module[drawtype]
 												
-												a.module.dropdown(title= catKeys[c])
+												a.module.focus.drop(href="#", onclick="document.getElementById('form_"+drawtype+"_"+k+"').submit();")
 													.ui
-														img(src="/images/"+catKeys[c])
+														img(src="/images/icons/"+drawtype+"_"+k+".svg")
+													span.tb-font-l #{ing.name}
+
+													form(id="form_"+drawtype+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/"+drawtype+"/"+k+"")
+														input(type="hidden", value="1", name= ing.name)
+														input(type="hidden", id="inputimg_"+drawtype+"_"+k+"", name= ing.name, value= ing.image)
+									//-
+										else
+											- var catKeys = Object.keys(menuData.content[index])
+											each cat, c in menuData.content[index]
+												if (Array.isArray(cat))
+													
+													a.module.dropdown(title= catKeys[c])
+														.ui
+															img(src="/images/"+catKeys[c]+"_"+c+"")
+														span.tb-font-l #{cat[c].name}
 						a.module(href="/logout", title="logout")
 							.ui
 								img(src="/images/icons/logout.svg")
