@@ -1,9 +1,9 @@
 div.grid-header.mainHeader
 	//#app(style="pointer-events:none;display: inline-block;float: left;margin: 0 auto;width: auto;position: absolute;z-index: 50;height: 33.2%;")
 
-	if (save)
+	if (type === 'draw')
 		a.mainmenu(href="#", title="Save", id="save")
-			i.fa.fa-check
+			img(src="/images/icons/check.svg")
 	else
 		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="http://pu.bli.sh/images/menu_button.svg")

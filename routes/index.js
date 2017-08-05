@@ -19,14 +19,17 @@ var marked = require('marked');
 var upload = multer();
 var thestore = require('../public/json/store.json');
 var storage = multer.diskStorage({
-	destination: function (req, file, cb) {
+	destination: function (req, files, cb) {
 		Page.findOne({pageindex: req.params.pageindex}, function(err, doc){
 			if (err) {
 				console.log(err)
 			}
-			var p = ''+publishers+'/pu/publishers/sfusd/'+ doc.urltitle +'/images/full/'+req.params.index+''
-			var q = ''+publishers+'/pu/publishers/sfusd/'+ doc.urltitle +'/images/thumbs/'+req.params.index+''
-
+			var p = ''+publishers+'/pu/publishers/sfusd/'+ doc.urltitle +'/images/'+req.params.index+'/'+(req.params.drawtype ? req.params.drawtype : 'main')+''
+			console.log(p)
+			/*if (req.params.drawtype && req.params.drawtype !== 'false') {
+				
+			}*/
+			
 			fs.access(p, function(err) {
 
 				if (err && err.code === 'ENOENT') {
@@ -35,13 +38,7 @@ var storage = multer.diskStorage({
 							console.log("err", err);
 						}
 						console.log('created folder: '+ p)
-						mkdirp(q, function(err){
-							if (err) {
-								console.log("err", err);
-							}
-							console.log('created folder: '+ q)
-							cb(null, p)
-						})
+						cb(null, p)
 					})
 				} else {
 					if (err && err.code === 'EACCESS') {
@@ -55,8 +52,16 @@ var storage = multer.diskStorage({
 			})
 		})
 	},
-	filename: function (req, file, cb) {
-		cb(null, file.fieldname + '_' + req.params.index + '.png')
+	filename: function (req, files, cb) {
+		if (req.params.drawtype && req.params.drawtype !== 'false') {
+			console.log('layer save')
+			cb(null, req.params.drawtype + '_' + req.params.layer + '.png')
+		} else {
+			console.log('main save')
+			cb(null, files[0].fieldname + '_' + req.params.index + '.png')
+		}
+		
+		
 		
   }
 })
@@ -143,7 +148,7 @@ router.get('/', function (req, res) {
 	}
 });
 
-router.param(function(param, option){
+/*router.param(function(param, option){
 	return function(req, res, next, val) {
 		if (option) {
 			next();
@@ -173,7 +178,7 @@ router.param('pagetitle', function(pagetitle){
 	} else {
 		return false
 	}
-});
+});*/
 
 router.get('/register', function(req, res) {
 	req.app.locals.theStore = thestore;
@@ -611,9 +616,9 @@ router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res
 	)
 })
 
-router.all('/api/uploadmedia/:pageindex/:index', uploadmedia.single('img'), function(req, res, next){
-	console.log('uploaded: '+req.file.path)
-	return res.status(200).send(req.file.path)
+router.all('/api/uploadmedia/:pageindex/:index/:drawtype/:layer', uploadmedia.any(), function(req, res, next){
+	console.log('uploaded: '+req.files[0].path)
+	return res.status(200).send(req.files[0].path)
 })
 
 router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(req, res, next){
@@ -634,27 +639,28 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 				datarray.push(data[l])
 			}
 			return res.render('publish', {
-				type: 'draw',
+				type: 'blog',
 				infowindow: 'edit',
 				loggedin: req.app.locals.loggedin ? req.app.locals.loggedin : false,
 				pageindex: doc.pageindex,
 				index: doc.content.length-1,
 				doc: doc,
 				data: datarray,
-				info: 'Edit your entry.',
-				save: true
+				info: 'Edit your entry.'
 			})
 		})
 	})
 })
 
-router.post('/api/selectlayer/:urltitle/:pageindex/:index/:type/:layer', upload.array(), function(req, res, next){
+router.post('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', upload.array(), function(req, res, next){
 	delete req.app.locals.layer;
 	var index = parseInt(req.params.index, 10);
 	var layer = parseInt(req.params.layer, 10);
 	var urltitle = req.params.urltitle;
+	var drawtype = req.params.drawtype;
 	req.app.locals.index = index;
 	req.app.locals.layer = layer;
+	req.app.locals.drawtype = drawtype;
 	async.waterfall([
 		
 		function(next){
@@ -701,7 +707,7 @@ router.post('/api/selectlayer/:urltitle/:pageindex/:index/:type/:layer', upload.
 							if (errrr) {
 								return next(errrr)
 							}
-							next(null, data, pub, index, req.params.type, layer)
+							next(null, data, pub, index, drawtype, layer)
 						})
 					//})
 				//})
@@ -751,34 +757,36 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 		var substrates = pub.content[index].substrates;
 		var filling = pub.content[index].filling;
 		var thissub = false;
-		var subind;
+		var subind, subname;
 		var thisfill = false;
-		var fillind;
+		var fillind, fillname;
 		for (var q = 0; q < substrates.length; q++) {
 			if (keys.indexOf(substrates[q].name) !== -1) {
 				thissub = substrates[q];
 				subind = substrates[q].index;
+				subname = thissub.name;
 			}
 		}
 		for (var r = 0; r < filling.length; r++) {
 			if (keys.indexOf(filling[r].name) !== -1) {
 				thisfill = filling[r];
 				fillind = filling[r].index;
+				fillname = thisfill.name;
 			}
 		}
 		if (thissub || thisfill) {
-			if (thissub) {
-				substrates[subind].image = body["img_sub_"+subind+""] 
+			if (thissub && body["img_substrates_"+subind+""] !== null) {
+				substrates[subind].image = body[subname] 
 			}
-			if (thisfill) {
-				filling[filling].image = body["img_fil_"+fillind+""]
+			if (thisfill && body["img_filling_"+fillind+""] !== null) {
+				filling[filling].image = body[fillname]
 			}
 		} else {
 			for (var i = 0; i < thestore.substrates.length; i++) {
 				for (var j = 0; j < keys.length; j++) {
 					if (thestore.substrates[i].name === keys[j]) {
 						var newentry = thestore.substrates[i];
-						newentry.image = body["img_sub_"+i+""]
+						newentry.image = body[subname]
 						substrates.push(newentry)
 					}
 				}		
@@ -787,7 +795,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 				for (var m = 0; m < keys.length; m++) {
 					if (thestore.filling[l].name === keys[m]) {
 						var newentry = thestore.filling[l];
-						newentry.image = body["img_fil_"+l+""]
+						newentry.image = body[fillname]
 						filling.push(newentry)
 					}
 				}
@@ -823,6 +831,8 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 				}
 				return res.render('publish', {
 					type: 'blog',
+					drawtype: req.app.locals.drawtype ? req.app.locals.drawtype : false,
+					layer: req.app.locals.layer ? req.app.locals.layer : false,
 					infowindow: 'edit',
 					loggedin: req.app.locals.loggedin,
 					pagetitle: doc.pagetitle,

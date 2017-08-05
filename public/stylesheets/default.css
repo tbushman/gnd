@@ -527,6 +527,7 @@ div.dashboard .menu {
 }
 .maincanvas.topRight {
 	display: block;
+	pointer-events: none;
 	background-attachment: fixed;
 	background-image:url('');
 	background-position: center;
@@ -542,6 +543,7 @@ div.dashboard .menu {
 
 .layer.topRight {
 	display: block;
+	pointer-events: auto;
 }
 div.menu > div.topLeft {
 	padding: 10px 0 0 0;

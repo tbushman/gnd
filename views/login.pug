@@ -1,11 +1,12 @@
 extends layout
 block page
-	- var menu = 'login'
+	- var menu = "login"
 block content
-	div.menu(class= type)
-		
-		div.topLeft
-		div.topRight
-	div.grid-container
-		include menu.pug
-		include datagallery.pug
+	div#select(class="blog")
+		div.menu(class="blog")
+			
+			div.topLeft
+			div.topRight
+		div.grid-container
+			include menu.pug
+			include datagallery.pug
