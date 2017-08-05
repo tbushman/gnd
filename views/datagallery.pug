@@ -59,14 +59,15 @@ if (menu === 'home')
 								span.tb-font-s by 
 								br
 								span.tb-font-xxs #{entry.publishers[0].username}
-							img(src= entry.content[entry.content.length-1].substrates[0].thumb)
+							img(src= entry.content[entry.content.length-1].substrates[entry.content[entry.content.length-1].level].image)
 						div#hide
-							if (entry.content[entry.content.length-1].substrates[0].name !== '')
-								span.tb-font-xxs #{entry.content[entry.content.length-1].substrates[0].name}
+							if (entry.content[entry.content.length-1].substrates[entry.content[entry.content.length-1].level])
+								span.tb-font-xxs #{entry.content[entry.content.length-1].substrates[entry.content[entry.content.length-1].level].name}
 
 
 				div.grid-right
-					p.tb-font-m.hideoverlap #{entry.content[entry.content.length-1].label}
+					p.tb-font-m.hideoverlap About
+						span #{entry.content[entry.content.length-1].info[entry.content[entry.content.length-1].level].name}
 					if (entry.content[entry.content.length-1].description)
 						p.tb-font-s.hideoverlap
 							!= md(entry.content[entry.content.length-1].description)

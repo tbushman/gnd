@@ -3,6 +3,7 @@ block page
 	
 block content
 	if (doc)
+		
 		- var menu = 'doc'
 		- var menuData = doc
 		- var pageIndex = pageindex
@@ -20,10 +21,16 @@ block content
 				- var menuData = data[0]
 	if (index)
 		- var contentData = menuData.content[index]
-		- var imageUrl = contentData.substrates[contentData.substrates.length-1].image
 	else
 		- var contentData = menuData.content[menuData.content.length-1]
 		- var index = contentData.index
+	
+	//-
+		if (layer)
+			- var level = layer
+		else
+	- var level = contentData.level
+
 	input(type="hidden", value= pageIndex, id="pageindex")
 		//-
 			navigation
@@ -491,11 +498,14 @@ block content
 						contentType: false,
 						success: function(response) {
 							$('#inputimg_'+drawtype+'_'+layer+'').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-							//$('#form').submit();
-							$('a.mainmenu').removeClass('dropdown');
+							
+							setTimeout(function(){
+								$('#form').submit();
+							}, 1000);
+							/*$('a.mainmenu').removeClass('dropdown');
 							$('a.mainmenu').addClass('dropdown');
 							$('a.mainmenu').attr('title', 'Menu');
-							$('a.mainmenu').html('<img class="i" src="http://pu.bli.sh/images/menu_button.svg"></img>')
+							$('a.mainmenu').html('<img class="i" src="http://pu.bli.sh/images/menu_button.svg"></img>')*/
 							//InitializeApp('#{drawtype}', '#{layer}');
 						}
 						
@@ -520,12 +530,15 @@ block content
 						success: function(response) {
 							
 								$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-								$('a.mainmenu').removeClass('dropdown');
+								/*$('a.mainmenu').removeClass('dropdown');
 								$('a.mainmenu').addClass('dropdown');
 								$('a.mainmenu').attr('title', 'Menu');
-								$('a.mainmenu').html('<img class="i" src="http://pu.bli.sh/images/menu_button.svg"></img>')
+								$('a.mainmenu').html('<img class="i" src="http://pu.bli.sh/images/menu_button.svg"></img>')*/
 																//$('#form').submit();
 								//InitializeApp('#{drawtype}', #{layer})
+								setTimeout(function(){
+									$('#form').submit();
+								}, 1000);
 							}
 						
 					})

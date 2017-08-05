@@ -10,11 +10,12 @@ div.grid-right
 					each imag, i in contentData.substrates
 						a.thumbnail.gallery(href="")
 							img(src=""+imag.image+"")
-					p.tb-font-s.hideoverlap #{contentData.label}
+					p.tb-font-s.hideoverlap About
+					 	span #{contentData.info[contentData.level].name}
 				div.grid-left(style="padding: 6px 0 0 6px;")
 					if (loggedin && loggedin === doc.publishers[0].username)
 						a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit blog entry")
-							i.fa.fa-edit
+							img(src="/images/tools/lvl_"+entry.level+".svg")
 				div.grid-right
 					p.tb-font-xl #{contentData.title}
 					p.tb-font-s #{contentData.description}
@@ -27,30 +28,26 @@ div.grid-right
 				if (loggedin && loggedin === doc.publishers[0].username)
 					div(style="padding: 10px 0 0 10px")
 						a.tb-font-m(style="margin: 6px 0 0 6px;z-index: 0;", href="/api/editcontent/"+menuData.urltitle+"/"+doc.pageindex+"/"+index+"", title="Edit "+doc.pagetitle+"")
-							i.fa.fa-edit
+							img(src="/images/tools/lvl_"+entry.level+".svg")
 				br
-				p.tb-font-s.hideoverlap #{entry.label}
+				p.tb-font-s.hideoverlap About
+					span #{entry.info[entry.level].name}
 				if (entry.description)
 					p.tb-font-xs.hideoverlap #{entry.description}
 					span &nbsp ...
 				if (entry.substrates.length > 0)
-					div.thumbnail.gallery(id= entry.pageindex, name= entry._id + "@all_" + entry.pageindex)
-						img(src= entry.substrates[0].thumb)
+					div.thumbnail.gallery(id= entry.pageindex)
+						img(src= entry.substrates[entry.level].image)
 					div#hide
-						if (entry.substrates[0].name === '')
+						if (entry.substrates[entry.level].name === '')
 							span.tb-font-xxs &nbsp
 						else
-							span.tb-font-xxs #{entry.substrates[0].name}
-						if (entry.substrates[0].caption === '')
+							span.tb-font-xxs #{entry.substrates[entry.level].name}
+						if (entry.substrates[entry.level].caption === '')
 							span.tb-font-xs &nbsp
 						else
 							span.tb-font-xs #{entry.substrates[0].caption}
 
-						div.ms-ListItem-actions
-							if (entry.substrates[0].url)
-								div.ms-ListItem-action
-									a(href= entry.substrates[0].url, target="_blank")
-										i.ms-Icon.ms-Icon--link
 				hr(style="color: "+doc.css.primary+"")
 		
 div.grid-footer

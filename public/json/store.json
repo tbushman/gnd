@@ -4,7 +4,7 @@
 			"index": 0,
 			"name": "bread",
 			"image": "/images/ingredients/substrate_0.svg",
-			"description": "...",
+			"caption": "...",
 			"current": false,
 			"info" : {
 				"safety": "gluten",
@@ -18,7 +18,7 @@
 			"index": 1,
 			"name": "rice",
 			"image": "/images/ingredients/substrate_1.svg",
-			"description": "...",
+			"caption": "...",
 			"current": false,
 			"info" : {
 				"safety": false,
@@ -29,7 +29,7 @@
 			"index": 2,
 			"name": "nori",
 			"image": "/images/ingredients/substrate_2.svg",
-			"description": "...",
+			"caption": "...",
 			"current": false,
 			"info" : {
 				"safety": false,
@@ -42,7 +42,7 @@
 			"index": 0,
 			"name": "jelly",
 			"image": "/images/ingredients/filling_0.svg",
-			"description": "...",
+			"caption": "...",
 			"current": false,
 			"info" : {
 				"safety": false,
@@ -53,7 +53,7 @@
 			"index": 1,
 			"name": "peanut butter",
 			"image": "/images/ingredients/filling_1.svg",
-			"description": "...",
+			"caption": "...",
 			"current": false,
 			"info" : {
 				"safety": "nuts",
@@ -66,7 +66,7 @@
 			"index": 2,
 			"name": "cream cheese",
 			"image": "/images/ingredients/filling_2.svg",
-			"description": "...",
+			"caption": "...",
 			"current": false,
 			"info" : {
 				"safety": "dairy",
@@ -79,7 +79,7 @@
 			"index": 3,
 			"name": "tofu",
 			"image": "/images/ingredients/filling_3.svg",
-			"description": "...",
+			"caption": "...",
 			"current": false,
 			"info" : {
 				"safety": false,
@@ -90,12 +90,69 @@
 	"tools": [
 		{
 			"index": 0,
-			"name": "butterknife",
+			"name": "cleaner",
 			"image": "/images/tools/lvl_0.svg",
-			"description": "...",
+			"caption": "...",
+			"current": false,
+			"info": {
+				"safety": "bacteria",
+				"alt": [ ]
+			}
+		},
+		{
+			"index": 0,
+			"name": "butterknife",
+			"image": "/images/tools/lvl_1.svg",
+			"caption": "...",
 			"current": false,
 			"info": {
 				"safety": false,
+				"alt": [ ]
+			}
+		}
+	],
+	"info": [
+		{
+			"index": 0,
+			"name": "bacteria",
+			"image": "",
+			"caption": "...",
+			"current": false,
+			"info": {
+				"safety": "cleaner",
+				"alt": [ ]
+			}
+		},
+		{
+			"index": 1,
+			"name": "gluten",
+			"image": "",
+			"caption": "...",
+			"current": false,
+			"info": {
+				"safety": "allergy",
+				"alt": [ ]
+			}
+		},
+		{
+			"index": 2,
+			"name": "nuts",
+			"image": "",
+			"caption": "...",
+			"current": false,
+			"info": {
+				"safety": "allergy",
+				"alt": [ ]
+			}
+		},
+		{
+			"index": 3,
+			"name": "dairy",
+			"image": "",
+			"caption": "...",
+			"current": false,
+			"info": {
+				"safety": "allergy",
 				"alt": [ ]
 			}
 		}

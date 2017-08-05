@@ -8,56 +8,9 @@ div.grid-header.mainHeader
 		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="http://pu.bli.sh/images/menu_button.svg")
 
-	//-
-		div.dropdown
-		
-			div.submenu
-				a#mySearch.ui
-					i.fa.fa-search
-				input(type="search", placeholder="search")
-		a.submenu.drop(href="/")
-			.ui
-				i.fa.fa-home
-			span.tb-font-l Home
-
-		if (loggedin)
-			if (menuData.publishers[0].username === loggedin)
-				a.submenu.drop(href="/ingredients/"+menuData.pageindex+"/"+contentData.index+"/"+infowindow+"/"+tlstatus+"", title="View pantry")
-					.ui
-						i.fa.fa-clock-o(class= tlstatus ? "active" : "")
-					span.tb-font-l My pantry
-
-				a.submenu.drop(href="/api/addfeature/"+menuData.pageindex+"")
-					.ui
-						i.fa.fa-shopping-basket
-					span.tb-font-l Get groceries
-			a.submenu.drop(href="/api/publish")
-				.ui
-					i.fa.fa-user-o
-				span.tb-font-l My Pages
-
-			a.submenu.drop(href="/logout")
-				.ui
-					i.fa.fa-sign-out
-				span.tb-font-l Log out
-			
-		else
-			a.submenu.drop(href="/login") 
-				.ui
-					i.fa.fa-sign-in
-				span.tb-font-l Login
-			
-			a.submenu.drop(href="/register") 
-				.ui
-					i.fa.fa-id-card-o
-				span.tb-font-l Register
 	div.pullquote
-		//-
-			if (contentData.substrates[contentData.substrates.length-1].caption)
-				span.tb-font-xl.hang #{(contentData.emoji?contentData.emoji:"ⱡ")}
-				span.tb-font-xxl #{contentData.substrates[contentData.substrates.length-1].caption}
-				a(href="#"+contentData.substrates[contentData.substrates.length-1].index+"")
-					//span.tb-font-xl.over ⟫
+		if (contentData[drawtype][level])
+			span.tb-font-xxl #{contentData[drawtype][level].caption}
 
 div.grid-left
 	#wrapper
@@ -107,7 +60,8 @@ div.grid-left
 						img(src="/images/icons/login.svg")
 					span.tb-font-l Login
 				
-				a.module(href="/register", title="register") 
-					.ui
-						i.fa.fa-id-card-o
-					span.tb-font-l Register
+				//-
+					a.module(href="/register", title="register") 
+						.ui
+							i.fa.fa-id-card-o
+						span.tb-font-l Register

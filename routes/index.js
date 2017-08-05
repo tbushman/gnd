@@ -310,10 +310,9 @@ router.get('/home', function(req, res, next) {
 			return res.render('publish', {
 				//theStore: thestore,
 				type: 'blog',
-				infowindow: 'root',
+				infowindow: 'home',
 				loggedin: req.app.locals.loggedin,
 				data: datarray,
-				pageindex: data[data.length-1].pageindex,
 				index: index,
 				info: info
 			})
@@ -321,9 +320,8 @@ router.get('/home', function(req, res, next) {
 			return res.render('publish', {
 				//theStore: thestore,
 				type: 'blog',
-				infowindow: 'root',
+				infowindow: 'home',
 				data: datarray,
-				pageindex: data[data.length-1].pageindex,
 				index: index,
 				info: info
 			})
@@ -369,7 +367,7 @@ router.get('/:pagetitle', ensurePage, function (req, res, next) {
 					return res.render('publish', {
 						pageindex: doc.pageindex,
 						type: 'blog',
-						infowindow: 'intro',
+						infowindow: 'doc',
 						loggedin: req.app.locals.loggedin,
 						index: index,
 						doc: doc,
@@ -380,7 +378,7 @@ router.get('/:pagetitle', ensurePage, function (req, res, next) {
 					return res.render('publish', {
 						pageindex: doc.pageindex,
 						type: 'blog',
-						infowindow: 'intro',
+						infowindow: 'doc',
 						index: index,
 						doc: doc,
 						data: datarray,
@@ -509,18 +507,12 @@ router.get('/api/publish', function(req, res, next) {
 								pid: data.length,
 								user: req.app.locals.user._id,
 								title: 'Peanut Butter and Jelly',
-								label: 'Sandwich',
 								description: 'My first sandwich',
 								current: true,
-								substrates: [ 
-									thestore.substrates[0]
-								],
-								filling: [ 
-									thestore.filling[0]
-								],
-								tools: [
-									thestore.tools[0]
-								]
+								level: 0,
+								substrates: [ ],
+								filling: [ ],
+								tools: [ ]
 							} ],
 							publishers: [{
 								_id: req.app.locals.user._id,
@@ -574,6 +566,7 @@ router.get('/api/publish', function(req, res, next) {
 			index: doc ? doc.content.length-1 : false,
 			data: [].map.call(data, function(d){return d}),
 			doc: doc ? doc : false,
+			drawtype: req.app.locals.drawtype ? req.app.locals.drawtype : false,
 			info: 'hi'
 		})
 	})
@@ -622,6 +615,8 @@ router.all('/api/uploadmedia/:pageindex/:index/:drawtype/:layer', uploadmedia.an
 })
 
 router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(req, res, next){
+	
+	delete req.app.locals.drawtype;
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath)
 	var index = parseInt(req.params.index, 10);
@@ -724,7 +719,7 @@ router.post('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', upl
 		return res.render('publish', {
 			type: 'draw',
 			drawtype: drawtype,
-			layer: layer,
+			//layer: layer,
 			infowindow: 'edit',
 			loggedin: req.app.locals.loggedin,
 			pagetitle: doc.pagetitle,
@@ -832,7 +827,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 				return res.render('publish', {
 					type: 'blog',
 					drawtype: req.app.locals.drawtype ? req.app.locals.drawtype : false,
-					layer: req.app.locals.layer ? req.app.locals.layer : false,
+					//layer: req.app.locals.layer ? req.app.locals.layer : false,
 					infowindow: 'edit',
 					loggedin: req.app.locals.loggedin,
 					pagetitle: doc.pagetitle,
