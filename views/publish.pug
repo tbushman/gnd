@@ -77,8 +77,6 @@ block content
 		var radiusSupported = false;
 		var nextCount = 0;
 		var touchMap = {};
-		var pointMode = (window.location.hash == "#points");
-		var pointerEventDisabledMode = (window.location.hash == "#nopointer");
 		var enableForce = false;
 		var drawTouchMajor = true;
 		var foundRotationAngle = false;
@@ -286,20 +284,13 @@ block content
 		})
 		$(document).on('click', '#save', function(e){
 			e.preventDefault();
-			//$('.grid-container.inner > .grid-mid').prepend('<canvas id="wipcanvas"></canvas>');
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+''
 			elem = document.getElementById(id);
-			/*var w = 400;
-			var h = 400;*/
-			//setTimeout(function(){
+
 			console.log('#{drawtype}', '#{layer}', id, elem);
 			if (elem !== null) {
 				saveImage(elem)
-			} else {
-				console.log('wtf')
 			}
-			
-			//}, 200);
 		})
 		
 		function InitializeApp(drawtype, layer) {
@@ -308,87 +299,17 @@ block content
 			console.log(elem)
 			InitializeCanvas(drawtype, layer);
 			if (elem) {
-				if (window.PointerEvent && !pointerEventDisabledMode) {
-					console.log("Adding PointerEvent listeners");
-					["pointerdown", "pointermove", "pointerup"].forEach(function(e) {
-							elem.addEventListener(e, PointerHandler);
-					});
-				} else {
-					console.log("Adding MouseEvent & TouchEvent listeners");
-					["mousedown", "mousemove", "mouseup"].forEach(function(e) {
-							elem.addEventListener(e, MouseHandler);
-					});
-					["touchstart", "touchmove", "touchend"].forEach(function(e) {
-							elem.addEventListener(e, TouchHandler);
-					});
-				}
+				console.log("Adding MouseEvent & TouchEvent listeners");
+				["mousedown", "mousemove", "mouseup"].forEach(function(e) {
+						elem.addEventListener(e, MouseHandler);
+				});
+				["touchstart", "touchmove", "touchend"].forEach(function(e) {
+						elem.addEventListener(e, TouchHandler);
+				});
 				window.addEventListener("resize", function(e) {
 					InitializeCanvas(drawtype, layer);
 				});
 			}
-			
-			//console.log(elem)
-			//drawtype = '#{drawtype}'
-			//layer = #{layer}
-			/*if (document.getElementById('canvas_'+drawtype+'_'+layer+'')) {
-				
-			}*/
-			/* else {
-				elem = document.getElementById('canvas');
-			}
-			
-			/*var canv = document.getElementById("canvas");
-			canvasWidth = canv.width;
-			canvasHeight = canv.height;
-			var layers = document.getElementsByClassName('layer');
-			for (var i in layers) {
-				layers[i].width = canvasWidth;
-				layers[i].height = canvasHeight;
-			}*/
-			
-
-			
-
-			/*document.addEventListener("keyup", function(e) {
-				switch(e.which) {
-				// ESC
-				case 27:
-					var canvas = document.getElementById("canvas_"+drawtype+"_"+layer+"");
-					canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-					break;
-
-				// p
-				case 80:
-					pointMode = !pointMode;
-					window.location.hash = pointMode ? "#points" : "";
-					break;
-
-				// f
-				case 70:
-					enableForce = !enableForce;
-					break;
-
-				// a
-				case 65:
-					drawTouchMajor = !drawTouchMajor;
-					break;
-
-				// c
-				case 67:
-					drawCoalesced = !drawCoalesced;
-					break;
-
-				// enter
-				case 13:
-					if (document.documentElement.webkitRequestFullscreen) {
-						if (document.webkitFullscreenElement)
-							document.webkitCancelFullScreen();
-						else
-							document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-					}
-				}
-			});
-			//console.log(elem)*/
 			
 		}
 		function InitializeCanvas(drawtype, layer) {
@@ -411,76 +332,14 @@ block content
 				canv.style.width = newwidth + "px";
 				canv.style.height = newheight + "px";
 				var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
-				/*var layers = document.getElementsByClassName('layer');
-				for (var i = 0;  i < layers.length; i++) {*/
-					elem.width = canvasWidth;
-					elem.height = canvasHeight;
-					elem.style.width = newwidth + "px";
-					elem.style.height = newheight + "px";
-					
-					/*if (i === parseInt(layer, 10)) {
-						//console.log(layers.item(i), layers[i])
-						
-						//thislayer = layers.item(i);
-					}*/
-					/*layers[i].style.width = window.screen.width + "px";
-					layers[i].style.height = window.screen.height + "px";*/
-					
-				//}
+				elem.width = canvasWidth;
+				elem.height = canvasHeight;
+				elem.style.width = newwidth + "px";
+				elem.style.height = newheight + "px";
 				scale = newscale;
-
-				/*elem.width = newwidth;
-				elem.height = newheight;*/
-				
 			}
-			//elem = document.getElementById('canvas_'+drawtype+'_'+layer+'')
-			//$('#select').prepend('<button id="save" style="z-index: 9999;position: absolute;">save</button>');
-
 		}
-		function PointerHandler(event) {
-			event.preventDefault();
-			
-			if (event.type == "pointerdown" && event.button === 0)
-				mousePressed = true;
-
-			if (mousePressed || event.type == "pointerup" || (event.buttons & 1)) {
-				var fakeTouch = {
-					identifier: event.pointerId,
-					pageX : event.pageX,
-					pageY : event.pageY,
-					radiusX : event.width,
-					radiusY : event.height,
-					force : event.pressure,
-				};
-				//var eventTarget = event//.target;
-				var eventType = event.type == "pointerdown" ? "touchstart" :
-					event.type == "pointerup" ? "touchend" : "touchmove";
-				event.preventDefault();
-				drawTouch(event.target, fakeTouch, eventType, false);
-
-				/*if (drawCoalesced && event.getCoalescedEvents) {
-					var points = event.getCoalescedEvents();
-					for(let coalesced of points) {
-						fakeTouch.pageX = coalesced.pageX;
-						fakeTouch.pageY = coalesced.pageY + 50;
-						fakeTouch.radiusX = coalesced.width;
-						fakeTouch.radiuxY = coalesced.height;
-						fakeTouch.force = coalesced.pressure;
-
-						drawTouch(event.target, fakeTouch, eventType, true);
-					}
-				}*/
-			}
-
-			if (event.type == "pointerup")
-				mousePressed = false;
-			
-			/*if (mainmenu.classList.contains('selected'))
-				mousePressed = false;
-				
-			if (document.getElementsByClassName('grid-container')[0].classList.contains('selected'))
-				mousePressed = false;*/
-		}
+		
 		function MouseHandler(event) {
 
 			if (event.type == "mousedown" && event.button === 0) {
@@ -496,7 +355,6 @@ block content
 				
 				var eventType = event.type ==  "mousedown" ? "touchstart" :
 						event.type == "mouseup" ? "touchend" : "touchmove";
-				//var eventTarget = event;
 
 				drawTouch(event.target, fakeTouch, eventType, false);
 				event.preventDefault();
@@ -504,21 +362,12 @@ block content
 
 			if (event.type == "mouseup")
 				mousePressed = false;
-			
-			/*if (mainmenu.classList.contains('selected')) {
-				console.log('selected menu')
-				mousePressed = false;
-			}
-			if (document.getElementsByClassName('grid-container')[0].classList.contains('selected'))
-				mousePressed = false;*/
-					
 		}
 		function TouchHandler(event) {
 			event.preventDefault();
 			
 			if (!mainmenu.classList.contains('selected')) {
 				for (var i = 0; i < event.changedTouches.length; i++)
-					//var eventTarget = event;//.target;
 					drawTouch(event.target, event.changedTouches[i], event.type, false);
 			}
 			
@@ -545,45 +394,18 @@ block content
 			if (!("force" in touch) && "webkitForce" in touch)
 				touch.force = touch.webkitForce;
 
-			var radiusX = getAdjustedRadius(touch.radiusX, touch.radiusY);
-			var radiusY = getAdjustedRadius(touch.radiusY, touch.radiusX);
+			var radiusX = 35;
+			var radiusY = 35;
 			var rotationAngle = getAdjustedRotationAngle(touch.rotationAngle);
 			foundRotationAngle = foundRotationAngle || rotationAngle;
-			var opacity, hue, lum, pattern;
-
+			
 			// Try to avoid start/end ellipses overlapping exactly
 			if (eventType == "touchend") {
 				radiusX++;
 				radiusY++;
 			}
-			if (drawType === 'filling') {
-				//context.globalAlpha = 0;
-				var img = new Image();
-				img.src = '/images/ingredients/'+drawtype+'_'+layer+'.svg';
-				
-				img.onload = function(){
-					pattern = context.createPattern(img, 'repeat');
-				};
-				
-			} else {
-				if (eventType != "touchend") {
-					opacity = drawType === 'filling' ? 1 : 0.1;
-					hue = (touchMap[touch.identifier] * 30) % 256;
-					if (coalesced)
-						hue += 10;
-					lum = 40;
-					if (enableForce && touch.force)
-						lum = Math.round(touch.force / 0.4 * 50 + 20);
-					
-				}
-				
-			}
-			function alphaDraw() {
-				
-				//pattern.setTransform(matrix.rotate(-45).scale(1.5));
-				//context.fillStyle = 'rgba(255,255,255, 0.4)';
-				
-			}
+			
+			
 			context.save();
 			context.translate(touch.pageX * scale, touch.pageY * scale);
 			context.rotate(rotationAngle);
@@ -591,84 +413,43 @@ block content
 			context.beginPath();
 			context.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
 			context.closePath();
-			//context.fillStyle = "hsla(100%,100%,100%, 1)";
-			// Fill the ellipse on start/move
-			if (eventType != "touchend") {
-				/*var opacity = 1//drawType === 'filling' ? 1 : 0.1;
-				var hue = (touchMap[touch.identifier] * 30) % 256;
-				if (coalesced)
-					hue += 10;
-				var lum = 40;
-				if (enableForce && touch.force)
-					lum = Math.round(touch.force / 0.4 * 50 + 20);
+			var pattern;
+			var img = new Image();
+			img.src = '/images/ingredients/'+drawType+'_'+layer+'.svg';
+			img.onload = function(){
 				
-				*/
-				if (drawType === 'filling') {
-					/*var r = eventTarget.getBoundingClientRect(),
-					x = touch.pageX - r.left,
-					y = touch.pageY - r.top;
-					context.beginPath();
-					context.moveTo(x + 35, y);
-					context.arc(x, y, 35, 0, 2*Math.PI);*/
-				
-					//context.fillRect(0, 0, canvasWidth, canvasHeight);
-				/*} else {
-					context.fillStyle = "hsla(" + hue + ",100%," + lum + "%, " + opacity + ")";
-				//context.fillStyle = "alpha(opacity="+opacity+");"
-			}*/
-					context.fillStyle = pattern;
-				} else {
-					context.fillStyle = "hsla(" + hue + ",100%," + lum + "%, " + opacity + ")";
-					console.log(context.fillStyle);
+				if (eventType != "touchend") {
+					if (drawType === 'filling') {
+						pattern = context.createPattern(img, 'no-repeat');
+						context.fillStyle = pattern;
+						context.fill();
+					}
 				}
-				
-				context.fill();
-			}
-
-			// Outline ellipse on start/end
-			if (eventType != "touchmove") {
-				context.strokeStyle = eventType == "touchstart" ? "black" : "grey";
-				context.lineWidth = 2;
-				context.stroke();
-			}
-
-			/*if (drawTouchMajor && foundRotationAngle) {
-				context.strokeStyle = "#fff";
-				context.lineWidth = 1;
-				context.beginPath();
-				if (radiusX >= radiusY) {
-					context.moveTo(-radiusX, 0);
-					context.lineTo(radiusX, 0);
-				} else {
-						// Note that this is also radiusX, because of the scaling above
-					context.moveTo(0, -radiusX);
-					context.lineTo(0, radiusX);
+				if (eventType != "touchmove" && eventType != "touchbegin") {
+					if (drawType === 'substrates') {
+						img.width = Math.min(canvasWidth, canvasHeight);
+						img.height = Math.min(canvasWidth, canvasHeight);
+						img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
+						img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
+						pattern = context.createPattern(img, 'no-repeat');
+						context.fillStyle = pattern;
+						context.fillRect(0, 0, canvasWidth, canvasHeight);
+					}
 				}
-				context.stroke();
-			}*/
-
+				if (eventType == "touchbegin") {
+					if (drawType === 'filling') {
+						context.fillStyle = pattern;
+					} else {
+						context.fillStyle = "rgba(255,255,255,0)"
+					}
+					context.fill();
+				}
+			}
+			
+			
 			context.restore();
 		}
-		function getAdjustedRadius(radius, otherRadius) {
-			if (pointMode)
-					return 1;
-
-			// Spec says to use 1 for unknown radius, can't differentiate between that
-			// and real 1 pixel radius.
-			var radiusUndefined = !radius || radius <= 1;
-			var otherRadiusUndefined = !otherRadius || otherRadius <= 1;
-
-			if (radiusUndefined) {
-					radius = otherRadiusUndefined? 15 : otherRadius;
-			}
-
-			if (radius > 100) {
-					console.error("Got large radius: " + radius);
-					radius = 100;
-			}
-
-			return radius * scale;
-		}
+		
 		function getAdjustedRotationAngle(angle) {
 			return angle * Math.PI / 180;
 		}
