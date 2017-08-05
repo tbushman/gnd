@@ -88,6 +88,9 @@ block content
 		var elem, canvasWidth, canvasHeight;
 		
 		$(document).ready(function(){
+			var can = document.getElementById('canvas');
+			can.style.width = '100%';
+			can.style.height = '100%';
 			pageIndex = parseInt(document.getElementById('pageindex').value, 10);
 			console.log('this pageindex'+pageIndex)
 			var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
@@ -114,6 +117,7 @@ block content
 			layer = '#{layer}'
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+''
 			if (document.getElementById(id) !== null) {
+				
 				InitializeApp(drawtype, parseInt(layer, 10));
 			}
 		})
@@ -404,15 +408,16 @@ block content
 				canvasHeight = newheight;
 				canv.width = canvasWidth;
 				canv.height = canvasHeight;
-				/*canv.style.width = "100%";
-				canv.style.height = "100%";*/
+				canv.style.width = newwidth + "px";
+				canv.style.height = newheight + "px";
 				var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
 				/*var layers = document.getElementsByClassName('layer');
 				for (var i = 0;  i < layers.length; i++) {*/
 					elem.width = canvasWidth;
 					elem.height = canvasHeight;
-					/*elem.style.width = "100%";
-					elem.style.height = "100%";*/
+					elem.style.width = newwidth + "px";
+					elem.style.height = newheight + "px";
+					
 					/*if (i === parseInt(layer, 10)) {
 						//console.log(layers.item(i), layers[i])
 						
@@ -521,6 +526,8 @@ block content
 		function drawTouch(eventTarget, touch, eventType, coalesced) {
 			var context = eventTarget.getContext("2d");
 			var drawType = eventTarget.getAttribute('id').split('_')[1];
+			var layer = eventTarget.getAttribute('id').split('_')[2];
+			
 			// Map the identifier to a small count (no-op on Chrome, but
 			// important for mobile Safari).
 			if (!(touch.identifier in touchMap)) {
@@ -542,11 +549,40 @@ block content
 			var radiusY = getAdjustedRadius(touch.radiusY, touch.radiusX);
 			var rotationAngle = getAdjustedRotationAngle(touch.rotationAngle);
 			foundRotationAngle = foundRotationAngle || rotationAngle;
+			var opacity, hue, lum, pattern;
 
 			// Try to avoid start/end ellipses overlapping exactly
 			if (eventType == "touchend") {
 				radiusX++;
 				radiusY++;
+			}
+			if (drawType === 'filling') {
+				//context.globalAlpha = 0;
+				var img = new Image();
+				img.src = '/images/ingredients/'+drawtype+'_'+layer+'.svg';
+				
+				img.onload = function(){
+					pattern = context.createPattern(img, 'repeat');
+				};
+				
+			} else {
+				if (eventType != "touchend") {
+					opacity = drawType === 'filling' ? 1 : 0.1;
+					hue = (touchMap[touch.identifier] * 30) % 256;
+					if (coalesced)
+						hue += 10;
+					lum = 40;
+					if (enableForce && touch.force)
+						lum = Math.round(touch.force / 0.4 * 50 + 20);
+					
+				}
+				
+			}
+			function alphaDraw() {
+				
+				//pattern.setTransform(matrix.rotate(-45).scale(1.5));
+				//context.fillStyle = 'rgba(255,255,255, 0.4)';
+				
 			}
 			context.save();
 			context.translate(touch.pageX * scale, touch.pageY * scale);
@@ -558,14 +594,34 @@ block content
 			//context.fillStyle = "hsla(100%,100%,100%, 1)";
 			// Fill the ellipse on start/move
 			if (eventType != "touchend") {
-				var opacity = drawType === 'filling' ? 1 : 0.1;
+				/*var opacity = 1//drawType === 'filling' ? 1 : 0.1;
 				var hue = (touchMap[touch.identifier] * 30) % 256;
 				if (coalesced)
 					hue += 10;
 				var lum = 40;
 				if (enableForce && touch.force)
 					lum = Math.round(touch.force / 0.4 * 50 + 20);
-				context.fillStyle = "hsla(" + hue + ",100%," + lum + "%, " + opacity + ")";
+				
+				*/
+				if (drawType === 'filling') {
+					/*var r = eventTarget.getBoundingClientRect(),
+					x = touch.pageX - r.left,
+					y = touch.pageY - r.top;
+					context.beginPath();
+					context.moveTo(x + 35, y);
+					context.arc(x, y, 35, 0, 2*Math.PI);*/
+				
+					//context.fillRect(0, 0, canvasWidth, canvasHeight);
+				/*} else {
+					context.fillStyle = "hsla(" + hue + ",100%," + lum + "%, " + opacity + ")";
+				//context.fillStyle = "alpha(opacity="+opacity+");"
+			}*/
+					context.fillStyle = pattern;
+				} else {
+					context.fillStyle = "hsla(" + hue + ",100%," + lum + "%, " + opacity + ")";
+					console.log(context.fillStyle);
+				}
+				
 				context.fill();
 			}
 
@@ -636,7 +692,7 @@ block content
 			}
 			layer = can.getAttribute('id').split('_')[2];
 			drawtype = can.getAttribute('id').split('_')[1];
-			if (drawtype !== undefined) {
+			if (drawtype && drawtype !== undefined) {
 				can.toBlob(function(blob) {
 					var fd = new FormData();
 					
@@ -659,7 +715,7 @@ block content
 							$('a.mainmenu').addClass('dropdown');
 							$('a.mainmenu').attr('title', 'Menu');
 							$('a.mainmenu').html('<img class="i" src="http://pu.bli.sh/images/menu_button.svg"></img>')
-							InitializeApp('#{drawtype}', '#{layer}');
+							//InitializeApp('#{drawtype}', '#{layer}');
 						}
 						
 					})
