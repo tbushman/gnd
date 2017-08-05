@@ -8,10 +8,7 @@ div.grid-header.mainHeader
 		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="http://pu.bli.sh/images/menu_button.svg")
 
-	div.pullquote
-		if (contentData[drawtype][level])
-			span.tb-font-xxl #{contentData[drawtype][level].caption}
-
+	
 div.grid-left
 	#wrapper
 		div#tlmodules.dropdown
@@ -30,26 +27,25 @@ div.grid-left
 						
 							each module, j in menuData.content
 								if (j === menuData.content[index].index)
-									each ing, k in menuData.content[index].substrates
-										
-										a.module.focus.drop(href="#", onclick="document.getElementById('form_sub"+k+"').submit();")
-											.ui
-												img(src="/images/icons/substrate_"+k+".svg")
-											span.tb-font-l #{ing.name}
+									if (menuData.content[index][drawtype])
+										each ing, k in menuData.content[index][drawtype]
+											
+											a.module.focus.drop(href="#", onclick="document.getElementById('form_"+drawtype+"_"+k+"').submit();")
+												.ui
+													img(src="/images/icons/"+drawtype+"_"+k+".svg")
+												span.tb-font-l #{ing.name}
 
-											form(id="form_sub"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/substrates/"+k+"")
-												input(type="hidden", value="1", name= ing.name)
-												input(type="hidden", id="inputimg_sub_"+k+"", name="img_sub_"+k+"", value= ing.image)
-
-									each ing, l in menuData.content[index].filling
-										a.module.focus.drop(href="#", onclick="document.getElementById('form_fil"+l+"').submit();")
-											.ui
-												img(src="/images/icons/filling_"+l+".svg")
-											span.tb-font-l #{ing.name}
-											form(id="form_fil"+l+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/filling/"+l+"")
-												input(type="hidden", value="1", name= ing.name)
-												input(type="hidden", id="inputimg_fil_"+l+"", name="img_fil_"+l+"", value= ing.image)
-
+												form(id="form_"+drawtype+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/"+drawtype+"/"+k+"")
+													input(type="hidden", value="1", name= ing.name)
+													input(type="hidden", id="inputimg_"+drawtype+"_"+k+"", name= ing.name, value= ing.image)
+									else
+										- var catKeys = Object.keys(menuData.content[index])
+										each cat, c in menuData.content[index]
+											if (Array.isArray(cat))
+												
+												a.module.dropdown(title= catKeys[c])
+													.ui
+														img(src="/images/"+catKeys[c])
 						a.module(href="/logout", title="logout")
 							.ui
 								img(src="/images/icons/logout.svg")

@@ -154,7 +154,8 @@ i.fa.active {
 	display: block;
 	position: fixed;
 	top: calc(var(--nowindowmenu) + 15px);
-	/*z-index:1;*/
+	left: var(--thumbwidth);
+	z-index:1;
 }
 @supports not (display:grid) {
 	.pullquote {
@@ -571,15 +572,13 @@ div.menu > div.topLeft {
 /*div.map .menu .topLeft, */div.map .menu .topRight {
 	position: static;
 }
-div.map .menu .topLeft {
-	position: static;
-}
-div.draw .menu .overtext {
+
+.overtext {
 	position: fixed;
 	top: calc(var(--thumbwidth)/6);
 	left: var(--thumbwidth);
 }
-div.draw .menu .blogname {
+.blogname {
 	position: fixed;
 	top: calc(var(--thumbwidth)/2.5);
 	left: var(--thumbwidth);

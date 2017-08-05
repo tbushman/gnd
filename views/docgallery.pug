@@ -7,15 +7,18 @@ div.grid-right
 		if (index >= 0)
 			div.grid-container.inner
 				div.grid-header
-					each imag, i in contentData.substrates
-						a.thumbnail.gallery(href="")
-							img(src=""+imag.image+"")
-					p.tb-font-s.hideoverlap About
-					 	span #{contentData.info[contentData.level].name}
+					each entry, i in contentData[drawtype]
+						if (Array.isArray(entry))
+							each imag, j in entry
+								a.thumbnail.gallery(href="")
+									img(src=""+imag.image+"")
+						if (contentData.info !== undefined)
+							p.tb-font-s.hideoverlap About
+								span #{contentData.info[contentData.level].name}
 				div.grid-left(style="padding: 6px 0 0 6px;")
-					if (loggedin && loggedin === doc.publishers[0].username)
-						a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit blog entry")
-							img(src="/images/tools/lvl_"+entry.level+".svg")
+					if (loggedin && loggedin === menuData.publishers[0].username && menuData.content.length > 0)
+						a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit sandwich")
+							img(src="/images/tools/lvl_"+contentData.level+".svg")
 				div.grid-right
 					p.tb-font-xl #{contentData.title}
 					p.tb-font-s #{contentData.description}
@@ -35,18 +38,18 @@ div.grid-right
 				if (entry.description)
 					p.tb-font-xs.hideoverlap #{entry.description}
 					span &nbsp ...
-				if (entry.substrates.length > 0)
+				if (entry[drawtype].length > 0)
 					div.thumbnail.gallery(id= entry.pageindex)
-						img(src= entry.substrates[entry.level].image)
+						img(src= entry[drawtype][level].image)
 					div#hide
-						if (entry.substrates[entry.level].name === '')
+						if (entry[drawtype][level].name === '')
 							span.tb-font-xxs &nbsp
 						else
-							span.tb-font-xxs #{entry.substrates[entry.level].name}
-						if (entry.substrates[entry.level].caption === '')
+							span.tb-font-xxs #{entry[drawtype][entry.level].name}
+						if (entry[drawtype][level].caption === '')
 							span.tb-font-xs &nbsp
 						else
-							span.tb-font-xs #{entry.substrates[0].caption}
+							span.tb-font-xs #{entry[drawtype][entry.level].caption}
 
 				hr(style="color: "+doc.css.primary+"")
 		

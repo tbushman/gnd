@@ -20,11 +20,18 @@ html
 		
 	body
 		block page
-		
+
+			
 		block header
 
 		block content
 
+		div.pullquote
+			if (drawtype)
+				if (contentData[drawtype][level])
+					span.tb-font-xxl #{contentData[drawtype][level].caption}
+			else 
+				span.tb-font-xxl testing
 		a#publish_logo(href="https://github.com/tbushman/pu" target="_blank")
 			img(src="/images/publish_logo.svg")
 			

@@ -1,7 +1,6 @@
 extends layout
 block page
-	
-block content
+
 	if (doc)
 		
 		- var menu = 'doc'
@@ -29,7 +28,10 @@ block content
 		if (layer)
 			- var level = layer
 		else
-	- var level = contentData.level
+	- var layer = contentData.level
+
+block content
+	
 
 	input(type="hidden", value= pageIndex, id="pageindex")
 		//-
@@ -39,10 +41,11 @@ block content
 
 			div.overtext #{menuData.pagetitle}
 			div.blogname
-				if (contentData.filling.length > 1)
-					span #{contentData.filling[1].name}
-					span  and  
-				span #{contentData.filling[0].name}
+				if (contentData.filling.length > 0)
+					if (contentData.filling.length > 1)
+						span #{contentData.filling[1].name}
+						span  and  
+					span #{contentData.filling[0].name}
 
 				
 			if (type === 'draw')
@@ -72,8 +75,7 @@ block content
 		var data = `'#{data}'`
 		/*var pageindex = '#{pageindex}'*/
 		var mainmenu = document.getElementsByClassName('menu')[0];
-		var pageIndex; 
-		var drawtype, layer;
+		var pageIndex, drawtype, layer;
 		var datalength = #{data.length};
 		var doc = `#{JSON.stringify(doc)}`;
 		var lMarker;
@@ -486,7 +488,7 @@ block content
 					
 					fd.append('img_'+drawtype+'_'+layer+'', blob);
 					
-					var uploadurl = '/api/uploadmedia/'+#{pageindex}+'/'+#{index}+'/'+drawtype+'/'+layer+'';
+					var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/'+drawtype+'/'+layer+'';
 
 					console.log(blob)
 					console.log(uploadurl)
@@ -517,7 +519,7 @@ block content
 					
 					fd.append("img", blob);
 					
-					var uploadurl = '/api/uploadmedia/'+#{pageindex}+'/'+#{index}+'/'+false+'/'+false+'';
+					var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/'+false+'/'+false+'';
 
 					console.log(blob)
 					console.log(uploadurl)

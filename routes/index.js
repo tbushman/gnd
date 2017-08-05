@@ -510,9 +510,10 @@ router.get('/api/publish', function(req, res, next) {
 								description: 'My first sandwich',
 								current: true,
 								level: 0,
+								info: [ thestore.info[0] ],
 								substrates: [ ],
 								filling: [ ],
-								tools: [ ]
+								tools: [ thestore.tools[0] ]
 							} ],
 							publishers: [{
 								_id: req.app.locals.user._id,
@@ -663,49 +664,21 @@ router.post('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', upl
 				if (err) {
 					return next(err)
 				}
-				/*var ings = pub.content[index][''+req.params.type+''];
-				var antiings = pub.content[index][''+!req.params.type+''];
-				
-				
-				var findkey = 'content.$.'+req.params.type+'.current'
-				//find.content[findkey] = true; 
-				var set = {$set:{}};
-				var key = 'content.0.'+req.params.type+'.$.current'
-				
-				set.$set[key] = true;
-				
-				Page.findOne({pageindex: pub.pageindex}).then(function(data1){
-					if (!data1) return;
-					data1.content[index]['substrates'].forEach(function(e){
-						for (var i = 0; i < e.length; i++) {
-							if (e[i].current) {
-								e[i].current = false;
-							}
+				Page.find({}, function(errrr, data){
+					if (errrr) {
+						return next(errrr)
+					}
+					var set = {$set:{}}
+					var key = 'content.$.level'
+					set.$set[key] = layer;
+					Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){
+						if (err) {
+							return next(err)
 						}
+						next(null, data, doc, index, drawtype, layer)
 					})
-					data1.content[index]['filling'].forEach(function(e){
-						for (var i = 0; i < e.length; i++) {
-							if (e[i].current) {
-								e[i].current = false;
-							}
-						}
-					})
-					var set1 = {$set:{}};
-					var key1 = 'content.'+index+'.'+req.params.type+'.'+layer+'.current';
-					set1.$set[key1] = true;
-					console.log(set1)
-					Page.update({urltitle: urltitle}, set1, {safe: true, new: true, upsert: false}, function(error, doc){
-						if (error) {
-							return next(error)
-						}*/
-						Page.find({}, function(errrr, data){
-							if (errrr) {
-								return next(errrr)
-							}
-							next(null, data, pub, index, drawtype, layer)
-						})
-					//})
-				//})
+					
+				})
 			})
 		}
 	], function(err, data, doc, index, drawtype, layer) {
@@ -738,7 +711,6 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 	console.log(outputPath)
 	var index = parseInt(req.params.index, 10);
 	var title = req.body.title;
-	var label = req.body.label;
 	var description = req.body.description;
 	var body = req.body;
 
@@ -749,68 +721,48 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 		var id = pub._id;
 		var pageindex = parseInt(pub.pageindex, 10)
 		var keys = Object.keys(body);
-		var substrates = pub.content[index].substrates;
-		var filling = pub.content[index].filling;
-		var thissub = false;
-		var subind, subname;
-		var thisfill = false;
-		var fillind, fillname;
-		for (var q = 0; q < substrates.length; q++) {
-			if (keys.indexOf(substrates[q].name) !== -1) {
-				thissub = substrates[q];
-				subind = substrates[q].index;
-				subname = thissub.name;
-			}
-		}
-		for (var r = 0; r < filling.length; r++) {
-			if (keys.indexOf(filling[r].name) !== -1) {
-				thisfill = filling[r];
-				fillind = filling[r].index;
-				fillname = thisfill.name;
-			}
-		}
-		if (thissub || thisfill) {
-			if (thissub && body["img_substrates_"+subind+""] !== null) {
-				substrates[subind].image = body[subname] 
-			}
-			if (thisfill && body["img_filling_"+fillind+""] !== null) {
-				filling[filling].image = body[fillname]
-			}
-		} else {
-			for (var i = 0; i < thestore.substrates.length; i++) {
-				for (var j = 0; j < keys.length; j++) {
-					if (thestore.substrates[i].name === keys[j]) {
-						var newentry = thestore.substrates[i];
-						newentry.image = body[subname]
-						substrates.push(newentry)
-					}
-				}		
-			}
-			for (var l = 0; l < thestore.filling.length; l++) {
-				for (var m = 0; m < keys.length; m++) {
-					if (thestore.filling[l].name === keys[m]) {
-						var newentry = thestore.filling[l];
-						newentry.image = body[fillname]
-						filling.push(newentry)
+		var contentdata = pub.content[index];
+		var cKeys = Object.keys(contentdata);
+		var key, push, drawType, drawInd, drawName, drawThis;
+		for (var i = 0; i < cKeys.length; i++) {
+			if (Array.isArray(contentdata[cKeys[i]])) {
+				drawType = cKeys[i]
+				for (var q = 0; q < contentdata[cKeys[i]].length; q++) {
+					if (keys.indexOf(contentdata[drawType][q].name) !== -1) {
+						drawThis = contentdata[drawType][q];
+						drawInd = drawThis.index;
+						drawName = drawThis.name;
+						key = 'content.$.'+drawType+'.'+drawInd+''
+						push = {$set: {}};
+						pushKey = '$set'
+						
+					} else {
+						for (var i = 0; i < thestore[drawtype].length; i++) {
+							for (var j = 0; j < keys.length; j++) {
+								if (thestore[drawtype][i].name === keys[j]) {
+									drawThis = thestore[drawtype][i];
+									drawInd = drawThis.index;
+									drawName = drawThis.name;
+									key = 'content.$.'+drawType+''
+									push = {$push: {}};
+									pushKey = '$push'
+								}
+							}		
+						}
 					}
 				}
 			}
 		}
-		var entry = {
-			index: index,
-			pid: pageindex,
-			label: body.label,
-			title: body.title,
-			description: body.description,
-			current: true,
-			substrates: substrates,
-			filling: filling,
-			image: body["img"] ? body["img"] : ""
+		if (drawThis) {
+			if (body[drawName]) {
+				drawThis.image = body[drawName];
+				drawThis.title = body['title'];
+				drawThis.description = body['description'];
+			}
 		}
-		entry = JSON.parse(JSON.stringify(entry))
-		var key = 'content.$'
-		var push = {$set: {}};
-		push.$set[key] = entry;
+		
+		drawThis = JSON.parse(JSON.stringify(drawThis))
+		push[pushKey][key] = drawThis;
 
 		Page.findOneAndUpdate({pageindex: pageindex, content: {$elemMatch: {index: index}}}, push, {safe: true, new: true, upsert: false}, function(error, doc){
 			if (error) {
