@@ -42,12 +42,12 @@ block content
 				if (drawtype === "substrates")
 					each sub, i in contentData.substrates
 						if (layer === i)
-							canvas.canvas.layer.topRight(id="canvas_substrates_"+i+"", style="z-index: "+i+"")
+							canvas.canvas.layer.topRight(id="canvas_substrates_"+i+"", style="z-index: "+i+"; cursor: grab;")
 				if (drawtype === "filling")
 					each fil, j in contentData.filling
 						if (layer === j)
-							canvas.canvas.layer.topRight(id="canvas_filling_"+j+"", style="z-index: "+j+"")
-			canvas.maincanvas.topRight(id="canvas", style="background-image:url('/images/backgrounds/lvl_"+index+".svg');")
+							canvas.canvas.layer.topRight(id="canvas_filling_"+j+"", style="z-index: "+j+"; cursor: url('/images/icons/edit.png');")
+			canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/lvl_"+index+".svg');")
 			div.topLeft
 		
 		div.grid-container(class= type)
@@ -111,9 +111,9 @@ block content
 			$('.drop').slideUp(100);
 			$('.selected').removeClass('selected');
 			drawtype = '#{drawtype}'
-			layer = `#{layer}`
+			layer = '#{layer}'
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+''
-			if (document.getElementById(id)) {
+			if (document.getElementById(id) !== null) {
 				InitializeApp(drawtype, parseInt(layer, 10));
 			}
 		})
@@ -288,7 +288,7 @@ block content
 			/*var w = 400;
 			var h = 400;*/
 			//setTimeout(function(){
-			console.log('#{drawtype}', `#{layer}`, id, elem);
+			console.log('#{drawtype}', '#{layer}', id, elem);
 			if (elem !== null) {
 				saveImage(elem)
 			} else {
@@ -299,47 +299,53 @@ block content
 		})
 		
 		function InitializeApp(drawtype, layer) {
-			/*console.log(drawtype, layer)
-			var elem;*/
+			console.log(drawtype, layer)
+			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
+			console.log(elem)
+			InitializeCanvas(drawtype, layer);
+			if (elem) {
+				if (window.PointerEvent && !pointerEventDisabledMode) {
+					console.log("Adding PointerEvent listeners");
+					["pointerdown", "pointermove", "pointerup"].forEach(function(e) {
+							elem.addEventListener(e, PointerHandler);
+					});
+				} else {
+					console.log("Adding MouseEvent & TouchEvent listeners");
+					["mousedown", "mousemove", "mouseup"].forEach(function(e) {
+							elem.addEventListener(e, MouseHandler);
+					});
+					["touchstart", "touchmove", "touchend"].forEach(function(e) {
+							elem.addEventListener(e, TouchHandler);
+					});
+				}
+				window.addEventListener("resize", function(e) {
+					InitializeCanvas(drawtype, layer);
+				});
+			}
 			
 			//console.log(elem)
 			//drawtype = '#{drawtype}'
 			//layer = #{layer}
-			if (document.getElementById('canvas_'+drawtype+'_'+layer+'')) {
-				elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
-				console.log(elem)
-				InitializeCanvas(drawtype, layer);
+			/*if (document.getElementById('canvas_'+drawtype+'_'+layer+'')) {
+				
+			}*/
+			/* else {
+				elem = document.getElementById('canvas');
 			}
 			
-			var canv = document.getElementById("canvas");
+			/*var canv = document.getElementById("canvas");
 			canvasWidth = canv.width;
 			canvasHeight = canv.height;
 			var layers = document.getElementsByClassName('layer');
 			for (var i in layers) {
 				layers[i].width = canvasWidth;
 				layers[i].height = canvasHeight;
-			}
+			}*/
 			
-			if (window.PointerEvent && !pointerEventDisabledMode) {
-				console.log("Adding PointerEvent listeners");
-				["pointerdown", "pointermove", "pointerup"].forEach(function(e) {
-						elem.addEventListener(e, PointerHandler);
-				});
-			} else {
-				console.log("Adding MouseEvent & TouchEvent listeners");
-				["mousedown", "mousemove", "mouseup"].forEach(function(e) {
-						elem.addEventListener(e, MouseHandler);
-				});
-				["touchstart", "touchmove", "touchend"].forEach(function(e) {
-						elem.addEventListener(e, TouchHandler);
-				});
-			}
 
-			window.addEventListener("resize", function(e) {
-				InitializeCanvas(drawtype, layer);
-			});
+			
 
-			document.addEventListener("keyup", function(e) {
+			/*document.addEventListener("keyup", function(e) {
 				switch(e.which) {
 				// ESC
 				case 27:
@@ -378,13 +384,17 @@ block content
 					}
 				}
 			});
-			//console.log(elem)
+			//console.log(elem)*/
 			
 		}
 		function InitializeCanvas(drawtype, layer) {
 			var canv = document.getElementById("canvas");
-			elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
+			//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
 			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
+			if (navigator.platform.split('Mac')[1] !== undefined) {
+				console.log(navigator.platform)
+				newscale = 1
+			}
 			var newwidth = window.screen.width * newscale;
 			var newheight = window.screen.height * newscale;
 			var thislayer;
@@ -394,20 +404,24 @@ block content
 				canvasHeight = newheight;
 				canv.width = canvasWidth;
 				canv.height = canvasHeight;
-				canv.style.width = newwidth + "px";
-				canv.style.height = newheight + "px";
-				
-				var layers = document.getElementsByClassName('layer');
-				for (var i in layers) {
-					if (i === parseInt(layer, 10)) {
-						layers[i].width = canvasWidth;
-						layers[i].height = canvasHeight;
-						thislayer = layers[i];
-					}
+				/*canv.style.width = "100%";
+				canv.style.height = "100%";*/
+				var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
+				/*var layers = document.getElementsByClassName('layer');
+				for (var i = 0;  i < layers.length; i++) {*/
+					elem.width = canvasWidth;
+					elem.height = canvasHeight;
+					/*elem.style.width = "100%";
+					elem.style.height = "100%";*/
+					/*if (i === parseInt(layer, 10)) {
+						//console.log(layers.item(i), layers[i])
+						
+						//thislayer = layers.item(i);
+					}*/
 					/*layers[i].style.width = window.screen.width + "px";
 					layers[i].style.height = window.screen.height + "px";*/
 					
-				}
+				//}
 				scale = newscale;
 
 				/*elem.width = newwidth;
@@ -420,7 +434,6 @@ block content
 		}
 		function PointerHandler(event) {
 			event.preventDefault();
-			console.log(event.type)
 			
 			if (event.type == "pointerdown" && event.button === 0)
 				mousePressed = true;
@@ -434,12 +447,13 @@ block content
 					radiusY : event.height,
 					force : event.pressure,
 				};
+				//var eventTarget = event//.target;
 				var eventType = event.type == "pointerdown" ? "touchstart" :
 					event.type == "pointerup" ? "touchend" : "touchmove";
 				event.preventDefault();
-				drawTouch(fakeTouch, eventType, false);
+				drawTouch(event.target, fakeTouch, eventType, false);
 
-				if (drawCoalesced && event.getCoalescedEvents) {
+				/*if (drawCoalesced && event.getCoalescedEvents) {
 					var points = event.getCoalescedEvents();
 					for(let coalesced of points) {
 						fakeTouch.pageX = coalesced.pageX;
@@ -448,24 +462,24 @@ block content
 						fakeTouch.radiuxY = coalesced.height;
 						fakeTouch.force = coalesced.pressure;
 
-						drawTouch(fakeTouch, eventType, true);
+						drawTouch(event.target, fakeTouch, eventType, true);
 					}
-				}
+				}*/
 			}
 
 			if (event.type == "pointerup")
 				mousePressed = false;
 			
-			if (mainmenu.classList.contains('selected'))
+			/*if (mainmenu.classList.contains('selected'))
 				mousePressed = false;
 				
 			if (document.getElementsByClassName('grid-container')[0].classList.contains('selected'))
-				mousePressed = false;
+				mousePressed = false;*/
 		}
 		function MouseHandler(event) {
+
 			if (event.type == "mousedown" && event.button === 0) {
 				mousePressed = true;
-				console.log('clicked '+ event);
 			}
 				
 			if (mousePressed && event.button === 0) {
@@ -474,21 +488,24 @@ block content
 					pageX : event.pageX,
 					pageY : event.pageY
 				};
-				var eventType = event.type == "mousedown" ? "touchstart" :
+				
+				var eventType = event.type ==  "mousedown" ? "touchstart" :
 						event.type == "mouseup" ? "touchend" : "touchmove";
-				drawTouch(fakeTouch, eventType, false);
+				//var eventTarget = event;
+
+				drawTouch(event.target, fakeTouch, eventType, false);
 				event.preventDefault();
 			}
 
 			if (event.type == "mouseup")
 				mousePressed = false;
 			
-			if (mainmenu.classList.contains('selected')) {
+			/*if (mainmenu.classList.contains('selected')) {
 				console.log('selected menu')
 				mousePressed = false;
 			}
 			if (document.getElementsByClassName('grid-container')[0].classList.contains('selected'))
-				mousePressed = false;
+				mousePressed = false;*/
 					
 		}
 		function TouchHandler(event) {
@@ -496,13 +513,14 @@ block content
 			
 			if (!mainmenu.classList.contains('selected')) {
 				for (var i = 0; i < event.changedTouches.length; i++)
-					drawTouch(event.changedTouches[i], event.type, false);
+					//var eventTarget = event;//.target;
+					drawTouch(event.target, event.changedTouches[i], event.type, false);
 			}
 			
 		}
-		function drawTouch(touch, eventType, coalesced) {
-			var context = document.getElementById("canvas").getContext("2d");
-
+		function drawTouch(eventTarget, touch, eventType, coalesced) {
+			var context = eventTarget.getContext("2d");
+			var drawType = eventTarget.getAttribute('id').split('_')[1];
 			// Map the identifier to a small count (no-op on Chrome, but
 			// important for mobile Safari).
 			if (!(touch.identifier in touchMap)) {
@@ -537,11 +555,10 @@ block content
 			context.beginPath();
 			context.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
 			context.closePath();
-
+			//context.fillStyle = "hsla(100%,100%,100%, 1)";
 			// Fill the ellipse on start/move
 			if (eventType != "touchend") {
-				var opacity = pointMode ? 1 : 0.1;
-
+				var opacity = drawType === 'filling' ? 1 : 0.1;
 				var hue = (touchMap[touch.identifier] * 30) % 256;
 				if (coalesced)
 					hue += 10;
@@ -559,7 +576,7 @@ block content
 				context.stroke();
 			}
 
-			if (drawTouchMajor && foundRotationAngle) {
+			/*if (drawTouchMajor && foundRotationAngle) {
 				context.strokeStyle = "#fff";
 				context.lineWidth = 1;
 				context.beginPath();
@@ -572,7 +589,7 @@ block content
 					context.lineTo(0, radiusX);
 				}
 				context.stroke();
-			}
+			}*/
 
 			context.restore();
 		}
@@ -637,8 +654,12 @@ block content
 						contentType: false,
 						success: function(response) {
 							$('#inputimg_'+drawtype+'_'+layer+'').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-							$('#form').submit();
-							InitializeApp('#{drawtype}', #{layer})
+							//$('#form').submit();
+							$('a.mainmenu').removeClass('dropdown');
+							$('a.mainmenu').addClass('dropdown');
+							$('a.mainmenu').attr('title', 'Menu');
+							$('a.mainmenu').html('<img class="i" src="http://pu.bli.sh/images/menu_button.svg"></img>')
+							InitializeApp('#{drawtype}', '#{layer}');
 						}
 						
 					})
@@ -662,8 +683,12 @@ block content
 						success: function(response) {
 							
 								$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-								$('#form').submit();
-								InitializeApp('#{drawtype}', #{layer})
+								$('a.mainmenu').removeClass('dropdown');
+								$('a.mainmenu').addClass('dropdown');
+								$('a.mainmenu').attr('title', 'Menu');
+								$('a.mainmenu').html('<img class="i" src="http://pu.bli.sh/images/menu_button.svg"></img>')
+																//$('#form').submit();
+								//InitializeApp('#{drawtype}', #{layer})
 							}
 						
 					})

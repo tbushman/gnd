@@ -840,8 +840,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 					index: index,
 					doc: doc,
 					data: datarray,
-					info: ':)',
-					save: true
+					info: ':)'
 				})
 			})
 		});
