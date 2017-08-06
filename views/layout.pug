@@ -20,11 +20,12 @@ html
 		
 	body
 		block page
+			- var theStore = theStore
 
-			
 		block header
 
 		block content
+			- var itemkeys = Object.keys(contentData.items)
 
 		div.pullquote
 			if (drawtype)

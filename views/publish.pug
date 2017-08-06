@@ -1,6 +1,6 @@
 extends layout
 block page
-
+	
 	if (doc)
 		
 		- var menu = 'doc'
@@ -14,7 +14,7 @@ block page
 		else
 			- var menu = 'home'
 			- var pageIndex = data[data.length-1].pageindex
-			if (data[data.length-1].content[data[data.length-1].content.length-1].substrates[0] !== undefined)
+			if (data[data.length-1].content[data[data.length-1].content.length-1].items.length === 0)
 				- var menuData = data[data.length-1]
 			else
 				- var menuData = data[0]
@@ -29,7 +29,7 @@ block page
 			- var level = layer
 		else
 	- var layer = contentData.level
-
+	- var itemkeys = Object.keys(contentData.items)
 block content
 	
 
@@ -41,15 +41,15 @@ block content
 
 			div.overtext #{menuData.pagetitle}
 			div.blogname
-				if (contentData.filling.length > 0)
-					if (contentData.filling.length > 1)
-						span #{contentData.filling[1].name}
+				if (contentData.items.filling.length > 0)
+					if (contentData.items.filling.length > 1)
+						span #{contentData.items.filling[1].name}
 						span  and  
-					span #{contentData.filling[0].name}
+					span #{contentData.items.filling[0].name}
 
 				
-			if (contentData[drawtype])
-				each sub, i in contentData[drawtype]
+			if (contentData.items[drawtype])
+				each sub, i in contentData.items[drawtype]
 					if (layer === i)
 						canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+i+"", style="z-index: "+i+"; cursor: grab;")
 

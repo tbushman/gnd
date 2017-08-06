@@ -5,7 +5,7 @@
 			"name": "bread",
 			"image": "/images/ingredients/substrate_0.svg",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info" : {
 				"safety": "gluten",
 				"alt": [
@@ -19,7 +19,7 @@
 			"name": "rice",
 			"image": "/images/ingredients/substrate_1.svg",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info" : {
 				"safety": false,
 				"alt": [ ]
@@ -30,7 +30,7 @@
 			"name": "nori",
 			"image": "/images/ingredients/substrate_2.svg",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info" : {
 				"safety": false,
 				"alt": [ ]
@@ -43,7 +43,7 @@
 			"name": "jelly",
 			"image": "/images/ingredients/filling_0.svg",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info" : {
 				"safety": false,
 				"alt": [ ]
@@ -54,7 +54,7 @@
 			"name": "peanut butter",
 			"image": "/images/ingredients/filling_1.svg",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info" : {
 				"safety": "nuts",
 				"alt": [
@@ -67,7 +67,7 @@
 			"name": "cream cheese",
 			"image": "/images/ingredients/filling_2.svg",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info" : {
 				"safety": "dairy",
 				"alt": [
@@ -80,7 +80,7 @@
 			"name": "tofu",
 			"image": "/images/ingredients/filling_3.svg",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info" : {
 				"safety": false,
 				"alt": [ ]
@@ -93,7 +93,7 @@
 			"name": "cleaner",
 			"image": "/images/tools/lvl_0.svg",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info": {
 				"safety": "bacteria",
 				"alt": [ ]
@@ -104,7 +104,7 @@
 			"name": "butterknife",
 			"image": "/images/tools/lvl_1.svg",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info": {
 				"safety": false,
 				"alt": [ ]
@@ -117,7 +117,7 @@
 			"name": "bacteria",
 			"image": "",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info": {
 				"safety": "cleaner",
 				"alt": [ ]
@@ -128,7 +128,7 @@
 			"name": "gluten",
 			"image": "",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info": {
 				"safety": "allergy",
 				"alt": [ ]
@@ -139,7 +139,7 @@
 			"name": "nuts",
 			"image": "",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info": {
 				"safety": "allergy",
 				"alt": [ ]
@@ -150,7 +150,7 @@
 			"name": "dairy",
 			"image": "",
 			"caption": "...",
-			"current": false,
+			"unlocked": false,
 			"info": {
 				"safety": "allergy",
 				"alt": [ ]

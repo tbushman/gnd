@@ -506,14 +506,17 @@ router.get('/api/publish', function(req, res, next) {
 								index: 0,
 								pid: data.length,
 								user: req.app.locals.user._id,
-								title: 'Peanut Butter and Jelly',
+								title: thestore.info[0].name + ' ' + thestore.tools[0].name,
 								description: 'My first sandwich',
-								current: true,
 								level: 0,
-								info: [ thestore.info[0] ],
-								substrates: [ ],
-								filling: [ ],
-								tools: [ thestore.tools[0] ]
+								items: {
+									info: thestore.info,
+									substrates: thestore.substrates,
+									filling: thestore.filling,
+									tools: thestore.tools
+								},
+								image: ''
+								
 							} ],
 							publishers: [{
 								_id: req.app.locals.user._id,

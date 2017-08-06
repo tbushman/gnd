@@ -125,6 +125,11 @@ i, .i {
 	font-size: calc(var(--thumbwidth) / 2);
 	font-weight: 300;
 }
+
+.inner .grid-left .tb-font-m {
+	position: absolute;
+}
+
 i.fa {
 	color: rgba(201, 202, 203, 1);
 }
@@ -448,7 +453,6 @@ div.blog {
 	overflow-x: hidden;
 	margin: 0;
 	position: absolute;
-	height: 100%;
 	right: 0;
 	left: 0;
 }

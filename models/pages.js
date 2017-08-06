@@ -1,6 +1,17 @@
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema;
 	
+var Item = new Schema({
+	index: Number,
+	name: String,
+	image: String,
+	caption: String,
+	unlocked: Boolean,
+	info: {
+		safety: String,
+		alt: []
+	}
+})
 
 var Page = new Schema({
 	pageindex: Number,
@@ -20,11 +31,13 @@ var Page = new Schema({
 		label: String,
 		title: String,
 		description: String,
-		current: Boolean,
+		unlocked: Boolean,
 		level: Number,
-		substrates: [],
-		filling: [],
-		tools: [],
+		items: {
+			substrates: [Item],
+			filling: [Item],
+			tools: [Item]
+		},
 		image: String
 	} ],
 	publishers: []

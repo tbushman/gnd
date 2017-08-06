@@ -1,3 +1,4 @@
+
 div.grid-header.mainHeader
 	//#app(style="pointer-events:none;display: inline-block;float: left;margin: 0 auto;width: auto;position: absolute;z-index: 50;height: 33.2%;")
 
@@ -24,30 +25,36 @@ div.grid-left
 								.ui
 									img(src="/images/icons/edit.svg")
 								span.tb-font-l Edit
-						
-								each module, j in menuData.content
-									if (j === module.index)
-										if (module[drawtype])
-											each ing, k in module[drawtype]
-												
-												a.module.focus.drop(href="#", onclick="document.getElementById('form_"+drawtype+"_"+k+"').submit();")
-													.ui
-														img(src="/images/icons/"+drawtype+"_"+k+".svg")
-													span.tb-font-l #{ing.name}
 
-													form(id="form_"+drawtype+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+module.index+"/"+drawtype+"/"+k+"")
-														input(type="hidden", value="1", name= ing.name)
-														input(type="hidden", id="inputimg_"+drawtype+"_"+k+"", name= ing.name, value= ing.image)
+								each key, j in itemkeys
+									
+									each ing, k in key
+										a.module.focus.drop(href="#", onclick="document.getElementById('form_"+key[j]+"_"+k+"').submit();")
+											.ui
+												img(src=(ing.unlocked ? "/images/icons/"+key[j]+"_"+k+".svg" : "/images/icons/unknown.svg"))
+
+									
+										//each ing, k in module
+											span.tb-font-l #{ing.name}
+											if (ing.unlocked)
+												form(id="form_"+keys[j]+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+keys[j]+"/"+k+"")
+													input(type="hidden", value="1", name= ing.name)
+													input(type="hidden", id="inputimg_"+keys[j]+"_"+k+"", name= ing.name, value= ing.image)
+
 									//-
 										else
-											- var catKeys = Object.keys(menuData.content[index])
-											each cat, c in menuData.content[index]
-												if (Array.isArray(cat))
-													
-													a.module.dropdown(title= catKeys[c])
-														.ui
-															img(src="/images/"+catKeys[c]+"_"+c+"")
-														span.tb-font-l #{cat[c].name}
+											each ing, k in `#{theStore[keys[j]]}`
+												a.module.focus.drop(href="#", onclick="document.getElementById('form_"+keys[j]+"_"+k+"').submit();")
+													.ui
+														img(src=(ing.unlocked ? "/images/icons/"+keys[j]+"_"+k+".svg" : "/images/icons/unknown.svg"))
+													span.tb-font-l #{ing.name}
+
+													form(id="form_"+keys[j]+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+keys[j]+"/"+k+"")
+														input(type="hidden", value="1", name= ing.name)
+														input(type="hidden", id="inputimg_"+keys[j]+"_"+k+"", name= ing.name, value= ing.image)
+
+									
+																	
 						a.module(href="/logout", title="logout")
 							.ui
 								img(src="/images/icons/logout.svg")
