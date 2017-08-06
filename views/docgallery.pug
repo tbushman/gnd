@@ -14,7 +14,7 @@ div.grid-right
 									a.thumbnail.gallery(href="")
 										img(src=""+imag.image+"", alt=""+imag.name+"")
 					if (contentData.info !== undefined)
-						p.tb-font-s.hideoverlap About
+						p.tb-font-s.hideoverlap About 
 							span #{contentData.info[contentData.level].name}
 				div.grid-left(style="padding: 6px 0 0 6px;")
 					//if (loggedin && loggedin === menuData.publishers[0].username && menuData.content.length > 0)
@@ -32,6 +32,7 @@ div.grid-right
 								input(type="hidden", value="1", name= contentData[drawtype][contentData.level].name)
 								input(type="hidden", id="inputimg_"+drawtype+"_"+level+"", name= contentData[drawtype][contentData.level].name, value= contentData[drawtype][contentData.level].image)
 					else
+						- var drawtype = "tools"
 						if (contentData.image !== '')
 							
 							a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit sandwich")
@@ -40,7 +41,11 @@ div.grid-right
 						else
 							a.tb-font-m(href="#", onclick="document.getElementById('form_tools_0').submit();")
 								.ui
-									img(src="/images/icons/unknown.svg", alt=""+contentData["tools"][contentData.level].name+" is not yet available.")
+									if (contentData["tools"][contentData.level].unlocked)
+										img(src="/images/tools/lvl_"+contentData.level+".svg", alt="Click to use the "+contentData["tools"][contentData.level].name+". ")
+
+									else
+										img(src="/images/icons/unknown.svg", alt=""+contentData["tools"][contentData.level].name+" is not yet available.")
 							span.tb-font-l #{contentData.tools[contentData.level].name}
 							form(id="form_tools_0", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/tools/0")
 								input(type="hidden", value="1", name= contentData["tools"][contentData.level].name)

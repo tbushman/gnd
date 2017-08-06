@@ -3,7 +3,7 @@
 		{
 			"index": 0,
 			"name": "bread",
-			"image": "/images/ingredients/substrate_0.svg",
+			"image": "/images/ingredients/substrates_0.svg",
 			"caption": "...",
 			"unlocked": true,
 			"info" : {
@@ -17,7 +17,7 @@
 		{
 			"index": 1,
 			"name": "rice",
-			"image": "/images/ingredients/substrate_1.svg",
+			"image": "/images/ingredients/substrates_1.svg",
 			"caption": "...",
 			"unlocked": false,
 			"info" : {
@@ -28,7 +28,7 @@
 		{
 			"index": 2,
 			"name": "nori",
-			"image": "/images/ingredients/substrate_2.svg",
+			"image": "/images/ingredients/substrates_2.svg",
 			"caption": "...",
 			"unlocked": false,
 			"info" : {

@@ -73,8 +73,8 @@ html
 
 		div.pullquote
 			if (drawtype)
-				if (contentData.items[drawtype][level])
-					span.tb-font-xxl #{contentData.items[drawtype][level].caption}
+				if (contentData[drawtype][level])
+					span.tb-font-xxl #{contentData[drawtype][level].caption}
 			else 
 				span.tb-font-xxl testing
 		a#publish_logo(href="https://github.com/tbushman/pu" target="_blank")

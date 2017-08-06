@@ -14,7 +14,7 @@ div.grid-container.inner
 				span.tb-font-s#previewtext #{contentData.description}
 			input(type="hidden", id="inputimg", name="img")
 			if (drawtype)
-				input(type="hidden", id="inputimg_"+drawtype+"_"+layer+"", name= contentData.items[drawtype][layer].name)
+				input(type="hidden", id="inputimg_"+drawtype+"_"+layer+"", name= contentData[drawtype][layer].name)
 			div.tb-u-100
 				button.ms-Button.ms-Button--primary.tb-u-100.block.spacer(id="submit", type="submit", ariaDescription="Save this Sandwich")
 					span.ms-Button-label Save

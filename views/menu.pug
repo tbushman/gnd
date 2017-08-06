@@ -1,10 +1,12 @@
+if (contentData)
+	- var keys = Object.keys(contentData)
+
 div.grid-header.mainHeader
 	//if (drawtype)
 	
-	if (contentData)
+	if (drawtype)
 		a.mainmenu(href="#", title="Save", id="save")
 			img.i(src="/images/icons/check.svg")
-		- var keys = Object.keys(contentData)
 		each ing, j in keys
 			if (Array.isArray(contentData[ing]))
 				each cat, i in contentData[ing]
