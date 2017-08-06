@@ -33,11 +33,10 @@ var Page = new Schema({
 		description: String,
 		unlocked: Boolean,
 		level: Number,
-		items: {
-			substrates: [Item],
-			filling: [Item],
-			tools: [Item]
-		},
+		info: [Item],
+		substrates: [Item],
+		filling: [Item],
+		tools: [Item],
 		image: String
 	} ],
 	publishers: []

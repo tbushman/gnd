@@ -220,7 +220,7 @@ router.post('/register', upload.array(), function(req, res, next) {
 router.post('/reserve/:pagetitle', function(req, res, next){
 	req.app.locals.pageTitle = decodeURIComponent(req.params.pagetitle);
 	console.log('this blog name: '+ req.app.locals.pageTitle);
-	return next();
+	return res.status(200).send(req.app.locals.pageTitle);
 })
 
 router.get('/login', function(req, res, next){
@@ -509,12 +509,10 @@ router.get('/api/publish', function(req, res, next) {
 								title: thestore.info[0].name + ' ' + thestore.tools[0].name,
 								description: 'My first sandwich',
 								level: 0,
-								items: {
-									info: thestore.info,
-									substrates: thestore.substrates,
-									filling: thestore.filling,
-									tools: thestore.tools
-								},
+								info: thestore.info,
+								substrates: thestore.substrates,
+								filling: thestore.filling,
+								tools: thestore.tools,
 								image: ''
 								
 							} ],
@@ -725,42 +723,47 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 		var pageindex = parseInt(pub.pageindex, 10)
 		var keys = Object.keys(body);
 		var contentdata = pub.content[index];
-		var cKeys = Object.keys(contentdata);
-		var key, push, drawType, drawInd, drawName, drawThis;
-		for (var i = 0; i < cKeys.length; i++) {
-			if (Array.isArray(contentdata[cKeys[i]])) {
-				drawType = cKeys[i]
-				for (var q = 0; q < contentdata[cKeys[i]].length; q++) {
-					if (keys.indexOf(contentdata[drawType][q].name) !== -1) {
-						drawThis = contentdata[drawType][q];
-						drawInd = drawThis.index;
-						drawName = drawThis.name;
-						key = 'content.$.'+drawType+'.'+drawInd+''
-						push = {$set: {}};
-						pushKey = '$set'
+		//var cKeys = Object.keys(contentdata);
+		var items = ["tools", "info", "substrates", "filling"];
+		var key, push, drawType, drawInd, drawName, drawThis, unlocked;
+		for (var i = 0; i < items.length; i++) {
+			//if (Array.isArray(contentdata[cKeys[i]])) {
+				drawType = items[i];
+				for (var q = 0; q < contentdata[drawType].length; q++) {
+					drawThis = contentdata[drawType][q];
+					drawInd = drawThis.index;
+					drawName = drawThis.name;
+					key = 'content.$.'+drawType+'.'+drawInd+''
+					push = {$set: {}};
+					pushKey = '$set';
+
+					if (contentdata[drawType][q].index === contentData.level) {
+						unlocked = true;
 						
 					} else {
-						for (var i = 0; i < thestore[drawtype].length; i++) {
+						unlocked = false;
+						/*for (var i = 0; i < thestore[drawtype].length; i++) {
 							for (var j = 0; j < keys.length; j++) {
 								if (thestore[drawtype][i].name === keys[j]) {
 									drawThis = thestore[drawtype][i];
 									drawInd = drawThis.index;
 									drawName = drawThis.name;
-									key = 'content.$.'+drawType+''
+									key = 'content.$.items.'+drawType+''
 									push = {$push: {}};
 									pushKey = '$push'
 								}
-							}		
-						}
+							}	
+						}*/
 					}
 				}
-			}
+			//}
 		}
 		if (drawThis) {
 			if (body[drawName]) {
 				drawThis.image = body[drawName];
 				drawThis.title = body['title'];
 				drawThis.description = body['description'];
+				drawThis.unlocked = unlocked;
 			}
 		}
 		

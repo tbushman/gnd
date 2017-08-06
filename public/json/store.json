@@ -5,7 +5,7 @@
 			"name": "bread",
 			"image": "/images/ingredients/substrate_0.svg",
 			"caption": "...",
-			"unlocked": false,
+			"unlocked": true,
 			"info" : {
 				"safety": "gluten",
 				"alt": [
@@ -43,7 +43,7 @@
 			"name": "jelly",
 			"image": "/images/ingredients/filling_0.svg",
 			"caption": "...",
-			"unlocked": false,
+			"unlocked": true,
 			"info" : {
 				"safety": false,
 				"alt": [ ]
@@ -93,14 +93,14 @@
 			"name": "cleaner",
 			"image": "/images/tools/lvl_0.svg",
 			"caption": "...",
-			"unlocked": false,
+			"unlocked": true,
 			"info": {
 				"safety": "bacteria",
 				"alt": [ ]
 			}
 		},
 		{
-			"index": 0,
+			"index": 1,
 			"name": "butterknife",
 			"image": "/images/tools/lvl_1.svg",
 			"caption": "...",
@@ -117,7 +117,7 @@
 			"name": "bacteria",
 			"image": "",
 			"caption": "...",
-			"unlocked": false,
+			"unlocked": true,
 			"info": {
 				"safety": "cleaner",
 				"alt": [ ]

@@ -1,21 +1,23 @@
 div.grid-header.mainHeader
-	//#app(style="pointer-events:none;display: inline-block;float: left;margin: 0 auto;width: auto;position: absolute;z-index: 50;height: 33.2%;")
-	if (drawtype)
+	//if (drawtype)
 	
+	if (contentData)
 		a.mainmenu(href="#", title="Save", id="save")
 			img.i(src="/images/icons/check.svg")
-		each cat, c in itemkeys
-			each ing, i in contentData.items[cat]
-				a.tool(href="#", onclick="document.getElementById('form_"+cat+"_"+i+"').submit();")
-					.ui
-						img(src="/images/icons/"+cat+"_"+i+".svg")
-					span.tb-font-l #{ing.name}
-					if (ing.unlocked)
-						form(id="form_"+cat+"_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+cat+"/"+i+"")
-							input(type="hidden", value="1", name= ing.name)
-							input(type="hidden", id="inputimg_"+cat+"_"+i+"", name= ing.name, value= ing.image)
+		- var keys = Object.keys(contentData)
+		each ing, j in keys
+			if (Array.isArray(contentData[ing]))
+				each cat, i in contentData[ing]
+					if (cat.unlocked)
+						a.tool(href="#", onclick="document.getElementById('form_substrates_"+i+"').submit();")
+							.ui
+								img(src="/images/icons/substrates_"+i+".svg")
+							span.tb-font-l #{cat.name}
+							if (cat.unlocked)
+								form(id="form_substrates_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/substrates/"+i+"")
+									input(type="hidden", value="1", name= cat.name)
+									input(type="hidden", id="inputimg_substrates_"+i+"", name= cat.name, value= cat.image)
 
-	
 	else
 		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="http://pu.bli.sh/images/menu_button.svg")
@@ -38,7 +40,7 @@ div.grid-left
 									img(src="/images/icons/edit.svg")
 								span.tb-font-l Edit
 
-								each key, j in itemkeys
+								each key, j in keys
 									
 									each ing, k in key
 										a.module.focus.drop(href="#", onclick="document.getElementById('form_"+key[j]+"_"+k+"').submit();")

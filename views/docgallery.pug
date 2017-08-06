@@ -8,43 +8,43 @@ div.grid-right
 			div.grid-container.inner
 				div.grid-header
 					if (drawtype)
-						each entry, i in contentData.items[drawtype]
+						each entry, i in contentData[drawtype]
 							each imag, j in entry
 								if (imag.unlocked)
 									a.thumbnail.gallery(href="")
 										img(src=""+imag.image+"", alt=""+imag.name+"")
-					if (contentData.items.info !== undefined)
+					if (contentData.info !== undefined)
 						p.tb-font-s.hideoverlap About
-							span #{contentData.items.info[contentData.level].name}
+							span #{contentData.info[contentData.level].name}
 				div.grid-left(style="padding: 6px 0 0 6px;")
-					if (loggedin && loggedin === menuData.publishers[0].username && menuData.content.length > 0)
-						if (drawtype)
-							if (contentData.items[drawtype][contentData.level].unlocked)
+					//if (loggedin && loggedin === menuData.publishers[0].username && menuData.content.length > 0)
+					if (drawtype)
+						if (contentData[drawtype][contentData.level].unlocked)
 
-								a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit sandwich")
-									img(src="/images/"+drawtype+"/lvl_"+contentData.level+".svg", alt=""+entry.pagetitle+"'s "+ranks[contentData.level]+" tool")
-							else
-								a.tb-font-m(href="#", onclick="document.getElementById('form_"+drawtype+"_"+level+"').submit();")
-									.ui
-										img(src="/images/icons/unknown.svg", alt=""+contentData.items[drawtype][contentData.level].name+" is not yet available.")
-								span.tb-font-l #{contentData.items[drawtype][contentData.level].name}
-								form(id="form_"+drawtype+"_"+level+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+level+"")
-									input(type="hidden", value="1", name= contentData.items[drawtype][contentData.level].name)
-									input(type="hidden", id="inputimg_"+drawtype+"_"+level+"", name= contentData.items[drawtype][contentData.level].name, value= contentData.items[drawtype][contentData.level].image)
+							a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit sandwich")
+								img(src="/images/"+drawtype+"/lvl_"+contentData.level+".svg", alt=""+entry.pagetitle+"'s "+ranks[contentData.level]+" tool")
 						else
-							if (contentData.image !== '')
-								
-								a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit sandwich")
-									img(src= contentData.image, alt=""+entry.pagetitle+"'s "+ranks[contentData.length]+" snack")
+							a.tb-font-m(href="#", onclick="document.getElementById('form_"+drawtype+"_"+level+"').submit();")
+								.ui
+									img(src="/images/icons/unknown.svg", alt=""+contentData[drawtype][contentData.level].name+" is not yet available.")
+							span.tb-font-l #{contentData[drawtype][contentData.level].name}
+							form(id="form_"+drawtype+"_"+level+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+level+"")
+								input(type="hidden", value="1", name= contentData[drawtype][contentData.level].name)
+								input(type="hidden", id="inputimg_"+drawtype+"_"+level+"", name= contentData[drawtype][contentData.level].name, value= contentData[drawtype][contentData.level].image)
+					else
+						if (contentData.image !== '')
+							
+							a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit sandwich")
+								img(src= contentData.image, alt=""+entry.pagetitle+"'s "+ranks[contentData.length]+" snack")
 
-							else
-								a.tb-font-m(href="#", onclick="document.getElementById('form_tools_0').submit();")
-									.ui
-										img(src="/images/icons/unknown.svg", alt=""+contentData.items["tools"][contentData.level].name+" is not yet available.")
-								span.tb-font-l #{contentData.items.tools[contentData.level].name}
-								form(id="form_tools_0", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/tools/0")
-									input(type="hidden", value="1", name= contentData.items["tools"][contentData.level].name)
-									input(type="hidden", id="inputimg_"+drawtype+"_"+level+"", name= contentData.items["tools"][contentData.level].name, value= contentData.items["tools"][contentData.level].image)
+						else
+							a.tb-font-m(href="#", onclick="document.getElementById('form_tools_0').submit();")
+								.ui
+									img(src="/images/icons/unknown.svg", alt=""+contentData["tools"][contentData.level].name+" is not yet available.")
+							span.tb-font-l #{contentData.tools[contentData.level].name}
+							form(id="form_tools_0", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/tools/0")
+								input(type="hidden", value="1", name= contentData["tools"][contentData.level].name)
+								input(type="hidden", id="inputimg_"+drawtype+"_"+level+"", name= contentData["tools"][contentData.level].name, value= contentData["tools"][contentData.level].image)
 
 				div.grid-right
 					p.tb-font-xl #{contentData.title}
@@ -54,6 +54,7 @@ div.grid-right
 					
 		else
 			each entry, k in menuData.content
+				p test all
 				a.tb-font-m(href="/"+menuData.pagetitle+"", title="Go to "+menuData.pagetitle+"") #{menuData.pagetitle}
 				if (loggedin && loggedin === menuData.publishers[0].username)
 					div(style="padding: 10px 0 0 10px")
@@ -61,22 +62,22 @@ div.grid-right
 							img(src="/images/tools/lvl_"+entry.level+".svg")
 				br
 				p.tb-font-s.hideoverlap About
-					span #{entry.items.info[entry.level].name}
+					span #{entry.info[entry.level].name}
 				if (entry.description)
 					p.tb-font-xs.hideoverlap #{entry.description}
 					span &nbsp ...
-				if (entry.items[drawtype].length > 0)
+				if (entry[drawtype].length > 0)
 					div.thumbnail.gallery(id= entry.pageindex)
-						img(src= entry.items[drawtype][level].image)
+						img(src= entry[drawtype][level].image)
 					div#hide
-						if (entry.items[drawtype][level].name === '')
+						if (entry[drawtype][level].name === '')
 							span.tb-font-xxs &nbsp
 						else
-							span.tb-font-xxs #{entry.items[drawtype][entry.level].name}
-						if (entry.items[drawtype][level].caption === '')
+							span.tb-font-xxs #{entry[drawtype][entry.level].name}
+						if (entry[drawtype][level].caption === '')
 							span.tb-font-xs &nbsp
 						else
-							span.tb-font-xs #{entry.items[drawtype][entry.level].caption}
+							span.tb-font-xs #{entry[drawtype][entry.level].caption}
 
 				hr(style="color: "+doc.css.primary+"")
 		
