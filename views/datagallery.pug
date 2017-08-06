@@ -20,7 +20,7 @@ if (menu === 'register')
 		p.tb-font-xl Choose a nickname for your Chef:
 		div.input-field#response
 			label.ms-Label Page Title
-			input.ms-TextField-field(type="text", name="pagetitle", id="pagetitle")
+			input.ms-TextField-field(type="text", name="pagetitle", id="pagetitle", aria-required="true", onblur="checkNameValidity('pagetitle', '!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alpha-numeric characters only, please');")
 			a.btn.waves-effect.waves-light(role="button") Check availability
 			hr
 		div#registersection(style="display: none")
@@ -29,14 +29,13 @@ if (menu === 'register')
 				input(type="hidden", name="pagetitle", id="pagetitle2")
 				input#svgurl(type="hidden", name="svg")
 				input#avatarurl(type="hidden", name="avatar")
-				input#resumeurl(type="hidden", name="resume")
 				div.tb-u-100
 					div.input-field
 						label.ms-Label Username
-						input.ms-TextField-field.is-required(type="text", name="username", maxlength="40")
+						input.ms-TextField-field.is-required(type="text", name="username", maxlength="40", id="username", aria-required="true", onblur="checkNameValidity('username', '!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alpha-numeric characters only, please');")
 					div.input-field
 						label.ms-Label Email
-						input.ms-TextField-field.is-required(type="email", name="email")
+						input.ms-TextField-field.is-required(type="email", name="email", id="email", aria-required="true", onblur="checkEmailValidity('email', '@', 'Please enter a valid e-mail address.');")
 					div.input-field.is-required
 						label.ms-Label Password
 						input.ms-TextField-field.is-required(type="password", name="password")
@@ -59,7 +58,7 @@ if (menu === 'home')
 								span.tb-font-s by 
 								br
 								span.tb-font-xxs #{entry.publishers[0].username}
-							img(src= entry.content[entry.content.length-1].image)
+							img(src= entry.content[entry.content.length-1].image, alt=""+entry.pagetitle+"'s "+ranks[entry.content.length-1]+" snack")
 
 				div.grid-right
 					if (entry.content[entry.content.length-1].level)

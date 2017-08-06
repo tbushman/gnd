@@ -1,15 +1,27 @@
-
 div.grid-header.mainHeader
 	//#app(style="pointer-events:none;display: inline-block;float: left;margin: 0 auto;width: auto;position: absolute;z-index: 50;height: 33.2%;")
-
-	if (type === 'draw')
+	if (drawtype)
+	
 		a.mainmenu(href="#", title="Save", id="save")
 			img.i(src="/images/icons/check.svg")
+		each cat, c in itemkeys
+			each ing, i in contentData.items[cat]
+				a.tool(href="#", onclick="document.getElementById('form_"+cat+"_"+i+"').submit();")
+					.ui
+						img(src="/images/icons/"+cat+"_"+i+".svg")
+					span.tb-font-l #{ing.name}
+					if (ing.unlocked)
+						form(id="form_"+cat+"_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+cat+"/"+i+"")
+							input(type="hidden", value="1", name= ing.name)
+							input(type="hidden", id="inputimg_"+cat+"_"+i+"", name= ing.name, value= ing.image)
+
+	
 	else
 		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="http://pu.bli.sh/images/menu_button.svg")
 
 	
+			
 div.grid-left
 	#wrapper
 		div#tlmodules.dropdown

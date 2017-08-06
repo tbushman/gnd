@@ -3,21 +3,65 @@ html
 	head
 		title= appTitle
 		meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
-		link(rel="stylesheet", href="/stylesheets/jquery-ui.min.css")
-		link(rel="stylesheet", href="/stylesheets/leaflet.css")
+		//link(rel="stylesheet", href="/stylesheets/jquery-ui.min.css")
+		//link(rel="stylesheet", href="/stylesheets/leaflet.css")
 		link(rel="stylesheet", href="/stylesheets/default.css", type="text/css")
 		//link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css")
 		link(href="https://fonts.googleapis.com/css?family=Roboto", rel="stylesheet")
 		
 		script(type="text/javascript", src="/scripts/jquery.min.js")
 		//script(type="text/javascript", src="/scripts/jquery-ui.min.js")
-		script(type="text/javascript", src="/scripts/leaflet.js")
+		//script(type="text/javascript", src="/scripts/leaflet.js")
 		script(type="text/javascript", src="/scripts/marked.min.js")
 		//script(src="https://use.fontawesome.com/b9a4978394.js")
 		script(type="text/javascript", src="/scripts/d3.v3.min.js")
 		//script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js")
 		//script(src="https://unpkg.com/vue/dist/vue.js")
-		
+		//https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/forms/alerts
+		script(type="application/javascript").
+			function removeOldAlert()
+				{
+					var oldAlert = document.getElementById("alert");
+					if (oldAlert)
+						document.body.removeChild(oldAlert);
+				}
+				
+				function addAlert(aMsg)
+				{
+					removeOldAlert();
+					var newAlert = document.createElement("div");
+					newAlert.setAttribute("role", "alert");
+					newAlert.setAttribute("id", "alert");
+					var msg = document.createTextNode(aMsg);
+					newAlert.appendChild(msg);
+					document.body.appendChild(newAlert);
+				}
+				function checkNameValidity(aID, aSearchTerm, aMsg)
+				{
+					var elem = document.getElementById(aID);
+					for (var i = 0; i < elem.value.length; i++) {
+						if (aSearchTerm.indexOf(elem.value.charAt(i)) !== -1) {
+							elem.setAttribute("aria-invalid", "true");
+							addAlert(aMsg);
+						} else {
+							elem.setAttribute("aria-invalid", "false");
+							removeOldAlert();
+						}
+					}
+				}
+				function checkEmailValidity(aID, aSearchTerm, aMsg)
+				{
+					var elem = document.getElementById(aID);
+					for (var i = 0; i < elem.value.length; i++) {
+						if (aSearchTerm.indexOf(elem.value.charAt(i)) === -1) {
+							elem.setAttribute("aria-invalid", "true");
+							addAlert(aMsg);
+						} else {
+							elem.setAttribute("aria-invalid", "false");
+							removeOldAlert();
+						}
+					}
+				}
 	body
 		block page
 			- var theStore = theStore
@@ -25,12 +69,12 @@ html
 		block header
 
 		block content
-			- var itemkeys = Object.keys(contentData.items)
+			
 
 		div.pullquote
 			if (drawtype)
-				if (contentData[drawtype][level])
-					span.tb-font-xxl #{contentData[drawtype][level].caption}
+				if (contentData.items[drawtype][level])
+					span.tb-font-xxl #{contentData.items[drawtype][level].caption}
 			else 
 				span.tb-font-xxl testing
 		a#publish_logo(href="https://github.com/tbushman/pu" target="_blank")

@@ -1,8 +1,0 @@
-#wrapper(style="top: " + ( 20 - ( ( contentData.index ) * 10 ) ) + "%" )
-	div#tlmodules
-		each module, j in menuData.content
-			if (j === menuData.content[index].index)
-				a.module.focus.block(class= tltype, href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "", style="z-index: 0; top: " + ( 20 - ( ( module.index ) * 10 ) ) + "%;" )
-					div.time.ms-font-s #{menuData.content[index].label}
-			else
-				a.module.block(href="/chefs/"+menuData.urltitle+"/"+module.index+"", title= module.label, name= module.label, id="" + module._id + "@" + module.index + "", style="top: "+ ( 20 - ( ( module.index ) * 10 ) ) + "%;" )
