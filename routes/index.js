@@ -593,7 +593,7 @@ router.get('/api/publish', function(req, res, next) {
 						if (err) {
 							return next(err)
 						}
-						if (req.app.locals.drawtype) {
+						if (req.app.locals.drawType) {
 							cb(null, pages, doc, doc.pageindex, 'edit')
 						} else {
 							cb(null, pages, doc, doc.pageindex, 'doc')
@@ -616,7 +616,7 @@ router.get('/api/publish', function(req, res, next) {
 			index: doc ? doc.content.length-1 : false,
 			data: [].map.call(data, function(d){return d}),
 			doc: doc ? doc : false,
-			drawtype: req.app.locals.drawtype ? req.app.locals.drawtype : false,
+			drawtype: req.app.locals.drawType ? req.app.locals.drawType : false,
 			info: 'hi'
 		})
 	})
@@ -690,7 +690,7 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 				index: doc.content.length-1,
 				doc: doc,
 				data: datarray,
-				drawtype: req.app.locals.drawtype ? req.app.locals.drawtype : 'info',
+				drawtype: req.app.locals.drawType ? req.app.locals.drawType : 'info',
 				info: 'Edit your entry.'
 			})
 		})
@@ -714,11 +714,11 @@ router.get('/api/selectlayer', function(req, res, next){
 			for (var l in data) {
 				datarray.push(data[l])
 			}
-			console.log('this drawtype: '+req.app.locals.drawtype)
+			console.log('this drawtype: '+req.app.locals.drawType)
 			return res.render('publish', {
 				type: 'draw',
 				infowindow: 'edit',
-				drawtype: req.app.locals.drawtype ? req.app.locals.drawtype : "info",
+				drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
 				loggedin: req.app.locals.loggedin,
 				pageindex: doc.pageindex,
 				index: req.app.locals.index,
@@ -739,7 +739,7 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 	var drawtype = req.params.drawtype;
 	req.app.locals.index = index;
 	req.app.locals.layer = layer;
-	req.app.locals.drawtype = drawtype;
+	req.app.locals.drawType = drawtype;
 	req.app.locals.urltitle = urltitle;
 	Page.findOne({urltitle: urltitle, content: {$elemMatch: {index: index}}}, function(err, pub){
 		if (err) {
@@ -756,7 +756,7 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 				if (err) {
 					return next(err)
 				}
-				req.app.locals.drawtype = drawtype;
+				req.app.locals.drawType = drawtype;
 
 				var datarray = [];
 				for (var l in data) {
@@ -887,7 +887,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 				}
 				return res.render('publish', {
 					type: 'blog',
-					drawtype: drawType !== undefined ? drawType : req.app.locals.drawtype,
+					drawtype: drawType !== undefined ? drawType : req.app.locals.drawType,
 					//layer: req.app.locals.layer ? req.app.locals.layer : false,
 					infowindow: 'edit',
 					loggedin: req.app.locals.loggedin,

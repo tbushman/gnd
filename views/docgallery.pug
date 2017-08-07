@@ -18,21 +18,40 @@ div.grid-right
 							span.translate #{contentData.info[contentData.level].name}
 				div.grid-left(style="padding: 6px 0 0 6px;")
 					//if (loggedin && loggedin === menuData.publishers[0].username && menuData.content.length > 0)
-					if (drawtype)
-						if (contentData[drawtype][contentData.level].unlocked)
-
-							a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit sandwich")
-								img(src="/images/"+drawtype+"/"+drawtype+"_"+contentData.level+".svg", alt=""+entry.pagetitle+"'s "+ranks[contentData.level]+" challenge")
-						else
-							a.tb-font-m(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+level+"', function(){ window.location.href = '/api/selectlayer';})")
-								.ui
-									img(src="/images/icons/unknown.svg", alt=""+contentData[drawtype][contentData.level].name+" is not yet available.")
-							span.tb-font-l #{contentData[drawtype][contentData.level].name}
-
+					if (loggedin)
+						if (menuData)
+							if (menuData.publishers[0].username === loggedin)
+								if (!drawtype)
+									a.thumbnail.gallery(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/tools/"+contentData.level+"', function(){ window.location.href = '/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"';})")
+										.ui
+											img(src="images/tools/tools_"+contentData.level+".svg", style="width: 100%; height: 100%;")
+									//-
+										if (contentData[drawtype][contentData.level].unlocked)
+											if (contentData.image !== "")
+												a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit sandwich")
+													img(src="/images/"+drawtype+"/"+drawtype+"_"+contentData.level+".svg", alt=""+entry.pagetitle+"'s "+ranks[contentData.level]+" challenge")
+											else
+												a.tb-font-m(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+level+"', function(){ window.location.href = '/api/selectlayer'});")
+													.ui
+														img(src="/images/"+drawtype+"/"+drawtype+"_"+contentData.level+".svg", alt="Click to use the "+contentData["info"][contentData.level].name+". ")
+												span.tb-font-l #{contentData[drawtype][contentData.level].name}
+								//-
+									else
+										a.thumbnail.gallery(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/tools/"+contentData.level+"', function(){ window.location.href = '/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"';})")
+											.ui
+												img(src="images/tools/tools_"+contentData.level+".svg", style="width: 100%; height: 100%;")
+					else
+						a.thumbnail.gallery(href="/"+menuData.pagetitle+"")
+							.ui
+								img(src="images/info/info_"+contentData.level+".svg", style="width: 100%; height: 100%;")
 				div.grid-right
 					p.tb-font-xl.translate #{contentData.title}
-					p.tb-font-s.translate #{contentData.description}
-					
+					p.tb-font-s.translate #{contentData.info[contentData.level].name}
+						span.tb-font-s  are 
+						span.tb-font-s.translate #{contentData.info[contentData.level].caption}
+						span.tb-font-s . Use the 
+						span.tb-font-s #{contentData.tools[contentData.level].name}
+						span.tb-font-s  to unlock the next step!
 				div.grid-footer
 					
 		else

@@ -46,7 +46,7 @@ block content
 			if (drawtype)
 				if (menuData.publishers[0].username === loggedin)
 						
-			canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+layer+".svg');")
+					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+layer+".svg');")
 
 			canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_0.svg');")
 			div.topLeft
@@ -61,7 +61,7 @@ block content
 		
 		div.pullquote
 			if (drawtype)
-				if (loggedin && menuData.publishers[0].username === loggedin)
+				if (menuData.publishers[0].username === loggedin)
 					each ing, j in keys
 						each cat, i in contentData[ing]
 							if (cat.unlocked && ing !== "info")
@@ -363,7 +363,8 @@ block content
 				if (eventType == "touchbegin") {
 					if (drawType === 'filling') {
 						context.fillStyle = pattern;
-					} else {
+					}
+					if (drawType === 'tools') {
 						context.fillStyle = "rgba(255,255,255,0)"
 					}
 					context.fill();
