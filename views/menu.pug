@@ -8,7 +8,7 @@ div.grid-header.mainHeader
 			img.i(src="/images/icons/check.svg")
 		each ing, j in keys
 			each cat, i in contentData[ing]
-				if (cat.unlocked && cat.index === contentData.level && drawtype === ing)
+				if (cat.unlocked && cat.layer === contentData.level && drawtype === ing)
 					a.tool(href="#", onclick="document.getElementById('form_"+drawtype+"_"+i+"').submit();")
 						.ui
 							img(src="/images/icons/"+drawtype+"_"+i+".svg")
@@ -61,11 +61,11 @@ div.grid-left
 						.ui
 							img(src="/images/icons/logout.svg")
 						span.tb-font-l Log out
-			else
-				a.module(href="/login", title="login") 
-					.ui
-						img(src="/images/icons/login.svg")
-					span.tb-font-l Login
+				else
+					a.module(href="/login", title="login") 
+						.ui
+							img(src="/images/icons/login.svg")
+						span.tb-font-l Login
 				
 				//-
 					a.module(href="/register", title="register") 

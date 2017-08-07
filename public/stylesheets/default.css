@@ -236,7 +236,9 @@ i.fa.active {
 	.grid-container.draw {
 		top: var(--panelheight);
 	}
-
+	.grid-container.blog {
+		top: var(--nowindowmenu);
+	}
 }
 @supports not (position:sticky) {
 	.grid-container {
@@ -249,7 +251,9 @@ i.fa.active {
 	.grid-container.draw {
 		top: var(--panelheight);
 	}
-
+	.grid-container.blog {
+		top: var(--nowindowmenu);
+	}
 }
 
 /*.grid-container.blog {

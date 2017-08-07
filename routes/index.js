@@ -68,7 +68,7 @@ var storage = multer.diskStorage({
 var uploadmedia = multer({ storage: storage })
 dotenv.load();
 
-var googleTranslate = require('google-translate')(process.env.GOOGLE_KEY);
+const googleTranslate = require('google-translate')(process.env.GOOGLE_KEY);
 //var translateThis = 
 //middleware
 function ensureAuthenticated(req, res, next) {
@@ -180,8 +180,24 @@ router.param('pagetitle', function(pagetitle){
 		return false
 	}
 });*/
+router.all('/translate/:text', function(req, res, next){
+
+	googleTranslate.translate(decodeURIComponent(req.params.text), 'en', req.app.locals.user ? req.app.locals.user.language : 'es', function(err, translation){
+		if (err) {
+			return res.json(err);
+		}
+		
+		if (translation !== undefined) {
+			console.log(translation.translatedText)
+			return res.json(translation.translatedText);
+		} else {
+			return res.json('');
+		}
+	});
+})
 
 router.get('/register', function(req, res) {
+	delete req.app.locals.loggedin;
 	req.app.locals.theStore = thestore;
 	googleTranslate.getSupportedLanguages(function(err, languageCodes) {
 		var langs = [];
@@ -199,34 +215,46 @@ router.get('/register', function(req, res) {
 });
 
 router.post('/register', upload.array(), function(req, res, next) {
-	if (!req.body.pagetitle) {
-		//upload.array() has not yet been fs-ed.
-		return res.render('register', {info: 'You must provide a nickname.'})
-	}
-	var pagetitle = encodeURIComponent(req.body.pagetitle);
-	Publisher.find({}, function(err, data){
-		if (err) {
-			return next(err)
-		}
-		var userindex = data.length;
-		Publisher.register(new Publisher({ username : req.body.username, email: req.body.email, userindex: userindex, avatar: '/images/avatars/avatar_1.svg', language: req.body.languages }), req.body.password, function(err, user) {
-			if (err) {
-				return res.render('register', {info: "Sorry. That username already exists. Try again."});
+	var langs = [];
+	googleTranslate.getSupportedLanguages(function(err, languageCodes) {
+		
+		for (var i = 0; i < languageCodes.length; i++) {
+			if (languages[languageCodes[i]] !== undefined) {
+				var obj = languages[languageCodes[i]];
+				obj.code = languageCodes[i];
+				langs.push(obj)
 			}
-			req.app.locals.username = req.body.username;
-			passport.authenticate('local')(req, res, function () {
-				Publisher.findOne({username: req.body.username}, function(error, doc){
-					if (error) {
-						return next(error)
-					}
-					req.app.locals.user = req.user;
-					req.app.locals.userId = doc._id;
-					req.app.locals.loggedin = doc.username;
-					return res.redirect('/api/publish')
-				})
+			
+		}
+		if (!req.body.pagetitle) {
+			//upload.array() has not yet been fs-ed.
+			return res.render('register', {info: 'You must provide a nickname.', languages: langs})
+		}
+		var pagetitle = encodeURIComponent(req.body.pagetitle);
+		Publisher.find({}, function(err, data){
+			if (err) {
+				return next(err)
+			}
+			Publisher.register(new Publisher({ username : req.body.username, avatar: '/images/avatars/avatar_1.svg', language: req.body.languages }), req.body.password, function(err, user) {
+				if (err) {
+					return res.render('register', {info: "Sorry. That Chef already exists. Try again.", languages: langs});
+				}
+				req.app.locals.username = req.body.username;
+				passport.authenticate('local')(req, res, function () {
+					Publisher.findOne({username: req.body.username}, function(error, doc){
+						if (error) {
+							return next(error)
+						}
+						req.app.locals.user = req.user;
+						req.app.locals.userId = doc._id;
+						req.app.locals.loggedin = doc.username;
+						return res.redirect('/api/publish')
+					})
+				});
 			});
-		});
+		})
 	})
+	
 });
 
 router.post('/reserve/:pagetitle', function(req, res, next){
@@ -484,28 +512,15 @@ router.all('/search/:term', function(req, res, next){
 //every edit-access api checks auth
 router.all('/api/*', ensureAuthenticated)
 
-router.all('/translate/:text', function(req, res, next){
-
-	googleTranslate.translate(decodeURIComponent(req.params.text), 'en', req.app.locals.user ? req.app.locals.user.language : 'es', function(err, translation){
-		if (err) {
-			console.log(err)
-		}
-		
-		console.log(translation.translatedText)
-		return res.json(translation.translatedText);
-	});
-})
-
-
 router.get('/api/publish', function(req, res, next) {
 	if (!req.app.locals.pageTitle) {
-		return res.redirect('/login')
+		return res.redirect('/register')
 	}
 	var outputPath = url.parse(req.url).pathname;
 	//var pagetitle = req.app.locals.pageTitle;
 	//var urltitle = pagetitle.replace(' ', '_');
-	req.app.locals.user = req.user;
-	req.app.locals.loggedin = req.user.username;
+	//req.app.locals.user = req.user;
+	//req.app.locals.loggedin = req.user.username;
 
 	async.waterfall([
 		function(cb) {
@@ -517,24 +532,6 @@ router.get('/api/publish', function(req, res, next) {
 					if (er) {
 						next(er)
 					}
-					/*var translateStore = thestore;
-					var storekeys = Object.keys(thestore);
-					for (var i = 0; i < storekeys.length; i++) {
-						for (var j = 0; j < thestore[storekeys[i]].length; j++) {
-							var desc = thestore[storekeys[i]][j].caption;
-							googleTranslate.translate(desc, 'en', req.app.locals.user.language, function(err, translation){
-								if (err) {
-									console.log(err)
-								}
-								//console.log(translation.translatedText)
-								translateStore[storekeys[i]][j].caption = translation.translatedText;
-							});
-							//var translated = translateThis(desc, 'en', req.app.locals.user.language);
-							//var translated = 
-							
-							
-						}
-					}*/
 					cb(null, data, pages/*, translateStore*/)
 				})
 			})
@@ -565,9 +562,7 @@ router.get('/api/publish', function(req, res, next) {
 					} ],
 					publishers: [{
 						_id: req.app.locals.user._id,
-						userindex: 0,
 						username: req.app.locals.user.username,
-						email: req.app.locals.user.email,
 						avatar: req.app.locals.user.avatar,
 						language: req.app.locals.user.language
 					}]

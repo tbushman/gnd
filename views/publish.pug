@@ -71,7 +71,7 @@ block content
 			else
 				if (contentData)
 					each item, i in contentData.info
-						if (item.unlocked && item.index === contentData.level)
+						if (item.unlocked && item.layer === contentData.level)
 							span.tb-font-xxl.translate #{item.caption}
 						else
 							span.tb-font-xxl testing
@@ -152,11 +152,9 @@ block content
 					$.post('/translate/'+text+'').then(function(result){
 						console.log(result)
 						addAlert(result);
-						return true;
 					})
-				} else {
-					return false;
 				}
+				return false;
 			}
 		});
 		$(document).on('touchend, mouseleave', '.translate', function (e){
@@ -167,68 +165,6 @@ block content
 			removeOldAlert()
 			return true;
 		})
-		//gallery
-		$(document).on('click', 'a.thumbnail', function(e){
-			e.preventDefault()
-			var imgindex = $(this).attr('id')
-			var userid = $(this).attr('name').split('@')[0]
-			if ($(this).hasClass('gallery')) {
-				var windex = $(this).attr('name').split('@')[1];
-				//var index = windex.split('all_')[1];
-				$.post('/gallery/'+pageid+'/'+windex+'/'+imgindex+'', function(){
-					window.location.href = '/gallery/'+pageid+'/'+windex+'/'+imgindex+'/#scrollto_'+index+'@'+imgindex+''
-				})
-			} else {
-				var windex = $(this).attr('name').split('@')[1];
-				
-				$.post('/gallery/'+pageid+'/'+windex+'/'+imgindex+'', function(){
-					window.location.href = '/gallery/'+pageid+'/'+windex+'/'+imgindex+''
-				})
-			}
-			return false;
-		});				
-		//expand the edit-able sections
-		$(document).on('click', '#editform', function(){
-			if ($('#formshow').css('display') === 'none') {
-				document.getElementById('select').className = 'map';
-				document.getElementsByClassName('menu')[0].className = 'menu map';//+ #{type} +''
-				document.getElementById('formshow').style.display = 'block';
-				//$('#formshow').css('display', 'block');
-				document.getElementById('map').style.visibility = 'visible';
-				$('#editform > span').html('Hide Feature details');
-				lMarker.dragging.enable();
-				console.log(lMarker)
-				beginFeatureDrag();
-			} else {
-				document.getElementById('select').className = 'blog';
-				document.getElementsByClassName('menu')[0].className = 'menu blog'
-				//$('#formshow').css('display', 'none');
-				document.getElementById('formshow').style.display = 'none';
-				document.getElementById('map').style.visibility = 'visible';
-				$('#editform > span').html('Show Feature details');
-				lMarker.dragging.disable();
-				endFeatureDrag();
-			}
-		})
-		$(document).on('click', '#editmedia', function(){
-			if ($('#mediashow').css('display') === 'none') {
-				$('#mediashow').css('display', 'block');
-				$('#editmedia > span').html('Hide Media details')
-			} else {
-				$('#mediashow').css('display', 'none');
-				$('#editmedia > span').html('Show Media details')
-			}
-		})
-		
-		$(document).on('click', '#editlayout', function(){
-			if ($('#layoutshow').css('display') === 'none') {
-				$('#layoutshow').css('display', 'block');
-				$('#editlayout > span').html('Hide Layout details')
-			} else {
-				$('#layoutshow').css('display', 'none');
-				$('#editlayout > span').html('Show Layout details')
-			}
-		});
 		//edit mode
 		$(document).on('click', '#deletefeature', function(){
 
@@ -238,40 +174,7 @@ block content
 				$('#deletefeature span').css('display', 'block')
 			}
 		})
-		//check / uncheck
-		$(document).on('click', '.ms-ChoiceField-field', function(e){
-			e.preventDefault;
-			var that = $(this);
-			var id = that.attr('id');
-			if (that.siblings('input').hasClass('is-checked')) {
-				that.siblings('input').removeClass('is-checked')
-				that.siblings('input').attr('aria-checked', 'false')
-				that.siblings('input').removeAttr('checked');
-				$('#input_date2').parent('.ms-TextField').removeClass('is-disabled');
-				
-			} else {
-				that.siblings('input').addClass('is-checked')
-				that.siblings('input').attr('aria-checked', 'true');
-				//that.siblings('input').attr('checked', 'checked');
-				$('#input_date2').val('');
-				$('#input_date2').parent('.ms-TextField').addClass('is-disabled');
-			}
-		})
-		//live update of 'layout' / wip
-		/*
-				$('#inputtext').on('mouseup', function(e){
-						
-					var whole = e.target.value.split("")
-					var selObj = window.getSelection();
-					console.log(selObj.toString());
-					var selRange = selObj.getRangeAt(0)
-					console.log(selRange)
-					var select = selObj.toString();
-					
-					whole.splice(selObj.focusOffset, selObj.length, "<span class='highlight'>"+select+"</span>");
-					$('#previewtext').html(marked(whole.join("")))
-				})
-		*/
+		
 		$('#inputtext').on('keyup', function(e){
 			$('#previewtext').html(marked(e.target.value))
 		});

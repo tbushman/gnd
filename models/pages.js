@@ -2,7 +2,7 @@ var mongoose = require('mongoose'),
 	Schema = mongoose.Schema;
 	
 var Item = new Schema({
-	index: Number,
+	layer: Number,
 	name: String,
 	image: String,
 	caption: String,

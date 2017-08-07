@@ -3,21 +3,16 @@ var mongoose = require('mongoose'),
     passportLocalMongoose = require('passport-local-mongoose');
 
 var Publisher = new Schema({
-	userindex: {
-		type: Number,
-		unique: true
-	},
 	username: {
 		type: String,
 		unique: true,
 		trim: true
 	},
 	password: String,
-	email: String,
 	avatar: String,
   language: String
 	
-}, { collection: 'publishers' });
+}, { collection: 'sfusd' });
 
 Publisher.plugin(passportLocalMongoose);
 
