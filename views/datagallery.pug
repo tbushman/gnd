@@ -60,21 +60,18 @@ if (menu === 'home')
 				a.grid-header(href="/"+entry.pagetitle+"")
 					p.tb-font-l #{entry.pagetitle}
 				div.grid-left
-					if (entry.content[entry.content.length-1].image)
-						div.thumbnail.gallery(id= entry.pageindex, name= entry._id + "@all_" + entry.pageindex)
-							div.actions
-								//if (entry.content[entry.content.length-1].substrates[0].url)
-								span.tb-font-s by 
-								br
-								span.tb-font-xxs #{entry.publishers[0].username}
+					if (entry.content[entry.content.length-1].image !== "")
+						a.thumbnail.gallery(href="/"+entry.pagetitle+"")
 							img(src= entry.content[entry.content.length-1].image, alt=""+entry.pagetitle+"'s "+ranks[entry.content.length-1]+" snack")
+					else
+						a.thumbnail.gallery(href="/"+entry.pagetitle+"")
+							img(src= entry.content[entry.content.length-1].info[entry.content[entry.content.length-1].level].image, alt=""+entry.pagetitle+"'s "+ranks[entry.content.length-1]+" snack")
 
 				div.grid-right
-					//if (entry.content[entry.content.length-1].level)
-					p.tb-font-m.hideoverlap.translate About
-						//span #{entry.content[entry.content.length-1][info][entry.content[entry.content.length-1].level].name}
+					p.tb-font-s by 
+						span.tb-font-xxs #{entry.publishers[0].username}
 					if (entry.content[entry.content.length-1].description)
-						p.tb-font-s.hideoverlap.translate
+						p.tb-font-s.hideoverlap
 							!= md(entry.content[entry.content.length-1].description)
 						span &nbsp ...
 				div.grid-footer

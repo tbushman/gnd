@@ -1,6 +1,7 @@
 extends layout
 block page
 	- var ranks = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"];
+	- var keys = ["tools", "info", "substrates", "filling"]
 
 	if (doc)
 		
@@ -24,16 +25,13 @@ block page
 	else
 		- var contentData = menuData.content[menuData.content.length-1]
 		- var index = contentData.index
-	
-	//-
-		if (layer)
-			- var level = layer
-		else
+
 	- var layer = contentData.level
 	if (!drawtype && infowindow === "edit")
 		- var drawtype = "info"
 block content
 	
+	- var keys = ["tools", "info", "substrates", "filling"]
 
 	input(type="hidden", value= pageIndex, id="pageindex")
 		//-
@@ -66,15 +64,25 @@ block content
 		
 		div.pullquote
 			if (drawtype)
-				if (contentData[drawtype][contentData.level])
-					span.tb-font-xxl.translate #{contentData[drawtype][contentData.level].caption}
+				//if (contentData[drawtype][contentData.level])
+				each ing, j in keys
+					each cat, i in contentData[ing]
+						if (cat.unlocked && ing !== "info")
+							a.tool(href="#", onclick="document.getElementById('form_"+drawtype+"_"+i+"').submit();")
+								.ui
+									img(src="/images/icons/"+drawtype+"_"+i+".svg")
+								span.tb-font-l #{cat.name}
+								if (cat.unlocked)
+									form(id="form_"+drawtype+"_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+i+"")
+										input(type="hidden", value="1", name= cat.name)
+										input(type="hidden", id="inputimg_"+drawtype+"_"+i+"", name= cat.name, value= cat.image)
 			else
 				if (contentData)
 					each item, i in contentData.info
 						if (item.unlocked && item.layer === contentData.level)
 							span.tb-font-xxl.translate #{item.caption}
-						else
-							span.tb-font-xxl testing
+				else
+					span.tb-font-xxl testing
 
 	//-
 		initiate map + event listeners

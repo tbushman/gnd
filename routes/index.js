@@ -274,7 +274,7 @@ router.get('/login', function(req, res, next){
 router.post('/login', upload.array(), passport.authenticate('local'), function(req, res, next) {
 	/*console.log('req.user._id: '+req.user._id)
 	req.app.locals.userId = req.user._id;*/
-	delete req.app.locals.pageTitle;
+	//delete req.app.locals.pageTitle;
 	req.app.locals.loggedin = req.body.username;
 	req.app.locals.username = req.body.username;
 	var pagetitle;
@@ -285,7 +285,7 @@ router.post('/login', upload.array(), passport.authenticate('local'), function(r
 	} else {
 		
 	}
-	delete req.app.locals.pageTitle;
+	//delete req.app.locals.pageTitle;
 	return res.redirect('/api/publish');
 });
 
@@ -514,7 +514,7 @@ router.all('/api/*', ensureAuthenticated)
 
 router.get('/api/publish', function(req, res, next) {
 	if (!req.app.locals.pageTitle) {
-		return res.redirect('/register')
+		return res.redirect('/')
 	}
 	var outputPath = url.parse(req.url).pathname;
 	//var pagetitle = req.app.locals.pageTitle;

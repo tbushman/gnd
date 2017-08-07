@@ -3,7 +3,7 @@
 		{
 			"index": 0,
 			"name": "bread",
-			"image": "/images/ingredients/substrates_0.svg",
+			"image": "/images/substrates/substrates_0.svg",
 			"caption": "The basis of a traditional sandwich. ",
 			"unlocked": false,
 			"info" : {
@@ -16,7 +16,7 @@
 		{
 			"index": 1,
 			"name": "rice",
-			"image": "/images/ingredients/substrates_1.svg",
+			"image": "/images/substrates/substrates_1.svg",
 			"caption": "Wrap up a snack in sticky rice. ",
 			"unlocked": false,
 			"info" : {
@@ -27,7 +27,7 @@
 		{
 			"index": 2,
 			"name": "nori",
-			"image": "/images/ingredients/substrates_2.svg",
+			"image": "/images/substrates/substrates_2.svg",
 			"caption": "Nutritious snack wrapper",
 			"unlocked": false,
 			"info" : {
@@ -40,7 +40,7 @@
 		{
 			"index": 0,
 			"name": "jelly",
-			"image": "/images/ingredients/filling_0.svg",
+			"image": "/images/filling/filling_0.svg",
 			"caption": "Sweet fruit spread",
 			"unlocked": false,
 			"info" : {
@@ -51,7 +51,7 @@
 		{
 			"index": 1,
 			"name": "peanut butter",
-			"image": "/images/ingredients/filling_1.svg",
+			"image": "/images/filling/filling_1.svg",
 			"caption": "A food processed from nuts",
 			"unlocked": false,
 			"info" : {
@@ -64,7 +64,7 @@
 		{
 			"index": 2,
 			"name": "cream cheese",
-			"image": "/images/ingredients/filling_2.svg",
+			"image": "/images/filling/filling_2.svg",
 			"caption": "Tangy accompaniment",
 			"unlocked": false,
 			"info" : {
@@ -77,7 +77,7 @@
 		{
 			"index": 3,
 			"name": "tofu",
-			"image": "/images/ingredients/filling_3.svg",
+			"image": "/images/filling/filling_3.svg",
 			"caption": "A food processed from soybeans",
 			"unlocked": false,
 			"info" : {
@@ -90,7 +90,7 @@
 		{
 			"index": 0,
 			"name": "cleaner",
-			"image": "/images/tools/lvl_0.svg",
+			"image": "/images/tools/tools_0.svg",
 			"caption": "Used to ensure sanitized surfaces",
 			"unlocked": true,
 			"info": {
@@ -101,7 +101,7 @@
 		{
 			"index": 1,
 			"name": "butterknife",
-			"image": "/images/tools/lvl_1.svg",
+			"image": "/images/tools/tools_1.svg",
 			"caption": "Used to spread sandwich toppings",
 			"unlocked": false,
 			"info": {
@@ -114,7 +114,7 @@
 		{
 			"index": 0,
 			"name": "bacteria",
-			"image": "",
+			"image": "/images/info/info_0.svg",
 			"caption": "Super-small organisms that make us sick",
 			"unlocked": true,
 			"info": {
@@ -126,7 +126,7 @@
 		{
 			"index": 1,
 			"name": "gluten",
-			"image": "",
+			"image": "/images/info/info_1.svg",
 			"caption": "A wheat ingredient in bread",
 			"unlocked": false,
 			"info": {
@@ -138,7 +138,7 @@
 		{
 			"index": 2,
 			"name": "nuts",
-			"image": "",
+			"image": "/images/info/info_2.svg",
 			"caption": "Nutritious food grown in nature and on farms",
 			"unlocked": false,
 			"info": {
@@ -150,7 +150,7 @@
 		{
 			"index": 3,
 			"name": "dairy",
-			"image": "",
+			"image": "/images/info/info_3.svg",
 			"caption": "Also known as milk produced by cows",
 			"unlocked": false,
 			"info": {
@@ -162,7 +162,7 @@
 		{
 			"index": 4,
 			"name": "allergy",
-			"image": "",
+			"image": "/images/info/info_4.svg",
 			"caption": "Our body's reaction to ingredients we can't have",
 			"unlocked": false,
 			"info": {
