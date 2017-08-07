@@ -10,7 +10,7 @@ form#form.tb-u-100(enctype="multipart/form-data", method="POST", action="/api/ed
 		textarea.ms-TextField-field#inputtext(type="text", name="description", value= contentData.description, placeholder= contentData.description)
 	div.tb-u-100
 		span.tb-font-s#previewtext.translate #{contentData.description}
-	input(type="hidden", id="inputimg", name="img")
+	input(type="hidden", id="inputimg", name="image")
 	if (drawtype)
 		input(type="hidden", id="inputimg_"+drawtype+"_"+contentData.level+"", name= contentData[drawtype][contentData.level].name)
 	div.tb-u-100

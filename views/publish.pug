@@ -86,7 +86,6 @@ block content
 		initiate map + event listeners
 	script(type="text/javascript").
 		const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-		var data = `'#{data}'`
 		/*var pageindex = '#{pageindex}'*/
 		var mainmenu = document.getElementsByClassName('menu')[0];
 		var pageIndex, drawtype, layer;
@@ -143,35 +142,6 @@ block content
 				InitializeApp(drawtype, parseInt(layer, 10));
 			}
 		})
-		//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
-		$(document).on('touchstart, mouseover', '.translate', function (e) {
-			var link = $(this); //preselect the link
-			if (link.hasClass('hover')) {
-				return true;
-			} else {
-				e.preventDefault();
-				link.addClass('hover');
-				$('a.taphover').not(this).removeClass('hover');
-				var text = link.html();
-				if (text.split('<')[1] === undefined) {
-					text = encodeURIComponent(text);
-					$.post('/translate/'+text+'').then(function(result){
-						console.log(result)
-						addAlert(result);
-					})
-				}
-				return false;
-			}
-		});
-		$(document).on('touchend, mouseleave', '.translate', function (e){
-			var link = $(this); //preselect the link
-			if (link.hasClass('hover')) {
-				$('.translate').removeClass('hover');
-			}
-			removeOldAlert()
-			return true;
-		})
-		//edit mode
 		$(document).on('click', '#deletefeature', function(){
 
 			if ($('#deletefeature span').css('display') === 'block') {
@@ -189,16 +159,16 @@ block content
 				e.preventDefault();
 			}
 		})
-		$(document).on('click', '#save', function(e){
+		/*$(document).on('click', '#save', function(e){
 			e.preventDefault();
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+''
 			elem = document.getElementById(id);
 
-			console.log('#{drawtype}', '#{layer}', id, elem);
+			console.log(elem);
 			if (elem !== null) {
 				saveImage(elem)
 			}
-		})
+		})*/
 		
 		function uiBlogMode(){
 			$('div.menu.draw').removeClass('draw');
@@ -280,7 +250,20 @@ block content
 				
 				var eventType = event.type ==  "mousedown" ? "touchstart" :
 						event.type == "mouseup" ? "touchend" : "touchmove";
+				if (eventType === "touchstart") {
+					event.target.setAttribute('style', 'cursor: grabbing;');
+					console.log(event.target.style.cursor)
 
+				}
+				if (eventType === "touchmove") {
+					//https://stackoverflow.com/a/18214483
+					event.target.setAttribute('style', 'cursor: url(/images/tools/tools_0.svg), grabbing;');
+					console.log(event.target.style.cursor)
+				}
+				if (eventType === "touchend") {
+					event.target.setAttribute('style', 'cursor: grab;');
+					console.log(event.target.style.cursor)
+				}
 				drawTouch(event.target, fakeTouch, eventType, false);
 				event.preventDefault();
 			}
@@ -349,6 +332,7 @@ block content
 						context.fillStyle = pattern;
 						context.fill();
 					}
+					
 				}
 				if (eventType != "touchmove" && eventType != "touchbegin") {
 					if (drawType === 'substrates') {
@@ -360,15 +344,17 @@ block content
 						context.fillStyle = pattern;
 						context.fillRect(0, 0, canvasWidth, canvasHeight);
 					}
+					
 				}
 				if (eventType == "touchbegin") {
 					if (drawType === 'filling') {
 						context.fillStyle = pattern;
 					}
-					if (drawType === 'tools') {
-						context.fillStyle = "rgba(255,255,255,0)"
-					}
+					i
 					context.fill();
+				}
+				if (eventType === "touchmove") {
+					
 				}
 			}
 			
@@ -381,6 +367,10 @@ block content
 		}
 		
 		function saveImage(can){
+			var mainCanvas = document.getElementById('canvas');
+			var width = mainCanvas.getBoundingClientRect().width;
+			var height = mainCanvas.getBoundingClientRect().height;
+			var context = mainCanvas.getContext("2d");
 			if (!HTMLCanvasElement.prototype.toBlob) {
 				Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
 					value: function (callback, type, quality) {
@@ -407,8 +397,6 @@ block content
 					
 					var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/'+drawtype+'/'+layer+'';
 
-					console.log(blob)
-					console.log(uploadurl)
 					$.ajax({
 						url: uploadurl,
 						type: 'POST',
@@ -416,16 +404,39 @@ block content
 						processData: false,
 						contentType: false,
 						success: function(response) {
+							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
 							$('#inputimg_'+drawtype+'_'+layer+'').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
 							
 							setTimeout(function(){
 								$('#form').submit();
+								//window.location.href = '/api/publish'
+								var img = new Image();
+								img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
+								img.onload = function(){
+									context.drawImage(this, 0, 0, width, height);
+									mainCanvas.toBlob(function(blob) {
+										var fd = new FormData();
+										
+										fd.append("img", blob);
+										
+										var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/'+false+'';
+
+										console.log(blob)
+										console.log(uploadurl)
+										$.ajax({
+											url: uploadurl,
+											type: 'POST',
+											data: fd,
+											processData: false,
+											contentType: false,
+											success: function(response) {
+												$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+												uiBlogMode();
+											}
+										})
+									}, 'image/png'/*, 0.95*/);
+								}
 							}, 500);
-							/*$('a.mainmenu').removeClass('dropdown');
-							$('a.mainmenu').addClass('dropdown');
-							$('a.mainmenu').attr('title', 'Menu');
-							$('a.mainmenu').html('<img class="i" src="http://pu.bli.sh/images/menu_button.svg"></img>')*/
-							//InitializeApp('#{drawtype}', '#{layer}');
 						}
 						
 					})
@@ -457,6 +468,7 @@ block content
 								//InitializeApp('#{drawtype}', #{layer})
 								setTimeout(function(){
 									$('#form').submit();
+									window.location.href = '/api/publish'
 								}, 500);
 							}
 						
@@ -464,3 +476,33 @@ block content
 				}, 'image/png'/*, 0.95*/);
 			}
 		}
+		//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
+		$(document).on('touchstart, mouseover', '.translate', function (e) {
+			var link = $(this); //preselect the link
+			if (link.hasClass('hover')) {
+				return true;
+			} else {
+				e.preventDefault();
+				link.addClass('hover');
+				$('a.taphover').not(this).removeClass('hover');
+				var text = link.html();
+				if (text.split('<')[1] === undefined) {
+					text = encodeURIComponent(text);
+					$.post('/translate/'+text+'').then(function(result){
+						console.log(result)
+						addAlert(result);
+					})
+				}
+				return false;
+			}
+		});
+		$(document).on('touchend, mouseleave', '.translate', function (e){
+			var link = $(this); //preselect the link
+			if (link.hasClass('hover')) {
+				$('.translate').removeClass('hover');
+			}
+			removeOldAlert()
+			return true;
+		})
+		//edit mode
+		

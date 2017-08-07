@@ -26,7 +26,7 @@ var storage = multer.diskStorage({
 			if (err) {
 				console.log(err)
 			}
-			var p = ''+publishers+'/pu/publishers/sfusd/'+ doc.urltitle +'/images/'+req.params.index+'/'+(req.params.drawtype ? req.params.drawtype : 'main')+''
+			var p = ''+publishers+'/pu/publishers/sfusd/'+ doc.urltitle +'/'+req.params.index+'/images/'+(req.params.drawtype ? req.params.drawtype : 'main')+''
 			console.log(p)
 			/*if (req.params.drawtype && req.params.drawtype !== 'false') {
 				
@@ -149,53 +149,6 @@ router.get('/', function (req, res) {
 	}
 });
 
-/*router.param(function(param, option){
-	return function(req, res, next, val) {
-		if (option) {
-			next();
-		} else {
-			next('/')
-		}
-	}
-})
-
-router.param('index', function(index){
-	return !isNaN(parseInt(index, 10)) && isFinite(index);
-})
-
-router.param('pagetitle', function(pagetitle){
-	if (pagetitle && pagetitle !== null) {
-		var urltitle = req.params.pagetitle.replace(' ', '_');
-		Page.findOne({urltitle: urltitle}, function(err, doc){
-			if (err) {
-				return false
-			}
-			if (!err && doc !== null) {
-				console.log('success')
-				return true
-			}
-			return false
-		})		
-	} else {
-		return false
-	}
-});*/
-router.all('/translate/:text', function(req, res, next){
-
-	googleTranslate.translate(decodeURIComponent(req.params.text), 'en', req.app.locals.user ? req.app.locals.user.language : 'es', function(err, translation){
-		if (err) {
-			return res.json(err);
-		}
-		
-		if (translation !== undefined) {
-			console.log(translation.translatedText)
-			return res.json(translation.translatedText);
-		} else {
-			return res.json('');
-		}
-	});
-})
-
 router.get('/register', function(req, res) {
 	delete req.app.locals.loggedin;
 	req.app.locals.theStore = thestore;
@@ -312,6 +265,18 @@ router.get('/logout', function(req, res) {
 		return res.redirect('/');
 	}
 });
+
+router.all('/translate/:text', function(req, res, next){
+
+	googleTranslate.translate(decodeURIComponent(req.params.text), 'en', req.app.locals.user ? req.app.locals.user.language : 'es', function(err, translation){
+		if (err) {
+			console.log(err)
+		}
+		
+		console.log(translation.translatedText)
+		return res.json(translation.translatedText);
+	});
+})
 
 router.get('/home', function(req, res, next) {
 	//todo test null vs delete
@@ -593,11 +558,11 @@ router.get('/api/publish', function(req, res, next) {
 						if (err) {
 							return next(err)
 						}
-						if (req.app.locals.drawType) {
+						/*if (req.app.locals.drawType) {
 							cb(null, pages, doc, doc.pageindex, 'edit')
-						} else {
+						} else {*/
 							cb(null, pages, doc, doc.pageindex, 'doc')
-						}
+						//}
 						
 					})
 					
@@ -616,7 +581,7 @@ router.get('/api/publish', function(req, res, next) {
 			index: doc ? doc.content.length-1 : false,
 			data: [].map.call(data, function(d){return d}),
 			doc: doc ? doc : false,
-			drawtype: req.app.locals.drawType ? req.app.locals.drawType : false,
+			//drawtype: req.app.locals.drawType ? req.app.locals.drawType : false,
 			info: 'hi'
 		})
 	})
@@ -673,7 +638,6 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 		if (error) {
 			return next(error)
 		}
-		console.log(doc)
 		Page.find({}, function(er, data){
 			if (er) {
 				return next(er)
@@ -719,6 +683,7 @@ router.get('/api/selectlayer', function(req, res, next){
 				type: 'draw',
 				infowindow: 'edit',
 				drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
+				layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
 				loggedin: req.app.locals.loggedin,
 				pageindex: doc.pageindex,
 				index: req.app.locals.index,
@@ -768,7 +733,7 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 				return res.render('publish', {
 					type: 'draw',
 					drawtype: drawtype,
-					//layer: layer,
+					layer: layer,
 					infowindow: 'edit',
 					loggedin: req.app.locals.loggedin,
 					pagetitle: doc.pagetitle,
@@ -782,33 +747,6 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 			
 		})
 	})
-	/*async.waterfall([
-		
-		function(next){
-			
-		}
-	], function(err, data, doc, index, drawtype, layer) {
-		if (err) {
-			return next(err)
-		}
-		
-		/*return res.render('publish', {
-			type: 'draw',
-			drawtype: drawtype,
-			//layer: layer,
-			infowindow: 'edit',
-			loggedin: req.app.locals.loggedin,
-			pagetitle: doc.pagetitle,
-			pageindex: doc.pageindex,
-			index: index,
-			doc: doc,
-			data: datarray,
-			info: ':)'
-		})*/
-		
-		
-		//return res.redirect('/api/publish')
-	/*})*/
 })
 
 router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), function(req, res, next){
@@ -831,6 +769,8 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 		var items = ["tools", "info", "substrates", "filling"];
 		var drawThis = false;
 		var key, push, drawType, drawInd, drawName, unlocked, thisValue;
+		
+		
 		for (var i = 0; i < items.length; i++) {
 			//if (Array.isArray(contentdata[items[i]])) {
 				drawType = items[i];
@@ -839,9 +779,9 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 						drawThis = contentdata[drawType][q];
 						drawInd = drawThis.index;
 						drawName = drawThis.name;
-						key = 'content.$.'+drawType+'.'+drawInd+''
+						/*key = 'content.$.'+drawType+'.'+drawInd+''
 						push = {$set: {}};
-						pushKey = '$set';
+						pushKey = '$set';*/
 					}
 					
 					if (contentdata[drawType][q].index <= contentdata.level) {
@@ -855,11 +795,27 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 			
 		}
 		if (drawThis) {
-			drawThis.image = body[drawName];
+			//drawThis.image = body[drawName];
 			//drawThis.caption = body['caption'];
-			drawThis.unlocked = unlocked;
-			drawThis = JSON.parse(JSON.stringify(drawThis));
-			thisValue = drawThis
+			//drawThis.unlocked = unlocked;
+			//drawThis = JSON.parse(JSON.stringify(drawThis));
+			//thisValue = drawThis
+			
+			for (var i = 0; i < keys.length; i++) {
+				contentdata[keys[i]] = body[keys[i]]
+				for (var j = 0; j < contentdata[keys[i]].length; j++) {
+					if (contentdata[keys[i]][j].name === drawName) {
+						contentdata[keys[i]][j].image = body[drawName]
+						contentdata[keys[i]][j].unlocked = unlocked
+					}
+				}
+				
+			}
+			
+			key = 'content.$'
+			push = {$set: {}};
+			pushKey = '$set';
+			thisValue = contentdata;
 		} else {
 			
 			//drawType = false;
@@ -877,6 +833,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 			if (error) {
 				return next(error)
 			}
+			
 			Page.find({}, function(err, data){
 				if (err) {
 					return next(err)
@@ -888,7 +845,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 				return res.render('publish', {
 					type: 'blog',
 					drawtype: drawType !== undefined ? drawType : req.app.locals.drawType,
-					//layer: req.app.locals.layer ? req.app.locals.layer : false,
+					layer: drawType !== undefined ? drawInd : req.app.locals.layer ? req.app.locals.layer : false,
 					infowindow: 'edit',
 					loggedin: req.app.locals.loggedin,
 					pagetitle: doc.pagetitle,
@@ -903,4 +860,104 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 	})
 })
 
+router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', function(req, res, next){
+	var urltitle = req.params.urltitle;
+	var pageindex = parseInt(req.params.pageindex, 10);
+	var index = parseInt(req.params.index, 10);
+	var drawtype = req.params.drawtype;
+	var layer = parseInt(req.params.layer, 10);
+	if (drawtype === "info") {
+		return res.redirect('/api/levelup')
+	}
+	Page.findOne({pageindex: pageindex, content: {$elemMatch: {index: index}}}, function(err, pub){
+		if (err) {
+			return next(err)
+		}
+		var keys = Object.keys(pub.content);
+		var key, level;
+		var keylist = [];
+		var levellist = [];
+		for (var i = 0; i < pub.content.length; i++) {
+			if (Array.isArray(pub.content[keys[i]])) {
+				//if next type
+				if (i > keys.indexOf(drawtype)) {
+					for (var j = 0; j < pub.content[keys[i]].length; j++) {
+						if (!pub.content[keys[i]][j].unlocked) {
+							keylist.push(keys[i]);
+							levellist.push(i)
+						}
+					}
+				}
+			}
+		}
+		var drawType = keylist[0] !== undefined ? keylist[0] : "info";
+		var level = levellist[0] !== undefined ? levellist[0] : 0;
+		var set1 = {$set: {}};
+		var key1 = 'content.$.'+keylist[0]+'.'+levellist[0]+'.unlocked';
+		set1.$set[key1] = true;
+		var set2 = {$set: {}}
+		
+		Page.findOneAndUpdate({pageindex: pageindex, content: {$elemMatch: {index: index}}}, set1, {safe: true, new: true, upsert: false}, function(error, dc){
+			if (error) {
+				return next(error)
+			}
+			Page.findOneAndUpdate({pageindex: pageindex, content: {$elemMatch: {index: index}}}, set2, {safe: true, new: true, upsert: false}, function(er, doc){
+				if (er) {
+					return next(er)
+				}
+				Page.find({}, function(er, data){
+					if (er) {
+						return next(er)
+					}
+					var datarray = [];
+					for (var l in data) {
+						datarray.push(data[l])
+					}
+					return res.render('publish', {
+						type: 'draw',
+						drawtype: drawType,
+						layer: level,
+						infowindow: 'edit',
+						loggedin: req.app.locals.loggedin,
+						pageindex: doc.pageindex,
+						index: index,
+						doc: doc,
+						data: datarray,
+						info: ':)'
+					})
+				})
+			})
+		})
+	})
+});
+
+router.get('/api/levelup', function(req, res, next){
+	var set = {$set:{}}
+	var key = 'content.$.level'
+	set2.$set[key2] = req.app.locals.layer + 1;
+	Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		Page.find({}, function(er, data){
+			if (er) {
+				return next(er)
+			}
+			var datarray = [];
+			for (var l in data) {
+				datarray.push(data[l])
+			}
+			return res.render('publish', {
+				type: 'blog',
+				infowindow: 'doc',
+				loggedin: req.app.locals.loggedin,
+				pageindex: doc.pageindex,
+				index: req.app.locals.index,
+				doc: doc,
+				data: datarray,
+				info: ':)'
+			})
+		})
+	})
+})
 module.exports = router;

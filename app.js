@@ -24,6 +24,17 @@ mongoose.Promise = promise;
 dotenv.load();
 
 var app = express();
+if (app.get('env') === 'production') {
+	app.set('trust proxy', 1) // trust first proxy	
+	app.use(function (req, res, next) {
+	    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:80');
+	    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+	    res.setHeader('Access-Control-Allow-Headers', 'Cache-Control, Origin, X-Requested-With, Content-Type, Accept, Authorization');
+	    res.setHeader('Access-Control-Allow-Credentials', true);
+	    next()
+	});
+}
+
 passport.use(new LocalStrategy(Publisher.authenticate()));
 // serialize and deserialize
 passport.serializeUser(function(user, done) {
@@ -81,6 +92,44 @@ app.locals.md = marked;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/publishers', express.static(path.join(__dirname, '../../pu/publishers')));
+app.use('/publishers/sfusd', express.static(path.join(__dirname, '../../pu/publishers/sfusd')));
+app.use('/publishers/sfusd/:urltitle', function(req, res, next) {
+	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		return express.static(path.join(__dirname, '../../pu/publishers/sfusd/'+req.params.urltitle+'')).apply(this, arguments);
+	})
+	
+});
+
+app.use('/publishers/sfusd/:urltitle/:index', function(req, res, next) {
+	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		return express.static(path.join(__dirname, '../../pu/publishers/sfusd/'+req.params.urltitle+'/'+req.params.index+'')).apply(this, arguments);
+	})
+});
+
+app.use('/publishers/sfusd/:urltitle/:index/images', function(req, res, next) {
+	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		return express.static(path.join(__dirname, '../../pu/publishers/sfusd/'+req.params.urltitle+'/'+req.params.index+'/images')).apply(this, arguments);
+	})
+});
+
+app.use('/publishers/sfusd/:urltitle/:index/images/:drawtype', function(req, res, next) {
+	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		return express.static(path.join(__dirname, '../../pu/publishers/sfusd/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'')).apply(this, arguments);
+	})
+});
 
 app.use('/', routes);
 app.use(function (err, req, res, next) {

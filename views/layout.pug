@@ -82,34 +82,6 @@ html
 				}
 				//e.stopPropagation();
 			});
-			//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
-			$(document).on('touchstart, mouseover', '.translate', function (e) {
-				var link = $(this); //preselect the link
-				if (link.hasClass('hover')) {
-					return true;
-				} else {
-					e.preventDefault();
-					link.addClass('hover');
-					$('a.taphover').not(this).removeClass('hover');
-					var text = link.html();
-					if (text.split('<')[1] === undefined) {
-						text = encodeURIComponent(text);
-						$.post('/translate/'+text+'').then(function(result){
-							console.log(result)
-							addAlert(result);
-						})
-					}
-					return false;
-				}
-			});
-			$(document).on('touchend, mouseleave', '.translate', function (e){
-				var link = $(this); //preselect the link
-				if (link.hasClass('hover')) {
-					$('.translate').removeClass('hover');
-				}
-				removeOldAlert()
-				return true;
-			})
 			function removeOldAlert()
 				{
 					var oldAlert = document.getElementById("alert");

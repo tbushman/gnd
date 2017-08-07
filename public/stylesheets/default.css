@@ -171,6 +171,12 @@ i.fa.active {
 	left: var(--thumbwidth);
 	z-index:1;
 }
+.pullquote > .tool > .ui > img {
+	height: var(--thumbwidth);
+}
+.pullquote >  span.translate {
+	display: none;
+}
 @supports not (display:grid) {
 	.pullquote {
 		left: var(--thumbwidth);
@@ -218,7 +224,6 @@ i.fa.active {
 	bottom: calc(var(--thumbwidth) - var(--windowmenu));
 	top: auto;
 	min-height: var(--panelheight);
-	background-color: tomato;
 }
 .grid-container.blog {
 	height: var(--panelheight);
@@ -280,7 +285,7 @@ i.fa.active {
 		"footer footer footer";
 	height: auto;
 	/*position: relative;*/
-	background-color: red;
+	background-color: rgba(255,255,255,0);
 }
 @supports not (display:grid) {
 	.grid-container.inner {
@@ -299,7 +304,6 @@ i.fa.active {
 	background-color: rgba(255,255,255,0.5);
 	height: auto;
 	max-height: 220px;
-	background-color: turquoise;
 }
 @supports not (display:grid) {
 	.grid-header {
@@ -325,7 +329,7 @@ i.fa.active {
 }
 .grid-header.mainHeader {
 	max-width: calc(100% - var(--thumbwidth));
-	background-color: aqua;
+	background-color: rgba(255,255,255,0);
 }
 a.grid-header:hover {
 	color: var(--secondary);
@@ -335,7 +339,6 @@ a.grid-header:hover {
 	grid-area: sideleft;
 	overflow: hidden;
 	pointer-events: none;
-	background-color: rgba(255,255,255,0);
 	background-color: rgba(255,255,255,0.5);
 	min-width: var(--thumbwidth);
 	/*background-image: radial-gradient(circle at 30px 0, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 0.5) 19px);*/
@@ -353,7 +356,7 @@ a.grid-header:hover {
 .grid-mid {
 	grid-area: mid;
 	overflow: hidden;
-	background-color: yellow;
+	background-color: rgba(255,255,255,0);
 	/*pointer-events: none;*/
 }
 @supports not (display:grid) {
@@ -388,11 +391,10 @@ a.grid-header:hover {
 	max-height: 100%;
 	max-width: calc(100% - var(--thumbwidth));
 	min-width: 0;
-	background-color: orange;
 }
 .grid-container.inner > .grid-right {
 	width: calc(100% - var(--thumbwidth));
-	background-color: blue;
+	background-color: rgba(255,255,255,0);
 	min-height: var(--windowmenu);
 	bottom: auto;
 	top: 0;
@@ -421,7 +423,6 @@ a.grid-header:hover {
 	background-color: #fff;
 	height: auto;
 	white-space: normal;
-	background-color: purple;
 }
 @supports not (display:grid) {
 	.grid-footer {
@@ -518,6 +519,9 @@ div.draw > .menu {
 	position: relative;
 	top: 0;
 }
+#select.draw > .pullquote {
+	top: var(--panelheight);
+}
 div.dashboard .menu {
 	display: inline-block;
 	pointer-events: none;
@@ -542,7 +546,7 @@ div.dashboard .menu {
 	background-color: rgba(255,255,255,0);
 	z-index: 0;
 	margin: 0 auto;
-	cursor: url('/images/icons/edit.png'), 2, 2, pointer;
+	/*cursor: url('/images/icons/edit.png'), 2, 2, pointer;*/
 }
 .maincanvas.topRight {
 	display: block;
@@ -759,8 +763,8 @@ div.dropdown {
 	width: auto;
 	min-width: var(--thumbwidth);
 	max-width: 100%;
-	cursor: -webkit-grab;
-	cursor: grab;
+	/*cursor: -webkit-grab;
+	cursor: grab;*/
 	display: inline-block;
 	margin-top: 0;
 	top: var(--nowindowheight);
