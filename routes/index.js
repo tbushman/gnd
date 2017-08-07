@@ -18,6 +18,8 @@ var request = require('request');
 var marked = require('marked');
 var upload = multer();
 var thestore = require('../public/json/store.json');
+var languages = require('../public/json/languages.json');
+
 var storage = multer.diskStorage({
 	destination: function (req, files, cb) {
 		Page.findOne({pageindex: req.params.pageindex}, function(err, doc){
@@ -60,16 +62,14 @@ var storage = multer.diskStorage({
 			console.log('main save')
 			cb(null, files[0].fieldname + '_' + req.params.index + '.png')
 		}
-		
-		
-		
   }
 })
 
 var uploadmedia = multer({ storage: storage })
 dotenv.load();
 
-
+var googleTranslate = require('google-translate')(process.env.GOOGLE_KEY);
+//var translateThis = 
 //middleware
 function ensureAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) {
@@ -99,9 +99,9 @@ function ensureUserId(req, res, next) {
 			}
 		if (user) {
 			return next();
-	    } else {
-				return res.redirect('/')
-			}
+		} else {
+			return res.redirect('/')
+		}
 	});
 }
 
@@ -128,6 +128,7 @@ function ensureUser(req, res, next) {
 //if logged in, go to your own profile
 //if not, go to global profile (home)
 router.get('/', function (req, res) {
+	
 	req.app.locals.theStore = thestore;
 
 	if (req.app.locals.loggedin !== undefined) {
@@ -182,8 +183,19 @@ router.param('pagetitle', function(pagetitle){
 
 router.get('/register', function(req, res) {
 	req.app.locals.theStore = thestore;
+	googleTranslate.getSupportedLanguages(function(err, languageCodes) {
+		var langs = [];
+		for (var i = 0; i < languageCodes.length; i++) {
+			if (languages[languageCodes[i]] !== undefined) {
+				var obj = languages[languageCodes[i]];
+				obj.code = languageCodes[i];
+				langs.push(obj)
+			}
+			
+		}
+		return res.render('register', {info: 'Thank you', action: 'login', languages: langs } );
 
-    return res.render('register', {info: 'Thank you', action: 'login' } );
+	});
 });
 
 router.post('/register', upload.array(), function(req, res, next) {
@@ -197,7 +209,7 @@ router.post('/register', upload.array(), function(req, res, next) {
 			return next(err)
 		}
 		var userindex = data.length;
-		Publisher.register(new Publisher({ username : req.body.username, email: req.body.email, userindex: userindex, avatar: '/images/avatars/avatar_1.svg' }), req.body.password, function(err, user) {
+		Publisher.register(new Publisher({ username : req.body.username, email: req.body.email, userindex: userindex, avatar: '/images/avatars/avatar_1.svg', language: req.body.languages }), req.body.password, function(err, user) {
 			if (err) {
 				return res.render('register', {info: "Sorry. That username already exists. Try again."});
 			}
@@ -472,11 +484,23 @@ router.all('/search/:term', function(req, res, next){
 //every edit-access api checks auth
 router.all('/api/*', ensureAuthenticated)
 
-router.get('/api/createpage', function(req, res, next){
-	
+router.all('/translate/:text', function(req, res, next){
+
+	googleTranslate.translate(decodeURIComponent(req.params.text), 'en', req.app.locals.user ? req.app.locals.user.language : 'es', function(err, translation){
+		if (err) {
+			console.log(err)
+		}
+		
+		console.log(translation.translatedText)
+		return res.json(translation.translatedText);
+	});
 })
 
+
 router.get('/api/publish', function(req, res, next) {
+	if (!req.app.locals.pageTitle) {
+		return res.redirect('/login')
+	}
 	var outputPath = url.parse(req.url).pathname;
 	//var pagetitle = req.app.locals.pageTitle;
 	//var urltitle = pagetitle.replace(' ', '_');
@@ -493,75 +517,97 @@ router.get('/api/publish', function(req, res, next) {
 					if (er) {
 						next(er)
 					}
-					var infowindow;
-					if (pages.length === 0) {
-						infowindow = 'doc';
-						//dummy automatic first content entry
-						var urltitle = req.app.locals.pageTitle.replace(' ', '_');
-						var page = new Page({
-							pageindex: data.length,
-							pagetitle: req.app.locals.pageTitle,
-							urltitle: urltitle,
-							content: [ {
-								index: 0,
-								pid: data.length,
-								user: req.app.locals.user._id,
-								title: thestore.info[0].name + ' ' + thestore.tools[0].name,
-								description: 'My first sandwich',
-								level: 0,
-								info: thestore.info,
-								substrates: thestore.substrates,
-								filling: thestore.filling,
-								tools: thestore.tools,
-								image: ''
-								
-							} ],
-							publishers: [{
-								_id: req.app.locals.user._id,
-								userindex: 0,
-								username: req.app.locals.user.username,
-								email: req.app.locals.user.email,
-								avatar: req.app.locals.user.avatar
-							}]
-						});
-						//for (var i = 0; i < thestore.length)
-						req.app.locals.index = 0;
-						page.save(function(error){
-							if (error) {
-								return next(error)
-							} else {
-								Page.find({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(er, pages){
-									if (er) {
-										next(er)
-									}
-									req.app.locals.pageId = page._id;
-									//req.app.locals.pageTitle = doc.pagetitle;
-									req.app.locals.userId = req.app.locals.user._id;
-									cb(null, pages, page, page.pageindex, infowindow)
-								})
-							}
-						})
+					/*var translateStore = thestore;
+					var storekeys = Object.keys(thestore);
+					for (var i = 0; i < storekeys.length; i++) {
+						for (var j = 0; j < thestore[storekeys[i]].length; j++) {
+							var desc = thestore[storekeys[i]][j].caption;
+							googleTranslate.translate(desc, 'en', req.app.locals.user.language, function(err, translation){
+								if (err) {
+									console.log(err)
+								}
+								//console.log(translation.translatedText)
+								translateStore[storekeys[i]][j].caption = translation.translatedText;
+							});
+							//var translated = translateThis(desc, 'en', req.app.locals.user.language);
+							//var translated = 
+							
+							
+						}
+					}*/
+					cb(null, data, pages/*, translateStore*/)
+				})
+			})
+		},
+		function(data, pages/*, translateStore*/, cb) {
+			var infowindow;
+			if (pages.length === 0) {
+				infowindow = 'doc';
+				//dummy automatic first content entry
+				var urltitle = req.app.locals.pageTitle.replace(' ', '_');
+				var page = new Page({
+					pageindex: data.length,
+					pagetitle: req.app.locals.pageTitle,
+					urltitle: urltitle,
+					content: [ {
+						index: 0,
+						pid: data.length,
+						user: req.app.locals.user._id,
+						title: thestore.info[0].name + ' ' + thestore.tools[0].name,
+						description: 'My first sandwich',
+						level: 0,
+						info: thestore.info,
+						substrates: thestore.substrates,
+						filling: thestore.filling,
+						tools: thestore.tools,
+						image: ''
+						
+					} ],
+					publishers: [{
+						_id: req.app.locals.user._id,
+						userindex: 0,
+						username: req.app.locals.user.username,
+						email: req.app.locals.user.email,
+						avatar: req.app.locals.user.avatar,
+						language: req.app.locals.user.language
+					}]
+				});
+				//for (var i = 0; i < thestore.length)
+				req.app.locals.index = 0;
+				page.save(function(error){
+					if (error) {
+						return next(error)
 					} else {
 						Page.find({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(er, pages){
 							if (er) {
-								return next(er)
+								next(er)
 							}
-							Page.findOne({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(err, doc){
-								if (err) {
-									return next(err)
-								}
-								if (req.app.locals.drawtype) {
-									cb(null, pages, doc, doc.pageindex, 'edit')
-								} else {
-									cb(null, pages, doc, doc.pageindex, 'doc')
-								}
-								
-							})
-							
+							req.app.locals.pageId = page._id;
+							//req.app.locals.pageTitle = doc.pagetitle;
+							req.app.locals.userId = req.app.locals.user._id;
+							cb(null, pages, page, page.pageindex, infowindow)
 						})
 					}
 				})
-			})
+			} else {
+				Page.find({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(er, pages){
+					if (er) {
+						return next(er)
+					}
+					Page.findOne({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(err, doc){
+						if (err) {
+							return next(err)
+						}
+						if (req.app.locals.drawtype) {
+							cb(null, pages, doc, doc.pageindex, 'edit')
+						} else {
+							cb(null, pages, doc, doc.pageindex, 'doc')
+						}
+						
+					})
+					
+				})
+			}
 		}
 	], function(err, data, doc, pageindex, infowindow){
 		if (err) {

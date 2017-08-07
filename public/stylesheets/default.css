@@ -64,6 +64,15 @@ i, .i {
 	float: left;
 	margin: 0 auto;
 }
+#alert {
+	position: absolute;
+	margin: 0 auto;
+	left: 0;
+	right: 0;
+	bottom: calc(var(--thumbwidth)/2);
+	top: auto;
+	display: inline-block;
+}
 .avatar {
 	max-width: 250px;
 	margin: 0 auto;
@@ -157,7 +166,7 @@ i.fa.active {
 }
 .pullquote {
 	display: block;
-	position: fixed;
+	position: absolute;
 	top: calc(var(--nowindowmenu) + 15px);
 	left: var(--thumbwidth);
 	z-index:1;

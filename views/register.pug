@@ -49,37 +49,4 @@ block content
 				//				InitializeApp();
 			}
 		})
-		$(document).on('click', 'a.dropdown', function (e) { 
-			//e.preventDefault();
-			var that, main;
-			if ($(this).hasClass('mainmenu')) {
-				$('.menu').css('height', 'var(--nowindowmenu)')
-				that = $('#tlmodules.dropdown');
-				main = true;
-			} else {
-				that = this;
-				main = false;
-			}
-			if ($(that).hasClass('selected')) {
-				if (main) {
-					$(that).slideUp(100);
-				} else {
-					$(that).next('.drop').slideUp(100);
-				}
-				$(that).removeClass("selected");
-				var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
-				$('.grid-header.mainHeader').css('height', topmargin + 30 + 'px');
-			} else {
-				$(that).addClass('selected');
-				if (main) {
-					$(that).slideDown(200);
-				} else {
-					$(that).next('.drop').slideDown(200);
-				}
-				setTimeout(function(){
-					var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
-					$('.grid-header.mainHeader').css('height', topmargin + 30 + 'px');
-				}, 210);
-			}
-			//e.stopPropagation();
-		});
+		

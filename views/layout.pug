@@ -18,7 +18,70 @@ html
 		//script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js")
 		//script(src="https://unpkg.com/vue/dist/vue.js")
 		//https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/forms/alerts
+	body
+		block page
+			- var theStore = theStore
+
+		block header
+
+		block content
+			
+
+		a#publish_logo(href="https://github.com/tbushman/pu" target="_blank")
+			img(src="/images/publish_logo.svg")
+		
 		script(type="application/javascript").
+			
+			$(document).on('click', 'canvas', function(e){
+				if ($('.menu').hasClass('blog')) {
+					//				e.preventDefault();
+					//				InitializeApp();
+					
+					/*$('.dropdown').not('.mainmenu').slideUp(100);
+					$('.drop').slideUp(100);
+					$('.selected').removeClass('selected');*/
+					uiDrawMode()
+				}
+			});
+			//drop-down event listener
+			$(document).on('click', '.dropdown', function (e) { 
+				//e.preventDefault();
+				console.log(e.target)
+				var that, main;
+				if ($(this).hasClass('mainmenu')) {
+					that = $('#tlmodules.dropdown');
+					main = true;
+				} else {
+					that = this;
+					main = false;
+				}
+				if ($(that).hasClass('selected')) {
+					if (main && $('div.menu').hasClass('blog')) {
+						$(that).slideUp(100);
+						$(that).removeClass("selected");
+					} else {
+						if ($('div.menu').hasClass('blog')) {
+							$(that).next('.drop').slideUp(100);
+						}
+					}
+				} else {
+					if (main && $('div.menu').hasClass('blog')) {
+						$(that).slideDown(200);
+						$(that).addClass('selected');
+					} else {
+						$(that).next('.drop').slideDown(200);
+					}
+				}
+				if ($('div.menu').hasClass('draw')) {
+					
+					uiBlogMode()
+				} else {
+					if ($('div.menu').hasClass('blog')) {
+						uiBlogMode()
+					}
+				}
+				//e.stopPropagation();
+			});
 			function removeOldAlert()
 				{
 					var oldAlert = document.getElementById("alert");
@@ -52,33 +115,16 @@ html
 				function checkEmailValidity(aID, aSearchTerm, aMsg)
 				{
 					var elem = document.getElementById(aID);
-					for (var i = 0; i < elem.value.length; i++) {
-						if (aSearchTerm.indexOf(elem.value.charAt(i)) === -1) {
-							elem.setAttribute("aria-invalid", "true");
-							addAlert(aMsg);
-						} else {
-							elem.setAttribute("aria-invalid", "false");
-							removeOldAlert();
-						}
+					console.log(aSearchTerm)
+					if (elem.value.indexOf(aSearchTerm) === -1) {
+						elem.setAttribute("aria-invalid", "true");
+						addAlert(aMsg);
+					} else {
+						elem.setAttribute("aria-invalid", "false");
+						removeOldAlert();
 					}
 				}
-	body
-		block page
-			- var theStore = theStore
 
-		block header
-
-		block content
-			
-
-		div.pullquote
-			if (drawtype)
-				if (contentData[drawtype][level])
-					span.tb-font-xxl #{contentData[drawtype][level].caption}
-			else 
-				span.tb-font-xxl testing
-		a#publish_logo(href="https://github.com/tbushman/pu" target="_blank")
-			img(src="/images/publish_logo.svg")
 			
 		
 		

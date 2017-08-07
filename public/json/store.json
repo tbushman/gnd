@@ -127,7 +127,7 @@
 			"index": 1,
 			"name": "gluten",
 			"image": "",
-			"caption": "An wheat ingredient in bread",
+			"caption": "A wheat ingredient in bread",
 			"unlocked": false,
 			"info": {
 				"safety": "allergy",

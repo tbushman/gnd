@@ -8,7 +8,7 @@ div.grid-header.mainHeader
 			img.i(src="/images/icons/check.svg")
 		each ing, j in keys
 			each cat, i in contentData[ing]
-				if (cat.unlocked)
+				if (cat.unlocked && cat.index === contentData.level && drawtype === ing)
 					a.tool(href="#", onclick="document.getElementById('form_"+drawtype+"_"+i+"').submit();")
 						.ui
 							img(src="/images/icons/"+drawtype+"_"+i+".svg")
@@ -31,48 +31,36 @@ div.grid-left
 				.ui
 					img(src="/images/icons/home.svg")
 				span.tb-font-l Home
-			if (loggedin)
-				if (menuData)
-					if (menuData.publishers[0].username === loggedin)
-						if (doc)
-							a.module.dropdown(title="edit")
-								.ui
-									img(src="/images/icons/edit.svg")
-								span.tb-font-l Edit
-
-								each key, j in keys
-									
-									each ing, k in key
-										a.module.focus.drop(href="#", onclick="document.getElementById('form_"+key[j]+"_"+k+"').submit();")
-											.ui
-												img(src=(ing.unlocked ? "/images/icons/"+key[j]+"_"+k+".svg" : "/images/icons/unknown.svg"))
-
-									
-										//each ing, k in module
-											span.tb-font-l #{ing.name}
-											if (ing.unlocked)
-												form(id="form_"+keys[j]+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+keys[j]+"/"+k+"")
-													input(type="hidden", value="1", name= ing.name)
-													input(type="hidden", id="inputimg_"+keys[j]+"_"+k+"", name= ing.name, value= ing.image)
-
-									//-
-										else
-											each ing, k in `#{theStore[keys[j]]}`
-												a.module.focus.drop(href="#", onclick="document.getElementById('form_"+keys[j]+"_"+k+"').submit();")
-													.ui
-														img(src=(ing.unlocked ? "/images/icons/"+keys[j]+"_"+k+".svg" : "/images/icons/unknown.svg"))
-													span.tb-font-l #{ing.name}
-
-													form(id="form_"+keys[j]+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+keys[j]+"/"+k+"")
-														input(type="hidden", value="1", name= ing.name)
-														input(type="hidden", id="inputimg_"+keys[j]+"_"+k+"", name= ing.name, value= ing.image)
-
-									
-																	
-						a.module(href="/logout", title="logout")
+			if (menuData)
+				if (menuData.publishers[0].username === loggedin)
+					
+						
+					if (pageindex)
+						a.module.dropdown(title="edit")
 							.ui
-								img(src="/images/icons/logout.svg")
-							span.tb-font-l Log out
+								img(src="/images/icons/edit.svg")
+							span.tb-font-l Edit
+
+							each key, j in keys
+								
+								each ing, k in contentData[key]
+									if (ing.unlocked)
+										a.module.focus.drop(href="#", onclick="document.getElementById('form_"+key+"_"+k+"').submit();")
+											.ui
+												img(src=(ing.unlocked ? "/images/icons/"+key+"_"+k+".svg" : "/images/icons/unknown.svg"))
+
+									
+											//each ing, k in module
+											span.tb-font-l #{ing.name}
+											form(id="form_"+key+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+key+"/"+k+"")
+												input(type="hidden", value="1", name= ing.name)
+												input(type="hidden", id="inputimg_"+keys[j]+"_"+k+"", name= ing.name, value= ing.image)
+									
+				if (loggedin)
+					a.module(href="/logout", title="logout")
+						.ui
+							img(src="/images/icons/logout.svg")
+						span.tb-font-l Log out
 			else
 				a.module(href="/login", title="login") 
 					.ui

@@ -45,18 +45,13 @@ block content
 			div.blogname
 				if (contentData.filling.length > 0)
 					if (contentData.filling.length > 1)
-						span #{contentData.filling[1].name}
+						span.translate #{contentData.filling[1].name}
 						span  and  
-					span #{contentData.filling[0].name}
+					span.translate #{contentData.filling[0].name}
 
 			if (drawtype)
-				
-				//-
-					if (contentData[drawtype][layer].unlocked)
-					each sub, i in contentData[drawtype]
-						if (contentData.level === i)
-						
-				canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+contentData.level+".svg');")
+							
+				canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+layer+".svg');")
 
 			canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_0.svg');")
 			div.topLeft
@@ -68,6 +63,18 @@ block content
 				include docgallery.pug
 			else
 				include datagallery.pug
+		
+		div.pullquote
+			if (drawtype)
+				if (contentData[drawtype][contentData.level])
+					span.tb-font-xxl.translate #{contentData[drawtype][contentData.level].caption}
+			else
+				if (contentData)
+					each item, i in contentData.info
+						if (item.unlocked && item.index === contentData.level)
+							span.tb-font-xxl.translate #{item.caption}
+						else
+							span.tb-font-xxl testing
 
 	//-
 		initiate map + event listeners
@@ -130,57 +137,36 @@ block content
 				InitializeApp(drawtype, parseInt(layer, 10));
 			}
 		})
-		
-		$(document).on('click', 'canvas', function(e){
-			if ($('.menu').hasClass('blog')) {
-				//				e.preventDefault();
-				//				InitializeApp();
-				
-				/*$('.dropdown').not('.mainmenu').slideUp(100);
-				$('.drop').slideUp(100);
-				$('.selected').removeClass('selected');*/
-				uiDrawMode()
+		//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
+		$(document).on('touchstart, mouseover', '.translate', function (e) {
+			var link = $(this); //preselect the link
+			if (link.hasClass('hover')) {
+				return true;
+			} else {
+				e.preventDefault();
+				link.addClass('hover');
+				$('a.taphover').not(this).removeClass('hover');
+				var text = link.html();
+				if (text.split('<')[1] === undefined) {
+					text = encodeURIComponent(text);
+					$.post('/translate/'+text+'').then(function(result){
+						console.log(result)
+						addAlert(result);
+						return true;
+					})
+				} else {
+					return false;
+				}
 			}
 		});
-		//drop-down event listener
-		$(document).on('click', '.dropdown', function (e) { 
-			//e.preventDefault();
-			console.log(e.target)
-			var that, main;
-			if ($(this).hasClass('mainmenu')) {
-				that = $('#tlmodules.dropdown');
-				main = true;
-			} else {
-				that = this;
-				main = false;
+		$(document).on('touchend, mouseleave', '.translate', function (e){
+			var link = $(this); //preselect the link
+			if (link.hasClass('hover')) {
+				$('.translate').removeClass('hover');
 			}
-			if ($(that).hasClass('selected')) {
-				if (main && $('div.menu').hasClass('blog')) {
-					$(that).slideUp(100);
-					$(that).removeClass("selected");
-				} else {
-					if ($('div.menu').hasClass('blog')) {
-						$(that).next('.drop').slideUp(100);
-					}
-				}
-			} else {
-				if (main && $('div.menu').hasClass('blog')) {
-					$(that).slideDown(200);
-					$(that).addClass('selected');
-				} else {
-					$(that).next('.drop').slideDown(200);
-				}
-			}
-			if ($('div.menu').hasClass('draw')) {
-				
-				uiBlogMode()
-			} else {
-				if ($('div.menu').hasClass('blog')) {
-					uiBlogMode()
-				}
-			}
-			//e.stopPropagation();
-		});
+			removeOldAlert()
+			return true;
+		})
 		//gallery
 		$(document).on('click', 'a.thumbnail', function(e){
 			e.preventDefault()
