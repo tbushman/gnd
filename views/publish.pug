@@ -16,10 +16,7 @@ block page
 		else
 			- var menu = 'home'
 			- var pageIndex = data[data.length-1].pageindex
-			if (data[data.length-1].content[data[data.length-1].content.length-1])
-				- var menuData = data[data.length-1]
-			else
-				- var menuData = data[0]
+			- var menuData = data[data.length-1]
 	if (index)
 		- var contentData = menuData.content[index]
 	else
@@ -27,8 +24,6 @@ block page
 		- var index = contentData.index
 
 	- var layer = contentData.level
-	if (!drawtype && infowindow === "edit")
-		- var drawtype = "info"
 block content
 	
 	- var keys = ["tools", "info", "substrates", "filling"]
@@ -46,10 +41,12 @@ block content
 						span.translate #{contentData.filling[1].name}
 						span  and  
 					span.translate #{contentData.filling[0].name}
-
+			
+			
 			if (drawtype)
-							
-				canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+layer+".svg');")
+				if (menuData.publishers[0].username === loggedin)
+						
+			canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+layer+".svg');")
 
 			canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_0.svg');")
 			div.topLeft
@@ -64,18 +61,18 @@ block content
 		
 		div.pullquote
 			if (drawtype)
-				//if (contentData[drawtype][contentData.level])
-				each ing, j in keys
-					each cat, i in contentData[ing]
-						if (cat.unlocked && ing !== "info")
-							a.tool(href="#", onclick="document.getElementById('form_"+drawtype+"_"+i+"').submit();")
-								.ui
-									img(src="/images/icons/"+drawtype+"_"+i+".svg")
-								span.tb-font-l #{cat.name}
-								if (cat.unlocked)
-									form(id="form_"+drawtype+"_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+i+"")
-										input(type="hidden", value="1", name= cat.name)
-										input(type="hidden", id="inputimg_"+drawtype+"_"+i+"", name= cat.name, value= cat.image)
+				if (loggedin && menuData.publishers[0].username === loggedin)
+					each ing, j in keys
+						each cat, i in contentData[ing]
+							if (cat.unlocked && ing !== "info")
+								a.tool(href="#", onclick="document.getElementById('form_"+ing+"_"+i+"').submit();")
+									.ui
+										img(src="/images/icons/"+ing+"_"+i+".svg")
+									span.tb-font-l #{cat.name}
+									if (cat.unlocked)
+										form(id="form_"+ing+"_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"")
+											input(type="hidden", value="1", name= cat.name)
+											input(type="hidden", id="inputimg_"+ing+"_"+i+"", name= cat.name, value= cat.image)
 			else
 				if (contentData)
 					each item, i in contentData.info

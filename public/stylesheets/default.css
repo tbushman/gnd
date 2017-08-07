@@ -563,6 +563,17 @@ div.dashboard .menu {
 .layer.topRight {
 	display: block;
 	pointer-events: auto;
+	background-attachment: fixed;
+	background-image:url('');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	-webkit-transition: background-image 1.3s ease-in-out;
+	-moz-transition: background-image 1.3s ease-in-out;
+	-ms-transition: background-image 1.3s ease-in-out;
+	-o-transition: background-image 1.3s ease-in-out;
+	-webkit-transition: background-image .3s ease-in-out;
+	transition: background-image .3s ease-in-out;
 }
 div.menu > div.topLeft {
 	padding: 10px 0 0 0;

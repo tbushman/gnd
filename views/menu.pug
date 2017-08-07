@@ -7,32 +7,8 @@ div.grid-header.mainHeader
 	if (drawtype)
 		a.mainmenu(href="#", title="Save", id="save")
 			img.i(src="/images/icons/check.svg")
-	if (contentData)
-		each ing, j in keys
-			each cat, i in contentData[ing]
-				if (drawtype)
-					if (cat.unlocked && cat.layer === contentData.level && drawtype === ing)
-						a.tool(href="#", onclick="document.getElementById('form_"+drawtype+"_"+i+"').submit();")
-							.ui
-								img(src="/images/icons/"+drawtype+"_"+i+".svg")
-							span.tb-font-l #{cat.name}
-							if (cat.unlocked)
-								form(id="form_"+drawtype+"_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+i+"")
-									input(type="hidden", value="1", name= cat.name)
-									input(type="hidden", id="inputimg_"+drawtype+"_"+i+"", name= cat.name, value= cat.image)
-				else
-					- var drawtype = "info"
-					
-					if (cat.unlocked && cat.layer === contentData.level)
-						a.tool(href="#", onclick="document.getElementById('form_"+drawtype+"_"+i+"').submit();")
-							.ui
-								img(src="/images/icons/"+drawtype+"_"+i+".svg")
-							span.tb-font-l #{cat.name}
-							if (cat.unlocked)
-								form(id="form_"+drawtype+"_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+i+"")
-									input(type="hidden", value="1", name= cat.name)
-									input(type="hidden", id="inputimg_"+drawtype+"_"+i+"", name= cat.name, value= cat.image)
-	if (!drawtype)
+	
+	else
 		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="http://pu.bli.sh/images/menu_button.svg")
 
