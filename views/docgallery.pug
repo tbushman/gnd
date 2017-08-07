@@ -22,7 +22,7 @@ div.grid-right
 						if (contentData[drawtype][contentData.level].unlocked)
 
 							a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit sandwich")
-								img(src="/images/"+drawtype+"/lvl_"+contentData.level+".svg", alt=""+entry.pagetitle+"'s "+ranks[contentData.level]+" tool")
+								img(src="/images/"+drawtype+"/"+drawtype+"_"+contentData.level+".svg", alt=""+entry.pagetitle+"'s "+ranks[contentData.level]+" challenge")
 						else
 							a.tb-font-m(href="#", onclick="document.getElementById('form_"+drawtype+"_"+level+"').submit();")
 								.ui
@@ -30,26 +30,26 @@ div.grid-right
 							span.tb-font-l #{contentData[drawtype][contentData.level].name}
 							form(id="form_"+drawtype+"_"+level+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+level+"")
 								input(type="hidden", value="1", name= contentData[drawtype][contentData.level].name)
-								input(type="hidden", id="inputimg_"+drawtype+"_"+level+"", name= contentData[drawtype][contentData.level].name, value= contentData[drawtype][contentData.level].image)
+								input(type="hidden", id="inputimg_"+drawtype+"_"+contentData.level+"", name= contentData[drawtype][contentData.level].name, value= contentData[drawtype][contentData.level].image)
 					else
-						- var drawtype = "tools"
+						- var drawtype = "info"
 						if (contentData.image !== '')
 							
 							a.tb-font-m(href="/api/editcontent/"+menuData.urltitle+"/"+pageindex+"/"+index+"", title="edit sandwich")
 								img(src= contentData.image, alt=""+entry.pagetitle+"'s "+ranks[contentData.length]+" snack")
 
 						else
-							a.tb-font-m(href="#", onclick="document.getElementById('form_tools_0').submit();")
+							a.tb-font-m(href="#", onclick="document.getElementById('form_info_0').submit();", title="Click to use the "+contentData["tools"][contentData.level].name+" on the "+contentData["info"][contentData.level].name+". ")
 								.ui
-									if (contentData["tools"][contentData.level].unlocked)
-										img(src="/images/tools/lvl_"+contentData.level+".svg", alt="Click to use the "+contentData["tools"][contentData.level].name+". ")
+									if (contentData["info"][contentData.level].unlocked)
+										img(src="/images/tools/"+drawtype+"_"+contentData.level+".svg", alt="Click to use the "+contentData["info"][contentData.level].name+". ")
 
 									else
-										img(src="/images/icons/unknown.svg", alt=""+contentData["tools"][contentData.level].name+" is not yet available.")
+										img(src="/images/icons/unknown.svg", alt=""+contentData["info"][contentData.level].name+" is not yet available.")
 							span.tb-font-l #{contentData.tools[contentData.level].name}
-							form(id="form_tools_0", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/tools/0")
-								input(type="hidden", value="1", name= contentData["tools"][contentData.level].name)
-								input(type="hidden", id="inputimg_"+drawtype+"_"+level+"", name= contentData["tools"][contentData.level].name, value= contentData["tools"][contentData.level].image)
+							form(id="form_info_0", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/info/0")
+								input(type="hidden", value="1", name= contentData["info"][contentData.level].name)
+								input(type="hidden", id="inputimg_"+drawtype+"_"+contentData.level+"", name= contentData["info"][contentData.level].name, value= contentData["info"][contentData.level].image)
 
 				div.grid-right
 					p.tb-font-xl #{contentData.title}
@@ -64,7 +64,7 @@ div.grid-right
 				if (loggedin && loggedin === menuData.publishers[0].username)
 					div(style="padding: 10px 0 0 10px")
 						a.tb-font-m(style="margin: 6px 0 0 6px;z-index: 0;", href="/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"", title="Edit "+menuData.pagetitle+"")
-							img(src="/images/tools/lvl_"+entry.level+".svg")
+							img(src="/images/tools/tools_"+entry.level+".svg")
 				br
 				p.tb-font-s.hideoverlap About
 					span #{entry.info[entry.level].name}

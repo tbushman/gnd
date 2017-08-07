@@ -1,5 +1,4 @@
-if (contentData)
-	- var keys = Object.keys(contentData)
+- var keys = ["tools", "info", "substrates", "filling"]
 
 div.grid-header.mainHeader
 	//if (drawtype)
@@ -8,17 +7,16 @@ div.grid-header.mainHeader
 		a.mainmenu(href="#", title="Save", id="save")
 			img.i(src="/images/icons/check.svg")
 		each ing, j in keys
-			if (Array.isArray(contentData[ing]))
-				each cat, i in contentData[ing]
-					if (cat.unlocked)
-						a.tool(href="#", onclick="document.getElementById('form_substrates_"+i+"').submit();")
-							.ui
-								img(src="/images/icons/substrates_"+i+".svg")
-							span.tb-font-l #{cat.name}
-							if (cat.unlocked)
-								form(id="form_substrates_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/substrates/"+i+"")
-									input(type="hidden", value="1", name= cat.name)
-									input(type="hidden", id="inputimg_substrates_"+i+"", name= cat.name, value= cat.image)
+			each cat, i in contentData[ing]
+				if (cat.unlocked)
+					a.tool(href="#", onclick="document.getElementById('form_"+drawtype+"_"+i+"').submit();")
+						.ui
+							img(src="/images/icons/"+drawtype+"_"+i+".svg")
+						span.tb-font-l #{cat.name}
+						if (cat.unlocked)
+							form(id="form_"+drawtype+"_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+i+"")
+								input(type="hidden", value="1", name= cat.name)
+								input(type="hidden", id="inputimg_"+drawtype+"_"+i+"", name= cat.name, value= cat.image)
 
 	else
 		a.dropdown.mainmenu(href="#", title="Menu")

@@ -30,6 +30,8 @@ block page
 			- var level = layer
 		else
 	- var layer = contentData.level
+	if (!drawtype && infowindow === "edit")
+		- var drawtype = "info"
 block content
 	
 
@@ -47,13 +49,16 @@ block content
 						span  and  
 					span #{contentData.filling[0].name}
 
+			if (drawtype)
 				
-			if (contentData[drawtype])
-				each sub, i in contentData[drawtype]
-					if (layer === i)
-						canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+i+"", style="z-index: "+i+"; cursor: grab;")
+				//-
+					if (contentData[drawtype][layer].unlocked)
+					each sub, i in contentData[drawtype]
+						if (contentData.level === i)
+						
+				canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+contentData.level+".svg');")
 
-			canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/lvl_"+index+".svg');")
+			canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_0.svg');")
 			div.topLeft
 		
 		div.grid-container(class= type)
@@ -127,15 +132,14 @@ block content
 		})
 		
 		$(document).on('click', 'canvas', function(e){
-			if ($('.grid-container').hasClass('selected')) {
+			if ($('.menu').hasClass('blog')) {
 				//				e.preventDefault();
 				//				InitializeApp();
-				$('.menu').css('height', 'var(--windowmenu)');
-				$('.dropdown').not('.mainmenu').slideUp(100);
+				
+				/*$('.dropdown').not('.mainmenu').slideUp(100);
 				$('.drop').slideUp(100);
-				$('.selected').removeClass('selected');
-			} else {
-				//				InitializeApp();
+				$('.selected').removeClass('selected');*/
+				uiDrawMode()
 			}
 		});
 		//drop-down event listener
@@ -144,7 +148,6 @@ block content
 			console.log(e.target)
 			var that, main;
 			if ($(this).hasClass('mainmenu')) {
-				$('.menu').css('height', 'var(--nowindowmenu)')
 				that = $('#tlmodules.dropdown');
 				main = true;
 			} else {
@@ -152,27 +155,29 @@ block content
 				main = false;
 			}
 			if ($(that).hasClass('selected')) {
-				if (main) {
+				if (main && $('div.menu').hasClass('blog')) {
 					$(that).slideUp(100);
+					$(that).removeClass("selected");
 				} else {
-					$(that).next('.drop').slideUp(100);
+					if ($('div.menu').hasClass('blog')) {
+						$(that).next('.drop').slideUp(100);
+					}
 				}
-				$(that).removeClass("selected");
-				$('.grid-container').removeClass('selected');
-				var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
-				$('.grid-header.mainHeader').css('height', topmargin + 30 + 'px');
 			} else {
-				$(that).addClass('selected');
-				$('.grid-container').addClass('selected');
-				if (main) {
+				if (main && $('div.menu').hasClass('blog')) {
 					$(that).slideDown(200);
+					$(that).addClass('selected');
 				} else {
 					$(that).next('.drop').slideDown(200);
 				}
-				setTimeout(function(){
-					var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
-					$('.grid-header.mainHeader').css('height', topmargin + 30 + 'px');
-				}, 210);
+			}
+			if ($('div.menu').hasClass('draw')) {
+				
+				uiBlogMode()
+			} else {
+				if ($('div.menu').hasClass('blog')) {
+					uiBlogMode()
+				}
 			}
 			//e.stopPropagation();
 		});
@@ -300,6 +305,24 @@ block content
 			}
 		})
 		
+		function uiBlogMode(){
+			$('div.menu.draw').removeClass('draw');
+			$('div.menu').addClass('blog');
+			$('.grid-container').removeClass('draw');
+			$('.grid-container').addClass('blog');
+			$('.grid-container').addClass('selected');
+			$('#select').removeClass('draw');
+			$('#select').addClass('blog');
+		}
+		function uiDrawMode(){
+			$('div.menu.blog').removeClass('blog');
+			$('div.menu').addClass('draw');
+			$('.grid-container').removeClass('blog');
+			$('.grid-container').addClass('draw');
+			$('.grid-container').removeClass('selected');
+			$('#select').removeClass('blog');
+			$('#select').addClass('draw');
+		}
 		function InitializeApp(drawtype, layer) {
 			console.log(drawtype, layer)
 			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
@@ -422,7 +445,7 @@ block content
 			context.closePath();
 			var pattern;
 			var img = new Image();
-			img.src = '/images/ingredients/'+drawType+'_'+layer+'.svg';
+			img.src = '/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
 			img.onload = function(){
 				
 				if (eventType != "touchend") {

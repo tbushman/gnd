@@ -195,7 +195,8 @@ i.fa.active {
 	display: grid;
 	grid-template-columns: auto minmax(-webkit-max-content, 0px) minmax(100%, 180px);
 	grid-template-columns: auto minmax(max-content, 0px) minmax(100%, 180px);
-	grid-template-rows:  auto auto auto;
+	grid-template-rows: minmax(-webkit-max-content, var(--thumbwidth)) minmax(-webkit-max-content, 100%) var(--thumbwidth);
+	grid-template-rows: minmax(max-content, var(--thumbwidth)) minmax(max-content, 100%) var(--thumbwidth);
 	background-color: rgba(255,255,255,0);
 	background-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 0, rgba(255, 255, 255, 0) calc(var(--thumbwidth) / 2), rgba(255, 255, 255, 0.9) calc(var(--thumbwidth) / 2));
 	pointer-events: auto;
@@ -210,6 +211,12 @@ i.fa.active {
 	min-height: var(--panelheight);
 	background-color: tomato;
 }
+.grid-container.blog {
+	height: var(--panelheight);
+}
+.grid-container.draw {
+	height: var(--panelheight);
+}
 @supports not (display:grid) {
 	.grid-container {
 		display: inline-block;
@@ -218,7 +225,7 @@ i.fa.active {
 		height: var(--panelheight);
 	}
 	.grid-container.draw {
-		top: var(--windowmenu);
+		top: var(--panelheight);
 	}
 
 }
@@ -231,7 +238,7 @@ i.fa.active {
 		overflow-y: scroll; 
 	}
 	.grid-container.draw {
-		top: var(--windowmenu);
+		top: var(--panelheight);
 	}
 
 }
@@ -365,6 +372,7 @@ a.grid-header:hover {
 	overflow-y: scroll;
 	line-height: calc(var(--thumbheight)/3);
 	min-height: calc(var(--panelheight) - 220px);
+	max-height: 100%;
 	max-width: calc(100% - var(--thumbwidth));
 	min-width: 0;
 	background-color: orange;
@@ -436,26 +444,13 @@ div.blogname {
 .hideoverlap {
 	white-space: nowrap;
 }
-div.map {
-	overflow: hidden;
-	overflow-y: scroll;
-	margin: 0;
-	position: absolute;
-	height: 50%;
-	display: block;
-	right: 0;
-	left: 0;
-	top: 50%;
-	bottom: 0;
-}
-div.blog {
+/*.menu.blog {
 	overflow-y: scroll;
 	overflow-x: hidden;
 	margin: 0;
-	position: absolute;
 	right: 0;
 	left: 0;
-}
+}*/
 div.dashboard {
 	width: auto;
 	/*margin: 0 0 0 50px;*/
@@ -472,7 +467,7 @@ div.menu {
 	-webkit-mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 100%, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
 	mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 100%, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
 	display: block;
-	bottom: var(--nowindowmenu);
+	bottom: auto;
 	/*position: -webkit-sticky;
 	position: sticky;*/
 	position: relative;
@@ -501,9 +496,14 @@ div.blog > .menu {
 	position: sticky;
 	pointer-events: auto;
 	width: 100%;
-	/*height: var(--windowmenu);*/
+	height: var(--nowindowmenu);
 	overflow: hidden;
 	/*z-index: 1;*/
+}
+div.draw > .menu {
+	height: var(--panelheight);
+	position: relative;
+	top: 0;
 }
 div.dashboard .menu {
 	display: inline-block;
@@ -529,10 +529,11 @@ div.dashboard .menu {
 	background-color: rgba(255,255,255,0);
 	z-index: 0;
 	margin: 0 auto;
+	cursor: url('/images/icons/edit.png'), 2, 2, pointer;
 }
 .maincanvas.topRight {
 	display: block;
-	pointer-events: none;
+	/*pointer-events: none;*/
 	background-attachment: fixed;
 	background-image:url('');
 	background-position: center;
