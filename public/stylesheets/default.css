@@ -616,6 +616,10 @@ div.menu > div.topLeft {
 	top: calc(var(--thumbwidth)/2.5);
 	left: var(--thumbwidth);
 }
+a.tool {
+	margin: 0 auto;
+	display: inline-block;
+}
 a.mainmenu {
 	position: absolute;
 	top: -10px;
@@ -631,14 +635,20 @@ a.mainmenu {
 	a.mainmenu {
 		position: fixed;
 		/*left: calc( var(--thumbwidth) * 0.5);*/
-		top: var(--thumbwidth);
+		top: var(--nowindowmenu);
+	}
+	.draw a.mainmenu {
+		top: var(--panelheight);
 	}
 }
 @supports not(position:sticky) {
 	a.mainmenu {
 		position: fixed;
 		/*left: calc( var(--thumbwidth) * 0.5);*/
-		top: var(--thumbwidth);
+		top: var(--nowindowmenu);
+	}
+	.draw a.mainmenu {
+		top: var(--panelheight);
 	}
 }
 div.dropdown {

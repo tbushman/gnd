@@ -41,6 +41,7 @@ block content
 						span.translate #{contentData.filling[1].name}
 						span  and  
 					span.translate #{contentData.filling[0].name}
+					span #{contentData.level}
 			
 			
 			if (drawtype)
@@ -421,8 +422,6 @@ block content
 										
 										var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/'+false+'';
 
-										console.log(blob)
-										console.log(uploadurl)
 										$.ajax({
 											url: uploadurl,
 											type: 'POST',
@@ -431,6 +430,7 @@ block content
 											contentType: false,
 											success: function(response) {
 												$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+												console.log('saved both')
 												uiBlogMode();
 											}
 										})
@@ -503,6 +503,5 @@ block content
 			}
 			removeOldAlert()
 			return true;
-		})
-		//edit mode
+		});
 		
