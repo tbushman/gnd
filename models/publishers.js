@@ -12,7 +12,7 @@ var Publisher = new Schema({
 	avatar: String,
   language: String
 	
-}, { collection: 'sfusd' });
+}, { collection: 'sfusd2' });
 
 Publisher.plugin(passportLocalMongoose);
 

@@ -41,7 +41,7 @@ var Page = new Schema({
 	} ],
 	publishers: []
 	
-}, { collection: 'sfusdpages' });
+}, { collection: 'sfusd2pages' });
 
 //Page.index({ 'content.$.index': 1 }, { unique: true, dropDups: true });
 module.exports = mongoose.model('Page', Page);
