@@ -154,7 +154,7 @@ app.use(function (req, res, next) {
 
 var uri = process.env.DEVDB;
 
-var promise = mongoose.connect(uri, { useMongoClient: true }/*, {authMechanism: 'ScramSHA1'}*/);
+var promise = mongoose.connect(uri, { useMongoClient: true }, {authMechanism: 'ScramSHA1'});
 promise.then(function(db){
 	db.on('error', console.error.bind(console, 'connection error:'));
 })
