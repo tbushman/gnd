@@ -26,7 +26,7 @@ block page
 	- var layer = contentData.level
 block content
 	
-	- var keys = ["substrates", "filling"]
+	- var keys = ["tools", "info", "substrates", "filling"]
 
 	input(type="hidden", value= pageIndex, id="pageindex")
 		//-
@@ -43,10 +43,10 @@ block content
 					span.translate #{contentData.filling[0].name}
 			
 			
-			if (drawtype && drawtype !== 'tools')
+			if (drawtype)
 				if (menuData.publishers[0].username === loggedin)
 						
-					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/"+drawtype+"/"+drawtype+"_"+layer+".svg');")
+					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+layer+".svg');")
 
 			canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_0.svg');")
 			div.topLeft
@@ -77,7 +77,7 @@ block content
 			else
 				if (contentData)
 					each item, i in contentData.info
-						if (item.unlocked && item.layer === contentData.level)
+						if (item.layer === contentData.level)
 							span.tb-font-xxl.translate #{item.caption}
 				else
 					span.tb-font-xxl testing
@@ -90,8 +90,7 @@ block content
 		var mainmenu = document.getElementsByClassName('menu')[0];
 		var pageIndex, drawtype, layer;
 		var datalength = #{data.length};
-		//var doc = `'#{JSON.stringify(doc)}'`;
-		var index = `#{parseInt(index, 10)}`
+		var doc = `#{JSON.stringify(doc)}`;
 		var lMarker;
 		var medialength;
 		var classname_a;
@@ -107,24 +106,7 @@ block content
 		var mousePressed = false;
 		var drawCoalesced = false;
 		var elem, canvasWidth, canvasHeight;
-		function uiBlogMode(){
-			$('div.menu.draw').removeClass('draw');
-			$('div.menu').addClass('blog');
-			$('.grid-container').removeClass('draw');
-			$('.grid-container').addClass('blog');
-			$('.grid-container').addClass('selected');
-			$('#select').removeClass('draw');
-			$('#select').addClass('blog');
-		}
-		function uiDrawMode(){
-			$('div.menu.blog').removeClass('blog');
-			$('div.menu').addClass('draw');
-			$('.grid-container').removeClass('blog');
-			$('.grid-container').addClass('draw');
-			$('.grid-container').removeClass('selected');
-			$('#select').removeClass('blog');
-			$('#select').addClass('draw');
-		}
+		
 		$(document).ready(function(){
 			var can = document.getElementById('canvas');
 			can.style.width = '100%';
@@ -145,6 +127,20 @@ block content
 				} 
 			});
 			
+			$('.list > .ms-Panel-main').css({display: 'none'})
+			$('.list').removeClass('is-open')
+			$('.list').css({display: 'none'});
+			
+			$('.dropdown').not('.mainmenu').slideUp(100);
+			$('.drop').slideUp(100);
+			$('.selected').removeClass('selected');
+			drawtype = '#{drawtype}'
+			layer = '#{layer}'
+			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+''
+			if (document.getElementById(id) !== null && drawtype !== 'info') {
+				
+				InitializeApp(drawtype, parseInt(layer, 10));
+			}
 		})
 		$(document).on('click', '#deletefeature', function(){
 
@@ -174,11 +170,29 @@ block content
 			}
 		})*/
 		
-		function InitializeApp(itemName, drawtype, layer) {
+		function uiBlogMode(){
+			$('div.menu.draw').removeClass('draw');
+			$('div.menu').addClass('blog');
+			$('.grid-container').removeClass('draw');
+			$('.grid-container').addClass('blog');
+			$('.grid-container').addClass('selected');
+			$('#select').removeClass('draw');
+			$('#select').addClass('blog');
+		}
+		function uiDrawMode(){
+			$('div.menu.blog').removeClass('blog');
+			$('div.menu').addClass('draw');
+			$('.grid-container').removeClass('blog');
+			$('.grid-container').addClass('draw');
+			$('.grid-container').removeClass('selected');
+			$('#select').removeClass('blog');
+			$('#select').addClass('draw');
+		}
+		function InitializeApp(drawtype, layer) {
 			console.log(drawtype, layer)
 			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
 			console.log(elem)
-			InitializeCanvas(itemName, drawtype, layer);
+			InitializeCanvas(drawtype, layer);
 			if (elem) {
 				console.log("Adding MouseEvent & TouchEvent listeners");
 				["mousedown", "mousemove", "mouseup"].forEach(function(e) {
@@ -188,12 +202,12 @@ block content
 						elem.addEventListener(e, TouchHandler);
 				});
 				window.addEventListener("resize", function(e) {
-					InitializeCanvas(itemName, drawtype, layer);
+					InitializeCanvas(drawtype, layer);
 				});
 			}
 			
 		}
-		function InitializeCanvas(itemName, drawtype, layer) {
+		function InitializeCanvas(drawtype, layer) {
 			var canv = document.getElementById("canvas");
 			//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
 			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
@@ -217,13 +231,12 @@ block content
 				elem.height = canvasHeight;
 				elem.style.width = newwidth + "px";
 				elem.style.height = newheight + "px";
-				elem.name = itemName;
 				scale = newscale;
 			}
 		}
 		
 		function MouseHandler(event) {
-			var coords = [event.clientX, event.clientY];
+
 			if (event.type == "mousedown" && event.button === 0) {
 				mousePressed = true;
 			}
@@ -251,7 +264,7 @@ block content
 					event.target.setAttribute('style', 'cursor: grab;');
 					console.log(event.target.style.cursor)
 				}
-				drawTouch(coords, event.target, fakeTouch, eventType, false);
+				drawTouch(event.target, fakeTouch, eventType, false);
 				event.preventDefault();
 			}
 
@@ -260,19 +273,18 @@ block content
 		}
 		function TouchHandler(event) {
 			event.preventDefault();
-			var coords = [event.clientX, event.clientY];
+			
 			if (!mainmenu.classList.contains('selected')) {
 				for (var i = 0; i < event.changedTouches.length; i++)
-					drawTouch(coords, event.target, event.changedTouches[i], event.type, false);
+					drawTouch(event.target, event.changedTouches[i], event.type, false);
 			}
 			
 		}
-		function drawTouch(coords, eventTarget, touch, eventType, coalesced) {
+		function drawTouch(eventTarget, touch, eventType, coalesced) {
 			var context = eventTarget.getContext("2d");
 			var drawType = eventTarget.getAttribute('id').split('_')[1];
 			var layer = eventTarget.getAttribute('id').split('_')[2];
-			var itemName = eventTarget.getAttribute('name');
-
+			
 			// Map the identifier to a small count (no-op on Chrome, but
 			// important for mobile Safari).
 			if (!(touch.identifier in touchMap)) {
@@ -313,51 +325,9 @@ block content
 			var img = new Image();
 			img.src = '/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
 			img.onload = function(){
-				var canvas = document.getElementById('canvas');
-				//https://stackoverflow.com/a/27410956/3530394
-				/*var ctx = canvas.getContext('2d');
-
-				//prepare canvas
-				ctx.fillStyle = '#ffffff'
-				ctx.fillRect(0, 0, 120, 120);
-
-				//prepare a 30% opacity eraser
-				ctx.globalCompositeOperation = 'destination-out';
-				ctx.lineWidth = 5;
-				ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
-
-				// make random strokes around cursor while mouse moves
-				canvas.onmousemove = function(e) {
-				   var rect = this.getBoundingClientRect();
-				   var x = e.clientX - rect.left;
-				   var y = e.clientY - rect.top;
-
-				   ctx.beginPath();
-				   ctx.moveTo(x + Math.random() * 33 - 16, y + Math.random() * 33 - 16);
-				   ctx.lineTo(x + Math.random() * 33 - 16, y + Math.random() * 33 - 16);
-				   ctx.stroke();
-
-				}*/
-				//https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
-
+				
 				if (eventType != "touchend") {
-					var alpha;
-					if (drawType === 'substrates') {
-						alpha = 'source-in'
-					}
-					if (drawType === 'tools') {
-						if (itemName = 'cleaner') {
-							alpha = 'destination-out';
-						} else {
-							alpha = false;
-						}
-					}
-					//...if false! == butterknife
-					context.globalCompositeOperation = alpha;
-					//https://stackoverflow.com/questions/27407710/reveal-image-on-canvas-with-draw-strokes-paint
-					
 					if (drawType === 'filling') {
-						
 						pattern = context.createPattern(img, 'no-repeat');
 						context.fillStyle = pattern;
 						context.fill();
@@ -370,10 +340,6 @@ block content
 						pattern = context.createPattern(img, 'no-repeat');
 						context.fillStyle = pattern;
 						context.fillRect(0, 0, canvasWidth, canvasHeight);
-					}
-					if (drawType === 'tools') {
-						context.lineWidth = 25;
-						context.strokeStyle = 'rgba(0,0,0,.9)';
 					}
 				}
 				if (eventType != "touchmove" && eventType != "touchbegin") {
