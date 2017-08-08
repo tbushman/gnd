@@ -648,7 +648,7 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 				}
 				var set2 = {$set:{}}
 				var key2 = 'content.$.title'
-				set2.$set[key2] = thestore[drawtype].name;
+				set2.$set[key2] = thestore[drawtype][layer].name;
 				Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set2, {safe: true, new: true, upsert: false}, function(er, doc){
 					if (er) {
 						return next(er)

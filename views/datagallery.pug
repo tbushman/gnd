@@ -19,7 +19,7 @@ if (menu === 'register')
 	div.grid-right
 		p.tb-font-xl Choose a nickname for your Chef:
 		div.input-field#response
-			label.ms-Label Page Title
+			label.ms-Label Chef
 			input.ms-TextField-field(type="text", name="pagetitle", id="pagetitle", aria-required="true", onblur="checkNameValidity('pagetitle', '!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alpha-numeric characters only, please');")
 			a.btn.waves-effect.waves-light(role="button") Check availability
 			hr
@@ -58,7 +58,8 @@ if (menu === 'home')
 		each entry, i in data
 			div.grid-container.inner
 				a.grid-header(href="/"+entry.pagetitle+"")
-					p.tb-font-l #{entry.pagetitle}
+					p.tb-font-l Chef 
+						span.tb-font-l #{entry.pagetitle}
 				div.grid-left
 					if (entry.content[entry.content.length-1].image !== "")
 						a.thumbnail.gallery(href="/"+entry.pagetitle+"")

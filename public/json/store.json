@@ -1,17 +1,6 @@
 {
 	"substrates": [
 		{
-			"index": 0,
-			"name": "surface",
-			"image": "",
-			"caption": "A clean place to build a sandwich ",
-			"unlocked": false,
-			"info" : {
-				"safety": "bacteria",
-				"alt": [ ]
-			}
-		},
-		{
 			"index": 1,
 			"name": "bread",
 			"image": "/images/substrates/substrates_0.svg",

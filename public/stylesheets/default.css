@@ -67,7 +67,7 @@ i, .i {
 #alert {
 	position: absolute;
 	margin: 0 auto;
-	left: 0;
+	left: var(--thumbwidth);
 	right: 0;
 	bottom: calc(var(--thumbwidth)/2);
 	top: auto;
@@ -227,6 +227,7 @@ i.fa.active {
 }
 .grid-container.blog {
 	height: var(--panelheight);
+	overflow-y: scroll;
 }
 .grid-container.draw {
 	height: var(--panelheight);
@@ -384,7 +385,6 @@ a.grid-header:hover {
 	grid-area: sideright;
 	background-color: #fff;
 	left: 0;
-	overflow: hidden;
 	overflow-y: scroll;
 	line-height: calc(var(--thumbheight)/3);
 	min-height: calc(var(--panelheight) - 220px);
@@ -675,7 +675,7 @@ div.dropdown {
 	-webkit-box-sizing: border-box;
 	        box-sizing: border-box;
 	pointer-events: auto;
-	background-color: var(--secondary);
+	background-color: #fff;
 	display: inline-block;
 	margin: 0 auto;
 	height: auto;
