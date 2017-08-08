@@ -26,7 +26,7 @@ var storage = multer.diskStorage({
 			if (err) {
 				console.log(err)
 			}
-			var p = ''+publishers+'/pu/publishers/sfusd/'+ doc.urltitle +'/'+req.params.index+'/images/'+(req.params.drawtype ? req.params.drawtype : 'main')+''
+			var p = ''+publishers+'/pu/publishers/sfusd2/'+ doc.urltitle +'/'+req.params.index+'/images/'+(req.params.drawtype ? req.params.drawtype : 'main')+''
 			console.log(p)
 
 			fs.access(p, function(err) {
