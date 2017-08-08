@@ -705,39 +705,46 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 		//var cKeys = Object.keys(contentdata);
 		var items = ["tools", "info", "substrates", "filling"];
 		var drawThis = false;
-		var key, push, drawType, drawInd, drawName, unlocked, thisValue;
+		var key, push, drawType, drawInd, drawName, unlocked, thisValue, unlockName, unlockInd, unlockThis;
 		
 		
 		for (var i = 0; i < items.length; i++) {
 			//if (Array.isArray(contentdata[items[i]])) {
 				drawType = items[i];
+				var lockedcount = 0;
 				for (var q = 0; q < contentdata[drawType].length; q++) {
 					if (body[contentdata[drawType][q].name]) {
 						drawThis = contentdata[drawType][q];
 						drawInd = drawThis.index;
 						drawName = drawThis.name;
+						/*var unlock = contentdata["info"][q].info.unlock.split('.');
+						unlockName = unlock[0]
+						unlockInd = unlock[1]*/
+						
 					}
 					
-					if (contentdata[drawType][q].index <= contentdata.level) {
+					/*if (contentdata[drawType][q].index <= contentdata.level) {
 						unlocked = true;
 						
 					} else {
 						unlocked = false;
-					}
+						lockedcount++;
+					}*/
 				}
 		}
+		
 		if (drawThis) {
 			for (var i = 0; i < keys.length; i++) {
 				contentdata[keys[i]] = body[keys[i]]
 				for (var j = 0; j < contentdata[keys[i]].length; j++) {
 					if (contentdata[keys[i]][j].name === drawName) {
 						contentdata[keys[i]][j].image = body[drawName]
-						contentdata[keys[i]][j].unlocked = unlocked
+						contentdata[keys[i]][j].unlocked = unlocked;
+						//unlockThis = contentdata[keys[i + 1]][unlockInd]
 					}
 				}
-				
 			}
-			
+			//unlockThis.unlocked = true;
 			key = 'content.$'
 			push = {$set: {}};
 			pushKey = '$set';
@@ -759,7 +766,8 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 			if (error) {
 				return next(error)
 			}
-			
+			delete req.app.locals.drawType
+			delete req.app.locals.layer
 			return res.redirect('/api/publish')
 		});
 	})
@@ -783,7 +791,7 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 		}
 		var keylist = [];
 		var levellist = [];
-		var keyz = ["tools", "substrates", "filling", "info"];
+		var keyz = ["substrates", "filling"];
 		for (var i = 0; i < keyz.length; i++) {
 			if (keyz[i] !== drawtype) {
 				for (var j = 0; j < pub.content[index][keyz[i]].length; j++) {

@@ -26,7 +26,7 @@ block page
 	- var layer = contentData.level
 block content
 	
-	- var keys = ["tools", "info", "substrates", "filling"]
+	- var keys = ["substrates", "filling"]
 
 	input(type="hidden", value= pageIndex, id="pageindex")
 		//-
@@ -46,7 +46,7 @@ block content
 			if (drawtype && drawtype !== 'tools')
 				if (menuData.publishers[0].username === loggedin)
 						
-					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+layer+".svg');")
+					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/"+drawtype+"/"+drawtype+"_"+layer+".svg');")
 
 			canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_0.svg');")
 			div.topLeft
@@ -90,7 +90,7 @@ block content
 		var mainmenu = document.getElementsByClassName('menu')[0];
 		var pageIndex, drawtype, layer;
 		var datalength = #{data.length};
-		var doc = '#{doc}';
+		//var doc = `'#{JSON.stringify(doc)}'`;
 		var index = `#{parseInt(index, 10)}`
 		var lMarker;
 		var medialength;
@@ -107,7 +107,24 @@ block content
 		var mousePressed = false;
 		var drawCoalesced = false;
 		var elem, canvasWidth, canvasHeight;
-		
+		function uiBlogMode(){
+			$('div.menu.draw').removeClass('draw');
+			$('div.menu').addClass('blog');
+			$('.grid-container').removeClass('draw');
+			$('.grid-container').addClass('blog');
+			$('.grid-container').addClass('selected');
+			$('#select').removeClass('draw');
+			$('#select').addClass('blog');
+		}
+		function uiDrawMode(){
+			$('div.menu.blog').removeClass('blog');
+			$('div.menu').addClass('draw');
+			$('.grid-container').removeClass('blog');
+			$('.grid-container').addClass('draw');
+			$('.grid-container').removeClass('selected');
+			$('#select').removeClass('blog');
+			$('#select').addClass('draw');
+		}
 		$(document).ready(function(){
 			var can = document.getElementById('canvas');
 			can.style.width = '100%';
@@ -128,25 +145,6 @@ block content
 				} 
 			});
 			
-			$('.list > .ms-Panel-main').css({display: 'none'})
-			$('.list').removeClass('is-open')
-			$('.list').css({display: 'none'});
-			
-			$('.dropdown').not('.mainmenu').slideUp(100);
-			$('.drop').slideUp(100);
-			$('.selected').removeClass('selected');
-			drawtype = '#{drawtype}'
-			layer = '#{layer}'
-			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
-			
-			var content = JSON.parse(doc.content)
-			var entry = content[index];
-			
-			var itemName = content[drawtype][layer].name;
-			if (document.getElementById(id) !== null && drawtype !== 'info') {
-				
-				InitializeApp(itemName, drawtype, parseInt(layer, 10));
-			}
 		})
 		$(document).on('click', '#deletefeature', function(){
 
@@ -176,24 +174,6 @@ block content
 			}
 		})*/
 		
-		function uiBlogMode(){
-			$('div.menu.draw').removeClass('draw');
-			$('div.menu').addClass('blog');
-			$('.grid-container').removeClass('draw');
-			$('.grid-container').addClass('blog');
-			$('.grid-container').addClass('selected');
-			$('#select').removeClass('draw');
-			$('#select').addClass('blog');
-		}
-		function uiDrawMode(){
-			$('div.menu.blog').removeClass('blog');
-			$('div.menu').addClass('draw');
-			$('.grid-container').removeClass('blog');
-			$('.grid-container').addClass('draw');
-			$('.grid-container').removeClass('selected');
-			$('#select').removeClass('blog');
-			$('#select').addClass('draw');
-		}
 		function InitializeApp(itemName, drawtype, layer) {
 			console.log(drawtype, layer)
 			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');

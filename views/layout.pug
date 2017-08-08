@@ -31,7 +31,11 @@ html
 			img(src="/images/sfusdblish_logo.svg")
 		
 		script(type="application/javascript").
-			
+			$(document).ready(function(){
+				$('.dropdown').not('.mainmenu').slideUp(100);
+				$('.drop').slideUp(100);
+				$('.selected').removeClass('selected');
+			})
 			$(document).on('click', 'canvas', function(e){
 				if ($('.menu').hasClass('blog')) {
 					//				e.preventDefault();

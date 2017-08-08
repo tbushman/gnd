@@ -22,10 +22,7 @@ div.grid-right
 											.ui
 												img(src="/images/"+drawtype+"/"+drawtype+"_"+contentData.level+".svg", style="width: 100%; height: 100%;")
 
-					a.thumbnail.gallery(href="/"+menuData.pagetitle+"")
-						.ui
-							img(src="/images/info/info_"+contentData.level+".svg", style="width: 100%; height: 100%;")
-
+					
 					//-
 						if (drawtype)
 							each imag, i in contentData[drawtype]
@@ -46,14 +43,21 @@ div.grid-right
 										img(src="/images/"+drawtype+"/"+drawtype+"_"+contentData.level+".svg", alt="Click to use the "+contentData["info"][contentData.level].name+". ")
 									span.tb-font-l #{contentData[drawtype][contentData.level].name}
 
-					
+					else
+						a.thumbnail.gallery(href="/"+menuData.pagetitle+"")
+							.ui
+								img(src="/images/info/info_"+contentData.level+".svg", style="width: 100%; height: 100%;")
+
 				div.grid-right
 					p.tb-font-xl.translate #{contentData.title}
 					p.tb-font-s.translate #{contentData.info[contentData.level].name}
 						span.tb-font-s  are 
 						span.tb-font-s.translate #{contentData.info[contentData.level].caption}
 						span.tb-font-s . Use the 
-						span.tb-font-s #{contentData.tools[contentData.level].name}
+						if (contentData.level < 2)
+							span.tb-font-s #{contentData.tools[contentData.level].name}
+						else
+							span.tb-font-s #{contentData.tools[contentData.tools.length-1].name}
 						span.tb-font-s  to unlock the next step!
 				div.grid-footer
 					

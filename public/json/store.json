@@ -34,17 +34,6 @@
 				"safety": false,
 				"alt": [ ]
 			}
-		},
-		{
-			"index": 3,
-			"name": "nori",
-			"image": "/images/substrates/substrates_2.svg",
-			"caption": "Nutritious snack wrapper",
-			"unlocked": false,
-			"info" : {
-				"safety": false,
-				"alt": [ ]
-			}
 		}
 	],
 	"filling": [
@@ -116,6 +105,17 @@
 			"caption": "Used to spread sandwich toppings",
 			"unlocked": false,
 			"info": {
+				"safety": false,
+				"alt": [ ]
+			}
+		},
+		{
+			"index": 2,
+			"name": "nori",
+			"image": "/images/substrates/substrates_2.svg",
+			"caption": "Nutritious snack wrapper",
+			"unlocked": false,
+			"info" : {
 				"safety": false,
 				"alt": [ ]
 			}
