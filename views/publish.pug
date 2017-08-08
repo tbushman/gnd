@@ -77,10 +77,9 @@ block content
 			else
 				if (contentData)
 					each item, i in contentData.info
-						if (item.layer === contentData.level)
+						if (item.index === contentData.level)
 							span.tb-font-xxl.translate #{item.caption}
-				else
-					span.tb-font-xxl testing
+				
 
 	//-
 		initiate map + event listeners
@@ -417,7 +416,7 @@ block content
 								var img = new Image();
 								img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
 								img.onload = function(){
-									context.drawImage(this, 0, 0, width, height);
+									context.drawImage(img, 0, 0, width, height);
 									mainCanvas.toBlob(function(blob) {
 										var fd = new FormData();
 										
