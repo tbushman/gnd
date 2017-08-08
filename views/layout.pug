@@ -31,7 +31,9 @@ html
 			img(src="/images/sfusdblish_logo.svg")
 		
 		script(type="application/javascript").
-			
+			$(document).ready(function(){
+				addAlert(marked('This app is being updated at <span><a href="https://sfusd2.bli.sh" target="_blank">sfusd2.bli.sh</a>'))
+			})
 			$(document).on('click', 'canvas', function(e){
 				if ($('.menu').hasClass('blog')) {
 					//				e.preventDefault();
@@ -95,8 +97,15 @@ html
 					var newAlert = document.createElement("div");
 					newAlert.setAttribute("role", "alert");
 					newAlert.setAttribute("id", "alert");
-					var msg = document.createTextNode(aMsg);
-					newAlert.appendChild(msg);
+					var msg;
+					if (aMsg.substr(0,1) === '<') {
+						newAlert.innerHTML = aMsg
+					} else {
+						msg = document.createTextNode(aMsg);
+						newAlert.appendChild(msg);
+					}
+					
+					
 					document.body.appendChild(newAlert);
 				}
 				function checkNameValidity(aID, aSearchTerm, aMsg)

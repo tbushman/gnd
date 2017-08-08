@@ -51,7 +51,10 @@ div.grid-right
 						span.tb-font-s  are 
 						span.tb-font-s.translate #{contentData.info[contentData.level].caption}
 						span.tb-font-s . Use the 
-						span.tb-font-s #{contentData.tools[contentData.level].name}
+						if (contentData.level < 2)
+							span.tb-font-s #{contentData.tools[contentData.level].name}
+						else
+							span.tb-font-s #{contentData.tools[contentData.tools.length-1].name}
 						span.tb-font-s  to unlock the next step!
 				div.grid-footer
 					

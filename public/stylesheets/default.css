@@ -10,6 +10,16 @@
 	--nowindowmenu: 15%; 
 } 
 
+a {
+	pointer-events: auto;
+	cursor: pointer;
+	text-decoration: none;
+	color: inherit;
+}
+
+a:hover {
+	color: var(--secondary);
+}
 
 html {
 	font-family: Roboto, sans-serif;
@@ -72,6 +82,7 @@ i, .i {
 	bottom: calc(var(--thumbwidth)/2);
 	top: auto;
 	display: inline-block;
+	color: rgba(0,0,0,.6);
 }
 .avatar {
 	max-width: 250px;
@@ -430,12 +441,7 @@ a.grid-header:hover {
 		width: 100%;
 	}
 }
-a {
-	pointer-events: auto;
-	cursor: pointer;
-	text-decoration: none;
-	color: inherit;
-}
+
 .spacer {
 	margin-top: 30px;
 }
