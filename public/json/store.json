@@ -1,10 +1,21 @@
 {
 	"substrates": [
 		{
+			"index": 0,
+			"name": "soap",
+			"image": "",
+			"caption": "Sanitizes surfaces",
+			"unlocked": true,
+			"info": {
+				"safety": "bacteria",
+				"alt": [ ]
+			}
+		},
+		{
 			"index": 1,
 			"name": "bread",
 			"image": "/images/substrates/substrates_0.svg",
-			"caption": "The basis of a traditional sandwich. ",
+			"caption": "The basis of a traditional sandwich",
 			"unlocked": false,
 			"info" : {
 				"safety": "gluten",
@@ -17,7 +28,7 @@
 			"index": 2,
 			"name": "rice",
 			"image": "/images/substrates/substrates_1.svg",
-			"caption": "Wrap up a snack in sticky rice. ",
+			"caption": "Wrap up a snack in sticky rice",
 			"unlocked": false,
 			"info" : {
 				"safety": false,
@@ -90,18 +101,18 @@
 		{
 			"index": 0,
 			"name": "cleaner",
-			"image": "/images/tools/tools_0.svg",
+			"image": "/images/tools/tools_0.png",
 			"caption": "Used to ensure sanitized surfaces",
-			"unlocked": true,
+			"unlocked": false,
 			"info": {
-				"safety": "bacteria",
+				"safety": false,
 				"alt": [ ]
 			}
 		},
 		{
 			"index": 1,
 			"name": "butterknife",
-			"image": "/images/tools/tools_1.svg",
+			"image": "/images/tools/tools_1.png",
 			"caption": "Used to spread sandwich toppings",
 			"unlocked": false,
 			"info": {

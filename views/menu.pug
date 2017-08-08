@@ -4,7 +4,7 @@ div.grid-header.mainHeader
 	//if (drawtype)
 	
 	
-	if (drawtype)
+	if (drawtype && drawtype !== "tools")
 		a.mainmenu(href="#", title="Save", id="save", onclick="$.post('/api/nextstep/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"').done(function(response){if (document.getElementById('canvas_"+drawtype+"_"+layer+"') !== null) {console.log('not null!');saveImage(document.getElementById('canvas_"+drawtype+"_"+layer+"'))}})")
 			img.i(src="/images/icons/check.svg")
 	
@@ -32,19 +32,20 @@ div.grid-left
 							span.tb-font-l Edit
 
 							each key, j in keys
+								if (key !== 'tools')
 								
-								each ing, k in contentData[key]
-									if (ing.unlocked)
-										a.module.focus.drop(href="#", onclick="document.getElementById('form_"+key+"_"+k+"').submit();")
-											.ui
-												img(src=(ing.unlocked ? "/images/icons/"+key+"_"+k+".svg" : "/images/icons/unknown.svg"))
+									each ing, k in contentData[key]
+										if (ing.unlocked)
+											a.module.focus.drop(href="#", onclick="document.getElementById('form_"+key+"_"+k+"').submit();")
+												.ui
+													img(src=(ing.unlocked ? "/images/icons/"+key+"_"+k+".svg" : "/images/icons/unknown.svg"))
 
-									
-											//each ing, k in module
-											span.tb-font-l #{ing.name}
-											form(id="form_"+key+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+key+"/"+k+"")
-												input(type="hidden", value="1", name= ing.name)
-												input(type="hidden", id="inputimg_"+keys[j]+"_"+k+"", name= ing.name, value= ing.image)
+										
+												//each ing, k in module
+												span.tb-font-l #{ing.name}
+												form(id="form_"+key+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+key+"/"+k+"")
+													input(type="hidden", value="1", name= ing.name)
+													input(type="hidden", id="inputimg_"+keys[j]+"_"+k+"", name= ing.name, value= ing.image)
 									
 				if (loggedin)
 					a.module(href="/logout", title="logout")

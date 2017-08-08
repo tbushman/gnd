@@ -370,7 +370,7 @@ router.get('/:pagetitle', ensurePage, function (req, res, next) {
 						pageindex: doc.pageindex,
 						type: 'blog',
 						infowindow: 'doc',
-						drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
+						drawtype: req.app.locals.drawType && req.app.locals.drawType !== 'tools' ? req.app.locals.drawType : 'info',
 						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[index].level,
 						loggedin: req.app.locals.loggedin,
 						index: index,
@@ -620,7 +620,11 @@ router.get('/api/selectlayer', function(req, res, next){
 	})
 })
 router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', upload.array(), function(req, res, next){
-	//delete req.app.locals.layer;
+	if (drawtype === 'tools') {
+		return res.redirect('/')
+	}
+	delete req.app.locals.layer;
+	delete req.app.locals.drawType;
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath)
 	var index = parseInt(req.params.index, 10);
@@ -629,7 +633,6 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 	var drawtype = req.params.drawtype;
 	req.app.locals.index = index;
 	req.app.locals.layer = layer;
-	req.app.locals.drawType = drawtype;
 	req.app.locals.urltitle = urltitle;
 	Page.findOne({urltitle: urltitle, content: {$elemMatch: {index: index}}}, function(err, pub){
 		if (err) {

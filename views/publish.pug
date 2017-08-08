@@ -43,7 +43,7 @@ block content
 					span.translate #{contentData.filling[0].name}
 			
 			
-			if (drawtype)
+			if (drawtype && drawtype !== 'tools')
 				if (menuData.publishers[0].username === loggedin)
 						
 					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+layer+".svg');")
@@ -90,7 +90,8 @@ block content
 		var mainmenu = document.getElementsByClassName('menu')[0];
 		var pageIndex, drawtype, layer;
 		var datalength = #{data.length};
-		var doc = `#{JSON.stringify(doc)}`;
+		var doc = '#{doc}';
+		var index = `#{parseInt(index, 10)}`
 		var lMarker;
 		var medialength;
 		var classname_a;
@@ -136,10 +137,15 @@ block content
 			$('.selected').removeClass('selected');
 			drawtype = '#{drawtype}'
 			layer = '#{layer}'
-			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+''
+			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
+			
+			var content = JSON.parse(doc.content)
+			var entry = content[index];
+			
+			var itemName = content[drawtype][layer].name;
 			if (document.getElementById(id) !== null && drawtype !== 'info') {
 				
-				InitializeApp(drawtype, parseInt(layer, 10));
+				InitializeApp(itemName, drawtype, parseInt(layer, 10));
 			}
 		})
 		$(document).on('click', '#deletefeature', function(){
@@ -188,11 +194,11 @@ block content
 			$('#select').removeClass('blog');
 			$('#select').addClass('draw');
 		}
-		function InitializeApp(drawtype, layer) {
+		function InitializeApp(itemName, drawtype, layer) {
 			console.log(drawtype, layer)
 			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
 			console.log(elem)
-			InitializeCanvas(drawtype, layer);
+			InitializeCanvas(itemName, drawtype, layer);
 			if (elem) {
 				console.log("Adding MouseEvent & TouchEvent listeners");
 				["mousedown", "mousemove", "mouseup"].forEach(function(e) {
@@ -202,12 +208,12 @@ block content
 						elem.addEventListener(e, TouchHandler);
 				});
 				window.addEventListener("resize", function(e) {
-					InitializeCanvas(drawtype, layer);
+					InitializeCanvas(itemName, drawtype, layer);
 				});
 			}
 			
 		}
-		function InitializeCanvas(drawtype, layer) {
+		function InitializeCanvas(itemName, drawtype, layer) {
 			var canv = document.getElementById("canvas");
 			//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
 			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
@@ -231,12 +237,13 @@ block content
 				elem.height = canvasHeight;
 				elem.style.width = newwidth + "px";
 				elem.style.height = newheight + "px";
+				elem.name = itemName;
 				scale = newscale;
 			}
 		}
 		
 		function MouseHandler(event) {
-
+			var coords = [event.clientX, event.clientY];
 			if (event.type == "mousedown" && event.button === 0) {
 				mousePressed = true;
 			}
@@ -264,7 +271,7 @@ block content
 					event.target.setAttribute('style', 'cursor: grab;');
 					console.log(event.target.style.cursor)
 				}
-				drawTouch(event.target, fakeTouch, eventType, false);
+				drawTouch(coords, event.target, fakeTouch, eventType, false);
 				event.preventDefault();
 			}
 
@@ -273,18 +280,19 @@ block content
 		}
 		function TouchHandler(event) {
 			event.preventDefault();
-			
+			var coords = [event.clientX, event.clientY];
 			if (!mainmenu.classList.contains('selected')) {
 				for (var i = 0; i < event.changedTouches.length; i++)
-					drawTouch(event.target, event.changedTouches[i], event.type, false);
+					drawTouch(coords, event.target, event.changedTouches[i], event.type, false);
 			}
 			
 		}
-		function drawTouch(eventTarget, touch, eventType, coalesced) {
+		function drawTouch(coords, eventTarget, touch, eventType, coalesced) {
 			var context = eventTarget.getContext("2d");
 			var drawType = eventTarget.getAttribute('id').split('_')[1];
 			var layer = eventTarget.getAttribute('id').split('_')[2];
-			
+			var itemName = eventTarget.getAttribute('name');
+
 			// Map the identifier to a small count (no-op on Chrome, but
 			// important for mobile Safari).
 			if (!(touch.identifier in touchMap)) {
@@ -325,9 +333,51 @@ block content
 			var img = new Image();
 			img.src = '/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
 			img.onload = function(){
-				
+				var canvas = document.getElementById('canvas');
+				//https://stackoverflow.com/a/27410956/3530394
+				/*var ctx = canvas.getContext('2d');
+
+				//prepare canvas
+				ctx.fillStyle = '#ffffff'
+				ctx.fillRect(0, 0, 120, 120);
+
+				//prepare a 30% opacity eraser
+				ctx.globalCompositeOperation = 'destination-out';
+				ctx.lineWidth = 5;
+				ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+
+				// make random strokes around cursor while mouse moves
+				canvas.onmousemove = function(e) {
+				   var rect = this.getBoundingClientRect();
+				   var x = e.clientX - rect.left;
+				   var y = e.clientY - rect.top;
+
+				   ctx.beginPath();
+				   ctx.moveTo(x + Math.random() * 33 - 16, y + Math.random() * 33 - 16);
+				   ctx.lineTo(x + Math.random() * 33 - 16, y + Math.random() * 33 - 16);
+				   ctx.stroke();
+
+				}*/
+				//https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
+
 				if (eventType != "touchend") {
+					var alpha;
+					if (drawType === 'substrates') {
+						alpha = 'source-in'
+					}
+					if (drawType === 'tools') {
+						if (itemName = 'cleaner') {
+							alpha = 'destination-out';
+						} else {
+							alpha = false;
+						}
+					}
+					//...if false! == butterknife
+					context.globalCompositeOperation = alpha;
+					//https://stackoverflow.com/questions/27407710/reveal-image-on-canvas-with-draw-strokes-paint
+					
 					if (drawType === 'filling') {
+						
 						pattern = context.createPattern(img, 'no-repeat');
 						context.fillStyle = pattern;
 						context.fill();
@@ -340,6 +390,10 @@ block content
 						pattern = context.createPattern(img, 'no-repeat');
 						context.fillStyle = pattern;
 						context.fillRect(0, 0, canvasWidth, canvasHeight);
+					}
+					if (drawType === 'tools') {
+						context.lineWidth = 25;
+						context.strokeStyle = 'rgba(0,0,0,.9)';
 					}
 				}
 				if (eventType != "touchmove" && eventType != "touchbegin") {
