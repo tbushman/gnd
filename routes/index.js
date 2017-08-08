@@ -833,7 +833,7 @@ router.get('/api/levelup', function(req, res, next){
 	req.app.locals.layer++;
 	var set = {$set:{}}
 	var key = 'content.$.level'
-	set.$set[key2] = req.app.locals.layer;
+	set.$set[key] = req.app.locals.layer;
 	Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){
 		if (err) {
 			return next(err)
