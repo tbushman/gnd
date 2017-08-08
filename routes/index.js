@@ -370,6 +370,8 @@ router.get('/:pagetitle', ensurePage, function (req, res, next) {
 						pageindex: doc.pageindex,
 						type: 'blog',
 						infowindow: 'doc',
+						drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
+						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[index].level,
 						loggedin: req.app.locals.loggedin,
 						index: index,
 						doc: doc,
@@ -394,82 +396,6 @@ router.get('/:pagetitle', ensurePage, function (req, res, next) {
 		})
 	})
 });
-
-router.get('/chefs/:urltitle/:index', function(req, res, next){
-	var outputPath = url.parse(req.url).pathname;
-	console.log(outputPath)
-	var urltitle = req.params.urltitle;
-	var index = parseInt(req.params.index, 10);
-	//delete req.app.locals.imgindex;
-	Page.findOne({urltitle: urltitle, content: {$elemMatch: {index: index}}}, function(err, doc){
-		if (err) {
-			return next(err)
-		}
-		Page.find({}, function(error, data) {
-			if (error) {
-				return next(error)
-			}
-			/*var imgs = [];
-			var imgindexes = []
-			for (var i in doc.content[index].media) {
-				if (doc.content[index].media !== '') {
-					imgs.push(doc.content[index].media[i].image)
-					imgindexes.push(i)
-				}
-			}*/
-			//req.app.locals.imgindex = imgindexes[0];
-
-			req.app.locals.index = index;
-			var datarray = [];
-			for (var l in data) {
-				datarray.push(data[l])
-			}
-
-			if (req.isAuthenticated()) {
-				//if (req.user._id === userid) {
-					return res.render('publish', {
-						index: index,
-						loggedin: req.app.locals.loggedin,
-						type: 'blog',
-						infowindow: 'doc',
-						pageindex: doc.pageindex,
-						data: datarray,
-						doc: doc,
-						info: ':)'
-					})
-
-			} else {
-				return res.render('publish', {
-					index: index,
-					type: 'blog',
-					infowindow: 'doc',
-					pageindex: doc.pageindex,
-					data: datarray,
-					doc: doc,
-					info: ':)'
-				})
-			}
-		})
-	})
-
-})
-
-//todo expand
-//currently only searches publisher
-router.all('/search/:term', function(req, res, next){
-	var term = req.params.term;
-	var regex = new RegExp(term);
-	console.log(regex)
-	Page.find({pagetitle: { $regex: regex }}, function(err, doc){
-		if (err) {
-			return next(err)
-		}
-		if (!err && doc === null) {
-			return ('none')
-		}
-		return res.json(doc)
-	})
-})
 
 //every edit-access api checks auth
 router.all('/api/*', ensureAuthenticated)
@@ -578,7 +504,8 @@ router.get('/api/publish', function(req, res, next) {
 			index: doc ? doc.content.length-1 : false,
 			data: [].map.call(data, function(d){return d}),
 			doc: doc ? doc : false,
-			//drawtype: req.app.locals.drawType ? req.app.locals.drawType : false,
+			drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
+			layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
 			info: 'hi'
 		})
 	})
@@ -652,6 +579,7 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 				doc: doc,
 				data: datarray,
 				drawtype: req.app.locals.drawType ? req.app.locals.drawType : 'info',
+				layer: req.app.locals.layer ? req.app.locals.layer : false,
 				info: 'Edit your entry.'
 			})
 		})
@@ -718,28 +646,37 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 				if (err) {
 					return next(err)
 				}
-				req.app.locals.drawType = drawtype;
+				var set2 = {$set:{}}
+				var key2 = 'content.$.title'
+				set2.$set[key2] = thestore[drawtype].name;
+				Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set2, {safe: true, new: true, upsert: false}, function(er, doc){
+					if (er) {
+						return next(er)
+					}
+					req.app.locals.drawType = drawtype;
 
-				var datarray = [];
-				for (var l in data) {
-					datarray.push(data[l])
-				}
-				console.log('this drawtype: '+drawtype)
-				console.log('this doc '+doc)
-				//return res.redirect('/api/selectlayer')
-				return res.render('publish', {
-					type: 'draw',
-					drawtype: drawtype,
-					layer: layer,
-					infowindow: 'edit',
-					loggedin: req.app.locals.loggedin,
-					pagetitle: doc.pagetitle,
-					pageindex: doc.pageindex,
-					index: index,
-					doc: doc,
-					data: datarray,
-					info: ':)'
+					var datarray = [];
+					for (var l in data) {
+						datarray.push(data[l])
+					}
+					console.log('this drawtype: '+drawtype)
+					console.log('this doc '+doc)
+					//return res.redirect('/api/selectlayer')
+					return res.render('publish', {
+						type: 'draw',
+						drawtype: drawtype,
+						layer: layer,
+						infowindow: 'edit',
+						loggedin: req.app.locals.loggedin,
+						pagetitle: doc.pagetitle,
+						pageindex: doc.pageindex,
+						index: index,
+						doc: doc,
+						data: datarray,
+						info: ':)'
+					})
 				})
+				
 			})
 			
 		})
@@ -857,7 +794,7 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 		}
 		console.log(levellist, keylist);
 		var drawType = keylist[0] !== undefined ? keylist[0] : "info";
-		var level = levellist[0] !== undefined ? levellist[0] : 0;
+		var level = levellist[0] !== undefined ? levellist[0] : layer;
 		var set1 = {$set: {}};
 		var key1 = 'content.$.'+keylist[0]+'.'+levellist[0]+'.unlocked';
 		set1.$set[key1] = true;
@@ -882,9 +819,10 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 });
 
 router.get('/api/levelup', function(req, res, next){
+	req.app.locals.layer++;
 	var set = {$set:{}}
 	var key = 'content.$.level'
-	set2.$set[key2] = req.app.locals.layer + 1;
+	set.$set[key2] = req.app.locals.layer;
 	Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){
 		if (err) {
 			return next(err)

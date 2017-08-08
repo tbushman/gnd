@@ -7,14 +7,15 @@ div.grid-right
 		if (index >= 0)
 			div.grid-container.inner
 				div.grid-header
-					if (drawtype)
-						each imag, i in contentData[drawtype]
-							if (imag.unlocked)
-								a.thumbnail.gallery(href="")
-									img(src=""+imag.image+"", alt=""+imag.name+"")
-					if (contentData.info !== undefined)
-						p.tb-font-s.hideoverlap.translate About 
-							span.translate #{contentData.info[contentData.level].name}
+					//-
+						if (drawtype)
+							each imag, i in contentData[drawtype]
+								if (imag.unlocked)
+									a.thumbnail.gallery(href="")
+										img(src=""+imag.image+"", alt=""+imag.name+"")
+						if (contentData.info !== undefined)
+							p.tb-font-s.hideoverlap.translate About 
+								span.translate #{contentData.info[contentData.level].name}
 				div.grid-left(style="padding: 6px 0 0 6px;")
 					//if (loggedin && loggedin === menuData.publishers[0].username && menuData.content.length > 0)
 					if (loggedin)
@@ -34,15 +35,16 @@ div.grid-right
 													.ui
 														img(src="/images/"+drawtype+"/"+drawtype+"_"+contentData.level+".svg", alt="Click to use the "+contentData["info"][contentData.level].name+". ")
 												span.tb-font-l #{contentData[drawtype][contentData.level].name}
-								//-
-									else
-										a.thumbnail.gallery(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/tools/"+contentData.level+"', function(){ window.location.href = '/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"';})")
+								
+								else
+									if (contentData[drawtype][contentData.level].unlocked)
+										a.thumbnail.gallery(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"', function(){ window.location.href = '/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"';})")
 											.ui
-												img(src="images/tools/tools_"+contentData.level+".svg", style="width: 100%; height: 100%;")
+												img(src="/images/"+drawtype+"/"+drawtype+"_"+contentData.level+".svg", style="width: 100%; height: 100%;")
 					else
 						a.thumbnail.gallery(href="/"+menuData.pagetitle+"")
 							.ui
-								img(src="images/info/info_"+contentData.level+".svg", style="width: 100%; height: 100%;")
+								img(src="/images/info/info_"+contentData.level+".svg", style="width: 100%; height: 100%;")
 				div.grid-right
 					p.tb-font-xl.translate #{contentData.title}
 					p.tb-font-s.translate #{contentData.info[contentData.level].name}

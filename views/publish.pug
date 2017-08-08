@@ -41,7 +41,6 @@ block content
 						span.translate #{contentData.filling[1].name}
 						span  and  
 					span.translate #{contentData.filling[0].name}
-					span #{contentData.level}
 			
 			
 			if (drawtype)
@@ -333,9 +332,6 @@ block content
 						context.fillStyle = pattern;
 						context.fill();
 					}
-					
-				}
-				if (eventType != "touchmove" && eventType != "touchbegin") {
 					if (drawType === 'substrates') {
 						img.width = Math.min(canvasWidth, canvasHeight);
 						img.height = Math.min(canvasWidth, canvasHeight);
@@ -345,13 +341,20 @@ block content
 						context.fillStyle = pattern;
 						context.fillRect(0, 0, canvasWidth, canvasHeight);
 					}
+				}
+				if (eventType != "touchmove" && eventType != "touchbegin") {
+					if (drawType === 'substrates') {
+						
+					}
 					
 				}
 				if (eventType == "touchbegin") {
 					if (drawType === 'filling') {
 						context.fillStyle = pattern;
 					}
-					i
+					if (drawType === 'tools') {
+						context.fillStyle = "rgba(255,255,255,0)"
+					}
 					context.fill();
 				}
 				if (eventType === "touchmove") {
