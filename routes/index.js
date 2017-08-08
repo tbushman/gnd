@@ -703,36 +703,24 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 		var keys = Object.keys(body);
 		var contentdata = pub.content[index];
 		//var cKeys = Object.keys(contentdata);
-		var items = ["tools", "info", "substrates", "filling"];
+		var items = ["substrates", "filling"];
 		var drawThis = false;
 		var key, push, drawType, drawInd, drawName, unlocked, thisValue, unlockName, unlockInd, unlockThis;
 		
 		
 		for (var i = 0; i < items.length; i++) {
-			//if (Array.isArray(contentdata[items[i]])) {
-				drawType = items[i];
-				var lockedcount = 0;
-				for (var q = 0; q < contentdata[drawType].length; q++) {
-					if (body[contentdata[drawType][q].name]) {
-						drawThis = contentdata[drawType][q];
-						drawInd = drawThis.index;
-						drawName = drawThis.name;
-						/*var unlock = contentdata["info"][q].info.unlock.split('.');
-						unlockName = unlock[0]
-						unlockInd = unlock[1]*/
-						
-					}
-					
-					/*if (contentdata[drawType][q].index <= contentdata.level) {
-						unlocked = true;
-						
-					} else {
-						unlocked = false;
-						lockedcount++;
-					}*/
+			
+			drawType = items[i];
+			var lockedcount = 0;
+			for (var q = 0; q < contentdata[drawType].length; q++) {
+				if (body[contentdata[drawType][q].name]) {
+					drawThis = contentdata[drawType][q];
+					drawInd = drawThis.index;
+					drawName = drawThis.name;
 				}
+			}
 		}
-		
+		//if any item's image is in req.body, add it
 		if (drawThis) {
 			for (var i = 0; i < keys.length; i++) {
 				contentdata[keys[i]] = body[keys[i]]
@@ -740,18 +728,15 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 					if (contentdata[keys[i]][j].name === drawName) {
 						contentdata[keys[i]][j].image = body[drawName]
 						contentdata[keys[i]][j].unlocked = unlocked;
-						//unlockThis = contentdata[keys[i + 1]][unlockInd]
 					}
 				}
 			}
-			//unlockThis.unlocked = true;
 			key = 'content.$'
 			push = {$set: {}};
 			pushKey = '$set';
 			thisValue = contentdata;
 		} else {
 			
-			//drawType = false;
 			var entry = contentdata;
 			for (var i = 0; i < keys.length; i++) {
 				contentdata[keys[i]] = body[keys[i]]
@@ -796,6 +781,22 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 			if (keyz[i] !== drawtype) {
 				for (var j = 0; j < pub.content[index][keyz[i]].length; j++) {
 					if (pub.content[index][keyz[i]][j].unlocked) {
+						if (pub.content[index][keyz[i]][j+1] !== undefined && pub.content[index][keyz[i]][j+1].unlocked) {
+							if (pub.content[index][keyz[i]][j+2] !== undefined && pub.content[index][keyz[i]][j+2].unlocked) {
+								if(pub.content[index][keyz[i]][j+3] !== undefined && pub.content[index][keyz[i]][j+3].unlocked) {
+									
+								} else {
+									keylist.push(keyz[i]);
+									levellist.push(j)
+								}
+							} else {
+								keylist.push(keyz[i]);
+								levellist.push(j)
+							}
+						} else {
+							keylist.push(keyz[i]);
+							levellist.push(j)
+						}
 					} else {
 						keylist.push(keyz[i]);
 						levellist.push(j)
@@ -804,7 +805,7 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 			}			
 		}
 		console.log(levellist, keylist);
-		var drawType = keylist[0] !== undefined ? keylist[0] : "info";
+		var drawType = keylist[0] !== undefined ? keylist[0] : req.app.locals.drawType ? req.app.locals.drawType : false;
 		var level = levellist[0] !== undefined ? levellist[0] : layer;
 		var set1 = {$set: {}};
 		var key1 = 'content.$.'+keylist[0]+'.'+levellist[0]+'.unlocked';

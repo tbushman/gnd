@@ -127,7 +127,7 @@
 			"name": "bacteria",
 			"image": "/images/info/info_0.svg",
 			"caption": "Super-small organisms that make us sick",
-			"unlocked": true,
+			"unlocked": false,
 			"info": {
 				"safety": "cleaner",
 				"alt": [ ],

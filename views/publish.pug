@@ -283,7 +283,8 @@ block content
 			var context = eventTarget.getContext("2d");
 			var drawType = eventTarget.getAttribute('id').split('_')[1];
 			var layer = eventTarget.getAttribute('id').split('_')[2];
-			
+			canvasWidth = eventTarget.getBoundingClientRect().width;
+			canvasHeight = eventTarget.getBoundingClientRect().height; 
 			// Map the identifier to a small count (no-op on Chrome, but
 			// important for mobile Safari).
 			if (!(touch.identifier in touchMap)) {
@@ -325,25 +326,48 @@ block content
 			img.src = '/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
 			img.onload = function(){
 				
+				
+				/*var alpha;
+				if (drawType === 'substrates') {
+					alpha = 'source-in'
+				}
+				if (drawType === 'filling') {
+					alpha = 'source-in'
+				}
+				if (drawType === 'tools') {
+					if (itemName = 'cleaner') {
+						alpha = 'destination-out';
+					} else {
+						alpha = 'source-in';
+					}
+				}
+				context.globalCompositeOperation = alpha;*/
 				if (eventType != "touchend") {
+					
+					//...if false! == butterknife
+					
+					//https://stackoverflow.com/questions/27407710/reveal-image-on-canvas-with-draw-strokes-paint
+					
 					if (drawType === 'filling') {
+						
 						pattern = context.createPattern(img, 'no-repeat');
 						context.fillStyle = pattern;
 						context.fill();
 					}
 					if (drawType === 'substrates') {
-						img.width = Math.min(canvasWidth, canvasHeight);
-						img.height = Math.min(canvasWidth, canvasHeight);
-						img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
-						img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
-						pattern = context.createPattern(img, 'no-repeat');
-						context.fillStyle = pattern;
-						context.fillRect(0, 0, canvasWidth, canvasHeight);
+						context.globalCompositeOperation = 'destination-over'
 					}
 				}
 				if (eventType != "touchmove" && eventType != "touchbegin") {
 					if (drawType === 'substrates') {
-						
+						img.width = Math.min(canvasWidth, canvasHeight);
+						img.height = Math.min(canvasWidth, canvasHeight);
+						img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
+						img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
+						pattern = context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+						//context.globalCompositeOperation = 'destination-in'
+						context.fillStyle = pattern;
+						context.fill()//.fillRect(0, 0, canvasWidth, canvasHeight);
 					}
 					
 				}
@@ -351,13 +375,18 @@ block content
 					if (drawType === 'filling') {
 						context.fillStyle = pattern;
 					}
+					if (drawType === 'substrates') {
+						context.fillStyle = pattern;
+					}
 					if (drawType === 'tools') {
-						context.fillStyle = "rgba(255,255,255,0)"
+						context.fillStyle = rgba(255,255,255,0);
 					}
 					context.fill();
 				}
 				if (eventType === "touchmove") {
-					
+					if (drawType === 'substrates') {
+						context.fillStyle = rgba(255,255,255,0);
+					}
 				}
 			}
 			
@@ -462,12 +491,6 @@ block content
 						success: function(response) {
 							
 								$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-								/*$('a.mainmenu').removeClass('dropdown');
-								$('a.mainmenu').addClass('dropdown');
-								$('a.mainmenu').attr('title', 'Menu');
-								$('a.mainmenu').html('<img class="i" src="http://pu.bli.sh/images/menu_button.svg"></img>')*/
-																//$('#form').submit();
-								//InitializeApp('#{drawtype}', #{layer})
 								setTimeout(function(){
 									$('#form').submit();
 									window.location.href = '/api/publish'
