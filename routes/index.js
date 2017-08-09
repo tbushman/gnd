@@ -72,7 +72,8 @@ function ensureAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) {
 		return next();
 	}
-	return res.redirect('/login');
+	//return res.redirect('/login');
+	return next()
 }
 
 function ensurePage(req, res, next) {
@@ -261,6 +262,19 @@ router.get('/logout', function(req, res) {
 	} else {
 		return res.redirect('/');
 	}
+});
+
+//
+router.post('/doc/:pageindex', function(req, res, next){
+	var pageindex = parseInt(req.params.pageindex, 10);
+	var index = parseInt(req.params.index, 10);
+	
+	Page.findOne({pageindex: pageindex}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		return res.json(doc)
+	})
 });
 
 router.all('/translate/:text', function(req, res, next){
@@ -755,7 +769,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 			}
 		}
 		//if any item's image is in req.body, add it
-		if (drawThis) {
+		if (drawThis !== undefined) {
 			for (var i = 0; i < keys.length; i++) {
 				contentdata[keys[i]] = body[keys[i]]
 				for (var j = 0; j < contentdata[keys[i]].length; j++) {

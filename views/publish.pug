@@ -43,7 +43,7 @@ block content
 					span.translate #{contentData.filling[0].name}
 			
 			
-			if (drawtype)
+			if (drawtype && drawtype !== "tools")
 				if (menuData.publishers[0].username === loggedin)
 						
 					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+layer+".svg');")
@@ -89,7 +89,9 @@ block content
 		var mainmenu = document.getElementsByClassName('menu')[0];
 		var pageIndex, drawtype, layer;
 		var datalength = #{data.length};
-		var doc = `#{JSON.stringify(doc)}`;
+		/*var doc = `#{doc}`*/
+		var index = #{index}
+		
 		var lMarker;
 		var medialength;
 		var classname_a;
@@ -135,11 +137,24 @@ block content
 			$('.selected').removeClass('selected');
 			drawtype = '#{drawtype}'
 			layer = '#{layer}'
-			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+''
-			if (document.getElementById(id) !== null && drawtype !== 'info') {
-				
-				InitializeApp(drawtype, parseInt(layer, 10));
-			}
+			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
+			var canv = document.getElementById('canvas')
+			var ctx = canv.getContext("2d");
+			$.post('/doc/'+pageIndex+'', function(result){
+				var img = new Image();
+				img.src = result.content[index].image;
+				console.log(result.content[index].image)
+				img.onload = function(){
+					ctx.fillRect(img, 0, 0, canvasWidth, canvasHeight)
+					if (document.getElementById(id) !== null && drawtype !== 'info') {
+						
+						InitializeApp(drawtype, parseInt(layer, 10));
+					}
+				}
+			})
+			
+			
+			
 		})
 		$(document).on('click', '#deletefeature', function(){
 
@@ -225,6 +240,7 @@ block content
 				canv.height = canvasHeight;
 				canv.style.width = newwidth + "px";
 				canv.style.height = newheight + "px";
+				
 				var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
 				var context = elem.getContext("2d");
 				/*if (drawtype === "filling") {
@@ -482,7 +498,7 @@ block content
 						contentType: false,
 						success: function(response) {
 							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
-							$('#inputimg_'+drawtype+'_'+layer+'').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+							$('#inputimg_'+drawtype+'_'+layer+'').val(imgurl);
 							
 							setTimeout(function(){
 								$('#form').submit();
@@ -494,7 +510,7 @@ block content
 									mainCanvas.toBlob(function(blob) {
 										var fd = new FormData();
 										
-										fd.append("img", blob);
+										fd.append("image", blob);
 										
 										var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/'+false+'';
 
@@ -521,7 +537,7 @@ block content
 				can.toBlob(function(blob) {
 					var fd = new FormData();
 					
-					fd.append("img", blob);
+					fd.append("image", blob);
 					
 					var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/'+false+'/'+false+'';
 
@@ -537,8 +553,8 @@ block content
 							
 								$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
 								setTimeout(function(){
-									$('#form').submit();
-									window.location.href = '/api/publish'
+									//$('#form').submit();
+									uiBlogMode();//window.location.href = '/api/publish'
 								}, 500);
 							}
 						
