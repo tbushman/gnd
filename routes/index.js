@@ -26,7 +26,7 @@ var storage = multer.diskStorage({
 			if (err) {
 				console.log(err)
 			}
-			var p = ''+publishers+'/pu/publishers/sfusd2/'+ doc.urltitle +'/'+req.params.index+'/images/'+(req.params.drawtype ? req.params.drawtype : 'main')+''
+			var p = ''+publishers+'/pu/publishers/sfusd/'+ doc.urltitle +'/'+req.params.index+'/images/'+(req.params.drawtype ? req.params.drawtype : 'main')+''
 			console.log(p)
 
 			fs.access(p, function(err) {
@@ -72,8 +72,7 @@ function ensureAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) {
 		return next();
 	}
-	//return res.redirect('/login');
-	return next()
+	return res.redirect('/login');
 }
 
 function ensurePage(req, res, next) {
@@ -145,6 +144,19 @@ router.get('/', function (req, res) {
 		delete req.app.locals.pageTitle;
 		return res.redirect('/home')
 	}
+});
+
+router.get('/doc/:pageindex', function(req, res, next){
+	var pageindex = parseInt(req.params.pageindex, 10);
+	var index = parseInt(req.params.index, 10);
+	
+	Page.findOne({pageindex: pageindex}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		//return res.status(200).send(doc)
+		return res.status(200).send(doc)
+	})
 });
 
 router.get('/register', function(req, res) {
@@ -264,19 +276,6 @@ router.get('/logout', function(req, res) {
 	}
 });
 
-//
-router.post('/doc/:pageindex', function(req, res, next){
-	var pageindex = parseInt(req.params.pageindex, 10);
-	var index = parseInt(req.params.index, 10);
-	
-	Page.findOne({pageindex: pageindex}, function(err, doc){
-		if (err) {
-			return next(err)
-		}
-		return res.json(doc)
-	})
-});
-
 router.all('/translate/:text', function(req, res, next){
 
 	googleTranslate.translate(decodeURIComponent(req.params.text), 'en', req.app.locals.user ? req.app.locals.user.language : 'es', function(err, translation){
@@ -345,7 +344,7 @@ router.get('/home', function(req, res, next) {
 	})
 })
 
-router.post('/:pagetitle', function(req, res, next){
+router.post('/chef/:pagetitle', function(req, res, next){
 	Page.find({pagetitle: decodeURIComponent(req.params.pagetitle)}, function(error, pages){
 		if (error) {
 			return next(error)
@@ -359,78 +358,62 @@ router.post('/:pagetitle', function(req, res, next){
 	})
 })
 
-router.get('/:pagetitle*', ensurePage, function (req, res, next) {
-	//check if pos1 is username
+router.get('/chef/:pagetitle*', ensurePage, function (req, res, next) {
+	var index;
 	var outputPath = url.parse(req.url).pathname;
+	console.log(outputPath);
+	console.log(outputPath.split('/').length)
+	
+	//check if pos1 is username
+	//view user profile
 	var pagetitle = decodeURIComponent(req.params.pagetitle)
 	var urltitle = pagetitle.split(' ').join('_');
 	Page.find({}, function(err, data) {
 		if (err) {
 			return next(err)
 		}
-		var datarray = [];
-		for (var l in data) {
-			datarray.push(data[l])
-		}
 		Page.findOne({urltitle: urltitle}, function(error, doc){
 			if (error) {
 				return next(error)
 			}
-			if (outputPath.split('/').length > 1) {
-				var index = outputPath.split('/')[1];
+			if (!err && doc !== undefined && doc !== null) {
+				var info;
+				var datarray = [];
+				for (var l in data) {
+					datarray.push(data[l])
+				}
+				if (outputPath.split('/').length > 3) {
+					index = outputPath.split('/')[2];
+				} else {
+					index = doc.content[doc.content.length-1].index;
+				}
 				if (req.isAuthenticated()) {
 					return res.render('publish', {
 						pageindex: doc.pageindex,
-						type: 'draw',
+						type: 'blog',
 						infowindow: 'doc',
-						drawtype: req.app.locals.drawType && req.app.locals.drawType !== 'tools' ? req.app.locals.drawType : 'info',
-						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
+						drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
+						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[index].level,
 						loggedin: req.app.locals.loggedin,
 						index: index,
 						doc: doc,
 						data: datarray,
-						info: doc.pagetitle+ "'s sandwich"
+						info: info
 					})
 				} else {
 					return res.render('publish', {
 						pageindex: doc.pageindex,
-						type: 'draw',
+						type: 'blog',
 						infowindow: 'doc',
 						index: index,
 						doc: doc,
 						data: datarray,
-						info: doc.pagetitle+ "'s sandwich"
+						info: info
 					})
 				}
-			} else {
-				//view user profile
-				var index = doc.content[doc.content.length-1].index;
-
 				
-				if (req.isAuthenticated()) {
-					return res.render('publish', {
-						pageindex: doc.pageindex,
-						type: 'blog',
-						infowindow: 'doc',
-						drawtype: req.app.locals.drawType && req.app.locals.drawType !== 'tools' ? req.app.locals.drawType : 'info',
-						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
-						loggedin: req.app.locals.loggedin,
-						index: index,
-						doc: doc,
-						data: datarray,
-						info: doc.pagetitle+ "'s sandwich"
-					})
-				} else {
-					return res.render('publish', {
-						pageindex: doc.pageindex,
-						type: 'blog',
-						infowindow: 'doc',
-						index: index,
-						doc: doc,
-						data: datarray,
-						info: doc.pagetitle+ "'s sandwich"
-					})
-				}
+			} else {
+				return res.redirect('/home')
 			}
 		})
 	})
@@ -659,11 +642,7 @@ router.get('/api/selectlayer', function(req, res, next){
 	})
 })
 router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', upload.array(), function(req, res, next){
-	if (drawtype === 'tools') {
-		return res.redirect('/')
-	}
-	delete req.app.locals.layer;
-	delete req.app.locals.drawType;
+	//delete req.app.locals.layer;
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath)
 	var index = parseInt(req.params.index, 10);
@@ -672,6 +651,7 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 	var drawtype = req.params.drawtype;
 	req.app.locals.index = index;
 	req.app.locals.layer = layer;
+	req.app.locals.drawType = drawtype;
 	req.app.locals.urltitle = urltitle;
 	Page.findOne({urltitle: urltitle, content: {$elemMatch: {index: index}}}, function(err, pub){
 		if (err) {
@@ -690,16 +670,7 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 				}
 				var set2 = {$set:{}}
 				var key2 = 'content.$.title'
-				var base = 'My ';
-				if (layer > 0) {				
-					for (var i = 0; i < layer; i++) {
-						base += thestore.filling[i].name;
-					}
-				} else {
-					base += thestore.filling[layer].name;
-				}
-				base += ' sandwich'
-				set2.$set[key2] = base;
+				set2.$set[key2] = thestore[drawtype][layer].name;
 				Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set2, {safe: true, new: true, upsert: false}, function(er, doc){
 					if (er) {
 						return next(er)
@@ -751,40 +722,48 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 		var keys = Object.keys(body);
 		var contentdata = pub.content[index];
 		//var cKeys = Object.keys(contentdata);
-		var items = ["substrates", "filling"];
+		var items = ["tools", "info", "substrates", "filling"];
 		var drawThis = false;
-		var key, push, drawType, drawInd, drawName, unlocked, thisValue, unlockName, unlockInd, unlockThis;
+		var key, push, drawType, drawInd, drawName, unlocked, thisValue;
 		
 		
 		for (var i = 0; i < items.length; i++) {
-			
-			drawType = items[i];
-			var lockedcount = 0;
-			for (var q = 0; q < contentdata[drawType].length; q++) {
-				if (body[contentdata[drawType][q].name]) {
-					drawThis = contentdata[drawType][q];
-					drawInd = drawThis.index;
-					drawName = drawThis.name;
+			//if (Array.isArray(contentdata[items[i]])) {
+				drawType = items[i];
+				for (var q = 0; q < contentdata[drawType].length; q++) {
+					if (body[contentdata[drawType][q].name]) {
+						drawThis = contentdata[drawType][q];
+						drawInd = drawThis.index;
+						drawName = drawThis.name;
+					}
+					
+					if (contentdata[drawType][q].index <= contentdata.level) {
+						unlocked = true;
+						
+					} else {
+						unlocked = false;
+					}
 				}
-			}
 		}
-		//if any item's image is in req.body, add it
-		if (drawThis !== undefined) {
+		if (drawThis) {
 			for (var i = 0; i < keys.length; i++) {
 				contentdata[keys[i]] = body[keys[i]]
 				for (var j = 0; j < contentdata[keys[i]].length; j++) {
 					if (contentdata[keys[i]][j].name === drawName) {
 						contentdata[keys[i]][j].image = body[drawName]
-						contentdata[keys[i]][j].unlocked = unlocked;
+						contentdata[keys[i]][j].unlocked = unlocked
 					}
 				}
+				
 			}
+			
 			key = 'content.$'
 			push = {$set: {}};
 			pushKey = '$set';
 			thisValue = contentdata;
 		} else {
 			
+			//drawType = false;
 			var entry = contentdata;
 			for (var i = 0; i < keys.length; i++) {
 				contentdata[keys[i]] = body[keys[i]]
@@ -799,8 +778,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index', upload.array(), func
 			if (error) {
 				return next(error)
 			}
-			delete req.app.locals.drawType
-			delete req.app.locals.layer
+			
 			return res.redirect('/api/publish')
 		});
 	})
@@ -824,27 +802,11 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 		}
 		var keylist = [];
 		var levellist = [];
-		var keyz = ["substrates", "filling"];
+		var keyz = ["tools", "substrates", "filling", "info"];
 		for (var i = 0; i < keyz.length; i++) {
 			if (keyz[i] !== drawtype) {
 				for (var j = 0; j < pub.content[index][keyz[i]].length; j++) {
 					if (pub.content[index][keyz[i]][j].unlocked) {
-						if (pub.content[index][keyz[i]][j+1] !== undefined && pub.content[index][keyz[i]][j+1].unlocked) {
-							if (pub.content[index][keyz[i]][j+2] !== undefined && pub.content[index][keyz[i]][j+2].unlocked) {
-								if(pub.content[index][keyz[i]][j+3] !== undefined && pub.content[index][keyz[i]][j+3].unlocked) {
-									
-								} else {
-									keylist.push(keyz[i]);
-									levellist.push(j)
-								}
-							} else {
-								keylist.push(keyz[i]);
-								levellist.push(j)
-							}
-						} else {
-							keylist.push(keyz[i]);
-							levellist.push(j)
-						}
 					} else {
 						keylist.push(keyz[i]);
 						levellist.push(j)
@@ -853,7 +815,7 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 			}			
 		}
 		console.log(levellist, keylist);
-		var drawType = keylist[0] !== undefined ? keylist[0] : req.app.locals.drawType ? req.app.locals.drawType : false;
+		var drawType = keylist[0] !== undefined ? keylist[0] : "info";
 		var level = levellist[0] !== undefined ? levellist[0] : layer;
 		var set1 = {$set: {}};
 		var key1 = 'content.$.'+keylist[0]+'.'+levellist[0]+'.unlocked';
@@ -882,7 +844,7 @@ router.get('/api/levelup', function(req, res, next){
 	req.app.locals.layer++;
 	var set = {$set:{}}
 	var key = 'content.$.level'
-	set.$set[key] = req.app.locals.layer;
+	set.$set[key2] = req.app.locals.layer;
 	Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){
 		if (err) {
 			return next(err)

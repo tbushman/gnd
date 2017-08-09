@@ -84,6 +84,24 @@ block content
 	//-
 		initiate map + event listeners
 	script(type="text/javascript").
+		function uiBlogMode(){
+			$('div.menu.draw').removeClass('draw');
+			$('div.menu').addClass('blog');
+			$('.grid-container').removeClass('draw');
+			$('.grid-container').addClass('blog');
+			$('.grid-container').addClass('selected');
+			$('#select').removeClass('draw');
+			$('#select').addClass('blog');
+		}
+		function uiDrawMode(){
+			$('div.menu.blog').removeClass('blog');
+			$('div.menu').addClass('draw');
+			$('.grid-container').removeClass('blog');
+			$('.grid-container').addClass('draw');
+			$('.grid-container').removeClass('selected');
+			$('#select').removeClass('blog');
+			$('#select').addClass('draw');
+		}
 		const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 		/*var pageindex = '#{pageindex}'*/
 		var mainmenu = document.getElementsByClassName('menu')[0];
@@ -140,17 +158,22 @@ block content
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
 			var canv = document.getElementById('canvas')
 			var ctx = canv.getContext("2d");
-			$.post('/doc/'+pageIndex+'', function(result){
+			$.get('/doc/'+pageIndex+''/*).done(*/,function(result){
 				var img = new Image();
 				img.src = result.content[index].image;
 				console.log(result.content[index].image)
-				img.onload = function(){
-					ctx.fillRect(img, 0, 0, canvasWidth, canvasHeight)
-					if (document.getElementById(id) !== null && drawtype !== 'info') {
-						
-						InitializeApp(drawtype, parseInt(layer, 10));
+				if (result.content[index].image !== '' && result.content[index].image !== ' ') {
+					img.onload = function(){
+						ctx.fillRect(img, 0, 0, canvasWidth, canvasHeight)
+						if (document.getElementById(id) !== null && drawtype !== 'info') {
+							
+							InitializeApp(drawtype, parseInt(layer, 10));
+						}
 					}
+				} else {
+					InitializeApp(drawtype, parseInt(layer, 10));
 				}
+				
 			})
 			
 			
@@ -184,24 +207,7 @@ block content
 			}
 		})*/
 		
-		function uiBlogMode(){
-			$('div.menu.draw').removeClass('draw');
-			$('div.menu').addClass('blog');
-			$('.grid-container').removeClass('draw');
-			$('.grid-container').addClass('blog');
-			$('.grid-container').addClass('selected');
-			$('#select').removeClass('draw');
-			$('#select').addClass('blog');
-		}
-		function uiDrawMode(){
-			$('div.menu.blog').removeClass('blog');
-			$('div.menu').addClass('draw');
-			$('.grid-container').removeClass('blog');
-			$('.grid-container').addClass('draw');
-			$('.grid-container').removeClass('selected');
-			$('#select').removeClass('blog');
-			$('#select').addClass('draw');
-		}
+		
 		function InitializeApp(drawtype, layer) {
 			console.log(drawtype, layer)
 			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
@@ -242,17 +248,20 @@ block content
 				canv.style.height = newheight + "px";
 				
 				var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
-				var context = elem.getContext("2d");
-				/*if (drawtype === "filling") {
-					context.globalCompositeOperation = 'destination-over';
-				} else {
-					context.globalCompositeOperation = 'destination-in';
-				}*/
+				if (elem !== null) {
+					var context = elem.getContext("2d");
+					/*if (drawtype === "filling") {
+						context.globalCompositeOperation = 'destination-over';
+					} else {
+						context.globalCompositeOperation = 'destination-in';
+					}*/
 
-				elem.width = canvasWidth;
-				elem.height = canvasHeight;
-				elem.style.width = newwidth + "px";
-				elem.style.height = newheight + "px";
+					elem.width = canvasWidth;
+					elem.height = canvasHeight;
+					elem.style.width = newwidth + "px";
+					elem.style.height = newheight + "px";
+				}
+				
 				scale = newscale;
 			}
 		}
@@ -290,71 +299,6 @@ block content
 			
 		}
 		
-		/*function compositionOp(img, eventTarget, eventType, drawType, canvasWidth, canvasHeight){
-			var context = eventTarget.getContext("2d");
-			var alpha, pattern;
-			if (drawType === 'substrates') {
-				alpha = 'source-in'
-			}
-			if (drawType === 'filling') {
-				alpha = 'source-over'
-			}
-			context.globalCompositeOperation = alpha;
-			if (eventType == "touchend") {
-				if (drawType === 'filling') {
-					eventTarget.setAttribute('style', 'cursor: pointer;');
-					pattern = context.createPattern(img, 'no-repeat');
-				}
-				if (drawType === 'substrates') {
-					//context.globalCompositeOperation = 'destination-over';
-					eventTarget.setAttribute('style', 'cursor: grab;');
-					img.width = Math.min(canvasWidth, canvasHeight);
-					img.height = Math.min(canvasWidth, canvasHeight);
-					img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
-					img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
-					pattern = context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-				}
-			}
-			
-			if (eventType == "touchbegin") {
-				if (drawType === 'filling') {
-					event.target.setAttribute('style', 'cursor: url("/images/icons/tools_1.png"), grabbing;');
-					pattern = context.createPattern(img, 'no-repeat');
-				}
-				if (drawType === 'substrates') {
-					eventTarget.setAttribute('style', 'cursor: grabbing;');
-					img.width = Math.min(canvasWidth, canvasHeight);
-					img.height = Math.min(canvasWidth, canvasHeight);
-					img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
-					img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
-					pattern = context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-					//pattern = 'rgba(255,255,255,1)';
-				}
-			}
-			if (eventType === "touchmove") {
-				
-
-				if (drawType === 'substrates') {
-					//pattern = rgba(255,255,255,0);
-					eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.png"), grabbing;');
-					img.width = Math.min(canvasWidth, canvasHeight);
-					img.height = Math.min(canvasWidth, canvasHeight);
-					img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
-					img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
-					pattern = context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-					//pattern = 'rgba(255,255,255,1)';
-				} else {
-					//pattern = 
-					eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.png"), grabbing;');
-					pattern = context.createPattern(img, 'no-repeat');
-					//pattern = 'rgba(255,255,255,0)';
-				}
-			}
-			context.fillStyle = pattern;
-			context.fill()
-			//context.restore();
-		}
-		*/
 		function drawTouch(eventTarget, touch, eventType, coalesced) {
 			var context = eventTarget.getContext("2d");
 			var drawType = eventTarget.getAttribute('id').split('_')[1];

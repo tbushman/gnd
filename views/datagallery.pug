@@ -57,15 +57,15 @@ if (menu === 'home')
 	div.grid-right
 		each entry, i in data
 			div.grid-container.inner
-				a.grid-header(href="/"+entry.pagetitle+"")
+				a.grid-header(href="/chef/"+entry.pagetitle+"")
 					p.tb-font-l Chef 
 						span.tb-font-l #{entry.pagetitle}
 				div.grid-left
 					if (entry.content[entry.content.length-1].image !== "")
-						a.thumbnail.gallery(href="/"+entry.pagetitle+"")
+						a.thumbnail.gallery(href="/chef/"+entry.pagetitle+"")
 							img(src= entry.content[entry.content.length-1].image, alt=""+entry.pagetitle+"'s "+ranks[entry.content.length-1]+" snack")
 					else
-						a.thumbnail.gallery(href="/"+entry.pagetitle+"")
+						a.thumbnail.gallery(href="/chef/"+entry.pagetitle+"")
 							img(src= entry.content[entry.content.length-1].info[entry.content[entry.content.length-1].level].image, alt=""+entry.pagetitle+"'s "+ranks[entry.content.length-1]+" snack")
 
 				div.grid-right
