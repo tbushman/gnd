@@ -427,7 +427,7 @@ block content
 						img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
 						img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
 
-						//context.fillStyle = context.drawImage(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight));
+						context.fillStyle = context.drawImage(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight));
 						context.fillRect(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight))
 					}
 				}
