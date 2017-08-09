@@ -42,7 +42,7 @@
 			"name": "jelly",
 			"image": "/images/filling/filling_0.svg",
 			"caption": "Sweet fruit spread",
-			"unlocked": false,
+			"unlocked": true,
 			"info" : {
 				"safety": false,
 				"alt": [ ]

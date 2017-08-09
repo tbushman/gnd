@@ -208,7 +208,7 @@ block content
 		}
 		function InitializeCanvas(drawtype, layer) {
 			var canv = document.getElementById("canvas");
-			//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
+						//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
 			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
 			if (navigator.platform.split('Mac')[1] !== undefined) {
 				console.log(navigator.platform)
@@ -226,6 +226,13 @@ block content
 				canv.style.width = newwidth + "px";
 				canv.style.height = newheight + "px";
 				var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
+				var context = elem.getContext("2d");
+				/*if (drawtype === "filling") {
+					context.globalCompositeOperation = 'destination-over';
+				} else {
+					context.globalCompositeOperation = 'destination-in';
+				}*/
+
 				elem.width = canvasWidth;
 				elem.height = canvasHeight;
 				elem.style.width = newwidth + "px";
@@ -267,7 +274,7 @@ block content
 			
 		}
 		
-		function compositionOp(img, eventTarget, eventType, drawType, canvasWidth, canvasHeight){
+		/*function compositionOp(img, eventTarget, eventType, drawType, canvasWidth, canvasHeight){
 			var context = eventTarget.getContext("2d");
 			var alpha, pattern;
 			if (drawType === 'substrates') {
@@ -277,25 +284,22 @@ block content
 				alpha = 'source-over'
 			}
 			context.globalCompositeOperation = alpha;
-			/*if (eventType == "touchend") {
+			if (eventType == "touchend") {
 				if (drawType === 'filling') {
-					eventTarget.setAttribute('style', 'cursor: grab;');
-					img.width = Math.min(canvasWidth, canvasHeight);
-					img.height = Math.min(canvasWidth, canvasHeight);
-					img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
-					img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
-					pattern = context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-					//	pattern = rgba(255,255,255,1);
-					//context.globalCompositeOperation = 'destination-in'
 					eventTarget.setAttribute('style', 'cursor: pointer;');
 					pattern = context.createPattern(img, 'no-repeat');
 				}
 				if (drawType === 'substrates') {
 					//context.globalCompositeOperation = 'destination-over';
 					eventTarget.setAttribute('style', 'cursor: grab;');
+					img.width = Math.min(canvasWidth, canvasHeight);
+					img.height = Math.min(canvasWidth, canvasHeight);
+					img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
+					img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
 					pattern = context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 				}
 			}
+			
 			if (eventType == "touchbegin") {
 				if (drawType === 'filling') {
 					event.target.setAttribute('style', 'cursor: url("/images/icons/tools_1.png"), grabbing;');
@@ -303,32 +307,51 @@ block content
 				}
 				if (drawType === 'substrates') {
 					eventTarget.setAttribute('style', 'cursor: grabbing;');
-					pattern = rgba(255,255,255,1);
+					img.width = Math.min(canvasWidth, canvasHeight);
+					img.height = Math.min(canvasWidth, canvasHeight);
+					img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
+					img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
+					pattern = context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+					//pattern = 'rgba(255,255,255,1)';
 				}
-			}*/
+			}
 			if (eventType === "touchmove") {
 				
 
 				if (drawType === 'substrates') {
 					//pattern = rgba(255,255,255,0);
 					eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.png"), grabbing;');
-
+					img.width = Math.min(canvasWidth, canvasHeight);
+					img.height = Math.min(canvasWidth, canvasHeight);
+					img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
+					img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
+					pattern = context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+					//pattern = 'rgba(255,255,255,1)';
 				} else {
 					//pattern = 
 					eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.png"), grabbing;');
+					pattern = context.createPattern(img, 'no-repeat');
+					//pattern = 'rgba(255,255,255,0)';
 				}
 			}
 			context.fillStyle = pattern;
 			context.fill()
 			//context.restore();
 		}
-		
+		*/
 		function drawTouch(eventTarget, touch, eventType, coalesced) {
 			var context = eventTarget.getContext("2d");
 			var drawType = eventTarget.getAttribute('id').split('_')[1];
 			var layer = eventTarget.getAttribute('id').split('_')[2];
-			canvasWidth = eventTarget.getBoundingClientRect().width;
-			canvasHeight = eventTarget.getBoundingClientRect().height; 
+			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
+			if (navigator.platform.split('Mac')[1] !== undefined) {
+				console.log(navigator.platform)
+				newscale = 1
+			}
+			//var newwidth = window.screen.width * newscale;
+			//var newheight = window.screen.height * newscale;
+			canvasWidth = window.screen.width * newscale;
+			canvasHeight = window.screen.height * newscale;
 			// Map the identifier to a small count (no-op on Chrome, but
 			// important for mobile Safari).
 			if (!(touch.identifier in touchMap)) {
@@ -364,58 +387,55 @@ block content
 			//context.rotate(rotationAngle);
 			context.scale(1, radiusY/radiusX);
 			context.beginPath();
+			//context.setFillColor(255,255,255,0);
 			context.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
 			context.closePath();
 			
 			var img = new Image();
 			img.src = '/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
-			img.onload = compositionOp(img, eventTarget, eventType, drawType, canvasWidth, canvasHeight)
+			img.onload = function(){
+				var pattern;
+				var context = eventTarget.getContext("2d");
+								//img.style.background = 'rgba(255,255,255,1)'
+								/*if (drawtype === "filling") {
+									context.globalCompositeOperation = 'destination-over';
+								} else {
+									context.globalCompositeOperation = 'destination-in';
+								}*/
 				
-				
-				
-				//https://stackoverflow.com/questions/27407710/reveal-image-on-canvas-with-draw-strokes-paint
-					
-				/*
-				if (eventType != "touchmove" && eventType != "touchbegin") {
-					
+
+				var pCanvas = document.createElement("canvas");
+				pCanvas.width = canvasWidth;
+				pCanvas.height = canvasHeight;
+				var pContext = pCanvas.getContext("2d");
+				pContext.fillStyle = pContext.drawImage(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight));
+
+				pContext.fill()
+				if (eventType != "touchend") {
+								
+					if (drawType === 'filling') {
+						//context.globalCompositeOperation = 'destination-over';
+						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_1.svg"), grabbing;');
+						context.fillStyle = context.createPattern(pCanvas, 'no-repeat');
+						context.fill()
+					}
 					if (drawType === 'substrates') {
-						eventTarget.setAttribute('style', 'cursor: grab;');
+						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.svg"), grabbing;');
+						//context.globalCompositeOperation = 'destination-in';
 						img.width = Math.min(canvasWidth, canvasHeight);
 						img.height = Math.min(canvasWidth, canvasHeight);
 						img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
 						img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
-						pattern = context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-						//	pattern = rgba(255,255,255,1);
-						//context.globalCompositeOperation = 'destination-in'
-					}
-					if (drawType === 'filling') {
-						event.target.setAttribute('style', 'cursor: url("/images/icons/tools_1.png"), grab;');
-						pattern = rgba(255,255,255,1);
-					}
-				}
-				if (eventType == "touchbegin") {
-					if (drawType === 'filling') {
-						event.target.setAttribute('style', 'cursor: url("/images/icons/tools_1.png"), grabbing;');
-					}
-					if (drawType === 'substrates') {
-						eventTarget.setAttribute('style', 'cursor: grabbing;');
-						pattern = rgba(255,255,255,1);
-					}
-				}
-				if (eventType === "touchmove") {
-					
 
-					if (drawType === 'substrates') {
-						//pattern = rgba(255,255,255,0);
-					} else {
-						//pattern = 
-						event.target.setAttribute('style', 'cursor: url("/images/icons/'+drawType+'_'+layer+'.png"), grabbing;');
+						//context.fillStyle = context.drawImage(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight));
+						context.fillRect(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight))
 					}
 				}
 				
-			}*/
-			
-			
+				
+			}
+
+			context.restore();
 			
 		}
 		
@@ -527,7 +547,7 @@ block content
 			}
 		}
 		//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
-		/*$(document).on('touchstart, mouseover', '.translate', function (e) {
+		$(document).on('touchstart, mouseover', '.translate', function (e) {
 			var link = $(this); //preselect the link
 			if (link.hasClass('hover')) {
 				return true;
@@ -553,5 +573,5 @@ block content
 			}
 			removeOldAlert()
 			return true;
-		});*/
+		});
 		

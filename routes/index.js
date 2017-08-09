@@ -345,38 +345,66 @@ router.post('/:pagetitle', function(req, res, next){
 	})
 })
 
-router.get('/:pagetitle', ensurePage, function (req, res, next) {
+router.get('/:pagetitle*', ensurePage, function (req, res, next) {
 	//check if pos1 is username
-	//view user profile
+	var outputPath = url.parse(req.url).pathname;
 	var pagetitle = decodeURIComponent(req.params.pagetitle)
 	var urltitle = pagetitle.split(' ').join('_');
 	Page.find({}, function(err, data) {
 		if (err) {
 			return next(err)
 		}
+		var datarray = [];
+		for (var l in data) {
+			datarray.push(data[l])
+		}
 		Page.findOne({urltitle: urltitle}, function(error, doc){
 			if (error) {
 				return next(error)
 			}
-			if (!err && doc !== undefined && doc !== null) {
-				var info;
-				var index = doc.content[doc.content.length-1].index;
-				var datarray = [];
-				for (var l in data) {
-					datarray.push(data[l])
+			if (outputPath.split('/').length > 1) {
+				var index = outputPath.split('/')[1];
+				if (req.isAuthenticated()) {
+					return res.render('publish', {
+						pageindex: doc.pageindex,
+						type: 'draw',
+						infowindow: 'doc',
+						drawtype: req.app.locals.drawType && req.app.locals.drawType !== 'tools' ? req.app.locals.drawType : 'info',
+						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
+						loggedin: req.app.locals.loggedin,
+						index: index,
+						doc: doc,
+						data: datarray,
+						info: doc.pagetitle+ "'s sandwich"
+					})
+				} else {
+					return res.render('publish', {
+						pageindex: doc.pageindex,
+						type: 'draw',
+						infowindow: 'doc',
+						index: index,
+						doc: doc,
+						data: datarray,
+						info: doc.pagetitle+ "'s sandwich"
+					})
 				}
+			} else {
+				//view user profile
+				var index = doc.content[doc.content.length-1].index;
+
+				
 				if (req.isAuthenticated()) {
 					return res.render('publish', {
 						pageindex: doc.pageindex,
 						type: 'blog',
 						infowindow: 'doc',
 						drawtype: req.app.locals.drawType && req.app.locals.drawType !== 'tools' ? req.app.locals.drawType : 'info',
-						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[index].level,
+						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
 						loggedin: req.app.locals.loggedin,
 						index: index,
 						doc: doc,
 						data: datarray,
-						info: info
+						info: doc.pagetitle+ "'s sandwich"
 					})
 				} else {
 					return res.render('publish', {
@@ -386,12 +414,9 @@ router.get('/:pagetitle', ensurePage, function (req, res, next) {
 						index: index,
 						doc: doc,
 						data: datarray,
-						info: info
+						info: doc.pagetitle+ "'s sandwich"
 					})
 				}
-				
-			} else {
-				return res.redirect('/home')
 			}
 		})
 	})
@@ -651,7 +676,16 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 				}
 				var set2 = {$set:{}}
 				var key2 = 'content.$.title'
-				set2.$set[key2] = thestore[drawtype][layer].name;
+				var base = 'My ';
+				if (layer > 0) {				
+					for (var i = 0; i < layer; i++) {
+						base += thestore.filling[i].name;
+					}
+				} else {
+					base += thestore.filling[layer].name;
+				}
+				base += ' sandwich'
+				set2.$set[key2] = base;
 				Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set2, {safe: true, new: true, upsert: false}, function(er, doc){
 					if (er) {
 						return next(er)

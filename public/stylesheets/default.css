@@ -280,14 +280,16 @@ i.fa.active {
 	/*grid-template-columns: var(--thumbwidth) minmax(-webkit-max-content, 0px) minmax(100%, 180px);
 	grid-template-columns: var(--thumbwidth) minmax(calc(100% - (var(--thumbwidth) * 2)), 0px) minmax(100%, 180px);*/
 	grid-template-columns: var(--thumbwidth) auto minmax(100%, 180px);
+	grid-template-rows: var(--thumbwidth) auto auto;
 	background-image: none;
 	grid-template-areas:
 		"head head head"
 		"sideleft mid sideright"
 		"footer footer footer";
-	height: auto;
+	min-height: 100%;
 	/*position: relative;*/
 	background-color: rgba(255,255,255,0);
+	overflow-x: hidden;
 }
 @supports not (display:grid) {
 	.grid-container.inner {
@@ -393,14 +395,16 @@ a.grid-header:hover {
 	max-height: 100%;
 	max-width: calc(100% - var(--thumbwidth));
 	min-width: 0;
-	padding-left: 10px; 
+	
 }
 .grid-container.inner > .grid-right {
 	width: calc(100% - var(--thumbwidth));
 	background-color: rgba(255,255,255,0);
-	min-height: var(--windowmenu);
-	bottom: auto;
+	min-height: 100%;
+	bottom: 0;
 	top: 0;
+	padding-left: 10px; 
+	display: inline-table;
 }
 @supports not (display:grid) {
 	.grid-right {

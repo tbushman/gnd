@@ -7,22 +7,7 @@ div.grid-right
 		if (index >= 0)
 			div.grid-container.inner
 				div.grid-header
-					div.tools
-					if (loggedin)
-						if (menuData)
-							if (menuData.publishers[0].username === loggedin)
-								if (!drawtype || drawtype === "tools")
-									a.thumbnail.gallery(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/tools/"+contentData.level+"', function(){ window.location.href = '/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"';})")
-										.ui
-											img(src="/images/tools/tools_"+contentData.level+".svg", style="width: 100%; height: 100%;")
-									
-								else
-									if (contentData[drawtype][contentData.level].unlocked)
-										a.thumbnail.gallery(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"', function(){ window.location.href = '/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"';})")
-											.ui
-												img(src="/images/"+drawtype+"/"+drawtype+"_"+contentData.level+".svg", style="width: 100%; height: 100%;")
-
-					
+					p.tb-font-xl.translate #{contentData.title}
 					//-
 						if (drawtype)
 							each imag, i in contentData[drawtype]
@@ -33,23 +18,23 @@ div.grid-right
 							p.tb-font-s.hideoverlap.translate About 
 								span.translate #{contentData.info[contentData.level].name}
 				div.grid-left(style="padding: 6px 0 0 6px;")
-					if (loggedin && menuData.publishers[0].username === 'loggedin')
+					if (menuData.publishers[0].username === loggedin)
 						if (drawtype && drawtype !== "tools")
 							
-							if (contentData[drawtype][contentData.level].unlocked)
+							//if (contentData[drawtype][contentData.level].unlocked)
 
-								a.tb-font-m(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+level+"', function(){ window.location.href = '/api/selectlayer'});")
-									.ui
-										img(src="/images/"+drawtype+"/"+drawtype+"_"+contentData.level+".svg", alt="Click to use the "+contentData["info"][contentData.level].name+". ")
-									span.tb-font-l #{contentData[drawtype][contentData.level].name}
+							a.tool(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"', function(){ window.location.href = '/api/selectlayer'});")
+								.ui
+									img(src="/images/info/info_"+contentData.level+".svg", style="width: 100%; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
 
 					else
-						a.thumbnail.gallery(href="/"+menuData.pagetitle+"")
+						a.tool(href="/"+menuData.pagetitle+"/"+contentData.index+"")
 							.ui
-								img(src="/images/info/info_"+contentData.level+".svg", style="width: 100%; height: 100%;")
+								img(src="/images/info/info_"+contentData.level+".svg", style="width: 100%; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
 
 				div.grid-right
-					p.tb-font-xl.translate #{contentData.title}
+					p.tb-font-l
+						!= md(contentData.info[contentData.level].name.toUpperCase())
 					p.tb-font-s.translate #{contentData.info[contentData.level].name}
 						span.tb-font-s  are 
 						span.tb-font-s.translate #{contentData.info[contentData.level].caption}
