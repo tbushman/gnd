@@ -33,17 +33,19 @@ div.grid-right
 								img(src="/images/info/info_"+contentData.level+".svg", style="width: 100%; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
 
 				div.grid-right
-					p.tb-font-l
-						!= md(contentData.info[contentData.level].name.toUpperCase())
-					p.tb-font-s.translate #{contentData.info[contentData.level].name}
-						span.tb-font-s  are 
-						span.tb-font-s.translate #{contentData.info[contentData.level].caption}
-						span.tb-font-s . Use the 
-						if (contentData.level < 2)
-							span.tb-font-s #{contentData.tools[contentData.level].name}
-						else
-							span.tb-font-s #{contentData.tools[contentData.tools.length-1].name}
-						span.tb-font-s  to unlock the next step!
+					each item, i in contentData.info
+						if (item.unlocked)
+							p.tb-font-l
+								!= md(item.name.toUpperCase())
+							p.tb-font-s.translate #{item.name}
+								span.tb-font-s  is 
+								span.tb-font-s.translate #{item.caption}
+								span.tb-font-s . Use the 
+								if (contentData.level > 2)
+									span.tb-font-s #{contentData.tools[2].name}
+								else
+									span.tb-font-s #{contentData.tools[i].name}
+								span.tb-font-s  to unlock the next step!
 				div.grid-footer
 					
 		else

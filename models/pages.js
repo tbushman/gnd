@@ -7,9 +7,10 @@ var Item = new Schema({
 	image: String,
 	caption: String,
 	unlocked: Boolean,
-	info: {
+	spec: {
 		safety: String,
-		alt: []
+		alt: [],
+		unlock: String
 	}
 })
 

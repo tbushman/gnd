@@ -286,20 +286,22 @@ i.fa.active {
 		"head head head"
 		"sideleft mid sideright"
 		"footer footer footer";
-	min-height: 100%;
+	min-height: 170px;
 	/*position: relative;*/
 	background-color: rgba(255,255,255,0);
 	overflow-x: hidden;
+	position: static;
 }
 @supports not (display:grid) {
 	.grid-container.inner {
 		display: block;
+		position:static;
 	}
 }
 @supports not (position:sticky) {
 	.grid-container.inner {
 		display: block;
-		position:relative;
+		position:static;
 		bottom:0;
 	}
 }
@@ -400,7 +402,7 @@ a.grid-header:hover {
 .grid-container.inner > .grid-right {
 	width: calc(100% - var(--thumbwidth));
 	background-color: rgba(255,255,255,0);
-	min-height: 100%;
+	min-height: 250px;
 	bottom: 0;
 	top: 0;
 	padding-left: 10px; 
