@@ -198,6 +198,9 @@ i.fa.active {
 	color: rgba(211, 212, 213, 1);
 }
 
+.tool > span {
+	
+}
 #select {
 	height: 100%;
 	display: block;
@@ -263,22 +266,8 @@ i.fa.active {
 	}
 }
 
-/*.grid-container.blog {
-	top: var(--nowindowmenu);
-	position: absolute;
-	width: 100%;
-}
-
-.grid-container.draw {
-	top: var(--windowmenu);
-	position: absolute;
-}*/
-
-
 .grid-container.inner {
 	height: auto;
-	/*grid-template-columns: var(--thumbwidth) minmax(-webkit-max-content, 0px) minmax(100%, 180px);
-	grid-template-columns: var(--thumbwidth) minmax(calc(100% - (var(--thumbwidth) * 2)), 0px) minmax(100%, 180px);*/
 	grid-template-columns: var(--thumbwidth) auto minmax(100%, 180px);
 	grid-template-rows: var(--thumbwidth) auto auto;
 	background-image: none;
@@ -287,7 +276,6 @@ i.fa.active {
 		"sideleft mid sideright"
 		"footer footer footer";
 	min-height: 170px;
-	/*position: relative;*/
 	background-color: rgba(255,255,255,0);
 	overflow-x: hidden;
 	position: static;
@@ -348,7 +336,6 @@ a.grid-header:hover {
 	pointer-events: none;
 	background-color: rgba(255,255,255,0.5);
 	min-width: var(--thumbwidth);
-	/*background-image: radial-gradient(circle at 30px 0, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 0.5) 19px);*/
 }
 @supports not (display:grid) {
 	.grid-left, #tl {
@@ -364,7 +351,6 @@ a.grid-header:hover {
 	grid-area: mid;
 	overflow: hidden;
 	background-color: rgba(255,255,255,0);
-	/*pointer-events: none;*/
 }
 @supports not (display:grid) {
 	.grid-mid {
@@ -468,16 +454,9 @@ div.blogname {
 .hideoverlap {
 	white-space: nowrap;
 }
-/*.menu.blog {
-	overflow-y: scroll;
-	overflow-x: hidden;
-	margin: 0;
-	right: 0;
-	left: 0;
-}*/
+
 div.dashboard {
 	width: auto;
-	/*margin: 0 0 0 50px;*/
 	position: absolute;
 	height: 100%;
 	top: 0;
@@ -492,12 +471,9 @@ div.menu {
 	mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 100%, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
 	display: block;
 	bottom: auto;
-	/*position: -webkit-sticky;
-	position: sticky;*/
 	position: relative;
 	pointer-events: auto;
 	width: 100%;
-	/*height: var(--windowmenu);*/
 	overflow: hidden;
 	height: 100%;
 }
@@ -522,7 +498,6 @@ div.blog > .menu {
 	width: 100%;
 	height: var(--nowindowmenu);
 	overflow: hidden;
-	/*z-index: 1;*/
 }
 div.draw > .menu {
 	height: var(--panelheight);
@@ -551,16 +526,12 @@ div.dashboard .menu {
 	bottom: 0;
 	color: var(--secondary);
 	padding: 0 25px 25px 0;
-	/*pointer-events: none;*/
-	/*padding: calc(var(--nowindowmenu)/3.7) 11px 11px 0;*/
 	background-color: rgba(255,255,255,0);
 	z-index: 0;
 	margin: 0 auto;
-	/*cursor: url('/images/icons/edit.png'), 2, 2, pointer;*/
 }
 .maincanvas.topRight {
 	display: block;
-	/*pointer-events: none;*/
 	background-attachment: fixed;
 	background-image:url('');
 	background-position: center;
@@ -612,9 +583,6 @@ div.menu > div.topLeft {
 	transition: background-image .3s ease-in-out;
 	pointer-events: none;
 }
-/*div.map .menu .topLeft, */div.map .menu .topRight {
-	position: static;
-}
 
 .overtext {
 	position: fixed;
@@ -663,7 +631,6 @@ a.mainmenu {
 }
 div.dropdown {
 	margin: var(--iconwidth) 0;
-	/*background: radial-gradient(ellipse at 0 50%, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));*/
 	background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 1)),  to(rgba(255, 255, 255, 0.3)));
 	background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.3));
 	background-color: rgba(255,255,255,0);
@@ -789,61 +756,7 @@ div.dropdown {
 	margin-top: 0;
 	top: var(--nowindowheight);
 }
-/*.module {
-	float: left;
-	right: 0;
-	padding: 19px 0 0 0;
-	min-width: var(--thumbwidth);
-	-webkit-box-sizing: border-box;
-	        box-sizing: border-box;
-	pointer-events: auto;
-	background-color: var(--secondary);
-	display: inline-block;
-	margin: 0 auto;
-	height: auto;
-	min-height: var(--thumbwidth);
-}
-.module > span, #tl > span {
-	text-align: left;
-	line-height: 0.95em;
-	float: left;
-	text-transform: uppercase;
-	letter-spacing: 0.09em;
-	padding: 7px 0 4px 4px;
-	color: #555;
-	text-shadow: 0 0 2px #fff;
-	-moz-text-shadow: 0 0 2px #fff;
-	-webkit-text-shadow: 0 0 2px #fff;
-	z-index:1;
-	margin: 0 auto;
-	display: inline-block;
-}
-.module > .overlay {
-	min-width: 100%;
-	left: -20px;
-	right: 0;
-	bottom: 0;
-	top: 0;
-	background-color: rgba(238, 244, 222, 0.3);
-	position: absolute;
-	display: inline-block;
-	z-index:-1;
-}
-.hover {
-	background-color: rgba(255,255,255,0.5);
-	z-index: 5;
-}
-.module.focus {
-	background-color: var(--secondary);
-	background-repeat: no-repeat;
-}
-.focus.gallery {
-	background-image: none;
-	background-color: var(--secondary);
-}
-.focus:hover {
-	z-index: 1;
-}*/
+
 #tlmodules {
 	min-height: 1px;
 	width: var(--thumbwidth);
@@ -876,7 +789,6 @@ div.dropdown {
 	margin-top: -40px;
 	white-space: nowrap;
 	font-size: 8px;
-	/*top: calc(var(--thumbwidth) / 2);*/
 }
 .module > p {
 	text-align: left;
@@ -885,7 +797,6 @@ div.dropdown {
 	letter-spacing: 0.01em;
 	padding: 0 4px 4px 4px;
 	color: rgba(205, 206, 207, 1);
-	/*white-space: nowrap;*/
 	text-shadow: 0 0 2px #fff;
 	-moz-text-shadow: 0 0 2px #fff;
 	-webkit-text-shadow: 0 0 2px #fff;
@@ -1079,76 +990,7 @@ div.dropdown {
 	font-size: 13px;
 	color: #999;
 }
-.list.ms-Panel--small.is-open {
-	pointer-events: none;
-}
-.list.leaflet-control {
-	bottom: 50%;
-	left: 0;
-	margin: 0;
-	pointer-events: none;
-}
-.list > .ms-Panel-main {
-	width: 100%;
-	top: 0;
-	bottom: 0;
-	position: absolute;
-	float: right;
-	background-color: rgba(255, 255, 255, 0);
-	background-image: radial-gradient(circle at 0 100%, rgba(255, 255, 255, 0) calc(var(--thumbwidth) / 2), rgba(255, 255, 255, 1) calc(var(--thumbwidth) / 2));
-	/*z-index:-2;*/
-	pointer-events: auto;
-}
-.list > .ms-Panel-contentInner {
-	background-color: rgba(255, 255, 255, 0);
-	pointer-events: auto;
-}
-.list a {
-	margin: 0 0 5px 0!important;
-}
-.list a:last-child {
-	margin: 0 0 23px 0!important;
-}
-.ms-Overlay.ms-Overlay--dark {
-	background-color: rgba(0, 0, 0, 0);
-}
-.list > .js-togglePanel {
-	background-color: rgba(0, 0, 0, 0);
-	background-image: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) calc(var(--thumbwidth) / 2), rgba(0, 0, 0, .2) calc(var(--thumbwidth) / 2));
-	position: fixed;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	/*z-index:-2;*/
-	display: block;
-}
-.js-togglePanel {
-	background-color: rgba(0, 0, 0, 0);
-	background-image: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) calc(var(--thumbwidth) / 2), rgba(0, 0, 0, .2) calc(var(--thumbwidth) / 2));
-	/*z-index: -1;*/
-}
 
-a.username:hover > .ms-font-l {
-	color: #BAD80A;
-}
-.picker__select--month, .picker__select--year {
-	height: 4em;
-}
-.highlight {
-	background-color: #BAD80A;
-	display: inline;
-}
-.ms-ChoiceField-field > .ms-label {
-	margin-left: 25px;
-}
-.ms-PersonaCard {
-	-webkit-box-shadow: 0 0 0 0 rgba(255,255,255,0);
-	        box-shadow: 0 0 0 0 rgba(255,255,255,0)
-}
-.ms-PersonaCard-persona {
-	background-color: rgba(255,255,255,0);
-}
 #inputtext {
 	min-height: 100px;
 }
@@ -1158,28 +1000,6 @@ a.username:hover > .ms-font-l {
 		max-width: 100px;
 	}
 
-	#arrows.gallery {
-		display: none;
-	}
-	#mainpanel > .ms-Panel-contentInner {
-		margin-bottom: 0;
-		overflow-y: hidden;
-	}
-	.list.leaflet-control .ms-Panel-contentInner {
-		padding: 0 32px 20px 20px;
-		margin-bottom: 20px;
-		margin-top: var(--thumbwidth);
-	}
-	.list.leaflet-control {
-		left: 50%;
-	}
-	.list > .ms-Grid > .ms-Panel-contentInner > a {
-		line-height: 1.1em;
-		padding-bottom: 10px;
-	}
-	.list > .ms-Grid > .ms-Panel-contentInner > a:hover {
-		color: #000;
-	}
 }
 
 @media (min-height: 600px) {
@@ -1193,18 +1013,10 @@ a.username:hover > .ms-font-l {
 		--windowmenu: 85%; 
 		--nowindowmenu: 15%; 
 	}*/
-	div.map {
-		overflow-y: hidden;
-	}
 }
 @media (min-width: 640px) and (orientation: landscape) {
 	
 
-	#select.map .menu {
-		-webkit-mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 0, rgba(255, 255, 255, 0) calc(var(--thumbwidth) / 2), rgba(255, 255, 255, 1) calc(var(--thumbwidth) / 2));
-		mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 0, rgba(255, 255, 255, 0) calc(var(--thumbwidth) / 2), rgba(255, 255, 255, 1) calc(var(--thumbwidth) / 2));
-		
-	}
 }
 @media (min-width: 1024px) and (orientation: landscape) {
 }

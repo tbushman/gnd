@@ -8,24 +8,12 @@ div.grid-right
 			div.grid-container.inner
 				div.grid-header
 					p.tb-font-xl.translate #{contentData.title}
-					//-
-						if (drawtype)
-							each imag, i in contentData[drawtype]
-								if (imag.unlocked)
-									a.thumbnail.gallery(href="")
-										img(src=""+imag.image+"", alt=""+imag.name+"")
-						if (contentData.info !== undefined)
-							p.tb-font-s.hideoverlap.translate About 
-								span.translate #{contentData.info[contentData.level].name}
+
 				div.grid-left(style="padding: 6px 0 0 6px;")
 					if (menuData.publishers[0].username === loggedin)
-						if (drawtype && drawtype !== "tools")
-							
-							//if (contentData[drawtype][contentData.level].unlocked)
-
-							a.tool(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"', function(){ window.location.href = '/api/selectlayer'});")
-								.ui
-									img(src="/images/info/info_"+contentData.level+".svg", style="width: 100%; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
+						a.tool(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"', function(){ window.location.href = '/api/selectlayer'});")
+							.ui
+								img(src= contentData.image, style="width: 100%; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
 
 					else
 						a.tool(href="/chef/"+menuData.pagetitle+"/"+contentData.index+"")
@@ -37,30 +25,17 @@ div.grid-right
 						if (item.unlocked)
 							p.tb-font-l
 								!= md(item.name.toUpperCase())
-							p.tb-font-s.translate #{item.name}
-								span.tb-font-s  is 
-								span.tb-font-s.translate #{item.caption}
+							p.tb-font-s.translate #{item.caption}
+								
 								if (item.spec.unlock)
 									- var drawtyp = item.spec.unlock.split('.')[0]
-									- var drawind = item.spec.unlock.split('.')[1]
+									- var drawind = parseInt(item.spec.unlock.split('.')[1], 10)
 									//if (drawind === contentData[drawType][i].ind)
-									span.tb-font-s . Use the #{contentData[drawtyp][drawind].name}
+									span.tb-font-s . Use the 
+									span.tb-font-s #{contentData[drawtyp][drawind+1].name}
 								
-								//-
-									if (contentData.level > 2)
-										span.tb-font-s #{contentData.tools[2].name}
-									if (contentData.level <= 2 && contentData.level > 0)
-										if (contentData[drawType] === "substrates")
-											if (contentData.level === 0)
-												span.tb-font-s #{contentData.tools[0].name}
-											else
-												span.tb-font-s #{item.name}
-										if (contentData[drawType] === "filling")
-											span.tb-font-s #{contentData.tools[1].name}
-									if (item.ind === contentData.level)
-										span.tb-font-s #{contentData.tools[0].name}
 
-								span.tb-font-s  to unlock the next step!
+									span.tb-font-s  to unlock the next step!
 				div.grid-footer
 					
 		else

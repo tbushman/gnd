@@ -3,7 +3,7 @@
 		{
 			"ind": 0,
 			"name": "soap",
-			"image": "",
+			"image": "/images/substrates/substrates_0.svg",
 			"caption": "Sanitizes surfaces",
 			"unlocked": true,
 			"spec": {
@@ -14,7 +14,7 @@
 		{
 			"ind": 1,
 			"name": "bread",
-			"image": "/images/substrates/substrates_0.svg",
+			"image": "/images/substrates/substrates_1.svg",
 			"caption": "The basis of a traditional sandwich",
 			"unlocked": false,
 			"spec": {
@@ -27,7 +27,7 @@
 		{
 			"ind": 2,
 			"name": "rice",
-			"image": "/images/substrates/substrates_1.svg",
+			"image": "/images/substrates/substrates_2.svg",
 			"caption": "Wrap up a snack in sticky rice",
 			"unlocked": false,
 			"spec": {

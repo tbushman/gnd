@@ -18,7 +18,6 @@ var routes = require('./routes/index');
 var Publisher = require('./models/publishers');
 var Page = require('./models/pages');
 var async = require('async');
-var Content = require('./models/content');
 var favicon = require('serve-favicon');
 mongoose.Promise = promise;
 dotenv.load();
