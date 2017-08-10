@@ -40,11 +40,26 @@ div.grid-right
 							p.tb-font-s.translate #{item.name}
 								span.tb-font-s  is 
 								span.tb-font-s.translate #{item.caption}
-								span.tb-font-s . Use the 
-								if (contentData.level > 2)
-									span.tb-font-s #{contentData.tools[2].name}
-								else
-									span.tb-font-s #{contentData.tools[i].name}
+								if (item.spec.unlock)
+									- var drawtyp = item.spec.unlock.split('.')[0]
+									- var drawind = item.spec.unlock.split('.')[1]
+									//if (drawind === contentData[drawType][i].ind)
+									span.tb-font-s . Use the #{contentData[drawtyp][drawind].name}
+								
+								//-
+									if (contentData.level > 2)
+										span.tb-font-s #{contentData.tools[2].name}
+									if (contentData.level <= 2 && contentData.level > 0)
+										if (contentData[drawType] === "substrates")
+											if (contentData.level === 0)
+												span.tb-font-s #{contentData.tools[0].name}
+											else
+												span.tb-font-s #{item.name}
+										if (contentData[drawType] === "filling")
+											span.tb-font-s #{contentData.tools[1].name}
+									if (item.ind === contentData.level)
+										span.tb-font-s #{contentData.tools[0].name}
+
 								span.tb-font-s  to unlock the next step!
 				div.grid-footer
 					

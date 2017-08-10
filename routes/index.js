@@ -711,7 +711,6 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 				var contentdatas = pub;
 				var contentdata = contentdatas.content[index]
 				//var cKeys = Object.keys(contentdata);
-				console.log(contentdata)
 				var items = ["tools", "info", "substrates", "filling"];
 				var drawThis = false;
 				
@@ -723,14 +722,14 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 					if (contentdata.info[j].spec.unlock === ''+drawType+'.'+level+'') {
 						
 						contentdata.info[j].unlocked = true;
-						if (contentdata[drawType][j+1] !== null && contentdata[drawType][j+1] !== undefined){
-							contentdata[drawType][j+1] = true;
-						}
+						/*if (contentdata[drawType][j+1] !== null && contentdata[drawType][j+1] !== undefined){
+							contentdata[drawType][j+1].unlocked = true;
+						}*/
 						 
 						if (contentdata.info[j-1]) {
 							contentdata.info[j-1].unlocked = false;
 						}
-						console.log('unlocked ' +contentdata.info[j])
+						console.log('unlocked ' +contentdata.info[j].name)
 					}
 				}
 				cb(null, body, contentdata, keys, drawType, index, pageindex)
@@ -738,16 +737,38 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 		},
 		function(body, contentdata, keys, drawType, index, pageindex, cb){
 			var drawThis, drawInd, drawName
+			console.log(contentdata[drawType].length)
+			var drawInds = [];
 			for (var q = 0; q < contentdata[drawType].length; q++) {
-				if (body[contentdata[drawType][q].name]) {
+				console.log(keys, contentdata[drawType][q].name)
+				if (keys.indexOf(contentdata[drawType][q].name) != -1) {
+					console.log('image hea')
 					drawThis = contentdata[drawType][q];
-					drawInd = drawThis.index;
+					drawInd = drawThis.ind;
 					drawName = drawThis.name;
-					/*contentdata[drawType][q].unlocked = true;
-					if (contentdata[drawType][q+1] !== null && contentdata[drawType][q+1] !== undefined){
-						contentdata[drawType][q+1].unlocked = true;
-					}*/
+					contentdata[drawType][q].unlocked = true;
+					if (q === contentdata[drawType].length -1) {
+						var contentkeys = Object.keys(contentdata);
+						for (var i = 0; i < contentkeys.length; i++){
+							if (Array.isArray(contentdata[contentkeys[i]])) {
+								if (contentkeys[i] !== drawType) {
+									contentdata[contentkeys[i]][0].unlocked = true;
+								}
+							}
+							
+						}
+						
+					}
 				}
+				
+			}
+			/*var elemMatch = {$elemMatch:{}}
+			var elemkey = 'content.$.'+drawType+'.'+drawInd+''
+			elemMatch.$elemMatch[elemkey] = drawThis*/
+
+			if (contentdata[drawType].length > drawInd+1 ){
+				console.log(contentdata[drawType][drawInd].name)
+				contentdata[drawType][drawInd+1].unlocked = true;
 			}
 			cb(null, body, contentdata, keys, drawName, index, pageindex)
 			
@@ -759,10 +780,10 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 					for (var j = 0; j < contentdata[keys[i]].length; j++) {
 						if (contentdata[keys[i]][j].name === drawName) {
 							contentdata[keys[i]][j].image = body[drawName]
-							if (j < contentdata[keys[i]].length - 1) {
+							/*if (j < contentdata[keys[i]].length - 1) {
 								contentdata[keys[i]][j+1].unlocked = true;
 								//contentdata.info[j].unlocked = unlocked;
-							}
+							}*/
 						}
 					}
 				}
