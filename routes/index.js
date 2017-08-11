@@ -266,7 +266,7 @@ router.get('/logout', function(req, res) {
 	}
 });
 
-/*router.all('/translate/:text', function(req, res, next){
+router.all('/translate/:text', function(req, res, next){
 
 	googleTranslate.translate(decodeURIComponent(req.params.text), 'en', req.app.locals.user ? req.app.locals.user.language : 'es', function(err, translation){
 		if (err) {
@@ -275,7 +275,7 @@ router.get('/logout', function(req, res) {
 		
 		return res.json(translation.translatedText);
 	});
-})*/
+});
 
 router.get('/home', function(req, res, next) {
 	//todo test null vs delete
@@ -640,13 +640,13 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 			if (err) {
 				return next(err)
 			}
-			/*var set2 = {$set:{}}
-			var key2 = 'content.$.title'
-			set2.$set[key2] = thestore[drawtype][layer].name;
+			var set2 = {$set:{}}
+			var key2 = 'content.$.'+drawtype+'.'+layer+'.unlocked'
+			set2.$set[key2] = true;
 			Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set2, {safe: true, new: true, upsert: false}, function(er, doc){
 				if (er) {
 					return next(er)
-				}*/
+				}
 				req.app.locals.drawType = drawtype;
 				if (req.body['inputimg_'+drawtype+'_'+layer+'']) {
 					console.log(req.body['inputimg_'+drawtype+'_'+layer+''])
@@ -696,7 +696,7 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 						info: ':)'
 					})
 				}
-			//})
+			})
 		})
 	})
 })
@@ -753,16 +753,16 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 					drawName = drawThis.name;
 					contentdata[drawType][q].unlocked = true;
 					if (q === contentdata[drawType].length - 1) {
-						var contentkeys = Object.keys(contentdata);
+						var contentkeys = ["substrates", "filling"];
 						for (var i = 0; i < contentkeys.length; i++){
-							if (Array.isArray(contentdata[contentkeys[i]])) {
-								if (contentkeys[i] !== drawType) {
-									contentdata[contentkeys[i]][0].unlocked = true;
-								}
+							if (contentkeys[i] !== drawType) {
+								contentdata[contentkeys[i]][0].unlocked = true;
 							}
 							
 						}
 						
+					} else {
+						//don't unlock yet
 					}
 				}
 				
@@ -819,31 +819,30 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 	if (drawtype === "info") {
 		return res.redirect('/api/levelup')
 	}
-	if (Number.isNaN(layer) || thestore[drawtype][layer].layer === thestore[drawtype].length - 1) {
-		return res.redirect('/api/nextstep/'+urltitle+'/'+pageindex+'/'+index+'/'+drawtype === 'filling' ? 'filling':'substrates/0')
-	}
 	Page.findOne({pageindex: pageindex, content: {$elemMatch: {index: index}}}, function(err, pub){
 		if (err) {
 			return next(err)
 		}
 		var keylist = [];
 		var levellist = [];
-		var keyz = ["tools", "substrates", "filling", "info"];
+		var keyz = ["substrates", "filling"];
 		for (var i = 0; i < keyz.length; i++) {
-			if (keyz[i] !== drawtype) {
-				for (var j = 0; j < pub.content[index][keyz[i]].length; j++) {
-					if (pub.content[index][keyz[i]][j].unlocked) {
-						if (j === pub.content[index][keyz[i]].length -1) {
-							return res.redirect('/api/levelup')
-						}
-					} else {
-						keylist.push(keyz[i]);
-						levellist.push(j)
-						
+			for (var j = 0; j < pub.content[index][keyz[i]].length; j++) {
+				if (pub.content[index][keyz[i]][j].unlocked) {
+					if (j === pub.content[index][keyz[i]].length -1) {
+						return res.redirect('/api/levelup')
 					}
+				} else {
+					keylist.push(keyz[i]);
+					levellist.push(j)
+					
 				}
-			}			
+			}		
 		}
+		console.log('keylist')
+		console.log(keylist)
+		console.log('levellist')
+		console.log(levellist)
 		var drawType = keylist[0] !== undefined ? keylist[0] : "info";
 		var level = levellist[0] !== undefined ? levellist[0] : layer;
 		var set1 = {$set: {}};
@@ -851,6 +850,7 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 		set1.$set[key1] = true;
 		req.app.locals.drawType = drawType;
 		req.app.locals.layer = level;
+		req.app.locals.pageindex = pageindex;
 		Page.findOneAndUpdate({pageindex: pageindex, content: {$elemMatch: {index: index}}}, set1, {safe: true, new: true, upsert: false}, function(error, dc){
 			if (error) {
 				return next(error)
@@ -863,7 +863,16 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 				for (var l in data) {
 					datarray.push(data[l])
 				}
-				return res.status(200).send('ok');
+				if (Number.isNaN(layer) || levellist[0] === thestore[drawtype].length - 1) {
+					req.app.locals.drawType = drawtype === 'filling' ? 'substrates':'filling';
+					req.app.locals.layer = 0;
+					//return res.redirect('/api/selectlayer')
+					//return res.redirect('/api/levelup')
+					//return res.redirect('/api/nextstep/'+urltitle+'/'+pageindex+'/'+index+'/'+(drawtype === 'filling' ? 'substrates':'filling')+'/0')
+				}// else {
+					return res.status(200).send('ok');
+				//}
+
 			})
 		})
 	})

@@ -76,6 +76,20 @@ i, .i {
 	display: inline-block;
 	z-index: 2;
 }
+#modal {
+	position: absolute;
+	width: 50%;
+	height: auto;
+	margin: 0 auto;
+	left: 0;
+	right: 0;
+	bottom: calc(50% - var(--thumbwidth));
+	top: auto;
+	display: inline-block;
+	z-index: 2;
+	background: #fff;
+	padding: calc(var(--thumbwidth)/2);
+}
 .avatar {
 	max-width: 250px;
 	margin: 0 auto;

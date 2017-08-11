@@ -105,13 +105,18 @@ html
 				$('#select').removeClass('blog');
 				$('#select').addClass('draw');
 			}
-			function removeOldAlert()
+				function removeOldAlert()
 				{
 					var oldAlert = document.getElementById("alert");
 					if (oldAlert)
 						document.body.removeChild(oldAlert);
 				}
-				
+				function removeOldModal()
+				{
+					var oldAlert = document.getElementById("modal");
+					if (oldAlert)
+						document.body.removeChild(oldAlert);
+				}
 				function addAlert(aMsg)
 				{
 					removeOldAlert();
@@ -150,37 +155,62 @@ html
 				function drawModeModal(aID, pageindex){
 					$.get('/doc/'+pageindex+'').done(function(result){
 						removeOldAlert();
+						removeOldModal();
 						
 						var elem = document.getElementById(aID);
 						var drawtype = aID.split('_')[1];
 						var layer = parseInt(aID.split('_')[2], 10);
-						var irr, irrname, ailment, ailmentname;
+						var irr, irrname, ailment, ailmentname, desci, desca;
 						if ('#{index}' !== ''){
 							var index = '#{index}'
 							index = parseInt(index, 10)
-							irr = result.content[index][drawtype][layer+1];
+							irr = result.content[index][drawtype][layer];
 							irrname = irr.spec.safety;
 							ailment = result.content[index].info[layer];
 							ailmentname = ailment.spec.safety;
+							for (var i = 0; i < result.content[index].info.length; i++){
+								if (result.content[index].info[i].name === ailmentname) {
+									desca = result.content[index].info[i].caption
+								}
+								if (result.content[index].info[i].name === irrname) {
+									desci = result.content[index].info[i].caption
+								}
+							}
 						}
 						console.log(aID.split('_'))
 						var newAlert = document.createElement("div");
 						newAlert.setAttribute("role", "alert");
-						newAlert.setAttribute("id", "alert");
+						newAlert.setAttribute("id", "modal");
 						var msg = document.createElement("div");
 						
 						/* else {
 							irr = ''
 							irrname = ''
 						}*/
-						if (irrname !== undefined) {
+						if (irrname !== false && irrname !== undefined && irrname !== "soap" && ailmentname !== "cleaner") {
+							
 							var text = document.createTextNode("Do you have an "+ailmentname+" to "+ irrname +"?")
 							msg.appendChild(text);
-							msg.setAttribute('class', 'translate')
+							msg.setAttribute('class', 'translate');
+							var infomoda = document.createElement('p');
+							infomoda.setAttribute('class', 'tb-font-xxs')
+							var infomodi = document.createElement('p');
+							infomodi.setAttribute('class', 'tb-font-xxs')
+							var infoheada = document.createTextNode(ailmentname + '\n');
+							infomoda.appendChild(infoheada)
+							var infoheadi = document.createTextNode(irrname + '\n');
+							infomodi.appendChild(infoheadi)
+							var infotexta = document.createTextNode(desca + '\n');
+							var infotexti = document.createTextNode(desci + '\n');
 							var buttons = document.createElement('div');
 							//buttons.setAttribute('class', )
+							var buttoni = document.createElement('button');
 							var buttony = document.createElement('button');
 							var buttonx = document.createElement('button');
+							buttoni.setAttribute('id', 'msg')
+							buttoni.setAttribute('className', 'info')
+							buttoni.innerText = 'Info'
+							buttoni.style.background = 'var(--secondary)'
 							buttonx.setAttribute('id', 'msg')
 							buttonx.setAttribute('className', 'no')
 							buttonx.innerText = 'No'
@@ -191,22 +221,30 @@ html
 							buttony.style.background = 'var(--primary)'
 							buttons.appendChild(buttony);
 							buttons.appendChild(buttonx);
+							buttons.appendChild(buttoni);
 							//msg != marked(msg)
 							//buttons != marked(buttons)
 							msg.appendChild(buttons);
 							newAlert.appendChild(msg);
 							document.body.appendChild(newAlert);
-							$('#msg').on('click', function(e){
+							$(document).on('click','#msg', function(e){
 								e.preventDefault();
-								console.log(e.target.getAttribute('className'))
+								console.log(e.target)
 								if (e.target.getAttribute('className') === 'yes') {
-									$.post('/api/selectlayer/'+result.urltitle+'/'+result.pagindex+'/'+index+'/'+drawtype+'/'+layer + 1+'').done(function(){
+
+									$.post('/api/selectlayer/'+result.urltitle+'/'+result.pageindex+'/'+index+'/'+drawtype+'/'+(parseInt(layer, 10)+1) +'').done(function(result){
 										window.location.href = '/api/selectlayer'
 									})
 								} else {
-									$.post('/api/selectlayer/'+result.urltitle+'/'+result.pagindex+'/'+index+'/'+drawtype+'/'+layer+'').done(function(){
-										window.location.href = '/api/selectlayer'
-									})
+									if (e.target.getAttribute('className') === 'no') {
+										removeOldModal();										
+									} else {
+										msg.appendChild(infomoda)
+										msg.appendChild(infotexta)
+										msg.appendChild(infomodi)
+										msg.appendChild(infotexti)
+									}
+									
 								}
 							})
 						}
