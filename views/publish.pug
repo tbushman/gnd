@@ -131,13 +131,6 @@ block content
 			var can = document.getElementById('canvas');
 			can.style.width = '100%';
 			can.style.height = '100%';
-			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
-			if (navigator.platform.split('Mac')[1] !== undefined) {
-				console.log(navigator.platform)
-				newscale = 1
-			}
-			canvasWidth = window.screen.width * newscale;
-			canvasHeight = window.screen.height * newscale;
 			pageIndex = parseInt(document.getElementById('pageindex').value, 10);
 			console.log('this pageindex'+pageIndex)
 			var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
@@ -165,7 +158,8 @@ block content
 			layer = '#{layer}'
 			console.log(drawtype, layer)
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
-			var ctx = can.getContext("2d");
+			var canv = document.getElementById('canvas')
+			var ctx = canv.getContext("2d");
 			$.get('/doc/'+pageIndex+'',function(result){
 				var img = new Image();
 				img.src = result.content[index].image;
@@ -174,15 +168,15 @@ block content
 					
 					img.onload = function(){
 						console.log('image hea')
-						//var canvasWidth = can.getBoundingClientRect().width;
-						//var canvasHeight = can.getBoundingClientRect().height;
-						img.width = canvasWidth;
-						img.height = canvasHeight;
-						img.style.width = canvasWidth + "px";
-						img.style.height = canvasHeight + "px";
+						var canvasWidth = canv.getBoundingClientRect().width;
+						var canvasHeight = canv.getBoundingClientRect().height;
+						img.width = Math.min(canvasWidth, canvasHeight);
+						img.height = Math.min(canvasWidth, canvasHeight);
+						img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
+						img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
 						var qCanvas = document.createElement("canvas");
-						qCanvas.width = canvasWidth;
-						qCanvas.height = canvasHeight;
+						qCanvas.width = Math.min(canvasWidth, canvasHeight);
+						qCanvas.height = Math.min(canvasWidth, canvasHeight);
 						var qContext = qCanvas.getContext("2d");
 						//qContext.fillStyle = 
 						
@@ -204,11 +198,10 @@ block content
 							if ('#{index}' !== '' && irr !== undefined && irr.spec.safety !== 'bacteria') {
 								id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
 								if ($('#select').hasClass('draw')) {
-									drawModeModal(id, '#{pageindex}')									
+									drawModeModal(id, '#{pageindex}')
+									
 								}
 							}
-						
-							
 						}
 					}
 				}
