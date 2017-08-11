@@ -7,7 +7,7 @@ form#form.tb-u-100(enctype="multipart/form-data", method="POST", action="/api/ed
 	div.tb-u-100
 		span.tb-font-s#previewtext.translate #{contentData.description}
 	input(type="hidden", id="inputimg", name="image")
-	if (drawtype)
+	if (drawtype && contentData[drawtype][contentData.level] !== undefined)
 		input(type="hidden", id="inputimg_"+drawtype+"_"+contentData.level+"", name= contentData[drawtype][contentData.level].name)
 	div.tb-u-100
 		button.ms-Button.ms-Button--primary.tb-u-100.block.spacer(id="submit", type="submit", ariaDescription="Save this Sandwich")

@@ -22,7 +22,9 @@ body {
 	height: 100%;
 	position: absolute;
 }
-
+form {
+	overflow-x: hidden;
+}
 input, textarea {
   line-height: normal;
 	background-color: transparent;
@@ -72,6 +74,7 @@ i, .i {
 	bottom: calc(var(--thumbwidth)/2);
 	top: auto;
 	display: inline-block;
+	z-index: 2;
 }
 .avatar {
 	max-width: 250px;
@@ -100,7 +103,8 @@ i, .i {
 }
 .tb-font-xxs {
 	font-family: var(--bfontname), sans-serif!important;
-	font-size: calc(var(--thumbwidth) / 5);
+	font-size: calc(var(--thumbwidth) / 6);
+	color: var(--secondary);
 	text-transform: uppercase;
 	font-weight: 600;
 }

@@ -18,30 +18,13 @@ html
 		//script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js")
 		//script(src="https://unpkg.com/vue/dist/vue.js")
 		//https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/forms/alerts
+		
 	body
 		block page
 			- var theStore = theStore
-			script(type="application/json").
-				function uiBlogMode(){
-					$('div.menu.draw').removeClass('draw');
-					$('div.menu').addClass('blog');
-					$('.grid-container').removeClass('draw');
-					$('.grid-container').addClass('blog');
-					$('.grid-container').addClass('selected');
-					$('#select').removeClass('draw');
-					$('#select').addClass('blog');
-				}
-				function uiDrawMode(){
-					$('div.menu.blog').removeClass('blog');
-					$('div.menu').addClass('draw');
-					$('.grid-container').removeClass('blog');
-					$('.grid-container').addClass('draw');
-					$('.grid-container').removeClass('selected');
-					$('#select').removeClass('blog');
-					$('#select').addClass('draw');
-				}
+			
 		block header
-
+			
 		block content
 			
 
@@ -104,6 +87,24 @@ html
 				}
 				//e.stopPropagation();
 			});
+			function uiBlogMode(){
+				$('div.menu.draw').removeClass('draw');
+				$('div.menu').addClass('blog');
+				$('.grid-container').removeClass('draw');
+				$('.grid-container').addClass('blog');
+				$('.grid-container').addClass('selected');
+				$('#select').removeClass('draw');
+				$('#select').addClass('blog');
+			}
+			function uiDrawMode(){
+				$('div.menu.blog').removeClass('blog');
+				$('div.menu').addClass('draw');
+				$('.grid-container').removeClass('blog');
+				$('.grid-container').addClass('draw');
+				$('.grid-container').removeClass('selected');
+				$('#select').removeClass('blog');
+				$('#select').addClass('draw');
+			}
 			function removeOldAlert()
 				{
 					var oldAlert = document.getElementById("alert");
@@ -146,8 +147,74 @@ html
 						removeOldAlert();
 					}
 				}
+				function drawModeModal(aID, pageindex){
+					$.get('/doc/'+pageindex+'').done(function(result){
+						removeOldAlert();
+						
+						var elem = document.getElementById(aID);
+						var drawtype = aID.split('_')[1];
+						var layer = parseInt(aID.split('_')[2], 10);
+						var irr, irrname, ailment, ailmentname;
+						if ('#{index}' !== ''){
+							var index = '#{index}'
+							index = parseInt(index, 10)
+							irr = result.content[index][drawtype][layer+1];
+							irrname = irr.spec.safety;
+							ailment = result.content[index].info[layer];
+							ailmentname = ailment.spec.safety;
+						}
+						console.log(aID.split('_'))
+						var newAlert = document.createElement("div");
+						newAlert.setAttribute("role", "alert");
+						newAlert.setAttribute("id", "alert");
+						var msg = document.createElement("div");
+						
+						/* else {
+							irr = ''
+							irrname = ''
+						}*/
+						if (irrname !== undefined) {
+							var text = document.createTextNode("Do you have an "+ailmentname+" to "+ irrname +"?")
+							msg.appendChild(text);
+							msg.setAttribute('class', 'translate')
+							var buttons = document.createElement('div');
+							//buttons.setAttribute('class', )
+							var buttony = document.createElement('button');
+							var buttonx = document.createElement('button');
+							buttonx.setAttribute('id', 'msg')
+							buttonx.setAttribute('className', 'no')
+							buttonx.innerText = 'No'
+							buttonx.style.background = 'var(--secondary)'
+							buttony.setAttribute('id', 'msg')
+							buttony.setAttribute('className', 'yes')
+							buttony.innerText = 'Yes'
+							buttony.style.background = 'var(--primary)'
+							buttons.appendChild(buttony);
+							buttons.appendChild(buttonx);
+							//msg != marked(msg)
+							//buttons != marked(buttons)
+							msg.appendChild(buttons);
+							newAlert.appendChild(msg);
+							document.body.appendChild(newAlert);
+							$('#msg').on('click', function(e){
+								e.preventDefault();
+								console.log(e.target.getAttribute('className'))
+								if (e.target.getAttribute('className') === 'yes') {
+									$.post('/api/selectlayer/'+result.urltitle+'/'+result.pagindex+'/'+index+'/'+drawtype+'/'+layer + 1+'').done(function(){
+										window.location.href = '/api/selectlayer'
+									})
+								} else {
+									$.post('/api/selectlayer/'+result.urltitle+'/'+result.pagindex+'/'+index+'/'+drawtype+'/'+layer+'').done(function(){
+										window.location.href = '/api/selectlayer'
+									})
+								}
+							})
+						}
+						
+					})
+				}
 
-			
+		
 		
 		
 		

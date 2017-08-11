@@ -36,8 +36,8 @@ block content
 
 			div.overtext #{menuData.pagetitle}
 			div.blogname
-				if (contentData.filling.length > 0)
-					if (contentData.filling.length > 1)
+				if (contentData.level > 0)
+					if (contentData.level > 1 && contentData.filling[contentData.level] !== undefined)
 						span.translate #{contentData.filling[contentData.level].name}
 						span  and  
 					span.translate #{contentData.filling[0].name}
@@ -179,19 +179,43 @@ block content
 						qCanvas.height = Math.min(canvasWidth, canvasHeight);
 						var qContext = qCanvas.getContext("2d");
 						//qContext.fillStyle = 
+						
 						qContext.drawImage(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight));
 						//ctx.globalCompositeOperation = 'destination-over'
 						
 						ctx.drawImage(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight));
 						//ctx.fill()
-						if (document.getElementById(id) !== null && drawtype !== 'info' && drawtype !== 'tools') {
+						if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
+							console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}')
+							//setTimeout(function(){
+							//$(document).ready(function(){
+							layer = parseInt(layer, 10)
+							var irr, irrname;
+							var index = '#{index}'
+								index = parseInt(index, 10)
+								irr = result.content[index][drawtype][layer+1];
 							
-							InitializeApp(drawtype, parseInt(layer, 10));
+							if ('#{index}' !== '' && irr !== undefined && irr.spec.safety !== 'bacteria') {
+								id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
+								drawModeModal(id, '#{pageindex}')/*, function(err, bool){
+									if (err) {
+										console.log('err: '+err)
+									}
+									console.log(bool)
+									if (bool) {
+										InitializeApp(drawtype, parseInt(layer, 10));
+									} else {
+										window.location.href = '/api/publish';
+									}
+								});
+							}, 100)*/
+								}
+						
+							
 						}
 					}
-				} else {
-					InitializeApp(drawtype, parseInt(layer, 10));
 				}
+				InitializeApp(drawtype, parseInt(layer, 10));
 				
 			})
 			
@@ -368,11 +392,11 @@ block content
 				var pattern;
 				var context = eventTarget.getContext("2d");
 								//img.style.background = 'rgba(255,255,255,1)'
-								/*if (drawtype === "filling") {
+				if (drawtype === "filling") {
 									context.globalCompositeOperation = 'destination-over';
 								} else {
 									context.globalCompositeOperation = 'destination-in';
-								}*/
+								}
 				
 
 				var pCanvas = document.createElement("canvas");

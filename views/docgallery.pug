@@ -22,20 +22,22 @@ div.grid-right
 
 				div.grid-right
 					each item, i in contentData.info
-						if (item.unlocked)
+						if (item.unlocked && item.spec.unlock)
+							- var drawtyp = item.spec.unlock.split('.')[0]
+							- var drawind = parseInt(item.spec.unlock.split('.')[1], 10)
+							- var nextind = drawind + 1
 							p.tb-font-l
 								!= md(item.name.toUpperCase())
 							p.tb-font-s.translate #{item.caption}
 								
-								if (item.spec.unlock)
-									- var drawtyp = item.spec.unlock.split('.')[0]
-									- var drawind = parseInt(item.spec.unlock.split('.')[1], 10)
+									
 									//if (drawind === contentData[drawType][i].ind)
-									span.tb-font-s . Use the 
-									span.tb-font-s #{contentData[drawtyp][drawind+1].name}
-								
+							span.tb-font-xxs Use the 
+							span.tb-font-xxs #{contentData[drawtyp][drawind].name}
+							span.tb-font-xxs  or the 
+							span.tb-font-xxs #{contentData[drawtyp][nextind].name}
+						
 
-									span.tb-font-s  to unlock the next step!
 				div.grid-footer
 					
 		else

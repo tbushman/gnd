@@ -245,6 +245,10 @@ router.get('/logout', function(req, res) {
 	req.app.locals.zoom = null;
 	req.app.locals.loggedin = null;
 	delete req.app.locals.pageTitle;
+	req.app.locals.drawtype = null;
+	req.app.locals.drawType = null;
+	req.app.locals.level = null;
+	req.app.locals.layer = null;
 	req.logout();
 	if (req.user || req.session) {
 		req.user = null;
@@ -262,7 +266,7 @@ router.get('/logout', function(req, res) {
 	}
 });
 
-router.all('/translate/:text', function(req, res, next){
+/*router.all('/translate/:text', function(req, res, next){
 
 	googleTranslate.translate(decodeURIComponent(req.params.text), 'en', req.app.locals.user ? req.app.locals.user.language : 'es', function(err, translation){
 		if (err) {
@@ -271,7 +275,7 @@ router.all('/translate/:text', function(req, res, next){
 		
 		return res.json(translation.translatedText);
 	});
-})
+})*/
 
 router.get('/home', function(req, res, next) {
 	//todo test null vs delete
@@ -427,6 +431,7 @@ router.get('/api/publish', function(req, res, next) {
 			if (pages.length === 0) {
 				infowindow = 'doc';
 				//dummy automatic first content entry
+				req.app.locals.urltitle = req.app.locals.pageTitle.replace(' ', '_')
 				var urltitle = req.app.locals.pageTitle.replace(' ', '_');
 				var page = new Page({
 					pageindex: data.length,
@@ -482,6 +487,7 @@ router.get('/api/publish', function(req, res, next) {
 						}
 						req.app.locals.pageindex = doc.pageindex;
 						req.app.locals.pageTitle = doc.pagetitle;
+						req.app.locals.urltitle = doc.pagetitle.replace(' ', '_')
 							cb(null, pages, doc, doc.pageindex, 'doc')
 						
 					})
@@ -634,13 +640,13 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 			if (err) {
 				return next(err)
 			}
-			var set2 = {$set:{}}
+			/*var set2 = {$set:{}}
 			var key2 = 'content.$.title'
 			set2.$set[key2] = thestore[drawtype][layer].name;
 			Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set2, {safe: true, new: true, upsert: false}, function(er, doc){
 				if (er) {
 					return next(er)
-				}
+				}*/
 				req.app.locals.drawType = drawtype;
 				if (req.body['inputimg_'+drawtype+'_'+layer+'']) {
 					console.log(req.body['inputimg_'+drawtype+'_'+layer+''])
@@ -690,7 +696,7 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', uplo
 						info: ':)'
 					})
 				}
-			})
+			//})
 		})
 	})
 })
@@ -743,10 +749,10 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 				if (keys.indexOf(contentdata[drawType][q].name) != -1) {
 					console.log('image hea')
 					drawThis = contentdata[drawType][q];
-					drawInd = drawThis.ind;
+					drawInd = parseInt(drawThis.ind, 10);
 					drawName = drawThis.name;
 					contentdata[drawType][q].unlocked = true;
-					if (q === contentdata[drawType].length -1) {
+					if (q === contentdata[drawType].length - 1) {
 						var contentkeys = Object.keys(contentdata);
 						for (var i = 0; i < contentkeys.length; i++){
 							if (Array.isArray(contentdata[contentkeys[i]])) {
@@ -813,6 +819,9 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 	if (drawtype === "info") {
 		return res.redirect('/api/levelup')
 	}
+	if (Number.isNaN(layer) || thestore[drawtype][layer].layer === thestore[drawtype].length - 1) {
+		return res.redirect('/api/nextstep/'+urltitle+'/'+pageindex+'/'+index+'/'+drawtype === 'filling' ? 'filling':'substrates/0')
+	}
 	Page.findOne({pageindex: pageindex, content: {$elemMatch: {index: index}}}, function(err, pub){
 		if (err) {
 			return next(err)
@@ -861,37 +870,53 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 });
 
 router.get('/api/levelup', function(req, res, next){
-	req.app.locals.layer++;
+	var layer = parseInt(req.app.locals.layer, 10)
+	layer++;
+	req.app.locals.layer = layer;
 	var set = {$set:{}}
 	var key = 'content.$.level'
 	set.$set[key] = req.app.locals.layer;
-	
-	Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){
-		if (err) {
-			return next(err)
+	var set1 = {$set:{}}
+	var key1 = 'publishers.0.avatar';
+	set1.$set[key1] = '/images/avatars/avatar_'+req.app.locals.layer+'.svg'
+	Page.findOne({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, function(errr, doc){
+		if (errr) {
+			return next(errr)
 		}
 		if (doc.content[req.app.locals.index].level > 3) {
-			return res.redirect('/chef/'+doc.pagetitle+'')
+			return res.redirect('/chef/'+doc.pagetitle+'/'+req.app.locals.index+'')
 		}
-		Page.find({}, function(er, data){
-			if (er) {
-				return next(er)
+		Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){
+			if (err) {
+				return next(err)
 			}
-			var datarray = [];
-			for (var l in data) {
-				datarray.push(data[l])
-			}
-			return res.render('publish', {
-				type: 'blog',
-				infowindow: 'doc',
-				loggedin: req.app.locals.loggedin,
-				pageindex: doc.pageindex,
-				index: req.app.locals.index,
-				doc: doc,
-				data: datarray,
-				info: ':)'
+			
+			Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set1, {safe: true, new: true, upsert: false}, function(err, doc){
+				if (err) {
+					return next(err)
+				}
+				Page.find({}, function(er, data){
+					if (er) {
+						return next(er)
+					}
+					var datarray = [];
+					for (var l in data) {
+						datarray.push(data[l])
+					}
+					return res.render('publish', {
+						type: 'blog',
+						infowindow: 'doc',
+						loggedin: req.app.locals.loggedin,
+						pageindex: doc.pageindex,
+						index: req.app.locals.index,
+						doc: doc,
+						data: datarray,
+						info: ':)'
+					})
+				})
 			})
 		})
 	})
+	
 })
 module.exports = router;
