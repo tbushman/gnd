@@ -691,36 +691,6 @@ router.post('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', upl
 						return next(err)
 					}
 					
-				//})
-				/*if (req.body['inputimg_'+drawtype+'_'+layer+'']) {
-					console.log(req.body['inputimg_'+drawtype+'_'+layer+''])
-					var set1 = {$set:{}}
-					var key1 = 'content.$.image'
-					set1.$set[key1] = req.body['inputimg_'+drawtype+'_'+layer+'']
-					Page.findOneAndUpdate({urltitle: urltitle, content: {$elemMatch: {index: index}}}, set1, {safe: true, new: true, upsert: false}, function(errr, doc){
-						if (errr){
-							return next(errr)
-						}
-						var datarray = [];
-						for (var l in data) {
-							datarray.push(data[l])
-						}
-						//return res.redirect('/api/selectlayer')
-						return res.render('publish', {
-							type: 'draw',
-							drawtype: drawtype,
-							layer: layer,
-							infowindow: 'edit',
-							loggedin: req.app.locals.loggedin,
-							pagetitle: doc.pagetitle,
-							pageindex: doc.pageindex,
-							index: index,
-							doc: doc,
-							data: datarray,
-							info: ':)'
-						})
-					})
-				} else {*/
 					var datarray = [];
 					for (var l in data) {
 						datarray.push(data[l])
@@ -872,7 +842,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 		if (err) {
 			return next(err)
 		}
-		return res.redirect('/api/publish')
+		return res.redirect('/api/selectlayer')
 	})
 	
 })
