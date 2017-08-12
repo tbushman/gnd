@@ -3,21 +3,12 @@ html
 	head
 		title= appTitle
 		meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
-		//link(rel="stylesheet", href="/stylesheets/jquery-ui.min.css")
-		//link(rel="stylesheet", href="/stylesheets/leaflet.css")
 		link(rel="stylesheet", href="/stylesheets/default.css", type="text/css")
-		//link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css")
 		link(href="https://fonts.googleapis.com/css?family=Roboto", rel="stylesheet")
 		
 		script(type="text/javascript", src="/scripts/jquery.min.js")
-		//script(type="text/javascript", src="/scripts/jquery-ui.min.js")
-		//script(type="text/javascript", src="/scripts/leaflet.js")
 		script(type="text/javascript", src="/scripts/marked.min.js")
-		//script(src="https://use.fontawesome.com/b9a4978394.js")
 		script(type="text/javascript", src="/scripts/d3.v3.min.js")
-		//script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js")
-		//script(src="https://unpkg.com/vue/dist/vue.js")
-		//https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/forms/alerts
 		
 	body
 		block page
@@ -40,12 +31,6 @@ html
 			})
 			$(document).on('click', 'canvas', function(e){
 				if ($('.menu').hasClass('blog')) {
-					//				e.preventDefault();
-					//				InitializeApp();
-					
-					/*$('.dropdown').not('.mainmenu').slideUp(100);
-					$('.drop').slideUp(100);
-					$('.selected').removeClass('selected');*/
 					uiDrawMode()
 				}
 			});
