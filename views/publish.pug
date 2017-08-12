@@ -238,8 +238,6 @@ block content
 					mainsrc = '/images/1px2.png'
 				}
 				console.log(res.content[index][drawtype][layer].image)
-				img.src = imgsrc;
-				mainimg.src = mainsrc;
 					
 				img.onload = function(){
 					console.log('image hea: '+img.src)
@@ -250,6 +248,7 @@ block content
 					var context = elem.getContext('2d');
 					context.drawImage(img, 0, 0, canvasWidth, canvasHeight)
 				}
+				img.src = imgsrc;
 				mainimg.onload = function() {
 					console.log(mainsrc)
 					mainimg.width = canvasWidth;
@@ -276,6 +275,8 @@ block content
 						}
 					}
 				}
+				mainimg.src = mainsrc;
+
 			})
 		}
 		
@@ -391,7 +392,7 @@ block content
 							
 							context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(pCanvas, 'no-repeat');
 							context.fill();
-							
+							ctx.globalCompositeOperation = 'destination-atop';
 							ctx.fillStyle = 'rgba(255,255,255,0)';//
 							ctx.fill()
 							
@@ -455,7 +456,6 @@ block content
 			layer = can.getAttribute('id').split('_')[2];
 			drawtype = can.getAttribute('id').split('_')[1];
 			if (drawtype && drawtype !== undefined) {
-				console.log('saving both')
 				can.toBlob(function(blob) {
 					var fd = new FormData();
 					
@@ -470,6 +470,7 @@ block content
 						processData: false,
 						contentType: false,
 						success: function(response) {
+							delete blob;
 							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
 							$('#inputimg_'+drawtype+'_'+layer+'').val(imgurl);
 							var img = new Image();
@@ -477,31 +478,26 @@ block content
 							img.onload = function(){
 								context.drawImage(img, 0, 0, width, height);
 							
-								setTimeout(function(){
-									//$('#form').submit();
-									//window.location.href = '/api/publish'
-									mainCanvas.toBlob(function(blobb) {
-										var fd = new FormData();
-										
-										fd.append("image", blobb);
-										
-										var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/'+false+'';
-
-										$.ajax({
-											url: uploadurl,
-											type: 'POST',
-											data: fd,
-											processData: false,
-											contentType: false,
-											success: function(response) {
-												$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-												console.log('saved both')
-												uiBlogMode();
-											}
-										})
-									}, 'image/png'/*, 0.95*/);
+								mainCanvas.toBlob(function(blob) {
+									var fd = new FormData();
 									
-								}, 500);
+									fd.append("image", blob);
+									
+									var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/'+false+'/'+false+'';
+
+									$.ajax({
+										url: uploadurl,
+										type: 'POST',
+										data: fd,
+										processData: false,
+										contentType: false,
+										success: function(response) {
+											$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+											console.log('saved both')
+											uiBlogMode();
+										}
+									})
+								}, 'image/png'/*, 0.95*/);
 							}
 						}
 						
@@ -515,7 +511,7 @@ block content
 					
 					fd.append("image", blob);
 					
-					var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/'+false+'';
+					var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/'+false+'/'+false+'';
 
 					console.log(blob)
 					console.log(uploadurl)
