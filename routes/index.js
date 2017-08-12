@@ -816,7 +816,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 			for (var i = 0; i < contentkeys.length; i++) {
 				for (var j = 0; j < contentdata[contentkeys[i]].length; j++) {
 					if (keys.indexOf(contentdata[contentkeys[i]][j].name) !== -1) {
-						console.log('draw this hea! '+contentdata[contentkeys[i]][j].name)
+						console.log('draw this hea! '+body[contentdata[contentkeys[i]][j].name])
 						contentdata[contentkeys[i]][j].image = body[contentdata[contentkeys[i]][j].name]
 
 					}
@@ -824,6 +824,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 				
 			}
 			if (body["image"]) {
+				console.log('body image '+body["image"])
 				contentdata.image = body["image"]
 			}
 			var key = 'content.$'
@@ -832,7 +833,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 			push.$set[key] = JSON.parse(JSON.stringify(contentdata));//JSON.parse(JSON.stringify(thisValue));
 			Page.findOneAndUpdate({pageindex: pageindex, content: {$elemMatch: {index: index}}}, push, {safe: true, new: true, upsert: false}, function(error, doc){
 				if (error) {
-					return next(error)
+					cb(error)
 				}
 				cb(null)
 				

@@ -176,7 +176,6 @@ block content
 		})
 		function InitializeApp(drawtype, layer) {
 			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
-			console.log(elem)
 			InitializeCanvas(drawtype, layer);
 			if (elem) {
 				console.log("Adding MouseEvent & TouchEvent listeners");
@@ -298,7 +297,7 @@ block content
 								}
 							}
 							
-						}, false);
+						});
 						
 					}
 				})
@@ -447,6 +446,7 @@ block content
 						}
 					}
 					
+					console.log(ctx, context)
 				}
 				context.restore();
 			}
