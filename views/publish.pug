@@ -472,8 +472,8 @@ block content
 							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
 							$('#inputimg_'+drawtype+'_'+layer+'').val(imgurl);
 							
-							setTimeout(function(){
-								$('#form').submit();
+							//setTimeout(function(){
+								//$('#form').submit();
 								//window.location.href = '/api/publish'
 								var img = new Image();
 								img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
@@ -500,7 +500,7 @@ block content
 										})
 									}, 'image/png'/*, 0.95*/);
 								}
-							}, 500);
+							//}, 500);
 						}
 						
 					})
