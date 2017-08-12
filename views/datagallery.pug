@@ -65,9 +65,6 @@ if (menu === 'home')
 					if (entry.content[entry.content.length-1].image !== "")
 						a.thumbnail.gallery(href="/chef/"+entry.pagetitle+"")
 							img(src= entry.content[entry.content.length-1].image, alt=""+entry.pagetitle+"'s "+ranks[entry.content.length-1]+" snack")
-					else
-						a.thumbnail.gallery(href="/chef/"+entry.pagetitle+"")
-							img(src= entry.content[entry.content.length-1].info[entry.content[entry.content.length-1].level].image, alt=""+entry.pagetitle+"'s "+ranks[entry.content.length-1]+" snack")
 
 				div.grid-right
 					p.tb-font-s by 

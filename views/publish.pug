@@ -53,7 +53,7 @@ block content
 			if (drawtype && drawtype !== "tools")
 				if (menuData.publishers[0].username === loggedin)
 						
-					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_"+layer+".svg');")
+					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_0.svg');")
 
 			canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_0.svg');")
 			div.topLeft
@@ -227,7 +227,7 @@ block content
 			}
 			$.get('/doc/'+pageIndex+'', function(res){
 				//console.log(res)
-				var mainimg = document.createElement('img');//new Image();
+				
 				var img = new Image();
 				var imgsrc = res.content[index][drawtype][layer].image;
 				var mainsrc = res.content[index].image;
@@ -249,35 +249,36 @@ block content
 					img.style.height = canvasHeight + "px";
 					var context = elem.getContext('2d');
 					context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-					mainimg.src = mainsrc;
-					mainimg.onload = function() {
-						console.log(mainsrc)
-						mainimg.width = canvasWidth;
-						mainimg.height = canvasHeight;
-						mainimg.style.width = canvasWidth + "px";
-						mainimg.style.height = canvasHeight + "px";
-						var ctx = canv.getContext('2d');
-						ctx.drawImage(mainimg, 0, 0, canvasWidth, canvasHeight);
-						if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
-							console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}', mainimg)
-							layer = parseInt(layer, 10)
-							var irr, irrname;
-							var index = '#{index}'
-								index = parseInt(index, 10)
-								irr = res.content[index][drawtype][layer+1];
-							
-							if ('#{index}' !== '' && irr !== undefined && irr.spec.safety !== 'bacteria') {
-								id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
-								if ($('#select').hasClass('draw')) {
-									console.log('drawing modal')
-									drawModeModal(id, '#{pageindex}')
-									
-								}
+					
+				}
+				var mainimg = document.createElement('img');//new Image();
+				mainimg.src = mainsrc;
+				mainimg.onload = function() {
+					console.log('mainimg:'+mainsrc)
+					mainimg.width = canvasWidth;
+					mainimg.height = canvasHeight;
+					mainimg.style.width = canvasWidth + "px";
+					mainimg.style.height = canvasHeight + "px";
+					var ctx = canv.getContext('2d');
+					ctx.drawImage(mainimg, 0, 0, canvasWidth, canvasHeight);
+					if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
+						console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}', mainimg)
+						layer = parseInt(layer, 10)
+						var irr, irrname;
+						var index = '#{index}'
+							index = parseInt(index, 10)
+							irr = res.content[index][drawtype][layer+1];
+						
+						if ('#{index}' !== '' && irr !== undefined && irr.spec.safety !== 'bacteria') {
+							id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
+							if ($('#select').hasClass('draw')) {
+								console.log('drawing modal')
+								drawModeModal(id, '#{pageindex}')
+								
 							}
 						}
 					}
 				}
-				
 
 			})
 		}
@@ -394,7 +395,7 @@ block content
 							
 							context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(pCanvas, 'no-repeat');
 							context.fill();
-							ctx.globalCompositeOperation = 'destination-atop';
+							//ctx.globalCompositeOperation = 'destination-atop';
 							ctx.fillStyle = 'rgba(255,255,255,0)';//
 							ctx.fill()
 							
@@ -407,7 +408,7 @@ block content
 				//}				
 				if (eventType != "touchmove" && eventType != "touchend") {
 					if (drawType === "substrates" && layer === 0) {
-						ctx.globalCompositeOperation = 'destination-atop';
+						//ctx.globalCompositeOperation = 'destination-atop';
 						context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(canv, 'no-repeat');
 						context.fill()
 						ctx.fillStyle = 'rgba(255,255,255,0)';//context.createPattern(canvas, 'no-repeat');//
@@ -416,7 +417,7 @@ block content
 				}
 				if (eventType == "touchmove") {
 					if (drawType === "substrates" && layer === 0) {
-						ctx.globalCompositeOperation = 'destination-atop';
+						//ctx.globalCompositeOperation = 'destination-atop';
 						context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(canv, 'no-repeat');
 						context.fill()
 						ctx.fillStyle = 'rgba(255,255,255,0)';//context.createPattern(canvas, 'no-repeat');//
