@@ -947,9 +947,7 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 router.get('/api/levelup', function(req, res, next){
 	var layer = parseInt(req.app.locals.layer, 10)
 	layer++;
-	if (layer > 2) {
-		return res.redirect('/chef/'+doc.pagetitle+'/'+req.app.locals.index+'')
-	}
+	
 	req.app.locals.layer = layer;
 	var set = {$set:{}}
 	var key = 'content.$.level'
@@ -961,7 +959,7 @@ router.get('/api/levelup', function(req, res, next){
 		if (errr) {
 			return next(errr)
 		}
-		if (doc.content[req.app.locals.index].level > 3) {
+		if (layer > 2) {
 			return res.redirect('/chef/'+doc.pagetitle+'/'+req.app.locals.index+'')
 		}
 		Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){

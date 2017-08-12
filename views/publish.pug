@@ -455,6 +455,7 @@ block content
 			layer = can.getAttribute('id').split('_')[2];
 			drawtype = can.getAttribute('id').split('_')[1];
 			if (drawtype && drawtype !== undefined) {
+				console.log('saving both')
 				can.toBlob(function(blob) {
 					var fd = new FormData();
 					
@@ -471,18 +472,18 @@ block content
 						success: function(response) {
 							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
 							$('#inputimg_'+drawtype+'_'+layer+'').val(imgurl);
+							var img = new Image();
+							img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
+							img.onload = function(){
+								context.drawImage(img, 0, 0, width, height);
 							
-							//setTimeout(function(){
-								//$('#form').submit();
-								//window.location.href = '/api/publish'
-								var img = new Image();
-								img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
-								img.onload = function(){
-									context.drawImage(img, 0, 0, width, height);
-									mainCanvas.toBlob(function(blob) {
+								setTimeout(function(){
+									//$('#form').submit();
+									//window.location.href = '/api/publish'
+									mainCanvas.toBlob(function(blobb) {
 										var fd = new FormData();
 										
-										fd.append("image", blob);
+										fd.append("image", blobb);
 										
 										var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/'+false+'';
 
@@ -499,19 +500,22 @@ block content
 											}
 										})
 									}, 'image/png'/*, 0.95*/);
-								}
-							//}, 500);
+									
+								}, 500);
+							}
 						}
 						
 					})
 				}, 'image/png'/*, 0.95*/);
 			} else {
-				can.toBlob(function(blob) {
+				console.log('saving main')
+
+				mainCanvas.toBlob(function(blob) {
 					var fd = new FormData();
 					
 					fd.append("image", blob);
 					
-					var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/'+false+'/'+false+'';
+					var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/'+false+'';
 
 					console.log(blob)
 					console.log(uploadurl)
@@ -524,10 +528,8 @@ block content
 						success: function(response) {
 							
 								$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-								setTimeout(function(){
 									//$('#form').submit();
 									uiBlogMode();//window.location.href = '/api/publish'
-								}, 500);
 							}
 						
 					})
