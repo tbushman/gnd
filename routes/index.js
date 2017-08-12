@@ -441,6 +441,7 @@ router.get('/api/publish', function(req, res, next) {
 					if (er) {
 						next(er)
 					}
+					console.log('this pages: '+pages)
 					cb(null, data, pages)
 				})
 			})
@@ -505,6 +506,7 @@ router.get('/api/publish', function(req, res, next) {
 						if (!req.app.locals.index) {
 							req.app.locals.index = doc.content[doc.content.length-1].index;
 						}
+						console.log('this pageindex: '+doc.pageindex)
 						req.app.locals.pageindex = doc.pageindex;
 						req.app.locals.pageTitle = doc.pagetitle;
 						req.app.locals.urltitle = doc.pagetitle.replace(' ', '_')
