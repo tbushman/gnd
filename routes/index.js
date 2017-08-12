@@ -744,6 +744,8 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 	var description = req.body.description;
 	var body = req.body;
 	var drawType = req.params.drawtype;
+	req.app.locals.drawType = drawType;
+	req.app.locals.layer = parseInt(req.params.level, 10);
 	//console.log(drawType)
 	var level = parseInt(req.params.level, 10);
 	var pageindex = parseInt(req.params.pageindex, 10);

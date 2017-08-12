@@ -247,36 +247,19 @@ block content
 						//mainimg.src = mainsrc;
 						//var imgs = [imgsrc, mainsrc]
 						//[''+imgsrc+'', ''+mainsrc+''].each(function(image){
-						$.each([''+imgsrc+'', ''+mainsrc+''], function(index, image){
-							console.log(index, image)
+						$.each([''+imgsrc+'', ''+mainsrc+''], function(ind, image){
+							console.log(ind, image)
 							var imgobj = new Image();
 							imgobj.width = canvasWidth;
 							imgobj.height = canvasHeight;
 							imgobj.style.width = canvasWidth + "px";
 							imgobj.style.height = canvasHeight + "px";
-							var cx;
 							if (image === imgsrc && image !== '') {
 								imgobj.src = imgsrc;
 								imgobj.onload = function(){
-									cx = elem.getContext('2d');
+									var cx = elem.getContext('2d');
 									cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
-									if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
-										console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}', image)
-										layer = parseInt(layer, 10)
-										var irr, irrname;
-										var index = '#{index}'
-											index = parseInt(index, 10)
-											irr = res.content[index][drawtype][layer+1];
-										
-										if ('#{index}' !== '' && irr !== undefined && irr.spec.safety !== 'bacteria') {
-											id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
-											if ($('#select').hasClass('draw')) {
-												console.log('drawing modal')
-												drawModeModal(id, '#{pageindex}')
-												
-											}
-										}
-									}
+									
 								}
 
 							}
@@ -284,7 +267,7 @@ block content
 								console.log(image)
 								imgobj.src = mainsrc;
 								imgobj.onload = function(){
-									cx = canv.getContext('2d');
+									var cx = canv.getContext('2d');
 									cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
 									var overlay = new Image();
 									if (imgsrc !== ''){
@@ -297,7 +280,23 @@ block content
 							}
 							
 						});
-						
+						if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
+							console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}')
+							layer = parseInt(layer, 10)
+							var irr, irrname;
+							var index = '#{index}'
+								index = parseInt(index, 10)
+								irr = res.content[index][drawtype][layer+1];
+							
+							if ('#{index}' !== '' && irr !== undefined && irr.spec.safety !== 'bacteria') {
+								id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
+								if ($('#select').hasClass('draw')) {
+									console.log('drawing modal')
+									drawModeModal(id, '#{pageindex}')
+									
+								}
+							}
+						}
 					}
 				})
 			}
@@ -445,7 +444,6 @@ block content
 						}
 					}
 					
-					console.log(ctx, context)
 				}
 				context.restore();
 			}
