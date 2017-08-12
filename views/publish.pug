@@ -214,17 +214,16 @@ block content
 				canv.style.width = newwidth + "px";
 				canv.style.height = newheight + "px";
 				
-				var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
-				if (elem !== null) {
-					var context = elem.getContext("2d");
-
-					elem.width = canvasWidth;
-					elem.height = canvasHeight;
-					elem.style.width = newwidth + "px";
-					elem.style.height = newheight + "px";
-				}
-				
 				scale = newscale;
+			}
+			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
+			if (elem !== null && elem.width != newwidth || elem.height != newheight) {
+				var context = elem.getContext("2d");
+
+				elem.width = canvasWidth;
+				elem.height = canvasHeight;
+				elem.style.width = newwidth + "px";
+				elem.style.height = newheight + "px";
 			}
 			$.get('/doc/'+pageIndex+'', function(res){
 				//console.log(res)
@@ -250,6 +249,8 @@ block content
 					img.style.height = canvasHeight + "px";
 					var context = elem.getContext('2d');
 					context.drawImage(img, 0, 0, canvasWidth, canvasHeight)
+				}
+				mainimg.onload = function() {
 					console.log(mainsrc)
 					mainimg.width = canvasWidth;
 					mainimg.height = canvasHeight;
@@ -275,7 +276,6 @@ block content
 						}
 					}
 				}
-
 			})
 		}
 		
