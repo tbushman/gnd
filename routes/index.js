@@ -838,19 +838,17 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 			
 		},
 		function(body, contentdata, keys, drawName, index, pageindex, cb){
-			for (var i = 0; i < keys.length; i++) {
-				if (contentdata[keys[i]] !== undefined) {
-					console.log(contentdata[keys[i]])
+			var contentkeys = ["substrates", "filling"]
+			//contentdata[keys[i]] = body[keys[i]]
+			for (var i = 0; i < contentkeys.length; i++) {
+				for (var j = 0; j < contentdata[contentkeys[i]].length; j++) {
+					if (keys.indexOf(contentdata[contentkeys[i]][j].name) !== -1) {
+						console.log('draw this hea! '+contentdata[contentkeys[i]][j].name)
+						contentdata[contentkeys[i]][j].image = body[contentdata[contentkeys[i]][j].name]
 
-					//contentdata[keys[i]] = body[keys[i]]
-					for (var j = 0; j < contentdata[keys[i]].length; j++) {
-						if (contentdata[keys[i]][j].name === drawName) {
-							console.log(drawName)
-							contentdata[keys[i]][j].image = body[drawName]
-
-						}
 					}
 				}
+				
 			}
 			if (body["image"]) {
 				contentdata.image = body["image"]
