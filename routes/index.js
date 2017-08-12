@@ -220,6 +220,10 @@ router.post('/register', upload.array(), function(req, res, next) {
 						req.app.locals.user = req.user;
 						req.app.locals.userId = doc._id;
 						req.app.locals.loggedin = doc.username;
+						req.app.locals.drawType = null;
+						req.app.locals.layer = null;
+						delete req.app.locals.drawType;
+						delete req.app.locals.layer;
 						return res.redirect('/api/publish')
 					})
 				});
