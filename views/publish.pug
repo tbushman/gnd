@@ -262,6 +262,23 @@ block content
 								imgobj.onload = function(){
 									cx = elem.getContext('2d');
 									cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
+									if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
+										console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}', image)
+										layer = parseInt(layer, 10)
+										var irr, irrname;
+										var index = '#{index}'
+											index = parseInt(index, 10)
+											irr = res.content[index][drawtype][layer+1];
+										
+										if ('#{index}' !== '' && irr !== undefined && irr.spec.safety !== 'bacteria') {
+											id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
+											if ($('#select').hasClass('draw')) {
+												console.log('drawing modal')
+												drawModeModal(id, '#{pageindex}')
+												
+											}
+										}
+									}
 								}
 
 							}
@@ -280,24 +297,9 @@ block content
 									}
 								}
 							}
-						}, false);
-						if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
-							console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}', mainimg)
-							layer = parseInt(layer, 10)
-							var irr, irrname;
-							var index = '#{index}'
-								index = parseInt(index, 10)
-								irr = res.content[index][drawtype][layer+1];
 							
-							if ('#{index}' !== '' && irr !== undefined && irr.spec.safety !== 'bacteria') {
-								id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
-								if ($('#select').hasClass('draw')) {
-									console.log('drawing modal')
-									drawModeModal(id, '#{pageindex}')
-									
-								}
-							}
-						}
+						}, false);
+						
 					}
 				})
 			}
