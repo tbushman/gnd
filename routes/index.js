@@ -571,7 +571,7 @@ router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res
 	)
 })
 
-router.all('/api/uploadmedia/:pageindex/:index/:drawtype/:layer', uploadmedia.any(), function(req, res, next){
+router.post('/api/uploadmedia/:pageindex/:index/:drawtype/:layer', uploadmedia.any(), function(req, res, next){
 	return res.status(200).send(req.files[0].path)
 })
 
