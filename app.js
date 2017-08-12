@@ -87,9 +87,8 @@ app.locals.$ = require('jquery');
 app.locals.fs = require('fs');
 var marked = require('marked')
 app.locals.md = marked; 
-//app.locals.circularJSON = circularJSON;
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+//app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/publishers', express.static(path.join(__dirname, '../../pu/publishers')));
 app.use('/publishers/sfusd2', express.static(path.join(__dirname, '../../pu/publishers/sfusd2')));
@@ -126,6 +125,7 @@ app.use('/publishers/sfusd2/:urltitle/:index/images/:drawtype', function(req, re
 		if (err) {
 			return next(err)
 		}
+		console.log('static: '+req.params.drawtype)
 		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'')).apply(this, arguments);
 	})
 });
