@@ -611,7 +611,7 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 
 router.get('/api/selectlayer', function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
-	if (!req.app.locals.pageindex){
+	if (!req.app.locals.urltitle){
 		return res.redirect('/api/publish')
 	}
 	Page.findOne({urltitle: req.app.locals.urltitle, content: {$elemMatch: {index: req.app.locals.index}}}, function(err, doc){
