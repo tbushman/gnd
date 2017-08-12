@@ -185,9 +185,9 @@ block content
 				["touchstart", "touchmove", "touchend"].forEach(function(e) {
 						elem.addEventListener(e, TouchHandler);
 				});
-				/*window.addEventListener("resize", function(e) {
+				window.addEventListener("resize", function(e) {
 					InitializeCanvas(drawtype, layer);
-				});*/
+				});
 			}
 			
 		}
@@ -198,7 +198,6 @@ block content
 						//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
 			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
 			if (navigator.platform.split('Mac')[1] !== undefined) {
-				console.log(navigator.platform)
 				newscale = 1
 			}
 			var newwidth = window.screen.width * newscale;
@@ -231,7 +230,7 @@ block content
 					//console.log(res)
 					
 					var img = new Image();
-					var mainimg = document.createElement('img');//new Image();
+					var mainimg = new Image();
 					var index = '#{index}'
 					var layer = '#{layer}'
 					if (index !== '') {

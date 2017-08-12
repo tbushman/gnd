@@ -90,6 +90,7 @@ app.locals.md = marked;
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../../pu/publishers')));
 app.use('/publishers', express.static(path.join(__dirname, '../../pu/publishers')));
 app.use('/publishers/sfusd2', express.static(path.join(__dirname, '../../pu/publishers/sfusd2')));
 app.use('/publishers/sfusd2/:urltitle', function(req, res, next) {
