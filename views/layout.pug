@@ -23,10 +23,11 @@ html
 		block page
 			- var theStore = theStore
 			
+
 		block header
 			
 		block content
-			
+				
 
 		a#publish_logo(href="https://github.com/tbushman/sfusd" target="_blank")
 			img(src="/images/sfusdblish_logo.svg")
@@ -231,9 +232,10 @@ html
 								e.preventDefault();
 								console.log(e.target)
 								if (e.target.getAttribute('className') === 'yes') {
-
-									$.post('/api/selectlayer/'+result.urltitle+'/'+result.pageindex+'/'+index+'/'+drawtype+'/'+(parseInt(layer, 10)+1) +'').done(function(result){
-										window.location.href = '/api/selectlayer'
+									$.post('/api/allergy/'+result.pageindex+'/'+index+'/'+drawtype+'/'+layer +'').done(function(){
+										$.post('/api/selectlayer/'+result.urltitle+'/'+result.pageindex+'/'+index+'/'+drawtype+'/'+(parseInt(layer, 10)+1) +'').done(function(result){
+											window.location.href = '/api/selectlayer'
+										})
 									})
 								} else {
 									if (e.target.getAttribute('className') === 'no') {

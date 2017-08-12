@@ -27,7 +27,7 @@ block page
 block content
 	
 	- var keys = ["tools", "info", "substrates", "filling"]
-
+	- var allergies = menuData.publishers[0].allergies;
 	input(type="hidden", value= pageIndex, id="pageindex")
 		//-
 			navigation
@@ -36,12 +36,19 @@ block content
 
 			div.overtext #{menuData.pagetitle}
 			div.blogname
-				if (contentData.level > 0)
-					if (contentData.level > 1 && contentData.filling[contentData.level] !== undefined)
-						span.translate #{contentData.filling[contentData.level].name}
-						span  and  
-					span.translate #{contentData.filling[0].name}
-			
+				
+				if (allergies.indexOf(contentData.filling[contentData.level].name) === -1)
+					span.translate #{contentData.filling[contentData.level].name}
+					span  and 
+				else
+					if (contentData.filling[contentData.level-1] !== null)
+						span.translate #{contentData.filling[contentData.level-1].name}
+						span  and 
+					else
+						if (contentData.filling[contentData.level+1] !== null)
+							span.translate #{contentData.filling[contentData.level+1].name}
+							span  and 
+				span.translate #{contentData.filling[0].name}
 			
 			if (drawtype && drawtype !== "tools")
 				if (menuData.publishers[0].username === loggedin)
@@ -60,26 +67,11 @@ block content
 				include datagallery.pug
 		
 		div.pullquote
-			if (drawtype)
-				if (menuData.publishers[0].username === loggedin)
-					each ing, j in keys
-						each cat, i in contentData[ing]
-							if (cat.unlocked && ing !== "info" && ing !== "tools")
-								a.tool(href="#", onclick="document.getElementById('form_"+ing+"_"+i+"').submit();")
-									.ui
-										img(src="/images/icons/"+ing+"_"+i+".svg")
-									span.tb-font-m #{cat.name}
-									if (cat.unlocked)
-										form(id="form_"+ing+"_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"")
-											input(type="hidden", value="1", name= cat.name)
-											//if (type === "draw")
-												//input(type="hidden", id="inputimg_"+ing+"_"+i+"", name= cat.name, value= cat.image)
-								//span.tb-font-xs.translate #{cat.caption}
-			else
-				if (contentData)
-					each item, i in contentData.info
-						if (item.ind === contentData.level)
-							span.tb-font-xxl.translate #{item.caption}
+			
+			if (contentData)
+				each item, i in contentData.info
+					if (item.ind === contentData.level)
+						span.tb-font-xxl.translate #{item.caption}
 				
 
 	//-
@@ -119,22 +111,22 @@ block content
 		var radiusSupported = false;
 		var nextCount = 0;
 		var touchMap = {};
-		var enableForce = false;
-		var drawTouchMajor = true;
 		var foundRotationAngle = false;
 		var scale = 1;
 		var mousePressed = false;
 		var drawCoalesced = false;
 		var elem, canvasWidth, canvasHeight;
-		
+		/*$('img').each(function(img){
+			if (img.src === (unknown))
+		})*/
 		$(document).ready(function(){
 			var can = document.getElementById('canvas');
 			can.style.width = '100%';
 			can.style.height = '100%';
 			pageIndex = parseInt(document.getElementById('pageindex').value, 10);
 			console.log('this pageindex'+pageIndex)
-			var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
-			$('.grid-header.mainHeader').css('height', (topmargin + 30) + 'px');
+			//var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
+			//$('.grid-header.mainHeader').css('height', (topmargin + 30) + 'px');
 			$('textarea').each(function(){
 				var text;
 				if ($(this).val()) {
@@ -157,59 +149,12 @@ block content
 			drawtype = '#{drawtype}'
 			layer = '#{layer}'
 			console.log(drawtype, layer)
-			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
 			var canv = document.getElementById('canvas')
 			var ctx = canv.getContext("2d");
-			$.get('/doc/'+pageIndex+'',function(result){
-				var img = new Image();
-				img.src = result.content[index].image;
-				console.log(result.content[index].image)
-				if (result.content[index].image !== null && result.content[index].image !== '' && result.content[index].image !== ' ') {
-					
-					img.onload = function(){
-						console.log('image hea')
-						var canvasWidth = canv.getBoundingClientRect().width;
-						var canvasHeight = canv.getBoundingClientRect().height;
-						img.width = Math.min(canvasWidth, canvasHeight);
-						img.height = Math.min(canvasWidth, canvasHeight);
-						img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
-						img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
-						var qCanvas = document.createElement("canvas");
-						qCanvas.width = Math.min(canvasWidth, canvasHeight);
-						qCanvas.height = Math.min(canvasWidth, canvasHeight);
-						var qContext = qCanvas.getContext("2d");
-						//qContext.fillStyle = 
-						
-						qContext.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-						//ctx.globalCompositeOperation = 'destination-over'
-						
-						ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-						//ctx.fill()
-						if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
-							console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}')
-							//setTimeout(function(){
-							//$(document).ready(function(){
-							layer = parseInt(layer, 10)
-							var irr, irrname;
-							var index = '#{index}'
-								index = parseInt(index, 10)
-								irr = result.content[index][drawtype][layer+1];
-							
-							if ('#{index}' !== '' && irr !== undefined && irr.spec.safety !== 'bacteria') {
-								id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
-								if ($('#select').hasClass('draw')) {
-									drawModeModal(id, '#{pageindex}')
-									
-								}
-							}
-						}
-					}
-				}
-				InitializeApp(drawtype, parseInt(layer, 10));
-				
-			})
-			
-			
+			if (drawtype && drawtype !== '') {
+				console.log('initializing app')
+				InitializeApp(drawtype, layer)
+			}
 			
 		})
 		$(document).on('click', '#deletefeature', function(){
@@ -249,6 +194,8 @@ block content
 		}
 		function InitializeCanvas(drawtype, layer) {
 			var canv = document.getElementById("canvas");
+			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
+
 						//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
 			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
 			if (navigator.platform.split('Mac')[1] !== undefined) {
@@ -279,6 +226,57 @@ block content
 				
 				scale = newscale;
 			}
+			$.get('/doc/'+pageIndex+'', function(res){
+				//console.log(res)
+				var mainimg = new Image();
+				var img = new Image();
+				var imgsrc = res.content[index][drawtype][layer].image;
+				var mainsrc = res.content[index].image;
+				if (imgsrc === '') {
+					imgsrc = '/images/1px.png'
+				}
+				if (mainsrc === '') {
+					mainsrc = '/images/1px2.png'
+				}
+				console.log(res.content[index][drawtype][layer].image)
+				img.src = imgsrc;
+				mainimg.src = mainsrc;
+					
+				img.onload = function(){
+					console.log('image hea: '+img.src)
+					img.width = canvasWidth;
+					img.height = canvasHeight;
+					img.style.width = canvasWidth + "px";
+					img.style.height = canvasHeight + "px";
+					var context = elem.getContext('2d');
+					context.drawImage(img, 0, 0, canvasWidth, canvasHeight)
+					console.log(mainsrc)
+					mainimg.width = canvasWidth;
+					mainimg.height = canvasHeight;
+					mainimg.style.width = canvasWidth + "px";
+					mainimg.style.height = canvasHeight + "px";
+					var ctx = canv.getContext('2d');
+					ctx.drawImage(mainimg, 0, 0, canvasWidth, canvasHeight);
+					if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
+						console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}', mainimg)
+						layer = parseInt(layer, 10)
+						var irr, irrname;
+						var index = '#{index}'
+							index = parseInt(index, 10)
+							irr = res.content[index][drawtype][layer+1];
+						
+						if ('#{index}' !== '' && irr !== undefined && irr.spec.safety !== 'bacteria') {
+							id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
+							if ($('#select').hasClass('draw')) {
+								console.log('drawing modal')
+								drawModeModal(id, '#{pageindex}')
+								
+							}
+						}
+					}
+				}
+
+			})
 		}
 		
 		function MouseHandler(event) {
@@ -321,14 +319,7 @@ block content
 			var context = eventTarget.getContext("2d");
 			var drawType = eventTarget.getAttribute('id').split('_')[1];
 			var layer = parseInt(eventTarget.getAttribute('id').split('_')[2], 10);
-			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
-			if (navigator.platform.split('Mac')[1] !== undefined) {
-				newscale = 1
-			}
-			canvasWidth = window.screen.width * newscale;
-			canvasHeight = window.screen.height * newscale;
-			// Map the identifier to a small count (no-op on Chrome, but
-			// important for mobile Safari).
+
 			if (!(touch.identifier in touchMap)) {
 				touchMap[touch.identifier] = nextCount;
 				nextCount++;
@@ -358,28 +349,19 @@ block content
 			
 			//
 			context.save();
-			//ctx.save();
 			context.translate(touch.pageX * scale, touch.pageY * scale);
-			//ctx.translate(touch.pageX * scale, touch.pageY * scale);
-			//context.rotate(rotationAngle);
 			context.scale(1, radiusY/radiusX);
-			//ctx.scale(1, radiusY/radiusX);
 			context.beginPath();
-			//ctx.beginPath();
-			//context.setFillColor(255,255,255,0);
 			context.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
-			//ctx.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
 			context.closePath();
-			//ctx.closePath();
 			
 			var img = new Image();
 			img.src = '/images/'+drawType+'/'+drawType+'_'+layer+'.svg';
 			img.onload = function(){
 				var pattern;
 				var context = eventTarget.getContext("2d");
-				var canv = document.getElementById('canvas');
-				var ctx = canv.getContext('2d');
-								//img.style.background = 'rgba(255,255,255,1)'
+				//var canv = document.getElementById('canvas');
+				//var ctx = canv.getContext('2d');
 				
 				
 
@@ -390,7 +372,7 @@ block content
 				pContext.fillStyle = pContext.drawImage(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight));
 
 				pContext.fill();
-								
+				//if (eventType == "touchend") {
 					if (drawType === 'filling') {
 						//context.globalCompositeOperation = 'destination-over';
 						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_1.svg"), grabbing;');
@@ -400,31 +382,42 @@ block content
 					if (drawType === 'substrates') {
 						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.svg"), grabbing;');
 						//context.globalCompositeOperation = 'destination-in';
-						img.width = Math.min(canvasWidth, canvasHeight);
-						img.height = Math.min(canvasWidth, canvasHeight);
-						img.style.width = Math.min(canvasWidth, canvasHeight) + "px";
-						img.style.height = Math.min(canvasWidth, canvasHeight) + "px";
+						var size = Math.min(canvasWidth, canvasHeight) / 2
+						img.width = size;
+						img.height = size;
+						img.style.width = size  + "px";
+						img.style.height = size  + "px";
 						if (layer === 0) {
 							
 							context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(pCanvas, 'no-repeat');
 							context.fill();
 							
-							ctx.fillStyle = 'rgba(255,255,255,0)';//context.createPattern(canvas, 'no-repeat');
+							ctx.fillStyle = 'rgba(255,255,255,0)';//
 							ctx.fill()
 							
 						} else {
-							context.fillStyle = context.drawImage(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight));
-							context.fillRect(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight))
+							context.fillStyle = context.drawImage(img, (size/2) - (size/2)/2, 15, size, size);
+							context.fillRect(img, (size/2) - (size/2)/2, 15, size, size)
 
 						}
 					}
+				//}				
 				if (eventType != "touchmove" && eventType != "touchend") {
 					if (drawType === "substrates" && layer === 0) {
-						
-						ctx.fillStyle = 'rgba(255,255,255,0)';//context.createPattern(canvas, 'no-repeat');//
-						ctx.fill()
+						ctx.globalCompositeOperation = 'destination-atop';
 						context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(canv, 'no-repeat');
 						context.fill()
+						ctx.fillStyle = 'rgba(255,255,255,0)';//context.createPattern(canvas, 'no-repeat');//
+						ctx.fill()
+					}
+				}
+				if (eventType == "touchmove") {
+					if (drawType === "substrates" && layer === 0) {
+						ctx.globalCompositeOperation = 'destination-atop';
+						context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(canv, 'no-repeat');
+						context.fill()
+						ctx.fillStyle = 'rgba(255,255,255,0)';//context.createPattern(canvas, 'no-repeat');//
+						ctx.fill()
 					}
 				}
 				
@@ -542,7 +535,7 @@ block content
 			}
 		}
 		//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
-		$(document).on('touchstart, mouseover', '.translate', function (e) {
+		/*$(document).on('touchstart, mouseover', '.translate', function (e) {
 			var link = $(this); //preselect the link
 			if (link.hasClass('hover')) {
 				return true;
@@ -568,5 +561,5 @@ block content
 			}
 			removeOldAlert()
 			return true;
-		});
+		});*/
 		

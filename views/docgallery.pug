@@ -7,36 +7,61 @@ div.grid-right
 		if (index >= 0)
 			div.grid-container.inner
 				div.grid-header
-					p.tb-font-xl.translate #{contentData.title}
+
+					p.tb-font-xl
+						
+						if (allergies.indexOf(contentData.filling[contentData.level].name) === -1)
+							span.translate #{contentData.filling[contentData.level].name}
+							span  and 
+						else
+							if (contentData.filling[contentData.level-1] !== null)
+								span.translate #{contentData.filling[contentData.level-1].name}
+								span  and 
+							else
+								if (contentData.filling[contentData.level+1] !== null)
+									span.translate #{contentData.filling[contentData.level+1].name}
+									span  and 
+						
+						span #{contentData.filling[0].name}
 
 				div.grid-left(style="padding: 6px 0 0 6px;")
 					if (menuData.publishers[0].username === loggedin)
 						a.tool(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"', function(){ window.location.href = '/api/selectlayer'});")
 							.ui
-								img(src= contentData.image, style="width: 100%; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
+								img(src= contentData.image !== "" ? contentData.image : menuData.publishers[0].avatar, style="width: auto; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
 
 					else
 						a.tool(href="/chef/"+menuData.pagetitle+"/"+contentData.index+"")
 							.ui
-								img(src="/images/info/info_"+contentData.level+".svg", style="width: 100%; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
+								img(src= contentData.image !== "" ? contentData.image : menuData.publishers[0].avatar, style="width: auto; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
 
 				div.grid-right
+					- var count = 0
 					each item, i in contentData.info
+						- var allergies = menuData.publishers[0].allergies;
 						if (item.unlocked && item.spec.unlock)
 							- var drawtyp = item.spec.unlock.split('.')[0]
 							- var drawind = parseInt(item.spec.unlock.split('.')[1], 10)
 							- var nextind = drawind + 1
-							p.tb-font-l
-								!= md(item.name.toUpperCase())
-							p.tb-font-s.translate #{item.caption}
+							- count++
+							if (allergies.indexOf(contentData[drawtyp][drawind].name) === -1 && allergies.indexOf(contentData[drawtyp][nextind].name) === -1 && allergies.indexOf(item.name) === -1)
+								p.tb-font-l
+									!= md(item.name.toUpperCase())
+								p.tb-font-s.translate #{item.caption}
 								
 									
 									//if (drawind === contentData[drawType][i].ind)
 							span.tb-font-xxs Use the 
-							span.tb-font-xxs #{contentData[drawtyp][drawind].name}
-							span.tb-font-xxs  or the 
-							span.tb-font-xxs #{contentData[drawtyp][nextind].name}
-						
+							if (allergies.indexOf(contentData[drawtyp][drawind].name) === -1)
+								span.tb-font-xxs #{contentData[drawtyp][drawind].name}
+							else
+								span.tb-font-xxs #{contentData[drawtyp][drawind+1].name}
+							if (i !== 0)
+								span.tb-font-xxs  or the 
+								if (allergies.indexOf(contentData[drawtyp][nextind].name) === -1)
+									span.tb-font-xxs #{contentData[drawtyp][nextind].name}
+								else
+									span.tb-font-xxs #{contentData[drawtyp][nextind+1].name}
 
 				div.grid-footer
 					

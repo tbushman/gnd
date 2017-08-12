@@ -3,7 +3,7 @@
 		{
 			"ind": 0,
 			"name": "soap",
-			"image": "/images/substrates/substrates_0.svg",
+			"image": "",
 			"caption": "Sanitizes surfaces",
 			"unlocked": true,
 			"spec": {
@@ -14,7 +14,7 @@
 		{
 			"ind": 1,
 			"name": "bread",
-			"image": "/images/substrates/substrates_1.svg",
+			"image": "",
 			"caption": "The basis of a traditional sandwich",
 			"unlocked": false,
 			"spec": {
@@ -27,7 +27,7 @@
 		{
 			"ind": 2,
 			"name": "rice",
-			"image": "/images/substrates/substrates_2.svg",
+			"image": "",
 			"caption": "Wrap up a snack in sticky rice",
 			"unlocked": false,
 			"spec": {
@@ -40,7 +40,7 @@
 		{
 			"ind": 0,
 			"name": "jelly",
-			"image": "/images/filling/filling_0.svg",
+			"image": "",
 			"caption": "Sweet fruit spread",
 			"unlocked": false,
 			"spec": {
@@ -51,7 +51,7 @@
 		{
 			"ind": 1,
 			"name": "peanut butter",
-			"image": "/images/filling/filling_1.svg",
+			"image": "",
 			"caption": "A food processed from nuts",
 			"unlocked": false,
 			"spec": {
@@ -64,7 +64,7 @@
 		{
 			"ind": 2,
 			"name": "cream cheese",
-			"image": "/images/filling/filling_2.svg",
+			"image": "",
 			"caption": "Tangy accompaniment",
 			"unlocked": false,
 			"spec": {
@@ -72,17 +72,6 @@
 				"alt": [
 					"tofu"
 				]
-			}
-		},
-		{
-			"ind": 3,
-			"name": "tofu",
-			"image": "/images/filling/filling_3.svg",
-			"caption": "A food processed from soybeans",
-			"unlocked": false,
-			"spec": {
-				"safety": false,
-				"alt": [ ]
 			}
 		}
 	],
@@ -131,7 +120,7 @@
 			"spec": {
 				"safety": "cleaner",
 				"alt": [ ],
-				"unlock": ""
+				"unlock": "substrates.0"
 			}
 		},
 		{

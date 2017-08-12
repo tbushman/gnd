@@ -1,14 +1,15 @@
 p#info.tb-font-s(width="100%")
 //(style="float: left;")
 form#form.tb-u-100(enctype="multipart/form-data", method="POST", action="/api/editcontent/"+doc.urltitle+"/"+doc.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"", style="margin-bottom: 50px")
+					
 	div.tb-u-100
 		label.ms-Label Description 
 		textarea.ms-TextField-field#inputtext(type="text", name="description", value= contentData.description, placeholder= contentData.description)
 	div.tb-u-100
 		span.tb-font-s#previewtext.translate #{contentData.description}
-	input(type="hidden", id="inputimg", name="image")
+	input(type="hidden", id="inputimg", name="image", value= contentData.image)
 	if (drawtype && contentData[drawtype][contentData.level] !== undefined)
-		input(type="hidden", id="inputimg_"+drawtype+"_"+contentData.level+"", name= contentData[drawtype][contentData.level].name)
+		input(type="hidden", id="inputimg_"+drawtype+"_"+contentData.level+"", name= contentData[drawtype][contentData.level].name, value= contentData[drawtype][contentData.level].image)
 	div.tb-u-100
 		button.ms-Button.ms-Button--primary.tb-u-100.block.spacer(id="submit", type="submit", ariaDescription="Save this Sandwich")
 			span.ms-Button-label Save
