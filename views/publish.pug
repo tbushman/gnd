@@ -236,12 +236,12 @@ block content
 				if (index !== '') {
 					var imgsrc = res.content[index][drawtype][layer].image;
 					var mainsrc = res.content[index].image;
-					if (imgsrc === '') {
+					/*if (imgsrc === '') {
 						imgsrc = '/images/1px.png'
 					}
 					if (mainsrc === '') {
 						mainsrc = '/images/1px2.png'
-					}
+					}*/
 					console.log(res.content[index][drawtype][layer].image)
 					//img.src = imgsrc;
 					//mainimg.src = mainsrc;
@@ -249,32 +249,34 @@ block content
 					//[''+imgsrc+'', ''+mainsrc+''].each(function(image){
 					$.each([''+imgsrc+'', ''+mainsrc+''], function(index, image){
 						console.log(index, image)
-						var imgobj = new Image();//document.createElement('img');
+						var imgobj = new Image();
 						imgobj.width = canvasWidth;
 						imgobj.height = canvasHeight;
 						imgobj.style.width = canvasWidth + "px";
 						imgobj.style.height = canvasHeight + "px";
 						var cx;
-						if (image === imgsrc) {
+						if (image === imgsrc && image !== '') {
 							imgobj.src = imgsrc;
 							imgobj.onload = function(){
 								cx = elem.getContext('2d');
 								cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
 							}
 
-						} else {
+						}
+						if (image === mainsrc && image !== '') {
 							console.log(image)
 							imgobj.src = mainsrc;
 							imgobj.onload = function(){
 								cx = canv.getContext('2d');
 								cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
-								var overlay = new Image()//document.createElement('img');
-								overlay.src = imgsrc;
-								overlay.onload = function(){
-									cx.drawImage(overlay, 0, 0, canvasWidth, canvasHeight)
+								var overlay = new Image();
+								if (imgsrc !== ''){
+									overlay.src = imgsrc;
+									overlay.onload = function(){
+										cx.drawImage(overlay, 0, 0, canvasWidth, canvasHeight)
+									}
 								}
 							}
-
 						}
 					}, false);
 					if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
@@ -497,7 +499,8 @@ block content
 							img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
 							img.onload = function(){
 								context.drawImage(img, 0, 0, width, height);
-							
+								var ctx = can.getContext('2d')
+								ctx.drawImage(img, 0, 0, width, height);
 								mainCanvas.toBlob(function(blob) {
 									var fd = new FormData();
 									

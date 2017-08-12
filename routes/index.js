@@ -609,7 +609,9 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 
 router.get('/api/selectlayer', function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
-
+	if (!req.app.locals.pageindex){
+		return res.redirect('/login')
+	}
 	Page.findOne({urltitle: req.app.locals.urltitle, content: {$elemMatch: {index: req.app.locals.index}}}, function(err, doc){
 		if (err) {
 			return next(err)
@@ -638,12 +640,13 @@ router.get('/api/selectlayer', function(req, res, next){
 		})
 	})
 })
-router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', upload.array(), function(req, res, next){
+router.post('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', upload.array(), function(req, res, next){
 	//delete req.app.locals.layer;
 	var outputPath = url.parse(req.url).pathname;
 	var index = parseInt(req.params.index, 10);
 	var layer = parseInt(req.params.layer, 10);
 	var urltitle = req.params.urltitle;
+	
 	var drawtype = req.params.drawtype;
 	req.app.locals.index = index;
 	req.app.locals.layer = layer;
