@@ -186,9 +186,9 @@ block content
 				["touchstart", "touchmove", "touchend"].forEach(function(e) {
 						elem.addEventListener(e, TouchHandler);
 				});
-				window.addEventListener("resize", function(e) {
+				/*window.addEventListener("resize", function(e) {
 					InitializeCanvas(drawtype, layer);
-				});
+				});*/
 			}
 			
 		}
@@ -204,7 +204,7 @@ block content
 			}
 			var newwidth = window.screen.width * newscale;
 			var newheight = window.screen.height * newscale;
-			var thislayer;
+			/*var thislayer;*/
 			if (canv.width != newwidth || canv.height != newheight || scale != newscale) {
 				// resizing a canvas clears it, so do it only when it's dimensions have changed.
 				canvasWidth = newwidth;
@@ -217,50 +217,66 @@ block content
 				scale = newscale;
 			}
 			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
-			if (elem !== null && elem.width != newwidth || elem.height != newheight) {
-				var context = elem.getContext("2d");
+			var context = elem.getContext("2d");
+			if (elem !== null && elem.width != newwidth || elem.height != newheight || scale != newscale) {
+				
 
 				elem.width = canvasWidth;
 				elem.height = canvasHeight;
 				elem.style.width = newwidth + "px";
 				elem.style.height = newheight + "px";
+				scale = newscale;
 			}
-			$.get('/doc/'+pageIndex+'', function(res){
+			$.get('/doc/'+'#{pageIndex}'+'', function(res){
 				//console.log(res)
 				
 				var img = new Image();
-				var imgsrc = res.content[index][drawtype][layer].image;
-				var mainsrc = res.content[index].image;
-				if (imgsrc === '') {
-					imgsrc = '/images/1px.png'
-				}
-				if (mainsrc === '') {
-					mainsrc = '/images/1px2.png'
-				}
-				console.log(res.content[index][drawtype][layer].image)
-				img.src = imgsrc;
-				
-					
-				img.onload = function(){
-					console.log('image hea: '+img.src)
-					img.width = canvasWidth;
-					img.height = canvasHeight;
-					img.style.width = canvasWidth + "px";
-					img.style.height = canvasHeight + "px";
-					var context = elem.getContext('2d');
-					context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-					
-				}
 				var mainimg = document.createElement('img');//new Image();
-				mainimg.src = mainsrc;
-				mainimg.onload = function() {
-					console.log('mainimg:'+mainsrc)
-					mainimg.width = canvasWidth;
-					mainimg.height = canvasHeight;
-					mainimg.style.width = canvasWidth + "px";
-					mainimg.style.height = canvasHeight + "px";
-					var ctx = canv.getContext('2d');
-					ctx.drawImage(mainimg, 0, 0, canvasWidth, canvasHeight);
+				var index = '#{index}'
+				if (index !== '') {
+					var imgsrc = res.content[index][drawtype][layer].image;
+					var mainsrc = res.content[index].image;
+					if (imgsrc === '') {
+						imgsrc = '/images/1px.png'
+					}
+					if (mainsrc === '') {
+						mainsrc = '/images/1px2.png'
+					}
+					console.log(res.content[index][drawtype][layer].image)
+					//img.src = imgsrc;
+					//mainimg.src = mainsrc;
+					//var imgs = [imgsrc, mainsrc]
+					//[''+imgsrc+'', ''+mainsrc+''].each(function(image){
+					$.each([''+imgsrc+'', ''+mainsrc+''], function(index, image){
+						console.log(index, image)
+						var imgobj = new Image();//document.createElement('img');
+						imgobj.width = canvasWidth;
+						imgobj.height = canvasHeight;
+						imgobj.style.width = canvasWidth + "px";
+						imgobj.style.height = canvasHeight + "px";
+						var cx;
+						if (image === imgsrc) {
+							imgobj.src = imgsrc;
+							imgobj.onload = function(){
+								cx = elem.getContext('2d');
+								cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
+							}
+
+						} else {
+							console.log(image)
+							imgobj.src = mainsrc;
+							imgobj.onload = function(){
+								cx = canv.getContext('2d');
+								cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
+								var overlay = new Image()//document.createElement('img');
+								overlay.src = imgsrc;
+								overlay.onload = function(){
+									cx.drawImage(overlay, 0, 0, canvasWidth, canvasHeight)
+								}
+							}
+
+						}
+					}, false);
 					if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
 						console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}', mainimg)
 						layer = parseInt(layer, 10)
@@ -279,6 +295,7 @@ block content
 						}
 					}
 				}
+				
 
 			})
 		}

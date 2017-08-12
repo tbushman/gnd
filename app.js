@@ -130,6 +130,15 @@ app.use('/publishers/sfusd2/:urltitle/:index/images/:drawtype', function(req, re
 	})
 });
 
+app.use('/publishers/sfusd2/:urltitle/:index/images/:drawtype/:file', function(req, res, next) {
+	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'/'+req.params.file+'')).apply(this, arguments);
+	})
+});
+
 app.use('/', routes);
 app.use(function (err, req, res, next) {
 
