@@ -247,6 +247,10 @@ router.post('/login', upload.array(), passport.authenticate('local'), function(r
 	
 	req.app.locals.loggedin = req.body.username;
 	req.app.locals.username = req.body.username;
+	req.app.locals.drawType = null;
+	req.app.locals.layer = null;
+	delete req.app.locals.drawType;
+	delete req.app.locals.layer;
 	/*var pagetitle;
 	if (req.body.pagetitle) {
 		pagetitle = encodeURIComponent(req.body.pagetitle);
@@ -519,6 +523,8 @@ router.get('/api/publish', function(req, res, next) {
 		if (err) {
 			return next(err)
 		}
+		req.app.locals.drawType = req.app.locals.drawType ? req.app.locals.drawType : "substrates";
+		req.app.locals.layer = req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level;
 		return res.render('publish', {
 			type: 'blog',
 			infowindow: infowindow,
@@ -527,7 +533,7 @@ router.get('/api/publish', function(req, res, next) {
 			index: doc ? doc.content.length-1 : false,
 			data: [].map.call(data, function(d){return d}),
 			doc: doc ? doc : false,
-			drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
+			drawtype: req.app.locals.drawType ? req.app.locals.drawType : "substrates",
 			layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
 			info: 'hi'
 		})
@@ -599,7 +605,7 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 				index: doc.content.length-1,
 				doc: doc,
 				data: datarray,
-				drawtype: req.app.locals.drawType ? req.app.locals.drawType : 'info',
+				drawtype: req.app.locals.drawType ? req.app.locals.drawType : 'substrates',
 				layer: req.app.locals.layer ? req.app.locals.layer : false,
 				info: 'Edit your entry.'
 			})
