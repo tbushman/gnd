@@ -227,7 +227,7 @@ block content
 			}
 			$.get('/doc/'+pageIndex+'', function(res){
 				//console.log(res)
-				var mainimg = new Image();
+				var mainimg = document.createElement('img');//new Image();
 				var img = new Image();
 				var imgsrc = res.content[index][drawtype][layer].image;
 				var mainsrc = res.content[index].image;
