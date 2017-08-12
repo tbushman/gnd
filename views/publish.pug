@@ -233,8 +233,14 @@ block content
 				var img = new Image();
 				var mainimg = document.createElement('img');//new Image();
 				var index = '#{index}'
+				var layer = '#{layer}'
 				if (index !== '') {
 					var imgsrc = res.content[index][drawtype][layer].image;
+					if (imgsrc === '') {
+						if ($('inputimg_'+drawtype+'_'+layer+'')){
+							imgsrc = $('inputimg_'+drawtype+'_'+layer+'').val()
+						}
+					}
 					var mainsrc = res.content[index].image;
 					/*if (imgsrc === '') {
 						imgsrc = '/images/1px.png'
