@@ -4,28 +4,28 @@ div.grid-header.mainHeader
 	//if (drawtype)
 	
 	
-	if (loggedin && drawtype && loggedin === menuData.publishers[0].username)
-		if (drawtype)
-			a.mainmenu(href="#", title="Save", id="save", onclick="$.post('/api/nextstep/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"').done(function(response){if (document.getElementById('canvas_"+drawtype+"_"+layer+"') !== null) {saveImage(document.getElementById('canvas_"+drawtype+"_"+layer+"'))}})")
-				img.i(src="/images/icons/check.svg")
-			- var allergies = menuData.publishers[0].allergies
-			each ing, j in keys
-				each cat, i in contentData[ing]
-					if (cat.unlocked && allergies.indexOf(cat.name) === -1)
-						a.tool(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
-							.ui
-								img(src="/images/icons/"+ing+"_"+i+".svg")
-								span.tb-font-m #{cat.name}
-								//-
-									if (cat.unlocked)
-										form(id="form_"+ing+"_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"")
-											input(type="hidden", value="1", name= cat.name)
-											//if (type === "draw")
-											input(type="hidden", id="inputimg_"+drawtype+"_"+layer+"", name= contentData[drawtype][layer].name, value= contentData[drawtype][layer].image)
-		else
-			
-			a.mainmenu(href="#", title="Done", id="done", onclick="$.post('/api/done').done(function(response){window.location.href = '/api/publish'})")
-				img.i(src="/images/icons/check.svg")
+	if (loggedin && drawtype && loggedin === menuData.publishers[0].username && type === "draw")
+		a.mainmenu(href="#", title="Save", id="save", onclick="$.post('/api/nextstep/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"').done(function(response){if (document.getElementById('canvas_"+drawtype+"_"+layer+"') !== null) {saveImage(document.getElementById('canvas_"+drawtype+"_"+layer+"'))}})")
+			img.i(src="/images/icons/check.svg")
+		- var allergies = menuData.publishers[0].allergies
+		each ing, j in keys
+			each cat, i in contentData[ing]
+				if (cat.unlocked && allergies.indexOf(cat.name) === -1)
+					a.tool(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
+						.ui
+							img(src="/images/icons/"+ing+"_"+i+".svg")
+							span.tb-font-m #{cat.name}
+							//-
+								if (cat.unlocked)
+									form(id="form_"+ing+"_"+i+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"")
+										input(type="hidden", value="1", name= cat.name)
+										//if (type === "draw")
+										input(type="hidden", id="inputimg_"+drawtype+"_"+layer+"", name= contentData[drawtype][layer].name, value= contentData[drawtype][layer].image)
+		//-
+			else
+				
+				a.mainmenu(href="#", title="Done", id="done", onclick="$.post('/api/done').done(function(response){window.location.href = '/api/publish'})")
+					img.i(src="/images/icons/check.svg")
 	else
 		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="/images/menu_button.svg")
