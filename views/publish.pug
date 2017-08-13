@@ -236,15 +236,28 @@ block content
 					var index = '#{index}'
 					var layer = '#{layer}'
 					if (index !== '') {
-						var imgsrc = res.content[index][drawtype][layer].image;
-						if (imgsrc === '') {
-							if ($('inputimg_'+drawtype+'_'+layer+'').val()){
+						var imgsrc;
+						if (res.content[index][drawtype][layer] !== undefined) {
+							if (res.content[index][drawtype][layer].image === '') {
+								if ($('inputimg_'+drawtype+'_'+layer+'').val() !== '' && $('inputimg_'+drawtype+'_'+layer+'').val() !== undefined){
+									imgsrc = $('#inputimg_'+drawtype+'_'+layer+'').val()
+									console.log($('#inputimg_'+drawtype+'_'+layer+'').val())
+								} else {
+									imgsrc = ''
+								}
+							} else {
+								imgsrc = res.content[index][drawtype][layer].image;
+							}
+							
+						} else {
+							if ($('inputimg_'+drawtype+'_'+layer+'').val() !== '' && $('inputimg_'+drawtype+'_'+layer+'').val() !== undefined){
 								imgsrc = $('#inputimg_'+drawtype+'_'+layer+'').val()
 								console.log($('#inputimg_'+drawtype+'_'+layer+'').val())
+							} else {
+								imgsrc = ''
 							}
 						}
 						var mainsrc = res.content[index].image;
-						console.log(res.content[index][drawtype][layer].image)
 						//img.src = imgsrc;
 						//mainimg.src = mainsrc;
 						//var imgs = [imgsrc, mainsrc]
