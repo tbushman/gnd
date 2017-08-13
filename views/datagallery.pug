@@ -30,23 +30,22 @@ if (menu === 'register')
 					input(type="hidden", name="pagetitle", id="pagetitle2")
 					input#svgurl(type="hidden", name="svg")
 					input#avatarurl(type="hidden", name="avatar")
-					div.tb-u-100
-						div.input-field
-							label.ms-Label Username
-							input.ms-TextField-field.is-required(type="text", name="username", maxlength="40", id="username", aria-required="true", onblur="checkNameValidity('username', '!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alpha-numeric characters only, please');")
-						div.input-field
-							label.ms-Label(for="languages") Language
-								datalist#theselanguages
-								
-								select(name="languages")
-									each lang, i in languages
-										option(value= lang.code) #{lang.nativeName}
-											span --
-											span #{lang.name}
-							//input.ms-TextField-field.is-required(type="text", list="theselanguages", id="languages")
+					div.tb-u-100.input-field
+						label.ms-Label Username
+						input.ms-TextField-field.is-required(type="text", name="username", maxlength="40", id="username", aria-required="true", onblur="checkNameValidity('username', '!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alpha-numeric characters only, please');")
+					div.tb-u-100.input-field
+						label.ms-Label(for="languages") Language
+							datalist#theselanguages
+							
+							select(name="languages")
+								each lang, i in languages
+									option(value= lang.code) #{lang.nativeName}
+										span --
+										span #{lang.name}
+						//input.ms-TextField-field.is-required(type="text", list="theselanguages", id="languages")
 
 
-					div.input-field.is-required
+					div.tb-u-100.input-field.is-required
 						label.ms-Label Password
 						input.ms-TextField-field.is-required(type="password", name="password")
 					p

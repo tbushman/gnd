@@ -252,18 +252,21 @@ router.post('/login', upload.array(), passport.authenticate('local'), function(r
 	
 	req.app.locals.loggedin = req.body.username;
 	req.app.locals.username = req.body.username;
-	/*req.app.locals.drawType = null;
+	req.app.locals.drawType = null;
 	req.app.locals.layer = null;
-	delete req.app.locals.drawType;
-	delete req.app.locals.layer;*/
-	/*var pagetitle;
-	if (req.body.pagetitle) {
-		pagetitle = encodeURIComponent(req.body.pagetitle);
-		req.app.locals.pageTitle = pagetitle;
-	} else {
-		
-	}*/
-	return res.redirect('/api/publish');
+	
+	Page.findOne({publishers: {$elemMatch:{username:req.body.username}}}, function(err, doc){
+			if (err) {
+				return next(err)
+			}
+			console.log(doc)
+			req.app.locals.pageTitle = doc.pagetitle;
+			req.app.locals.pageindex = doc.pageindex; 
+			req.app.locals.urltitle = doc.urltitle; 
+			return res.redirect('/api/publish');
+	})
+
+	
 });
 
 router.get('/logout', function(req, res) {
@@ -272,7 +275,7 @@ router.get('/logout', function(req, res) {
 	req.app.locals.userId = null;
 	req.app.locals.zoom = null;
 	req.app.locals.loggedin = null;
-	delete req.app.locals.pageTitle;
+	req.app.locals.pageTitle = null;
 	req.app.locals.drawtype = null;
 	req.app.locals.drawType = null;
 	req.app.locals.level = null;
@@ -499,33 +502,28 @@ router.get('/api/publish', function(req, res, next) {
 							}
 							req.app.locals.pageId = page._id;
 							req.app.locals.userId = req.app.locals.user._id;
-							cb(null, pages, page, page.pageindex, infowindow)
+							cb(null, data, pages, page, page.pageindex, infowindow)
 						})
 					}
 				})
 			} else {
-				Page.find({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(er, pages){
-					if (er) {
-						return next(er)
+				infowindow = 'data';
+				Page.findOne({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(err, doc){
+					if (err) {
+						return next(err)
 					}
-					Page.findOne({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(err, doc){
-						if (err) {
-							return next(err)
-						}
-						if (!req.app.locals.index) {
-							req.app.locals.index = doc.content[doc.content.length-1].index;
-						}
-						req.app.locals.pageindex = doc.pageindex;
-						req.app.locals.pageTitle = doc.pagetitle;
-						req.app.locals.urltitle = doc.pagetitle.replace(' ', '_')
-							cb(null, pages, doc, doc.pageindex, 'doc')
-						
-					})
+					if (!req.app.locals.index) {
+						req.app.locals.index = doc.content[doc.content.length-1].index;
+					}
+					req.app.locals.pageindex = doc.pageindex;
+					req.app.locals.pageTitle = doc.pagetitle;
+					req.app.locals.urltitle = doc.pagetitle.replace(' ', '_')
+						cb(null, data, pages, doc, doc.pageindex, 'doc')
 					
 				})
 			}
 		}
-	], function(err, data, doc, pageindex, infowindow){
+	], function(err, pages, data, doc, pageindex, infowindow){
 		if (err) {
 			return next(err)
 		}
@@ -538,7 +536,7 @@ router.get('/api/publish', function(req, res, next) {
 			pageindex: pageindex ? pageindex : data[data.length-1].pageindex,
 			index: doc ? doc.content.length-1 : false,
 			data: [].map.call(data, function(d){return d}),
-			doc: doc ? doc : false,
+			doc: doc ? doc : pages[0],
 			drawtype: req.app.locals.drawType ? req.app.locals.drawType : "substrates",
 			layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
 			info: 'hi'
@@ -656,7 +654,7 @@ router.get('/api/selectlayer', function(req, res, next){
 		})
 	})
 })
-router.post('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', function(req, res, next){
+router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', function(req, res, next){
 	//delete req.app.locals.layer;
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath)

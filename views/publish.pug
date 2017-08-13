@@ -9,10 +9,15 @@ block page
 		- var menuData = doc
 		- var pageIndex = pageindex
 	else
-		if (pageindex)
-			- var menu = 'doc'
-			- var pageIndex = pageindex
-			- var menuData = data[pageindex]
+		if (loggedin)
+			if (pageindex)
+				- var menu = 'doc'
+				- var pageIndex = pageindex
+				- var menuData = data[pageindex]
+			else
+				- var menu = 'home'
+				- var pageIndex = data[data.length-1].pageindex
+				- var menuData = data[data.length-1]
 		else
 			- var menu = 'home'
 			- var pageIndex = data[data.length-1].pageindex
@@ -151,8 +156,7 @@ block content
 			drawtype = '#{drawtype}'
 			layer = '#{layer}'
 			console.log(drawtype, layer)
-			var canv = document.getElementById('canvas')
-			var ctx = canv.getContext("2d");
+
 			if (drawtype && drawtype !== '') {
 				console.log('initializing app')
 				InitializeApp(drawtype, layer)
@@ -196,8 +200,9 @@ block content
 		function InitializeCanvas(drawtype, layer) {
 			var canv = document.getElementById("canvas");
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
-
-						//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
+			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
+			var context = elem.getContext("2d");
+			//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
 			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
 			if (navigator.platform.split('Mac')[1] !== undefined) {
 				newscale = 1
@@ -205,28 +210,30 @@ block content
 			var newwidth = window.screen.width * newscale;
 			var newheight = window.screen.height * newscale;
 			/*var thislayer;*/
+			//var size;
 			if (canv.width != newwidth || canv.height != newheight || scale != newscale) {
 				// resizing a canvas clears it, so do it only when it's dimensions have changed.
 				canvasWidth = newwidth;
 				canvasHeight = newheight;
+				//size = Math.min(canvasWidth, canvasHeight);
 				canv.width = canvasWidth;
 				canv.height = canvasHeight;
-				canv.style.width = newwidth + "px";
-				canv.style.height = newheight + "px";
-				
+				canv.style.width = canvasWidth + "px";
+				canv.style.height = canvasHeight + "px";
+				var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
+				if (elem !== null && elem.width != newwidth || elem.height != newheight || scale != newscale) {
+					
+					elem.width = canvasWidth;
+					elem.height = canvasHeight;
+					elem.style.width = canvasWidth + "px";
+					elem.style.height = canvasHeight + "px";
+				}
 				scale = newscale;
-			}
-			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
-			var context = elem.getContext("2d");
-			if (elem !== null && elem.width != newwidth || elem.height != newheight || scale != newscale) {
-				
-
-				elem.width = canvasWidth;
-				elem.height = canvasHeight;
-				elem.style.width = newwidth + "px";
-				elem.style.height = newheight + "px";
-				scale = newscale;
-			}
+			}/* else {
+				size = Math.min(newwidth, newheight)
+			}*/
+			
+						
 			if (drawtype !== "info" && drawtype !== "tools") {
 				$.get('/doc/'+'#{pageIndex}'+'', function(res){
 					//console.log(res)
@@ -235,66 +242,26 @@ block content
 					var mainimg = document.createElement('img');
 					var index = '#{index}'
 					var layer = '#{layer}'
+					var mainsrc;
 					if (index !== '') {
-						var imgsrc;
-						if (res.content[index][drawtype][layer] !== undefined) {
-							if (res.content[index][drawtype][layer].image === '') {
-								if ($('inputimg_'+drawtype+'_'+layer+'').val() !== '' && $('inputimg_'+drawtype+'_'+layer+'').val() !== undefined){
-									imgsrc = $('#inputimg_'+drawtype+'_'+layer+'').val()
-									console.log($('#inputimg_'+drawtype+'_'+layer+'').val())
-								} else {
-									imgsrc = ''
-								}
-							} else {
-								imgsrc = res.content[index][drawtype][layer].image;
+						mainsrc = res.content[index].image;
+						var imgobj = document.createElement('img');
+						if (mainsrc !== undefined && mainsrc !== '') {
+							imgobj.onload = function(){
+								var cx = canv.getContext('2d');
+								
+								cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
 							}
-							
-						} else {
-							if ($('inputimg_'+drawtype+'_'+layer+'').val() !== '' && $('inputimg_'+drawtype+'_'+layer+'').val() !== undefined){
-								imgsrc = $('#inputimg_'+drawtype+'_'+layer+'').val()
-								console.log($('#inputimg_'+drawtype+'_'+layer+'').val())
-							} else {
-								imgsrc = ''
-							}
+							imgobj.src = mainsrc;
 						}
-						var mainsrc = res.content[index].image;
-						//img.src = imgsrc;
-						//mainimg.src = mainsrc;
-						//var imgs = [imgsrc, mainsrc]
-						//[''+imgsrc+'', ''+mainsrc+''].each(function(image){
-						$.each([''+imgsrc+'', ''+mainsrc+''], function(ind, image){
-							console.log(ind, image)
-							var imgobj = document.createElement('img');
-							imgobj.width = canvasWidth;
-							imgobj.height = canvasHeight;
-							imgobj.style.width = canvasWidth + "px";
-							imgobj.style.height = canvasHeight + "px";
-							if (image === imgsrc && image !== '') {
-								imgobj.onload = function(){
-									var cx = elem.getContext('2d');
-									cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
-									
-								}
-								imgobj.src = imgsrc;
-
+						/*var c = canv.getContext('2d');
+						var overlay = document.createElement('img');
+						if (imgsrc !== ''){
+							overlay.onload = function(){
+								c.drawImage(overlay, 0, 0, canvasWidth, canvasHeight)
 							}
-							if (image === mainsrc && image !== '') {
-								console.log(image)
-								imgobj.onload = function(){
-									var cx = canv.getContext('2d');
-									var overlay = document.createElement('img');
-									if (imgsrc !== ''){
-										overlay.onload = function(){
-											cx.drawImage(overlay, 0, 0, canvasWidth, canvasHeight)
-										}
-										overlay.src = imgsrc;
-									}
-									cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
-								}
-								imgobj.src = mainsrc;
-							}
-							
-						});
+							overlay.src = imgsrc;
+						}*/
 						if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
 							console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}')
 							layer = parseInt(layer, 10)
@@ -510,14 +477,14 @@ block content
 						processData: false,
 						contentType: false,
 						success: function(response) {
-							delete blob;
+							//delete blob;
 							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
 							$('#inputimg_'+drawtype+'_'+layer+'').val(imgurl);
 							var img = document.createElement('img');
 							img.onload = function(){
-								/*context.drawImage(img, 0, 0, width, height);
-								var ctx = can.getContext('2d')
-								ctx.drawImage(img, 0, 0, width, height);*/
+								context.drawImage(img, 0, 0, width, height);
+								//var ctx = can.getContext('2d')
+								//ctx.drawImage(img, 0, 0, width, height);
 								mainCanvas.toBlob(function(blob) {
 									var fd = new FormData();
 									

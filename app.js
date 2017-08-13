@@ -144,12 +144,10 @@ app.use('/', routes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-	var err = new Error('Not Found');
-	err.status = 404;
-	next(err);
+	res.status(404).send('Not Found');
 });
 
-app.use(function (err, req, res) {
+/*app.use(function (err, req, res) {
 
 	console.log(err.stack)
 	req.app.locals.username = null;
@@ -164,7 +162,7 @@ app.use(function (err, req, res) {
 	    message: err.message,
 	    error: err.status
 	})
-});
+});*/
 
 var uri = process.env.DEVDB;
 
