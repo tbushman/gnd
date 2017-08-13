@@ -243,7 +243,7 @@ html
 								console.log(e.target)
 								if (e.target.getAttribute('className') === 'yes') {
 									$.post('/api/allergy/'+result.pageindex+'/'+index+'/'+drawtype+'/'+layer +'').done(function(){
-										$.post('/api/selectlayer/'+result.urltitle+'/'+result.pageindex+'/'+index+'/'+drawtype+'/'+(parseInt(layer, 10)+1) +'').done(function(result){
+										$.post('/api/nextstep/'+result.urltitle+'/'+result.pageindex+'/'+index+'/'+drawtype+'/'+parseInt(layer, 10) +'').done(function(result){
 											window.location.href = '/api/selectlayer'
 										})
 									})

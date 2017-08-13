@@ -231,8 +231,8 @@ block content
 				$.get('/doc/'+'#{pageIndex}'+'', function(res){
 					//console.log(res)
 					
-					var img = new Image();
-					var mainimg = new Image();
+					var img = document.createElement('img');
+					var mainimg = document.createElement('img');
 					var index = '#{index}'
 					var layer = '#{layer}'
 					if (index !== '') {
@@ -264,7 +264,7 @@ block content
 						//[''+imgsrc+'', ''+mainsrc+''].each(function(image){
 						$.each([''+imgsrc+'', ''+mainsrc+''], function(ind, image){
 							console.log(ind, image)
-							var imgobj = new Image();
+							var imgobj = document.createElement('img');
 							imgobj.width = canvasWidth;
 							imgobj.height = canvasHeight;
 							imgobj.style.width = canvasWidth + "px";
@@ -282,14 +282,14 @@ block content
 								console.log(image)
 								imgobj.onload = function(){
 									var cx = canv.getContext('2d');
-									cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
-									var overlay = new Image();
+									var overlay = document.createElement('img');
 									if (imgsrc !== ''){
 										overlay.onload = function(){
 											cx.drawImage(overlay, 0, 0, canvasWidth, canvasHeight)
 										}
 										overlay.src = imgsrc;
 									}
+									cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
 								}
 								imgobj.src = mainsrc;
 							}
@@ -393,7 +393,7 @@ block content
 			context.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
 			context.closePath();
 			if (drawType !== "info" && drawType !== "tools") {
-				var img = new Image();
+				var img = document.createElement('img');
 				img.onload = function(){
 					var pattern;
 					var context = eventTarget.getContext("2d");
@@ -513,11 +513,11 @@ block content
 							delete blob;
 							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
 							$('#inputimg_'+drawtype+'_'+layer+'').val(imgurl);
-							var img = new Image();
+							var img = document.createElement('img');
 							img.onload = function(){
-								context.drawImage(img, 0, 0, width, height);
+								/*context.drawImage(img, 0, 0, width, height);
 								var ctx = can.getContext('2d')
-								ctx.drawImage(img, 0, 0, width, height);
+								ctx.drawImage(img, 0, 0, width, height);*/
 								mainCanvas.toBlob(function(blob) {
 									var fd = new FormData();
 									
