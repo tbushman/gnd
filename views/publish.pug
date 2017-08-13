@@ -36,26 +36,28 @@ block content
 
 			div.overtext #{menuData.pagetitle}
 			div.blogname
-				
-				if (allergies.indexOf(contentData.filling[contentData.level].name) === -1)
-					span.translate #{contentData.filling[contentData.level].name}
-					span  and 
-				else
-					if (contentData.filling[contentData.level-1] !== null)
-						span.translate #{contentData.filling[contentData.level-1].name}
+				if (contentData.filling[contentData.level] !== undefined && drawtype)
+					if (allergies.length && allergies.indexOf(contentData.filling[contentData.level].name) === -1)
+						span.translate #{contentData.filling[contentData.level].name}
 						span  and 
 					else
-						if (contentData.filling[contentData.level+1] !== null)
-							span.translate #{contentData.filling[contentData.level+1].name}
+						if (contentData.filling[contentData.level-1] !== undefined)
+							span.translate #{contentData.filling[contentData.level-1].name}
 							span  and 
+						else
+							if (contentData.filling[contentData.level+1] !== null)
+								span.translate #{contentData.filling[contentData.level+1].name}
+								span  and 
 				span.translate #{contentData.filling[0].name}
 			
 			if (drawtype && drawtype !== "tools")
 				if (menuData.publishers[0].username === loggedin)
 						
 					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_0.svg');")
-
-			canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_0.svg');")
+			if (contentData.level === 3)
+				canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_"+1+".svg');")
+			else
+				canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_0.svg');")
 			div.topLeft
 		
 		div.grid-container(class= type)
@@ -157,10 +159,10 @@ block content
 			}
 			
 		})
-		$(document).on('click', '#deletefeature', function(){
-
+		$(document).on('click', '#deletefeature', function(e){
+			e.preventDefault();
 			if ($('#deletefeature span').css('display') === 'block') {
-				$(this).attr("href", "/api/deletefeature/"+pageIndex+"/"+#{index}+"");
+				$(this).attr("href", "/api/deletefeature/"+'#{pageindex}'+"/"+'#{index}'+"");
 			} else {
 				$('#deletefeature span').css('display', 'block')
 			}
@@ -255,17 +257,16 @@ block content
 							imgobj.style.width = canvasWidth + "px";
 							imgobj.style.height = canvasHeight + "px";
 							if (image === imgsrc && image !== '') {
-								imgobj.src = imgsrc;
 								imgobj.onload = function(){
 									var cx = elem.getContext('2d');
 									cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
 									
 								}
+								imgobj.src = imgsrc;
 
 							}
 							if (image === mainsrc && image !== '') {
 								console.log(image)
-								imgobj.src = mainsrc;
 								imgobj.onload = function(){
 									var cx = canv.getContext('2d');
 									cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
@@ -277,6 +278,7 @@ block content
 										}
 									}
 								}
+								imgobj.src = mainsrc;
 							}
 							
 						});
@@ -379,7 +381,6 @@ block content
 			context.closePath();
 			if (drawType !== "info" && drawType !== "tools") {
 				var img = new Image();
-				img.src = '/images/'+drawType+'/'+drawType+'_'+layer+'.svg';
 				img.onload = function(){
 					var pattern;
 					var context = eventTarget.getContext("2d");
@@ -419,8 +420,8 @@ block content
 								ctx.fill()
 								
 							} else {
-								context.fillStyle = context.drawImage(img, (size/2) - (size/2)/2, 15, size, size);
-								context.fillRect(img, (size/2) - (size/2)/2, 15, size, size)
+								context.fillStyle = context.drawImage(img, (size/2) - (size/2)/2, (size/2) - (size/2)/1.42, size, size);
+								context.fillRect(img, (size/2) - (size/2)/2, (size/2) - (size/2)/1.42, size, size)
 
 							}
 						}
@@ -445,6 +446,8 @@ block content
 					}
 					
 				}
+				img.src = '/images/'+drawType+'/'+drawType+'_'+layer+'.svg';
+
 				context.restore();
 			}
 			
@@ -498,7 +501,6 @@ block content
 							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
 							$('#inputimg_'+drawtype+'_'+layer+'').val(imgurl);
 							var img = new Image();
-							img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
 							img.onload = function(){
 								context.drawImage(img, 0, 0, width, height);
 								var ctx = can.getContext('2d')
@@ -524,6 +526,8 @@ block content
 									})
 								}, 'image/png'/*, 0.95*/);
 							}
+							img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
+
 						}
 						
 					})

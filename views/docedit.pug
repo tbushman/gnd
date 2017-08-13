@@ -10,14 +10,21 @@ form#form.tb-u-100(enctype="multipart/form-data", method="POST", action="/api/ed
 	input(type="hidden", id="inputimg", name="image")
 	if (drawtype && contentData[drawtype][contentData.level] !== undefined)
 		input(type="hidden", id="inputimg_"+drawtype+"_"+contentData.level+"", name= contentData[drawtype][contentData.level].name)
-	div.tb-u-100
-		button.ms-Button.ms-Button--primary.tb-u-100.block.spacer(id="submit", type="submit", ariaDescription="Save this Sandwich")
-			span.ms-Button-label Save
-p.tb-font-xs#info
+	button.tb-u-33.ms-Button.ms-Button--primary.block.spacer(id="submit", type="submit", ariaDescription="Save this Sandwich")
+		span.ms-Button-label Save
+	
+if (contentData !== undefined && contentData.image !== "")
+	a.tb-u-33.ms-Button.ms-Button--primary.block.spacer(role="button", href="#", title="Menu", onclick="blogModeModal('"+contentData.image+"');")
+		span.ms-Button-label Share
+
+//-
+	div.tb-u-33
+		a.ms-Button.ms-Button--alert#deletefeature.tb-u-100(href="#", role="button")
+			span.ms-Button-label Delete Post
+			span.tb-font-s(style="display: none") This cannot be undone. Continue?
+
 div.tb-u-33
-	a.ms-Button.ms-Button--alert#deletefeature.tb-u-100(href="#", role="button")
-		span.ms-Button-label Delete Post
-		span.tb-font-s(style="display: none") This cannot be undone. Continue?
-div.tb-u-33
-	a.ms-Button.tb-u-100(href="/", role="button")
+	a.ms-Button.tb-u-100.secondary(href="/", role="button")
 		span.ms-Button-label.tb-u-100 Cancel
+
+p.tb-font-xs#info

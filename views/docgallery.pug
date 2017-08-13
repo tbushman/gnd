@@ -10,7 +10,7 @@ div.grid-right
 
 					p.tb-font-xl
 						
-						if (allergies.indexOf(contentData.filling[contentData.level].name) === -1)
+						if (contentData.filling[contentData.level] !== undefined && allergies.indexOf(contentData.filling[contentData.level].name) === -1)
 							span.translate #{contentData.filling[contentData.level].name}
 							span  and 
 						else

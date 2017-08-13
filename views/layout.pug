@@ -74,22 +74,26 @@ html
 				//e.stopPropagation();
 			});
 			function uiBlogMode(){
-				$('div.menu.draw').removeClass('draw');
-				$('div.menu').addClass('blog');
-				$('.grid-container').removeClass('draw');
-				$('.grid-container').addClass('blog');
-				$('.grid-container').addClass('selected');
-				$('#select').removeClass('draw');
-				$('#select').addClass('blog');
+				$(document).ready(function(){
+					$('.menu.draw').removeClass('draw');
+					$('.menu').addClass('blog');
+					$('.grid-container').removeClass('draw');
+					$('.grid-container').addClass('blog');
+					$('.grid-container').addClass('selected');
+					$('#select').removeClass('draw');
+					$('#select').addClass('blog');
+				})
 			}
 			function uiDrawMode(){
-				$('div.menu.blog').removeClass('blog');
-				$('div.menu').addClass('draw');
-				$('.grid-container').removeClass('blog');
-				$('.grid-container').addClass('draw');
-				$('.grid-container').removeClass('selected');
-				$('#select').removeClass('blog');
-				$('#select').addClass('draw');
+				$(document).ready(function(){
+					$('.menu.blog').removeClass('blog');
+					$('.menu').addClass('draw');
+					$('.grid-container').removeClass('blog');
+					$('.grid-container').addClass('draw');
+					$('.grid-container').removeClass('selected');
+					$('#select').removeClass('blog');
+					$('#select').addClass('draw');
+			});
 			}
 				function removeOldAlert()
 				{
@@ -137,6 +141,27 @@ html
 						elem.setAttribute("aria-invalid", "false");
 						removeOldAlert();
 					}
+				}
+				function blogModeModal(url){
+					removeOldAlert();
+					removeOldModal();
+					var newAlert = document.createElement("div");
+					newAlert.setAttribute("role", "alert");
+					newAlert.setAttribute("id", "modal");
+					var msg = document.createElement("p");
+					msg.setAttribute('class', 'tb-font-xxl');
+					msg.style.color = 'var(--primary)';
+					msg.style.margin = '0 auto';
+					msg.style['text-align'] = 'center'
+					var link = document.createElement('a');
+					var text = document.createTextNode('View and share');
+					link.href = url;
+						link.target = '_blank';
+						link.appendChild(text);
+						msg.appendChild(link)
+						newAlert.appendChild(msg);
+						newAlert.style['box-shadow'] =  '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)'
+						document.body.appendChild(newAlert);
 				}
 				function drawModeModal(aID, pageindex){
 					$.get('/doc/'+pageindex+'').done(function(result){

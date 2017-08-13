@@ -220,10 +220,11 @@ router.post('/register', upload.array(), function(req, res, next) {
 						req.app.locals.user = req.user;
 						req.app.locals.userId = doc._id;
 						req.app.locals.loggedin = doc.username;
-						req.app.locals.drawType = null;
+						req.app.locals.pageTitle = req.body.pagetitle;
+						/*req.app.locals.drawType = null;
 						req.app.locals.layer = null;
 						delete req.app.locals.drawType;
-						delete req.app.locals.layer;
+						delete req.app.locals.layer;*/
 						return res.redirect('/api/publish')
 					})
 				});
@@ -251,10 +252,10 @@ router.post('/login', upload.array(), passport.authenticate('local'), function(r
 	
 	req.app.locals.loggedin = req.body.username;
 	req.app.locals.username = req.body.username;
-	req.app.locals.drawType = null;
+	/*req.app.locals.drawType = null;
 	req.app.locals.layer = null;
 	delete req.app.locals.drawType;
-	delete req.app.locals.layer;
+	delete req.app.locals.layer;*/
 	/*var pagetitle;
 	if (req.body.pagetitle) {
 		pagetitle = encodeURIComponent(req.body.pagetitle);
@@ -306,7 +307,7 @@ router.all('/translate/:text', function(req, res, next){
 
 router.get('/home', function(req, res, next) {
 	//todo test null vs delete
-	delete req.app.locals.pageTitle;
+	//delete req.app.locals.pageTitle;
 
 	var info;
 	// Get data
@@ -458,12 +459,13 @@ router.get('/api/publish', function(req, res, next) {
 			if (pages.length === 0) {
 				infowindow = 'doc';
 				//dummy automatic first content entry
-				req.app.locals.urltitle = req.app.locals.pageTitle.replace(' ', '_')
-				var urltitle = req.app.locals.pageTitle.replace(' ', '_');
+				
+				var urltitle = req.app.locals.pageTitle !== undefined ? req.app.locals.pageTitle.replace(' ', '_') : null;
+				req.app.locals.urltitle = urltitle;
 				var page = new Page({
 					pageindex: data.length,
 					pagetitle: req.app.locals.pageTitle,
-					urltitle: urltitle,
+					urltitle: urltitle ? urltitle : '',
 					content: [ {
 						index: 0,
 						pid: data.length,
@@ -568,7 +570,7 @@ router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res
 					}
 					return res.render('publish', {
 						type: 'blog',
-						infowindow: 'dashboard',
+						infowindow: 'doc',
 						loggedin: req.app.locals.loggedin,
 						pageindex: doc.pageindex,
 						index: 0,
@@ -636,7 +638,7 @@ router.get('/api/selectlayer', function(req, res, next){
 				datarray.push(data[l])
 			}
 			return res.render('publish', {
-				type: 'draw',
+				type: req.app.locals.type ? req.app.locals.type : 'blog',
 				infowindow: 'edit',
 				drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
 				layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
@@ -653,6 +655,7 @@ router.get('/api/selectlayer', function(req, res, next){
 router.post('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', upload.array(), function(req, res, next){
 	//delete req.app.locals.layer;
 	var outputPath = url.parse(req.url).pathname;
+	console.log(outputPath)
 	var index = parseInt(req.params.index, 10);
 	var layer = parseInt(req.params.layer, 10);
 	var urltitle = req.params.urltitle;
@@ -662,6 +665,8 @@ router.post('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', upl
 	req.app.locals.layer = layer;
 	req.app.locals.drawType = drawtype;
 	req.app.locals.urltitle = urltitle;
+	req.app.locals.type = 'draw'
+	req.app.locals.pageindex = parseInt(req.params.pageindex, 10);
 	Page.find({}, function(errrr, data){
 		if (errrr) {
 			return next(errrr)
@@ -759,6 +764,8 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 	//console.log(drawType)
 	var level = parseInt(req.params.level, 10);
 	var pageindex = parseInt(req.params.pageindex, 10);
+	req.app.locals.pageindex = pageindex;
+	req.app.locals.urltitle = req.params.urltitle;
 	async.waterfall([
 		function(cb){
 			Page.findOne({pageindex: pageindex}, function(err, pub) {
@@ -945,7 +952,7 @@ router.get('/api/levelup', function(req, res, next){
 		if (errr) {
 			return next(errr)
 		}
-		if (layer > 2) {
+		if (layer > 3) {
 			return res.redirect('/chef/'+doc.pagetitle+'/'+req.app.locals.index+'')
 		}
 		Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){
@@ -970,7 +977,7 @@ router.get('/api/levelup', function(req, res, next){
 						infowindow: 'doc',
 						loggedin: req.app.locals.loggedin,
 						pageindex: doc.pageindex,
-						index: req.app.locals.index,
+						index: req.app.locals.index ? req.app.locals.index : doc.content[doc.content.length-1].index,
 						doc: doc,
 						data: datarray,
 						info: ':)'

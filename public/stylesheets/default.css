@@ -10,6 +10,12 @@
 	--nowindowmenu: 15%; 
 } 
 
+.primary {
+	background-color: var(--primary);
+}
+.secondary {
+	background-color: var(--secondary)!important;
+}
 
 html {
 	font-family: Roboto, sans-serif;
@@ -183,6 +189,12 @@ i.fa.active {
 	display: inline-block;
 	text-align: center;
 	margin: 0 4px 10px 0;
+}
+.tb-u-50 {
+	width: 45%;
+	display: inline-block;
+	margin: 0 auto;
+	text-align: center;
 }
 
 #hide .tb-font-xxs {
