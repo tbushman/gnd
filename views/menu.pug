@@ -48,16 +48,10 @@ div.grid-left
 						
 							each ing, k in contentData[key]
 								if (ing.unlocked)
-									a.module.focus.drop(href="#", onclick="document.getElementById('form_"+key+"_"+k+"').submit();")
+									a.module.focus.drop(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
 										.ui
 											img(src=(ing.unlocked ? "/images/icons/"+key+"_"+k+".svg" : "/images/icons/unknown.svg"))
-
-								
-										//each ing, k in module
 										span.tb-font-l #{ing.name}
-										form(id="form_"+key+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+key+"/"+k+"")
-											input(type="hidden", value="1", name= ing.name)
-											//input(type="hidden", id="inputimg_"+keys[j]+"_"+k+"", name= ing.name, value= ing.image)
 									
 			if (loggedin)
 				a.module(href="/logout", title="logout")

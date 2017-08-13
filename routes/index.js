@@ -652,7 +652,7 @@ router.get('/api/selectlayer', function(req, res, next){
 		})
 	})
 })
-router.post('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', upload.array(), function(req, res, next){
+router.post('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', function(req, res, next){
 	//delete req.app.locals.layer;
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath)
