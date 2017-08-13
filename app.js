@@ -25,13 +25,13 @@ dotenv.load();
 var app = express();
 if (app.get('env') === 'production') {
 	app.set('trust proxy', 1) // trust first proxy	
-	app.use(function (req, res, next) {
+	/*app.use(function (req, res, next) {
 	    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:80');
 	    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 	    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Authorization');
 	    res.setHeader('Access-Control-Allow-Credentials', true);
 	    next()
-	});
+	});*/
 }
 
 passport.use(new LocalStrategy(Publisher.authenticate()));
@@ -42,8 +42,8 @@ passport.serializeUser(function(user, done) {
 });
 passport.deserializeUser(function(id, done) {
 	Publisher.findOne({_id: id}, function(err, user){
-    	//console.log(user);
-    	if(!err) {
+
+		if(!err) {
 			done(null, user);
 		} else {
 			done(err, null);
@@ -141,7 +141,15 @@ app.use('/publishers/sfusd2/:urltitle/:index/images/:drawtype/:file', function(r
 });
 
 app.use('/', routes);
-app.use(function (err, req, res, next) {
+
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+	var err = new Error('Not Found');
+	err.status = 404;
+	next(err);
+});
+
+app.use(function (err, req, res) {
 
 	console.log(err.stack)
 	req.app.locals.username = null;
@@ -149,16 +157,13 @@ app.use(function (err, req, res, next) {
 	req.app.locals.zoom = null;
 	req.app.locals.loggedin = null;
 	delete req.app.locals.pageTitle;
+	delete req.app.locals.drawType;
+	delete req.app.locals.layer;
 	req.logout();
 	res.status(err.status || 500).send({
 	    message: err.message,
 	    error: err.status
 	})
-});
-
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  res.status(404).send('Not Found');
 });
 
 var uri = process.env.DEVDB;
