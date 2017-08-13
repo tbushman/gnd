@@ -584,11 +584,15 @@ router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res
 })
 
 router.post('/api/uploadmedia/:pageindex/:index/:drawtype/:layer', uploadmedia.any(), function(req, res, next){
+	var outputPath = url.parse(req.url).pathname;
+	console.log(outputPath)
 	return res.status(200).send(req.files[0].path)
 })
 
 router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(req, res, next){
-	
+	var outputPath = url.parse(req.url).pathname;
+	console.log(outputPath)
+
 	var outputPath = url.parse(req.url).pathname;
 	var index = parseInt(req.params.index, 10);
 	Page.findOne({pageindex: parseInt(req.params.pageindex, 10)}, function(error, doc){
@@ -731,6 +735,9 @@ router.post('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', fun
 })
 
 router.post('/api/allergy/:pageindex/:index/:drawtype/:level', function(req, res, next){
+	var outputPath = url.parse(req.url).pathname;
+	console.log(outputPath)
+
 	var pageindex = parseInt(req.params.pageindex, 10);
 	Page.findOne({pageindex:pageindex, publishers: {$elemMatch:{username: req.app.locals.loggedin}}}, function(er, pub){
 		if (er){
@@ -753,7 +760,7 @@ router.post('/api/allergy/:pageindex/:index/:drawtype/:level', function(req, res
 })
 router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upload.array(), function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
-	//console.log(outputPath)
+	console.log(outputPath)
 	var index = parseInt(req.params.index, 10);
 	var title = req.body.title;
 	var description = req.body.description;
@@ -869,6 +876,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 
 router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
+	console.log(outputPath)
 	var urltitle = req.params.urltitle;
 	var pageindex = parseInt(req.params.pageindex, 10);
 	var index = parseInt(req.params.index, 10);
@@ -938,6 +946,8 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 });
 
 router.get('/api/levelup', function(req, res, next){
+	var outputPath = url.parse(req.url).pathname;
+	console.log(outputPath)
 	var layer = parseInt(req.app.locals.layer, 10)
 	layer++;
 	

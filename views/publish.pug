@@ -285,10 +285,10 @@ block content
 									cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
 									var overlay = new Image();
 									if (imgsrc !== ''){
-										overlay.src = imgsrc;
 										overlay.onload = function(){
 											cx.drawImage(overlay, 0, 0, canvasWidth, canvasHeight)
 										}
+										overlay.src = imgsrc;
 									}
 								}
 								imgobj.src = mainsrc;
