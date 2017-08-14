@@ -24,9 +24,7 @@ div.grid-header.mainHeader
 						span#continue.tb-font-xxl.translate Continue
 				
 					
-					//#{contentData.description}
-					//if (type === 'draw' && infowindow === 'edit' && !document.getElementsByClassName('grid-container')[0].classList.contains("selected"))
-					//if (pageindex)
+
 				else
 					if (type === "draw")
 						each ing, j in keys
@@ -44,7 +42,6 @@ div.grid-header.mainHeader
 		div.pullquote
 			if (contentData)
 				span.tb-font-xxl.translate #{contentData.description}
-			//if (type === 'draw' && infowindow === 'edit' && !document.getElementsByClassName('grid-container')[0].classList.contains("selected"))
 
 			
 div.grid-left#tl
@@ -63,22 +60,6 @@ div.grid-left#tl
 									.ui
 										img(src="/images/icons/"+ing+"_"+i+".svg")
 									span.tb-font-m.translate #{cat.name}
-			//-
-				if (loggedin && drawtype && drawtype !== "tools" && drawtype !== "info" && loggedin === menuData.publishers[0].username && type === "draw")
-					a.module.dropdown(title="edit")
-						.ui
-							img(src="/images/icons/edit.svg")
-						span.tb-font-l Edit
-
-						each key, j in keys
-							if (key !== "tools" && key !== "info")
-							
-								each ing, k in contentData[key]
-									if (ing.unlocked)
-										a.module.focus.drop(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
-											.ui
-												img(src=(ing.unlocked ? "/images/icons/"+key+"_"+k+".svg" : "/images/icons/unknown.svg"))
-											span.tb-font-l #{ing.name}
 									
 			if (loggedin)
 				a.module(href="/logout", title="logout")

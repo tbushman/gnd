@@ -204,9 +204,8 @@ i.fa.active {
 }
 .pullquote {
 	display: block;
-	position: absolute;
+	position: relative;
 	/*top: calc(var(--nowindowmenu) + 15px);*/
-	left: var(--thumbwidth);
 	z-index:1;
 }
 .pullquote > .tool > .ui > img {
@@ -739,10 +738,12 @@ a.tool {
 	width: calc(var(--thumbwidth)*1.1);
 	margin: 0 auto;
 	display: inline-block;
+	float: left;
+	position: relative;
 }
 a.tool .ui {
 	width: var(--thumbwidth);
-	display: table;
+	display: inline-table;
 	position: relative;
 	margin: 0 auto;
 }

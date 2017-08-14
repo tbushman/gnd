@@ -160,35 +160,7 @@ block content
 					if (!res || res == undefined || res == null) {
 						
 					}
-					else {/*
-						var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
-						if (navigator.platform.split('Mac')[1] !== undefined) {
-							newscale = 1
-						}
-						var canv = document.getElementById('canvas');
-						var canvW = window.screen.width * newscale;
-						var canvH = window.screen.height * newscale;
-						context = canv.getContext('2d');
-						console.log(res)
-						var img = document.createElement('img');
-						if (canv.width != canvW || canv.height != canvH) { 
-							canv.width = canvW
-							canv.heigth = canvH
-							canv.style.width = canvW + 'px'
-							canv.style.height = canvH + 'px'
-						}*/
-						/*
-						img.onload = function(){
-							
-							img.width = canvW;
-							img.height = canvH;
-							context.drawImage(img, 0, 0, canvW, canvH);
-							//context.imageSmoothingEnabled = true;
-							console.log(context)
-							
-						}
-						img.src = res.content[index].image;//'/publishers/sfusd2/'+res.urltitle+'/'+res.content.length-1+'/images/main/main_0.png';
-						*/
+					else {
 						InitializeCanvas("main", res.content.length-1)
 					}
 				})
@@ -293,21 +265,21 @@ block content
 							}
 							imgobj.src = mainsrc;
 						}
-						/*var c = canv.getContext('2d');
-						var overlay = document.createElement('img');
-						if (imgsrc !== ''){
-							overlay.onload = function(){
-								c.drawImage(overlay, 0, 0, canvasWidth, canvasHeight)
-							}
-							overlay.src = imgsrc;
-						}*/
+
 						if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
-							console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}')
 							layer = parseInt(layer, 10)
 							var irr, irrname;
 							var index = '#{index}'
 								index = parseInt(index, 10)
-								irr = res.content[index][drawtype][layer+1];
+							if (res.content[index][drawtype] !== undefined) {
+								console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}', res.content[index][drawtype][layer])
+								if (res.content[index][drawtype][layer+1]) {
+									irr = res.content[index][drawtype][layer+1];									
+								}
+							} else {
+								irr = undefined;
+							}
+								
 							
 							if ('#{index}' !== '' && '#{infowindow}' === "edit" && irr !== undefined && irr.spec.safety !== 'bacteria') {
 								id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';

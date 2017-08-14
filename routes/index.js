@@ -259,7 +259,6 @@ router.post('/login', upload.array(), passport.authenticate('local'), function(r
 			if (err) {
 				return next(err)
 			}
-			console.log(doc)
 			req.app.locals.pageTitle = doc.pagetitle;
 			req.app.locals.pageindex = doc.pageindex; 
 			req.app.locals.urltitle = doc.urltitle; 
