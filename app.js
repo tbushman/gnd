@@ -25,13 +25,13 @@ dotenv.load();
 var app = express();
 if (app.get('env') === 'production') {
 	app.set('trust proxy', 1) // trust first proxy	
-	/*app.use(function (req, res, next) {
+	app.use(function (req, res, next) {
 	    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:80');
 	    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 	    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Authorization');
 	    res.setHeader('Access-Control-Allow-Credentials', true);
 	    next()
-	});*/
+	});
 }
 
 passport.use(new LocalStrategy(Publisher.authenticate()));
