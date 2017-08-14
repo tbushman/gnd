@@ -73,12 +73,7 @@ block content
 			else
 				include datagallery.pug
 		
-		div.pullquote
-			
-			if (contentData)
-				each item, i in contentData.info
-					if (item.ind === contentData.level)
-						span.tb-font-xxl.translate #{item.caption}
+		
 				
 
 	//-
@@ -480,36 +475,68 @@ block content
 							//delete blob;
 							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
 							$('#inputimg_'+drawtype+'_'+layer+'').val(imgurl);
-							var img = document.createElement('img');
-							img.onload = function(){
-								context.drawImage(img, 0, 0, width, height);
-								//var ctx = can.getContext('2d')
-								//ctx.drawImage(img, 0, 0, width, height);
-								mainCanvas.toBlob(function(blob) {
-									var fd = new FormData();
-									
-									fd.append("image", blob);
-									
-									var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/0';
-
-									$.ajax({
-										url: uploadurl,
-										type: 'POST',
-										data: fd,
-										processData: false,
-										contentType: false,
-										success: function(response) {
-											$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-											console.log('saved both')
-											uiBlogMode();
+							var text = '';
+							var index = '#{index}';
+							
+							if (index !== '') {
+								index = parseInt(index, 10);
+								layer = parseInt(layer, 10);
+								$.get('/doc/'+'#{pageIndex}'+'', function(res){
+									var level = parseInt(res.content[index].level, 10);
+									var filling = res.content[index].filling;
+									var allergies = res.publishers[0].allergies;
+									if (filling[layer] !== undefined && allergies.indexOf(filling[layer].name) === -1){
+										text += filling[layer].name
+									}
+									if (text !== '') {
+										text += ' and '
+									}
+									else {
+										if (filling[layer-1] !== undefined && filling[layer-1].image !== ''){
+											text += filling[layer-1].name
 										}
-									})
-								}, 'image/png'/*, 0.95*/);
-							}
-							img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
+										else {
+											if (filling[level+1] !== undefined && filling[level+1].image !== ''){
+												text += filling[layer+1].name
+											}
+										}
+										if (text !== '') {
+											text += ' and '
+										}
+									}
+										
+									text += filling[0].name;
+									$('#title').val(text);
+									var img = document.createElement('img');
+									img.onload = function(){
+										context.drawImage(img, 0, 0, width, height);
+										//var ctx = can.getContext('2d')
+										//ctx.drawImage(img, 0, 0, width, height);
+										mainCanvas.toBlob(function(blob) {
+											var fd = new FormData();
+											
+											fd.append("image", blob);
+											
+											var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/0';
 
+											$.ajax({
+												url: uploadurl,
+												type: 'POST',
+												data: fd,
+												processData: false,
+												contentType: false,
+												success: function(response) {
+													$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+													console.log('saved both')
+													uiBlogMode();
+												}
+											})
+										}, 'image/png'/*, 0.95*/);
+									}
+									img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
+								})
+							}
 						}
-						
 					})
 				}, 'image/png'/*, 0.95*/);
 			} else {

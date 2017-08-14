@@ -14,7 +14,13 @@ div.grid-header.mainHeader
 			a.dropdown.mainmenu(href="#", title="Menu")
 				img.i(src="/images/menu_button.svg")
 			
-				
+			
+		
+		div.pullquote
+			
+			span.tb-font-xxl.translate #{contentData.description}
+			//if (type === 'draw' && infowindow === 'edit' && !document.getElementsByClassName('grid-container')[0].classList.contains("selected"))
+
 		each ing, j in keys
 			if (contentData !== undefined)
 				each cat, i in contentData[ing]
@@ -27,31 +33,45 @@ div.grid-header.mainHeader
 		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="/images/menu_button.svg")
 
-	
+		div.pullquote
 			
-div.grid-left
+			span.tb-font-xxl.translate #{contentData.description}
+			//if (type === 'draw' && infowindow === 'edit' && !document.getElementsByClassName('grid-container')[0].classList.contains("selected"))
+
+			
+div.grid-left#tl
 	#wrapper
 		div#tlmodules.dropdown
 			a.module(href="/", title="home")
 				.ui
 					img(src="/images/icons/home.svg")
 				span.tb-font-l Home
-			
-			if (loggedin && drawtype && drawtype !== "tools" && drawtype !== "info" && loggedin === menuData.publishers[0].username && type === "draw")
-				a.module.dropdown(title="edit")
-					.ui
-						img(src="/images/icons/edit.svg")
-					span.tb-font-l Edit
+			if (loggedin && drawtype && loggedin === menuData.publishers[0].username)
+				- var allergies = menuData.publishers[0].allergies
+				each ing, j in keys
+					if (contentData !== undefined)
+						each cat, i in contentData[ing]
+							if (cat.unlocked && allergies.indexOf(cat.name) === -1)
+								a.module(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
+									.ui
+										img(src="/images/icons/"+ing+"_"+i+".svg")
+									span.tb-font-m #{cat.name}
+			//-
+				if (loggedin && drawtype && drawtype !== "tools" && drawtype !== "info" && loggedin === menuData.publishers[0].username && type === "draw")
+					a.module.dropdown(title="edit")
+						.ui
+							img(src="/images/icons/edit.svg")
+						span.tb-font-l Edit
 
-					each key, j in keys
-						if (key !== "tools" && key !== "info")
-						
-							each ing, k in contentData[key]
-								if (ing.unlocked)
-									a.module.focus.drop(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
-										.ui
-											img(src=(ing.unlocked ? "/images/icons/"+key+"_"+k+".svg" : "/images/icons/unknown.svg"))
-										span.tb-font-l #{ing.name}
+						each key, j in keys
+							if (key !== "tools" && key !== "info")
+							
+								each ing, k in contentData[key]
+									if (ing.unlocked)
+										a.module.focus.drop(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
+											.ui
+												img(src=(ing.unlocked ? "/images/icons/"+key+"_"+k+".svg" : "/images/icons/unknown.svg"))
+											span.tb-font-l #{ing.name}
 									
 			if (loggedin)
 				a.module(href="/logout", title="logout")

@@ -252,8 +252,8 @@ router.post('/login', upload.array(), passport.authenticate('local'), function(r
 	
 	req.app.locals.loggedin = req.body.username;
 	req.app.locals.username = req.body.username;
-	req.app.locals.drawType = null;
-	req.app.locals.layer = null;
+	//req.app.locals.drawType = null;
+	//req.app.locals.layer = null;
 	
 	Page.findOne({publishers: {$elemMatch:{username:req.body.username}}}, function(err, doc){
 			if (err) {
@@ -399,20 +399,21 @@ router.get('/chef/:pagetitle*', ensurePage, function (req, res, next) {
 				for (var l in data) {
 					datarray.push(data[l])
 				}
-				if (outputPath.split('/').length > 3) {
+				/*if (outputPath.split('/').length > 3) {
+					console.log('this index '+parseInt(outputPath.split('/')[3], 10))
 					index = parseInt(outputPath.split('/')[3], 10);
 				} else {
 					index = doc.content[doc.content.length-1].index;
-				}
+				}*/
 				if (req.isAuthenticated()) {
 					return res.render('publish', {
 						pageindex: doc.pageindex,
 						type: 'draw',
 						infowindow: 'doc',
 						drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
-						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[index].level,
+						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
 						loggedin: req.app.locals.loggedin,
-						index: index,
+						index: doc.content[doc.content.length-1].index,
 						doc: doc,
 						data: datarray,
 						info: info
@@ -422,7 +423,7 @@ router.get('/chef/:pagetitle*', ensurePage, function (req, res, next) {
 						pageindex: doc.pageindex,
 						type: 'draw',
 						infowindow: 'doc',
-						index: index,
+						index: doc.content[doc.content.length-1].index,
 						doc: doc,
 						data: datarray,
 						info: info
@@ -537,7 +538,7 @@ router.get('/api/publish', function(req, res, next) {
 			index: doc ? doc.content.length-1 : false,
 			data: [].map.call(data, function(d){return d}),
 			doc: doc ? doc : pages[0],
-			drawtype: req.app.locals.drawType ? req.app.locals.drawType : "substrates",
+			drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
 			layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
 			info: 'hi'
 		})
@@ -613,7 +614,7 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 				index: doc.content.length-1,
 				doc: doc,
 				data: datarray,
-				drawtype: req.app.locals.drawType ? req.app.locals.drawType : 'substrates',
+				drawtype: req.app.locals.drawType ? req.app.locals.drawType : 'info',
 				layer: req.app.locals.layer ? req.app.locals.layer : false,
 				info: 'Edit your entry.'
 			})
@@ -847,9 +848,12 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 				}
 				
 			}
-			if (body["image"]) {
-				console.log('body image '+body["image"])
-				contentdata.image = body["image"]
+			if (body['image']) {
+				console.log('body image '+body['image'])
+				contentdata.image = body['image']
+			}
+			if (body['title']) {
+				contentdata.title = body['title']
 			}
 			var key = 'content.$'
 			var push = {$set: {}};
@@ -867,6 +871,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 		if (err) {
 			return next(err)
 		}
+		delete req.app.locals.type
 		return res.redirect('/api/selectlayer')
 	})
 	
@@ -960,7 +965,7 @@ router.get('/api/levelup', function(req, res, next){
 		if (errr) {
 			return next(errr)
 		}
-		if (layer > 3) {
+		if (layer > 2) {
 			return res.redirect('/chef/'+doc.pagetitle+'/'+req.app.locals.index+'')
 		}
 		Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){

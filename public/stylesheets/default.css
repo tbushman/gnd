@@ -205,7 +205,7 @@ i.fa.active {
 .pullquote {
 	display: block;
 	position: absolute;
-	top: calc(var(--nowindowmenu) + 15px);
+	/*top: calc(var(--nowindowmenu) + 15px);*/
 	left: var(--thumbwidth);
 	z-index:1;
 }
@@ -682,7 +682,6 @@ div.dropdown {
 	width: 100%;
 	float: left;
 	right: 0;
-	padding: 19px 0 0 0;
 	min-width: var(--thumbwidth);
 	-webkit-box-sizing: border-box;
 	        box-sizing: border-box;
@@ -744,15 +743,21 @@ a.tool {
 a.tool .ui {
 	width: var(--thumbwidth);
 	display: table;
-	position: static;
+	position: relative;
 	margin: 0 auto;
 }
+
 a.tool > .ui > img {
-	width: calc(var(--thumbwidth)/1.25);
-	height: calc(var(--thumbwidth)/1.25);
-	margin: 5px auto;
+	/*width: calc(var(--thumbwidth)/1.25);*/
+	height: calc(var(--thumbwidth)/2);
+	left: 50%;
+	top: 50%;
+	width: auto;
+	-webkit-transform: translate(-50%,-50%);
+	-ms-transform: translate(-50%,-50%);
+	transform: translate(-50%,-50%);
 	display: table;
-	position: relative;
+	position: absolute;
 	text-align: center;
 }
 a.tool span {

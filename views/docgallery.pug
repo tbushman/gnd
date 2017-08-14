@@ -4,7 +4,7 @@ div.grid-right
 	if (infowindow === 'edit')
 		include docedit.pug
 	else
-		if (index >= 0)
+		if (pageindex)
 			div.grid-container.inner
 				div.grid-header
 
@@ -67,30 +67,23 @@ div.grid-right
 					
 		else
 			each entry, k in menuData.content
-				a.tb-font-m(href="/chef/"+menuData.pagetitle+"", title="Go to "+menuData.pagetitle+"") #{menuData.pagetitle}
-				if (loggedin && loggedin === menuData.publishers[0].username)
-					div(style="padding: 10px 0 0 10px")
-						a.tb-font-m(style="margin: 6px 0 0 6px;z-index: 0;", href="/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"", title="Edit "+menuData.pagetitle+"")
-							img(src="/images/tools/tools_"+entry.level+".svg")
+				a.tb-font-m.tb-u-100(href="/chef/"+menuData.pagetitle+"", title="Go to "+menuData.pagetitle+"") #{menuData.pagetitle}
+				a.tool(href="/chef/"+menuData.pagetitle+"/"+entry.index+"")
+					.ui
+						img(src= entry.image !== "" ? entry.image : menuData.publishers[0].avatar, style="width: auto; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
+
+				//-
+					if (loggedin && loggedin === menuData.publishers[0].username)
+						div(style="padding: 10px 0 0 10px")
+							a.tb-font-m(style="margin: 6px 0 0 6px;z-index: 0;", href="/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"", title="Edit "+menuData.pagetitle+"")
+								img(src="/images/tools/tools_"+entry.level+".svg")
 				br
-				p.tb-font-s.hideoverlap About
-					span #{entry.info[entry.level].name}
+				p.tb-font-s.hideoverlap #{entry.title}
 				if (entry.description)
 					p.tb-font-xs.hideoverlap #{entry.description}
-					span &nbsp ...
-				if (entry[drawtype].length > 0)
-					div.thumbnail.gallery(id= entry.pageindex)
-						img(src= entry[drawtype][level].image)
-					div#hide
-						if (entry[drawtype][level].name === '')
-							span.tb-font-xxs &nbsp
-						else
-							span.tb-font-xxs #{entry[drawtype][entry.level].name}
-						if (entry[drawtype][level].caption === '')
-							span.tb-font-xs &nbsp
-						else
-							span.tb-font-xs #{entry[drawtype][entry.level].caption}
+				
+				
 
-				hr(style="color: "+doc.css.primary+"")
+				hr
 		
 div.grid-footer

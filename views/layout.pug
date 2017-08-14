@@ -27,7 +27,12 @@ html
 			$(document).ready(function(){
 				$('.dropdown').not('.mainmenu').slideUp(100);
 				$('.drop').slideUp(100);
+				
 				$('.selected').removeClass('selected');
+				$('#wrapper').draggable({
+					axis: "y",
+					disabled: false
+				});
 			})
 			$(document).on('click', 'canvas', function(e){
 				if ($('.menu').hasClass('blog')) {
@@ -53,6 +58,7 @@ html
 					} else {
 						if ($('div.menu').hasClass('blog')) {
 							$(that).next('.drop').slideUp(100);
+							
 						}
 					}
 				} else {
@@ -82,6 +88,9 @@ html
 					$('.grid-container').addClass('selected');
 					$('#select').removeClass('draw');
 					$('#select').addClass('blog');
+					$('.mainHeader .tool').css('display', 'none');
+					$('.pullquote span').css('display', 'block');
+
 				})
 			}
 			function uiDrawMode(){
@@ -93,6 +102,9 @@ html
 					$('.grid-container').removeClass('selected');
 					$('#select').removeClass('blog');
 					$('#select').addClass('draw');
+					$('.mainHeader .tool').css('display', 'inline-block');
+					$('.pullquote span').css('display', 'none');
+
 			});
 			}
 				function removeOldAlert()
