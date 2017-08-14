@@ -210,7 +210,7 @@ i.fa.active {
 	z-index:1;
 }
 .pullquote > .tool > .ui > img {
-	height: var(--thumbwidth);
+	height: calc(var(--thumbwidth)/1.5);
 }
 .pullquote >  span.translate {
 	display: none;
@@ -749,7 +749,7 @@ a.tool .ui {
 
 a.tool > .ui > img {
 	/*width: calc(var(--thumbwidth)/1.25);*/
-	height: calc(var(--thumbwidth)/2);
+	height: calc(var(--thumbwidth)/2.5);
 	left: 50%;
 	top: 50%;
 	width: auto;

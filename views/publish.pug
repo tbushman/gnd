@@ -123,8 +123,8 @@ block content
 		})*/
 		$(document).ready(function(){
 			var can = document.getElementById('canvas');
-			can.style.width = '100%';
-			can.style.height = '100%';
+			//can.style.width = '100%';
+			//can.style.height = '100%';
 			pageIndex = parseInt(document.getElementById('pageindex').value, 10);
 			console.log('this pageindex'+pageIndex)
 			//var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
@@ -152,9 +152,43 @@ block content
 			layer = '#{layer}'
 			console.log(drawtype, layer)
 
-			if (drawtype && drawtype !== '') {
+			if (drawtype && drawtype !== '' && '#{infowindow}' === 'edit') {
 				console.log('initializing app')
 				InitializeApp(drawtype, layer)
+			} else {
+				$.get('/doc/'+'#{pageindex}'+'', function(res){
+					if (!res || res == undefined || res == null) {
+						
+					}
+					else {
+						var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
+						if (navigator.platform.split('Mac')[1] !== undefined) {
+							newscale = 1
+						}
+						var canv = document.getElementById('canvas');
+						var canvW = window.screen.width * newscale;
+						var canvH = window.screen.height * newscale;
+						context = canv.getContext('2d');
+						console.log(res)
+						var img = document.createElement('img');
+						if (canv.width != canvW || canv.height != canvH) { 
+							canv.width = canvW
+							canv.heigth = canvH
+							canv.style.width = canvW + 'px'
+							canv.style.height = canvH + 'px'
+						}
+						img.onload = function(){
+							
+							img.width = canvW;
+							img.height = canvH;
+							context.drawImage(img, 0, 0, canvW, canvH);
+							//context.imageSmoothingEnabled = true;
+							console.log(context)
+							
+						}
+						img.src = res.content[index].image;//'/publishers/sfusd2/'+res.urltitle+'/'+res.content.length-1+'/images/main/main_0.png';
+					}
+				})
 			}
 			
 		})
@@ -265,7 +299,7 @@ block content
 								index = parseInt(index, 10)
 								irr = res.content[index][drawtype][layer+1];
 							
-							if ('#{index}' !== '' && irr !== undefined && irr.spec.safety !== 'bacteria') {
+							if ('#{index}' !== '' && '#{infowindow}' === "edit" && irr !== undefined && irr.spec.safety !== 'bacteria') {
 								id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
 								if ($('#select').hasClass('draw')) {
 									console.log('drawing modal')

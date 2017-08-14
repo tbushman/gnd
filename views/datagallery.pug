@@ -61,14 +61,15 @@ if (menu === 'home')
 					p.tb-font-l Chef 
 						span.tb-font-l #{entry.pagetitle}
 				div.grid-left
-					if (entry.content[entry.content.length-1].image !== "")
-						a.thumbnail.gallery(href="/chef/"+entry.pagetitle+"")
-							img(src= entry.content[entry.content.length-1].image, alt=""+entry.pagetitle+"'s "+ranks[entry.content.length-1]+" snack")
+					if (entry.content[entry.content.length-1] !== undefined)
+						if (entry.content[entry.content.length-1].image !== "")
+							a.thumbnail.gallery(href="/chef/"+entry.pagetitle+"")
+								img(src= entry.content[entry.content.length-1].image, alt=""+entry.pagetitle+"'s "+ranks[entry.content.length-1]+" snack")
 
 				div.grid-right
 					p.tb-font-s by 
 						span.tb-font-xxs #{entry.publishers[0].username}
-					if (entry.content[entry.content.length-1].description)
+					if (entry.content[entry.content.length-1] !== undefined)
 						p.tb-font-s
 							!= md(entry.content[entry.content.length-1].description)
 						span &nbsp ...
