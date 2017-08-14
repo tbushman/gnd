@@ -62,7 +62,7 @@ div.grid-left#tl
 								a.module(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
 									.ui
 										img(src="/images/icons/"+ing+"_"+i+".svg")
-									span.tb-font-m #{cat.name}
+									span.tb-font-m.translate #{cat.name}
 			//-
 				if (loggedin && drawtype && drawtype !== "tools" && drawtype !== "info" && loggedin === menuData.publishers[0].username && type === "draw")
 					a.module.dropdown(title="edit")

@@ -123,8 +123,8 @@ block content
 		})*/
 		$(document).ready(function(){
 			var can = document.getElementById('canvas');
-			//can.style.width = '100%';
-			//can.style.height = '100%';
+			can.style.width = '100%';
+			can.style.height = '100%';
 			pageIndex = parseInt(document.getElementById('pageindex').value, 10);
 			console.log('this pageindex'+pageIndex)
 			//var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
@@ -160,7 +160,7 @@ block content
 					if (!res || res == undefined || res == null) {
 						
 					}
-					else {
+					else {/*
 						var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
 						if (navigator.platform.split('Mac')[1] !== undefined) {
 							newscale = 1
@@ -176,7 +176,8 @@ block content
 							canv.heigth = canvH
 							canv.style.width = canvW + 'px'
 							canv.style.height = canvH + 'px'
-						}
+						}*/
+						/*
 						img.onload = function(){
 							
 							img.width = canvW;
@@ -187,6 +188,8 @@ block content
 							
 						}
 						img.src = res.content[index].image;//'/publishers/sfusd2/'+res.urltitle+'/'+res.content.length-1+'/images/main/main_0.png';
+						*/
+						InitializeCanvas("main", res.content.length-1)
 					}
 				})
 			}
@@ -228,9 +231,7 @@ block content
 		}
 		function InitializeCanvas(drawtype, layer) {
 			var canv = document.getElementById("canvas");
-			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
-			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
-			var context = elem.getContext("2d");
+			//var context = elem.getContext("2d");
 			//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
 			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
 			if (navigator.platform.split('Mac')[1] !== undefined) {
@@ -240,6 +241,13 @@ block content
 			var newheight = window.screen.height * newscale;
 			/*var thislayer;*/
 			//var size;
+			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
+			var elem;
+			/*if (document.getElementById('canvas_'+drawtype+'_'+layer+'') !== null) {*/
+				elem = document.getElementById('canvas_'+drawtype+'_'+layer+'')
+			//} else {
+			//	elem = null;
+			//}
 			if (canv.width != newwidth || canv.height != newheight || scale != newscale) {
 				// resizing a canvas clears it, so do it only when it's dimensions have changed.
 				canvasWidth = newwidth;
@@ -249,13 +257,15 @@ block content
 				canv.height = canvasHeight;
 				canv.style.width = canvasWidth + "px";
 				canv.style.height = canvasHeight + "px";
-				var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
-				if (elem !== null && elem.width != newwidth || elem.height != newheight || scale != newscale) {
-					
-					elem.width = canvasWidth;
-					elem.height = canvasHeight;
-					elem.style.width = canvasWidth + "px";
-					elem.style.height = canvasHeight + "px";
+				//var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
+				if (elem !== null && elem !== undefined) {
+					if (elem.width != newwidth || elem.height != newheight || scale != newscale) {
+						
+						elem.width = canvasWidth;
+						elem.height = canvasHeight;
+						elem.style.width = canvasWidth + "px";
+						elem.style.height = canvasHeight + "px";
+					}
 				}
 				scale = newscale;
 			}/* else {
