@@ -42,7 +42,7 @@ block content
 			div.overtext #{menuData.pagetitle}
 			div.blogname
 				if (contentData.filling[contentData.level] !== undefined && drawtype)
-					if (allergies.length && allergies.indexOf(contentData.filling[contentData.level].name) === -1)
+					if (allergies.length && allergies.indexOf(contentData.filling[contentData.level].name) === -1 && contentData.level > 0)
 						span.translate #{contentData.filling[contentData.level].name}
 						span  and 
 					else
@@ -504,15 +504,15 @@ block content
 					}
 				});
 			}
-			layer = can.getAttribute('id').split('_')[2];
-			drawtype = can.getAttribute('id').split('_')[1];
+			var layer = can.getAttribute('id').split('_')[2];
+			var drawtype = can.getAttribute('id').split('_')[1];
 			if (drawtype && drawtype !== undefined) {
 				can.toBlob(function(blob) {
 					var fd = new FormData();
 					
 					fd.append('img_'+drawtype+'_'+layer+'', blob);
 					
-					var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/'+drawtype+'/'+layer+'';
+					var uploadurl = '/api/uploadmedia/'+#{pageindex}+'/'+#{index}+'/'+drawtype+'/'+layer+'';
 
 					$.ajax({
 						url: uploadurl,
@@ -556,33 +556,31 @@ block content
 										
 									text += filling[0].name;
 									$('#title').val(text);
-									var img = document.createElement('img');
+									var img = new Image();//document.createElement('img');
 									img.onload = function(){
-										context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+										//context.fillRect(img,0,0,canvasWidth,canvasHeight)
+										context.drawImage(img, 0, 0, mainCanvas.width, mainCanvas.height);
 										//var ctx = can.getContext('2d')
 										//ctx.drawImage(img, 0, 0, width, height);
-										setTimeout(function(){
-											mainCanvas.toBlob(function(blobb) {
-												var fd = new FormData();
-												
-												fd.append("image", blobb);
-												
-												var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/0';
+										mainCanvas.toBlob(function(blobb) {
+											var fd = new FormData();
+											fd.append("image", blobb);
+											
+											var uploadurl = '/api/uploadmedia/'+#{pageindex}+'/'+#{index}+'/main/0';
 
-												$.ajax({
-													url: uploadurl,
-													type: 'POST',
-													data: fd,
-													processData: false,
-													contentType: false,
-													success: function(response) {
-														$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-														console.log('saved both')
-														uiBlogMode();
-													}
-												})
-											}, 'image/png'/*, 0.95*/);
-										},200)
+											$.ajax({
+												url: uploadurl,
+												type: 'POST',
+												data: fd,
+												processData: false,
+												contentType: false,
+												success: function(response) {
+													$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+													console.log('saved both')
+													uiBlogMode();
+												}
+											})
+										}, 'image/png'/*, 0.95*/);
 										
 									}
 									img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
@@ -599,7 +597,7 @@ block content
 					
 					fd.append("image", blob);
 					
-					var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/0';
+					var uploadurl = '/api/uploadmedia/'+#{pageindex}+'/'+#{index}+'/main/0';
 
 					console.log(blob)
 					console.log(uploadurl)
