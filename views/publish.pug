@@ -441,8 +441,6 @@ block content
 										}
 									}
 								}
-								
-
 							}
 						}
 					//}				
@@ -559,7 +557,9 @@ block content
 										
 									}
 									img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';*/
-									context.drawImage(can, 0, 0, mainCanvas.width, mainCanvas.height);
+									context.fillStyle = context.drawImage(can, 0, 0, canvasWidth, canvasHeight);
+									context.fill()
+									
 									//var ctx = can.getContext('2d')
 									//ctx.drawImage(img, 0, 0, width, height);
 									//alert('drew can');
