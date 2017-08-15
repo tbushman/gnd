@@ -55,10 +55,10 @@ block content
 								span  and 
 				span.translate #{contentData.filling[0].name}
 			
-			if (drawtype && drawtype !== "tools")
+			if (drawtype && drawtype !== "tools" && drawtype !== "info")
 				if (menuData.publishers[0].username === loggedin)
 						
-					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/images/info/info_0.svg');")
+					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/publishers/sfusd2/"+menuData.urltitle+"/"+index+"/images/main/main_0.png');")
 			if (contentData.level === 3)
 				canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_"+1+".svg');")
 			else

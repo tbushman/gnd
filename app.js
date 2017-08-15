@@ -94,7 +94,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '../../pu/publishers')));
 app.use('/publishers', express.static(path.join(__dirname, '../../pu/publishers')));
-app.use('/publishers/sfusd2', express.static(path.join(__dirname, '../../pu/publishers/sfusd2')));
+/*app.use('/publishers/sfusd2', express.static(path.join(__dirname, '../../pu/publishers/sfusd2')));
 app.use('/publishers/sfusd2/:urltitle', function(req, res, next) {
 	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
 		if (err) {
@@ -141,7 +141,7 @@ app.use('/publishers/sfusd2/:urltitle/:index/images/:drawtype/:file', function(r
 		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'/'+req.params.file+'')).apply(this, arguments);
 	})
 });
-
+*/
 app.use('/', routes);
 
 // catch 404 and forward to error handler
