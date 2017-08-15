@@ -205,12 +205,12 @@ block content
 			var canv = document.getElementById("canvas");
 			//var context = elem.getContext("2d");
 			//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
-			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
+			/*var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
 			if (navigator.platform.split('Mac')[1] !== undefined) {
 				newscale = 1
-			}
-			var newwidth = window.screen.width * newscale;
-			var newheight = window.screen.height * newscale;
+			}*/
+			var newwidth = window.innerWidth;//window.screen.width * newscale;
+			var newheight = window.innerHeight;//window.screen.height * newscale;
 			/*var thislayer;*/
 			//var size;
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
@@ -220,7 +220,7 @@ block content
 			//} else {
 			//	elem = null;
 			//}
-			if (canv.width != newwidth || canv.height != newheight || scale != newscale) {
+			if (canv.width != newwidth || canv.height != newheight) {
 				// resizing a canvas clears it, so do it only when it's dimensions have changed.
 				canvasWidth = newwidth;
 				canvasHeight = newheight;
@@ -239,7 +239,7 @@ block content
 						elem.style.height = canvasHeight + "px";
 					}
 				}
-				scale = newscale;
+				//scale = newscale;
 			}/* else {
 				size = Math.min(newwidth, newheight)
 			}*/
@@ -425,13 +425,24 @@ block content
 											}
 										}
 									}
-									if (count > 0) {
-										console.log(count)
-										context.fillStyle = context.drawImage(img, size+(size/2), size - (size/2), size, size);
-										context.fillRect(img, size+(size/2), size - (size/2), size, size)
+									if (canvasWidth > canvasHeight) {
+										if (count > 0) {
+											console.log(count)
+											context.fillStyle = context.drawImage(img, size+(size/2), size - (size/2), size, size);
+											context.fillRect(img, size+(size/2), size - (size/2), size, size)
+										} else {
+											context.fillStyle = context.drawImage(img, size - (size/2), size - (size/2), size, size);
+											context.fillRect(img, size - (size/2), size - (size/2), size, size)
+										}
 									} else {
-										context.fillStyle = context.drawImage(img, size - (size/2), size - (size/2), size, size);
-										context.fillRect(img, size - (size/2), size - (size/2), size, size)
+										if (count > 0) {
+											console.log(count)
+											context.fillStyle = context.drawImage(img, size, size - (size/2), size, size);
+											context.fillRect(img, size, size - (size/2), size, size)
+										} else {
+											context.fillStyle = context.drawImage(img, size - (size/1.1), size - (size/2), size, size);
+											context.fillRect(img, size - (size/1.1), size - (size/2), size, size)
+										}
 									}
 								}
 								
@@ -474,8 +485,8 @@ block content
 		
 		function saveImage(can){
 			var mainCanvas = document.getElementById('canvas');
-			var width = mainCanvas.getBoundingClientRect().width;
-			var height = mainCanvas.getBoundingClientRect().height;
+			//var width = mainCanvas.getBoundingClientRect().width;
+			//var height = mainCanvas.getBoundingClientRect().height;
 			var context = mainCanvas.getContext("2d");
 			if (!HTMLCanvasElement.prototype.toBlob) {
 				Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
@@ -523,7 +534,7 @@ block content
 									var level = parseInt(res.content[index].level, 10);
 									var filling = res.content[index].filling;
 									var allergies = res.publishers[0].allergies;
-									if (filling[layer] !== undefined && allergies.indexOf(filling[layer].name) === -1){
+									if (filling[layer] !== undefined && allergies.indexOf(filling[layer].name) === -1 && layer > 0){
 										text += filling[layer].name
 									}
 									if (text !== '') {
