@@ -58,7 +58,7 @@ block content
 			if (drawtype && drawtype !== "tools" && drawtype !== "info")
 				if (menuData.publishers[0].username === loggedin)
 						
-					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; ")
+					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('"+contentData.image+"');")
 			if (contentData.level === 3)
 				canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_"+1+".svg');")
 			else
@@ -208,8 +208,8 @@ block content
 			if (navigator.platform.split('Mac')[1] !== undefined) {
 				newscale = 1
 			}*/
-			var newwidth = window.screen.width //* newscale//window.innerWidth;//window.screen.width// * newscale;////window.screen.width * newscale;
-			var newheight = window.screen.height //* newscale//window.innerHeight;//// * newscale;////window.screen.height * newscale;
+			var newwidth = window.innerWidth;//window.screen.width// * newscale;////window.screen.width * newscale;
+			var newheight = window.innerHeight;//// * newscale;////window.screen.height * newscale;
 			/*var thislayer;*/
 			//var size;
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
