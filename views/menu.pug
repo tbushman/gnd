@@ -7,7 +7,7 @@ div.grid-header.mainHeader
 	if (loggedin && drawtype && loggedin === menuData.publishers[0].username)
 		- var allergies = menuData.publishers[0].allergies
 		if (contentData && type === "draw")
-			a.mainmenu(href="#", title="Save", id="save", aria-labelledby="continue", onclick="$.post('/api/nextstep/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"').done(function(response){if (document.getElementById('canvas_"+drawtype+"_"+layer+"') !== null) {saveImage(document.getElementById('canvas_"+drawtype+"_"+layer+"'))}})")
+			a.mainmenu(href="#", title="Save", id="save", aria-labelledby="continue", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/nextstep/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"').done(function(response){if (document.getElementById('canvas_"+drawtype+"_"+layer+"') !== null) {saveImage(document.getElementById('canvas_"+drawtype+"_"+layer+"'))}})")
 				img.i(src="/images/icons/check.svg")
 		else
 			
@@ -31,7 +31,7 @@ div.grid-header.mainHeader
 							if (contentData !== undefined)
 								each cat, i in contentData[ing]
 									if (cat.unlocked && allergies.indexOf(cat.name) === -1)
-										a.tool(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
+										a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
 											.ui
 												img(src="/images/icons/"+ing+"_"+i+".svg")
 												span.tb-font-m #{cat.name}
@@ -56,7 +56,7 @@ div.grid-left#tl
 					if (contentData !== undefined)
 						each cat, i in contentData[ing]
 							if (cat.unlocked && allergies.indexOf(cat.name) === -1)
-								a.module(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
+								a.module(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
 									.ui
 										img(src="/images/icons/"+ing+"_"+i+".svg")
 									span.tb-font-m.translate #{cat.name}
