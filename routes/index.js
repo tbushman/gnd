@@ -19,46 +19,7 @@ var upload = multer();
 var thestore = require('../public/json/store.json');
 var languages = require('../public/json/languages.json');
 
-var storage = multer.diskStorage({
-	destination: function (req, files, cb) {
-		Page.findOne({pageindex: req.params.pageindex}, function(err, doc){
-			if (err) {
-				console.log(err)
-			}
-			var p = ''+publishers+'/pu/publishers/sfusd2/'+ doc.urltitle +'/'+req.params.index+'/images/'+(req.params.drawtype ? req.params.drawtype : 'main')+''
 
-			fs.access(p, function(err) {
-
-				if (err && err.code === 'ENOENT') {
-					mkdirp(p, function(err){
-						if (err) {
-							console.log("err", err);
-						}
-						console.log('created folder: '+ p)
-						cb(null, p)
-					})
-				} else {
-					if (err && err.code === 'EACCESS') {
-						console.log('permission error: '+err)
-						cb(err)
-					} else {
-						cb(null, p)
-
-					}
-				}
-			})
-		})
-	},
-	filename: function (req, files, cb) {
-		if (req.params.drawtype && req.params.drawtype !== 'false') {
-			cb(null, req.params.drawtype + '_' + req.params.layer + '.png')
-		} else {
-			cb(null, files[0].fieldname + '_' + req.params.index + '.png')
-		}
-  }
-})
-
-var uploadmedia = multer({ storage: storage })
 dotenv.load();
 
 const googleTranslate = require('google-translate')(process.env.GOOGLE_KEY);
@@ -137,6 +98,54 @@ router.get('/', function (req, res) {
 		return res.redirect('/home')
 	}
 });
+
+var storage = multer.diskStorage({
+	destination: function (req, files, cb) {
+		Page.findOne({pageindex: req.params.pageindex}, function(err, doc){
+			if (err) {
+				console.log(err)
+			}
+			var p = ''+publishers+'/pu/publishers/sfusd2/'+ doc.urltitle +'/'+req.params.index+'/images/'+(req.params.drawtype ? req.params.drawtype : 'main')+''
+
+			fs.access(p, function(err) {
+
+				if (err && err.code === 'ENOENT') {
+					mkdirp(p, function(err){
+						if (err) {
+							console.log("err", err);
+						}
+						console.log('created folder: '+ p)
+						cb(null, p)
+					})
+				} else {
+					if (err && err.code === 'EACCESS') {
+						console.log('permission error: '+err)
+						cb(err)
+					} else {
+						cb(null, p)
+
+					}
+				}
+			})
+		})
+	},
+	filename: function (req, files, cb) {
+		if (req.params.drawtype && req.params.drawtype !== 'false') {
+			cb(null, req.params.drawtype + '_' + req.params.layer + '.png')
+		} else {
+			cb(null, files[0].fieldname + '_' + req.params.index + '.png')
+		}
+  }
+})
+
+var uploadmedia = multer({ storage: storage })
+
+router.post('/api/uploadmedia/:pageindex/:index/:drawtype/:layer', uploadmedia.any(), function(req, res, next){
+	var outputPath = url.parse(req.url).pathname;
+	console.log(outputPath)
+	return res.status(200).send(req.files[0].path)
+})
+
 
 router.get('/doc/:pageindex', function(req, res, next){
 	var pageindex = parseInt(req.params.pageindex, 10);
@@ -579,12 +588,6 @@ router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res
 			})
 		}
 	)
-})
-
-router.post('/api/uploadmedia/:pageindex/:index/:drawtype/:layer', uploadmedia.any(), function(req, res, next){
-	var outputPath = url.parse(req.url).pathname;
-	console.log(outputPath)
-	return res.status(200).send(req.files[0].path)
 })
 
 router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(req, res, next){
