@@ -528,10 +528,10 @@ block content
 										context.drawImage(img, 0, 0, width, height);
 										//var ctx = can.getContext('2d')
 										//ctx.drawImage(img, 0, 0, width, height);
-										mainCanvas.toBlob(function(blob) {
+										mainCanvas.toBlob(function(blobb) {
 											var fd = new FormData();
 											
-											fd.append("image", blob);
+											fd.append("image", blobb);
 											
 											var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/0';
 
