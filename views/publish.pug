@@ -117,7 +117,7 @@ block content
 		var scale = 1;
 		var mousePressed = false;
 		var drawCoalesced = false;
-		var elem, canvasWidth, canvasHeight;
+		var canvasWidth, canvasHeight;
 		/*$('img').each(function(img){
 			if (img.src === (unknown))
 		})*/
@@ -263,7 +263,7 @@ block content
 								cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
 								cx.fill()
 							}
-							imgobj.src = res.content[index].image;
+							imgobj.src = '/var/www/pu'+res.content[index].image;
 						}
 
 						if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
