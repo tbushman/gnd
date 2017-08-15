@@ -209,8 +209,8 @@ block content
 			if (navigator.platform.split('Mac')[1] !== undefined) {
 				newscale = 1
 			}*/
-			var newwidth = window.screen.width// * newscale;//window.innerWidth;//window.screen.width * newscale;
-			var newheight = window.screen.height// * newscale;//window.innerHeight;//window.screen.height * newscale;
+			var newwidth = window.innerWidth;//window.screen.width// * newscale;////window.screen.width * newscale;
+			var newheight = window.innerHeight;//window.screen.height// * newscale;////window.screen.height * newscale;
 			/*var thislayer;*/
 			//var size;
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
@@ -510,7 +510,7 @@ block content
 					
 					fd.append('img_'+drawtype+'_'+layer+'', blob);
 					
-					var uploadurl = '/api/uploadmedia/'+#{pageindex}+'/'+#{index}+'/'+drawtype+'/'+layer+'';
+					var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/'+drawtype+'/'+layer+'';
 
 					$.ajax({
 						url: uploadurl,
@@ -564,25 +564,29 @@ block content
 									context.drawImage(can, 0, 0, mainCanvas.width, mainCanvas.height);
 									//var ctx = can.getContext('2d')
 									//ctx.drawImage(img, 0, 0, width, height);
-									mainCanvas.toBlob(function(blobb) {
-										var fd = new FormData();
-										fd.append("image", blobb);
-										
-										var uploadurl = '/api/uploadmedia/'+#{pageindex}+'/'+#{index}+'/main/0';
+									alert('drew can');
+									setTimeout(function(){
+										mainCanvas.toBlob(function(blobb) {
+											var fd = new FormData();
+											fd.append("image", blobb);
+											
+											var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
 
-										$.ajax({
-											url: uploadurl,
-											type: 'POST',
-											data: fd,
-											processData: false,
-											contentType: false,
-											success: function(response) {
-												$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-												console.log('saved both')
-												uiBlogMode();
-											}
-										})
-									}, 'image/png', 0.95);
+											$.ajax({
+												url: uploadurl,
+												type: 'POST',
+												data: fd,
+												processData: false,
+												contentType: false,
+												success: function(response) {
+													$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+													console.log('saved both')
+													uiBlogMode();
+												}
+											})
+										}, 'image/png', 0.95);
+									},500)
+									
 								})
 							}
 						}
@@ -596,7 +600,7 @@ block content
 					
 					fd.append("image", blob);
 					
-					var uploadurl = '/api/uploadmedia/'+#{pageindex}+'/'+#{index}+'/main/0';
+					var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
 
 					console.log(blob)
 					console.log(uploadurl)
