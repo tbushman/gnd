@@ -58,7 +58,7 @@ block content
 			if (drawtype && drawtype !== "tools" && drawtype !== "info")
 				if (menuData.publishers[0].username === loggedin)
 						
-					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('/publishers/sfusd2/"+menuData.urltitle+"/"+index+"/images/main/main_0.png');")
+					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; ")
 			if (contentData.level === 3)
 				canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_"+1+".svg');")
 			else
@@ -204,12 +204,12 @@ block content
 			var canv = document.getElementById("canvas");
 			//var context = elem.getContext("2d");
 			//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
-			/*var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
+			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;/*
 			if (navigator.platform.split('Mac')[1] !== undefined) {
 				newscale = 1
 			}*/
-			var newwidth = window.innerWidth;//window.screen.width// * newscale;////window.screen.width * newscale;
-			var newheight = window.innerHeight;//window.screen.height// * newscale;////window.screen.height * newscale;
+			var newwidth = window.screen.width //* newscale//window.innerWidth;//window.screen.width// * newscale;////window.screen.width * newscale;
+			var newheight = window.screen.height //* newscale//window.innerHeight;//// * newscale;////window.screen.height * newscale;
 			/*var thislayer;*/
 			//var size;
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
@@ -262,6 +262,7 @@ block content
 								imgobj.height = canvasHeight;
 								cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
 								cx.fill()
+								//cx.fillRect(imgobj, 0,0,canvasWidth,canvasHeight)
 							}
 							imgobj.src = res.content[index].image;
 						}
@@ -559,6 +560,7 @@ block content
 									img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';*/
 									context.fillStyle = context.drawImage(can, 0, 0, canvasWidth, canvasHeight);
 									context.fill()
+									//context.fillRect(can,0,0,canvasWidth,canvasHeight)
 									
 									//var ctx = can.getContext('2d')
 									//ctx.drawImage(img, 0, 0, width, height);
