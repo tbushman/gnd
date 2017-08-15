@@ -263,7 +263,7 @@ block content
 								cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
 								cx.fill()
 							}
-							imgobj.src = '/var/www/pu'+res.content[index].image;
+							imgobj.src = res.content[index].image;
 						}
 
 						if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
