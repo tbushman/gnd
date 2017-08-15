@@ -46,7 +46,7 @@ block content
 						span.translate #{contentData.filling[contentData.level].name}
 						span  and 
 					else
-						if (contentData.filling[contentData.level-1] !== undefined)
+						if (contentData.filling[contentData.level-1] !== undefined && contentData.level - 1 > 0)
 							span.translate #{contentData.filling[contentData.level-1].name}
 							span  and 
 						else
@@ -209,14 +209,12 @@ block content
 			if (navigator.platform.split('Mac')[1] !== undefined) {
 				newscale = 1
 			}*/
-			var newwidth = window.innerWidth;//window.screen.width * newscale;
-			var newheight = window.innerHeight;//window.screen.height * newscale;
+			var newwidth = window.screen.width// * newscale;//window.innerWidth;//window.screen.width * newscale;
+			var newheight = window.screen.height// * newscale;//window.innerHeight;//window.screen.height * newscale;
 			/*var thislayer;*/
 			//var size;
 			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
-			var elem;
-			/*if (document.getElementById('canvas_'+drawtype+'_'+layer+'') !== null) {*/
-				elem = document.getElementById('canvas_'+drawtype+'_'+layer+'')
+			var elem = document.getElementById(id)
 			//} else {
 			//	elem = null;
 			//}
@@ -245,7 +243,7 @@ block content
 			}*/
 			
 						
-			if (drawtype !== "info" && drawtype !== "tools") {
+			if ('#{drawtype}' !== "info" && '#{drawtype}' !== "tools" && '#{drawtype}' !== '') {
 				$.get('/doc/'+'#{pageindex}'+'', function(res){
 					//console.log(res)
 					
@@ -263,7 +261,7 @@ block content
 								
 								cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
 							}
-							imgobj.src = mainsrc;
+							imgobj.src = res.content[index].image;
 						}
 
 						if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
@@ -556,34 +554,35 @@ block content
 										
 									text += filling[0].name;
 									$('#title').val(text);
-									var img = new Image();//document.createElement('img');
+									/*var img = new Image();//document.createElement('img');
 									img.onload = function(){
 										//context.fillRect(img,0,0,canvasWidth,canvasHeight)
-										context.drawImage(img, 0, 0, mainCanvas.width, mainCanvas.height);
-										//var ctx = can.getContext('2d')
-										//ctx.drawImage(img, 0, 0, width, height);
-										mainCanvas.toBlob(function(blobb) {
-											var fd = new FormData();
-											fd.append("image", blobb);
-											
-											var uploadurl = '/api/uploadmedia/'+#{pageindex}+'/'+#{index}+'/main/0';
-
-											$.ajax({
-												url: uploadurl,
-												type: 'POST',
-												data: fd,
-												processData: false,
-												contentType: false,
-												success: function(response) {
-													$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-													console.log('saved both')
-													uiBlogMode();
-												}
-											})
-										}, 'image/png'/*, 0.95*/);
+										
 										
 									}
-									img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
+									img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';*/
+									context.drawImage(can, 0, 0, mainCanvas.width, mainCanvas.height);
+									//var ctx = can.getContext('2d')
+									//ctx.drawImage(img, 0, 0, width, height);
+									mainCanvas.toBlob(function(blobb) {
+										var fd = new FormData();
+										fd.append("image", blobb);
+										
+										var uploadurl = '/api/uploadmedia/'+#{pageindex}+'/'+#{index}+'/main/0';
+
+										$.ajax({
+											url: uploadurl,
+											type: 'POST',
+											data: fd,
+											processData: false,
+											contentType: false,
+											success: function(response) {
+												$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+												console.log('saved both')
+												uiBlogMode();
+											}
+										})
+									}, 'image/png'/*, 0.95*/);
 								})
 							}
 						}
