@@ -25,6 +25,16 @@ dotenv.load();
 var app = express();
 if (app.get('env') === 'production') {
 	app.set('trust proxy', 1) // trust first proxy	
+	app.use(function(req, res, next) {
+		res.set({
+			"Access-Control-Allow-Origin" : "*",
+			"Access-Control-Allow-Methods" : "GET, POST, OPTIONS, PUT, PATCH, DELETE",
+			"Access-Control-Allow-Headers" : "Cache-Control, Origin, X-Requested-With, content-type, Accept, Authorization",
+			"Access-Control-Allow-Credentials" : true
+		});
+		app.disable('x-powered-by');
+		next();
+	});
 	/*app.use(function (req, res, next) {
 	    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:80');
 	    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -36,7 +46,7 @@ if (app.get('env') === 'production') {
 }
 var helmet = require('helmet');
 app.use(helmet());
-app.use(helmet.noCache());
+//app.use(helmet.noCache());
 passport.use(new LocalStrategy(Publisher.authenticate()));
 // serialize and deserialize
 passport.serializeUser(function(user, done) {
