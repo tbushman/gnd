@@ -268,10 +268,12 @@ i.fa.active {
 }
 .grid-container.blog {
 	height: var(--panelheight);
+	width: calc(100% - var(--thumbwidth));
 	overflow-y: scroll;
 }
 .grid-container.draw {
 	height: var(--panelheight);
+	width: calc(100% - var(--thumbwidth));
 }
 @supports not (display:grid) {
 	.grid-container {

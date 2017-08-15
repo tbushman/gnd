@@ -561,26 +561,29 @@ block content
 										context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 										//var ctx = can.getContext('2d')
 										//ctx.drawImage(img, 0, 0, width, height);
-										mainCanvas.toBlob(function(blobb) {
-											var fd = new FormData();
-											
-											fd.append("image", blobb);
-											
-											var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/0';
+										setTimeout(function(){
+											mainCanvas.toBlob(function(blobb) {
+												var fd = new FormData();
+												
+												fd.append("image", blobb);
+												
+												var uploadurl = '/api/uploadmedia/'+pageIndex+'/'+#{index}+'/main/0';
 
-											$.ajax({
-												url: uploadurl,
-												type: 'POST',
-												data: fd,
-												processData: false,
-												contentType: false,
-												success: function(response) {
-													$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-													console.log('saved both')
-													uiBlogMode();
-												}
-											})
-										}, 'image/png'/*, 0.95*/);
+												$.ajax({
+													url: uploadurl,
+													type: 'POST',
+													data: fd,
+													processData: false,
+													contentType: false,
+													success: function(response) {
+														$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+														console.log('saved both')
+														uiBlogMode();
+													}
+												})
+											}, 'image/png'/*, 0.95*/);
+										},200)
+										
 									}
 									img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';
 								})
