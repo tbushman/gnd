@@ -538,7 +538,7 @@ router.get('/api/publish', function(req, res, next) {
 		}
 		req.app.locals.drawType = req.app.locals.drawType ? req.app.locals.drawType : "substrates";
 		req.app.locals.layer = req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level;
-		return res.render('publish', {
+		return res.set('Cache-Control', 'private,max-age=30').render('publish', {
 			type: 'blog',
 			infowindow: infowindow,
 			loggedin: req.app.locals.loggedin,
@@ -575,7 +575,7 @@ router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res
 					for (var l in data) {
 						datarray.push(data[l])
 					}
-					return res.render('publish', {
+					return res.set('Cache-Control', 'private,max-age=30').render('publish', {
 						type: 'blog',
 						infowindow: 'doc',
 						loggedin: req.app.locals.loggedin,
@@ -608,7 +608,7 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 			for (var l in data) {
 				datarray.push(data[l])
 			}
-			return res.render('publish', {
+			return res.set('Cache-Control', 'private,max-age=30').render('publish', {
 				type: 'blog',
 				infowindow: 'edit',
 				loggedin: req.app.locals.loggedin ? req.app.locals.loggedin : false,
@@ -642,7 +642,7 @@ router.get('/api/selectlayer', function(req, res, next){
 			for (var l in data) {
 				datarray.push(data[l])
 			}
-			return res.render('publish', {
+			return res.set('Cache-Control', 'private,max-age=30').render('publish', {
 				type: req.app.locals.type ? req.app.locals.type : 'blog',
 				infowindow: 'edit',
 				drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
@@ -716,7 +716,7 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', func
 						datarray.push(data[l])
 					}
 					//return res.redirect('/api/selectlayer')
-					return res.render('publish', {
+					return res.set('Cache-Control', 'private,max-age=30').render('publish', {
 						type: 'draw',
 						drawtype: drawtype,
 						layer: layer,
@@ -874,7 +874,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 			return next(err)
 		}
 		delete req.app.locals.type
-		return res.redirect('/api/selectlayer')
+		return res.set('Cache-Control', 'private,max-age=30').redirect('/api/selectlayer')
 	})
 	
 })
@@ -987,7 +987,7 @@ router.get('/api/levelup', function(req, res, next){
 					for (var l in data) {
 						datarray.push(data[l])
 					}
-					return res.render('publish', {
+					return res.set('Cache-Control', 'private,max-age=30').render('publish', {
 						type: 'blog',
 						infowindow: 'doc',
 						loggedin: req.app.locals.loggedin,
