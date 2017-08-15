@@ -246,7 +246,7 @@ block content
 			
 						
 			if (drawtype !== "info" && drawtype !== "tools") {
-				$.get('/doc/'+'#{pageIndex}'+'', function(res){
+				$.get('/doc/'+'#{pageindex}'+'', function(res){
 					//console.log(res)
 					
 					var img = document.createElement('img');
@@ -384,7 +384,7 @@ block content
 					pCanvas.width = canvasWidth;
 					pCanvas.height = canvasHeight;
 					var pContext = pCanvas.getContext("2d");
-					pContext.fillStyle = pContext.drawImage(img, 0, 0, Math.min(canvasWidth, canvasHeight), Math.min(canvasWidth, canvasHeight));
+					pContext.fillStyle = pContext.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
 					pContext.fill();
 					//if (eventType == "touchend") {
@@ -411,8 +411,30 @@ block content
 								ctx.fill()
 								
 							} else {
-								context.fillStyle = context.drawImage(img, (size/2) - (size/2)/2, (size/2) - (size/2)/1.42, size, size);
-								context.fillRect(img, (size/2) - (size/2)/2, (size/2) - (size/2)/1.42, size, size)
+								if (eventType == 'touchend') {
+									var imagedata = ctx.getImageData(size, size, 1, 1);
+
+									var count = 0;
+									for (var x = 0; x < 1; x++) {
+										for (var y = 0; y < 1; y++) {
+											// imagedata index for each pixel in bounds
+											var pxX = (y * 1 + x) * 4;
+
+											if (imagedata.data[pxX + 3] > 0) {
+												count++
+											}
+										}
+									}
+									if (count > 0) {
+										console.log(count)
+										context.fillStyle = context.drawImage(img, size+(size/2), size - (size/2), size, size);
+										context.fillRect(img, size+(size/2), size - (size/2), size, size)
+									} else {
+										context.fillStyle = context.drawImage(img, size - (size/2), size - (size/2), size, size);
+										context.fillRect(img, size - (size/2), size - (size/2), size, size)
+									}
+								}
+								
 
 							}
 						}
@@ -525,7 +547,7 @@ block content
 									$('#title').val(text);
 									var img = document.createElement('img');
 									img.onload = function(){
-										context.drawImage(img, 0, 0, width, height);
+										context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 										//var ctx = can.getContext('2d')
 										//ctx.drawImage(img, 0, 0, width, height);
 										mainCanvas.toBlob(function(blobb) {
