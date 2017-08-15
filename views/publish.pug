@@ -254,12 +254,13 @@ block content
 					var mainsrc;
 					if (index !== '') {
 						mainsrc = res.content[index].image;
-						var imgobj = document.createElement('img');
 						if (mainsrc !== undefined && mainsrc !== '') {
+							var imgobj = new Image()//document.createElement('img');
 							imgobj.onload = function(){
 								var cx = canv.getContext('2d');
 								
 								cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
+								alert('drew init')
 							}
 							imgobj.src = res.content[index].image;
 						}
