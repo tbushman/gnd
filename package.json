@@ -32,6 +32,7 @@
     "express-session": "^1.15.4",
     "google-geolocation": "^1.0.1",
     "google-translate": "^2.0.5",
+    "helmet": "^3.8.1",
     "jquery": "^3.2.1",
     "leaflet": "^1.1.0",
     "marked": "^0.3.6",
