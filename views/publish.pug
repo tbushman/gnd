@@ -188,7 +188,6 @@ block content
 			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
 			InitializeCanvas(drawtype, layer);
 			if (elem) {
-				console.log("Adding MouseEvent & TouchEvent listeners");
 				["mousedown", "mousemove", "mouseup"].forEach(function(e) {
 						elem.addEventListener(e, MouseHandler);
 				});
@@ -254,13 +253,14 @@ block content
 					var mainsrc;
 					if (index !== '') {
 						mainsrc = res.content[index].image;
+						console.log(mainsrc)
 						if (mainsrc !== undefined && mainsrc !== '') {
 							var imgobj = new Image()//document.createElement('img');
 							imgobj.onload = function(){
 								var cx = canv.getContext('2d');
-								
+								imgobj.width = canvasWidth;
+								imgobj.height = canvasHeight;
 								cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
-								alert('drew init')
 							}
 							imgobj.src = res.content[index].image;
 						}
@@ -271,7 +271,6 @@ block content
 							var index = '#{index}'
 								index = parseInt(index, 10)
 							if (res.content[index][drawtype] !== undefined) {
-								console.log('alert: '+ '#{drawtype}'+'_'+'#{layer}', res.content[index][drawtype][layer])
 								if (res.content[index][drawtype][layer+1]) {
 									irr = res.content[index][drawtype][layer+1];									
 								}
@@ -283,7 +282,6 @@ block content
 							if ('#{index}' !== '' && '#{infowindow}' === "edit" && irr !== undefined && irr.spec.safety !== 'bacteria') {
 								id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
 								if ($('#select').hasClass('draw')) {
-									console.log('drawing modal')
 									drawModeModal(id, '#{pageindex}')
 									
 								}
@@ -426,7 +424,6 @@ block content
 									}
 									if (canvasWidth > canvasHeight) {
 										if (count > 0) {
-											console.log(count)
 											context.fillStyle = context.drawImage(img, size+(size/2), size - (size/2), size, size);
 											context.fillRect(img, size+(size/2), size - (size/2), size, size)
 										} else {
@@ -435,7 +432,6 @@ block content
 										}
 									} else {
 										if (count > 0) {
-											console.log(count)
 											context.fillStyle = context.drawImage(img, size, size - (size/2), size, size);
 											context.fillRect(img, size, size - (size/2), size, size)
 										} else {
