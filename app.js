@@ -34,7 +34,8 @@ if (app.get('env') === 'production') {
 	});*/
 	
 }
-var helmet = require('helmet')
+var helmet = require('helmet');
+app.use(helmet());
 app.use(helmet.noCache());
 passport.use(new LocalStrategy(Publisher.authenticate()));
 // serialize and deserialize
