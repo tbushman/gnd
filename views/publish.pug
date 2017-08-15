@@ -242,7 +242,7 @@ block content
 			}*/
 			
 						
-			if ('#{drawtype}' !== "info" && '#{drawtype}' !== "tools" && '#{drawtype}' !== '') {
+			if ('#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools' && '#{drawtype}' !== '') {
 				$.get('/doc/'+'#{pageindex}'+'', function(res){
 					//console.log(res)
 					
@@ -255,12 +255,13 @@ block content
 						mainsrc = res.content[index].image;
 						console.log(mainsrc)
 						if (mainsrc !== undefined && mainsrc !== '') {
-							var imgobj = new Image()//document.createElement('img');
+							var imgobj = document.createElement('img');
 							imgobj.onload = function(){
 								var cx = canv.getContext('2d');
 								imgobj.width = canvasWidth;
 								imgobj.height = canvasHeight;
-								cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight)
+								cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
+								cx.fill()
 							}
 							imgobj.src = res.content[index].image;
 						}
@@ -279,7 +280,7 @@ block content
 							}
 								
 							
-							if ('#{index}' !== '' && '#{infowindow}' === "edit" && irr !== undefined && irr.spec.safety !== 'bacteria') {
+							if ('#{index}' !== '' && '#{infowindow}' === 'edit' && irr !== undefined && irr.spec.safety !== 'bacteria') {
 								id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
 								if ($('#select').hasClass('draw')) {
 									drawModeModal(id, '#{pageindex}')
@@ -561,7 +562,7 @@ block content
 									context.drawImage(can, 0, 0, mainCanvas.width, mainCanvas.height);
 									//var ctx = can.getContext('2d')
 									//ctx.drawImage(img, 0, 0, width, height);
-									alert('drew can');
+									//alert('drew can');
 									setTimeout(function(){
 										mainCanvas.toBlob(function(blobb) {
 											var fd = new FormData();
