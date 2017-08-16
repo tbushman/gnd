@@ -58,7 +58,7 @@ block content
 			if (drawtype && drawtype !== "tools" && drawtype !== "info")
 				if (menuData.publishers[0].username === loggedin)
 						
-					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('"+contentData.image+"');")
+					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('"+contentData.info[contentData.level].image+"');")
 			if (contentData.level === 3)
 				canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_"+1+".svg');")
 			else
@@ -388,14 +388,19 @@ block content
 					pContext.fill();
 					//if (eventType == "touchend") {
 						if (drawType === 'filling') {
-							//context.globalCompositeOperation = 'destination-over';
+							context.globalCompositeOperation = 'source-over';
 							eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_1.svg"), grabbing;');
 							context.fillStyle = context.createPattern(pCanvas, 'no-repeat');
 							context.fill()
 						}
 						if (drawType === 'substrates') {
 							eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.svg"), grabbing;');
-							//context.globalCompositeOperation = 'destination-in';
+							if (level === 1) {
+								context.globalCompositeOperation = 'source-over';
+							} else {
+								context.globalCompositeOperation = 'destination-over';
+							}
+							
 							var size = Math.min(canvasWidth, canvasHeight) / 2
 							img.width = size;
 							img.height = size;

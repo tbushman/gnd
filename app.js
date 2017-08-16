@@ -26,13 +26,15 @@ var app = express();
 if (app.get('env') === 'production') {
 	app.set('trust proxy', 1) // trust first proxy	
 	app.use(function(req, res, next) {
+		app.disable('x-powered-by');
+		app.disable('Strict-Transport-Security');
+		app.disable('Access-Control-Allow-Credentials');
 		res.set({
 			"Access-Control-Allow-Origin" : "*",
-			"Access-Control-Allow-Methods" : "GET, POST, OPTIONS, PUT, PATCH, DELETE",
-			"Access-Control-Allow-Headers" : "Cache-Control, Origin, X-Requested-With, content-type, Accept, Authorization",
-			"Access-Control-Allow-Credentials" : true
+			"Access-Control-Allow-Methods" : "GET, POST, HEAD",
+			"Access-Control-Allow-Headers" : "Content-Type, Accept"/*,
+			"Access-Control-Allow-Credentials" : true*/
 		});
-		app.disable('x-powered-by');
 		next();
 	});
 	/*app.use(function (req, res, next) {
