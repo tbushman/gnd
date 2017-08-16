@@ -34,6 +34,7 @@ block content
 	- var keys = ["tools", "info", "substrates", "filling"]
 	- var allergies = menuData.publishers[0].allergies;
 	input(type="hidden", value= pageIndex, id="pageindex")
+	input(type="hidden", value= index, id="index")
 		//-
 			navigation
 	div#select(class= type)
@@ -58,7 +59,7 @@ block content
 			if (drawtype && drawtype !== "tools" && drawtype !== "info")
 				if (menuData.publishers[0].username === loggedin)
 						
-					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('"+contentData.info[contentData.level].image+"');")
+					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('"+(contentData.info[contentData.level].image !== ""? contentData.info[contentData.level].image : "")+"');")
 			if (contentData.level === 3)
 				canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_"+1+".svg');")
 			else
@@ -103,8 +104,27 @@ block content
 		var pageIndex, drawtype, layer;
 		var datalength = #{data.length};
 		/*var doc = `#{doc}`*/
-		var index = #{index}
-		
+		var index = '#{index}'
+		if (index === '' || isNaN(parseInt(index, 10))) {
+			index = parseInt(document.getElementById('index').value, 10);
+		} else {
+			index = parseInt(index, 10);
+		}
+		pageIndex = '#{pageindex}'
+		if (pageIndex == '' || isNaN(parseInt(pageIndex, 10))) {
+			pageIndex = parseInt(document.getElementById('pageindex').value, 10);
+		} else {
+			pageIndex = parseInt(pageIndex, 10);
+		}
+		console.log('this pageindex'+pageIndex)
+		//var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
+		//$('.grid-header.mainHeader').css('height', (topmargin + 30) + 'px');
+		drawtype = '#{drawtype}'
+		layer = '#{layer}'
+		if (layer !== '') {
+			layer = parseInt(layer, 10);
+		}
+		console.log(drawtype, layer)
 		var lMarker;
 		var medialength;
 		var classname_a;
@@ -117,18 +137,79 @@ block content
 		var scale = 1;
 		var mousePressed = false;
 		var drawCoalesced = false;
-		var canvasWidth, canvasHeight;
+		var res, canvasWidth, canvasHeight;
 		/*$('img').each(function(img){
 			if (img.src === (unknown))
 		})*/
+		$.fn.imgLoad = function(src, f){
+			return this.each(function(){
+				var img = new Image();
+				img.crossOrigin = '';
+				img.width = canvasWidth;
+				img.height = canvasHeight;
+				img.src = src;
+				img.onload = f(img);
+			})
+		}
 		$(document).ready(function(){
-			var can = document.getElementById('canvas');
-			can.style.width = '100%';
-			can.style.height = '100%';
-			pageIndex = parseInt(document.getElementById('pageindex').value, 10);
-			console.log('this pageindex'+pageIndex)
-			//var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
-			//$('.grid-header.mainHeader').css('height', (topmargin + 30) + 'px');
+			canvasWidth = window.innerWidth;
+			canvasHeight = window.innerHeight;
+			
+			var canv = document.getElementById('canvas');
+			var id, elem, url, irr, arr;
+			arr = [document.getElementById('canvas'), document.getElementById('canvas_'+drawtype+'_'+layer+'')]
+			if (pageIndex !== '') {
+				$.get('/doc/'+pageIndex+'', function(result){
+					res = result;
+					console.log(res)
+					$.each(arr, function(i, can){
+						if (can && can !== null) {
+							var canid = can.getAttribute('id');
+							can.width = canvasWidth;
+							can.height = canvasHeight;
+							can.style.width = canvasWidth+'px';
+							can.style.height = canvasHeight+'px';
+							if (canid === 'canvas') {
+								url = res.content[index].image;
+							} else {
+								if (drawtype !== undefined && drawtype !== '' && drawtype !== 'info' && drawtype !== 'tools' && '#{infowindow}' === 'edit') {
+									url = res.content[index][drawtype][layer].image;
+									if (res.content[index][drawtype] !== undefined) {
+										if (res.content[index][drawtype][layer+1]) {
+											irr = res.content[index][drawtype][layer+1];									
+										}
+									} else {
+										irr = undefined;
+									}
+								} else {
+									irr = undefined;
+									url = undefined;
+								}
+							}
+							if (url !== undefined) {
+								$('#'+canid+'').imgLoad(url, function(imgobj){
+									var cx = can.getContext('2d');
+									cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
+									cx.fill();
+									console.log(canid)
+									if (canid !== 'canvas' && canid !== undefined && canid !== null && canid !== '') {
+										if ('#{infowindow}' === 'edit' && irr !== undefined && irr.spec.safety !== 'bacteria') {
+											if ($('#select').hasClass('draw')) {
+												drawModeModal(canid, '#{pageindex}')
+												
+											}
+										}
+										console.log('initializing app')
+										InitializeApp(canid, drawtype, layer)
+									}
+								})		
+							}
+															
+						}
+					})
+				})
+			}
+			
 			$('textarea').each(function(){
 				var text;
 				if ($(this).val()) {
@@ -148,23 +229,7 @@ block content
 			$('.dropdown').not('.mainmenu').slideUp(100);
 			$('.drop').slideUp(100);
 			$('.selected').removeClass('selected');
-			drawtype = '#{drawtype}'
-			layer = '#{layer}'
-			console.log(drawtype, layer)
 
-			if (drawtype && drawtype !== '' && '#{infowindow}' === 'edit') {
-				console.log('initializing app')
-				InitializeApp(drawtype, layer)
-			} else {
-				$.get('/doc/'+'#{pageindex}'+'', function(res){
-					if (!res || res == undefined || res == null) {
-						
-					}
-					else {
-						InitializeCanvas("main", res.content.length-1)
-					}
-				})
-			}	
 		})
 		
 		
@@ -185,9 +250,9 @@ block content
 				e.preventDefault();
 			}
 		})
-		function InitializeApp(drawtype, layer) {
-			var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
-			InitializeCanvas(drawtype, layer);
+		function InitializeApp(aID, drawtype, layer) {
+			var elem = document.getElementById(aID);
+			InitializeCanvas(aID, drawtype, layer);
 			if (elem) {
 				["mousedown", "mousemove", "mouseup"].forEach(function(e) {
 						elem.addEventListener(e, MouseHandler);
@@ -196,13 +261,13 @@ block content
 						elem.addEventListener(e, TouchHandler);
 				});
 				window.addEventListener("resize", function(e) {
-					InitializeCanvas(drawtype, layer);
+					InitializeCanvas(aID, drawtype, layer);
 				});
 			}
 			
 		}
-		function InitializeCanvas(drawtype, layer) {
-			var canv = document.getElementById("canvas");
+		function InitializeCanvas(aID, drawtype, layer) {
+			var canv = document.getElementById(aID);
 			//var context = elem.getContext("2d");
 			//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
 			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;/*
@@ -211,13 +276,7 @@ block content
 			}*/
 			var newwidth = window.innerWidth;//window.screen.width// * newscale;////window.screen.width * newscale;
 			var newheight = window.innerHeight;//// * newscale;////window.screen.height * newscale;
-			/*var thislayer;*/
-			//var size;
-			var id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
-			var elem = document.getElementById(id)
-			//} else {
-			//	elem = null;
-			//}
+
 			if (canv.width != newwidth || canv.height != newheight) {
 				// resizing a canvas clears it, so do it only when it's dimensions have changed.
 				canvasWidth = newwidth;
@@ -227,72 +286,7 @@ block content
 				canv.height = canvasHeight;
 				canv.style.width = canvasWidth + "px";
 				canv.style.height = canvasHeight + "px";
-				//var elem = document.getElementById('canvas_'+drawtype+'_'+layer+'');
-				if (elem !== null && elem !== undefined) {
-					if (elem.width != newwidth || elem.height != newheight || scale != newscale) {
-						
-						elem.width = canvasWidth;
-						elem.height = canvasHeight;
-						elem.style.width = canvasWidth + "px";
-						elem.style.height = canvasHeight + "px";
-					}
-				}
-				//scale = newscale;
-			}/* else {
-				size = Math.min(newwidth, newheight)
-			}*/
-			
-			$.fn.imgLoad = function(src, f){
-				return this.each(function(){
-					var img = new Image();
-					img.crossOrigin = '';
-					img.width = canvasWidth;
-					img.height = canvasHeight;
-					img.src = src;
-					img.onload = f(img);
-				})
-			}
-				
-			if ('#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools' && '#{drawtype}' !== '') {
-				$.get('/doc/'+'#{pageindex}'+'', function(res){
-					//console.log(res)
-					
-					var img = document.createElement('img');
-					var mainimg = document.createElement('img');
-					var index = '#{index}'
-					var layer = '#{layer}'
-					var mainsrc;
-					if (index !== '') {
-						$('#canvas').imgLoad(res.content[index].image, function(imgobj){
-							var cx = canv.getContext('2d');
-							cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
-							cx.fill()
-						})
 
-						if (document.getElementById(id) !== null && '#{drawtype}' !== '' && '#{drawtype}' !== 'info' && '#{drawtype}' !== 'tools') {
-							layer = parseInt(layer, 10)
-							var irr, irrname;
-							var index = '#{index}'
-								index = parseInt(index, 10)
-							if (res.content[index][drawtype] !== undefined) {
-								if (res.content[index][drawtype][layer+1]) {
-									irr = res.content[index][drawtype][layer+1];									
-								}
-							} else {
-								irr = undefined;
-							}
-								
-							
-							if ('#{index}' !== '' && '#{infowindow}' === 'edit' && irr !== undefined && irr.spec.safety !== 'bacteria') {
-								id = 'canvas_'+'#{drawtype}'+'_'+'#{layer}'+'';
-								if ($('#select').hasClass('draw')) {
-									drawModeModal(id, '#{pageindex}')
-									
-								}
-							}
-						}
-					}
-				})
 			}
 		}
 		
@@ -527,71 +521,58 @@ block content
 							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
 							$('#inputimg_'+drawtype+'_'+layer+'').val(imgurl);
 							var text = '';
-							var index = '#{index}';
-							
+								
 							if (index !== '') {
 								index = parseInt(index, 10);
 								layer = parseInt(layer, 10);
-								$.get('/doc/'+'#{pageIndex}'+'', function(res){
-									var level = parseInt(res.content[index].level, 10);
-									var filling = res.content[index].filling;
-									var allergies = res.publishers[0].allergies;
-									if (filling[layer] !== undefined && allergies.indexOf(filling[layer].name) === -1 && layer > 0){
-										text += filling[layer].name
+								var level = parseInt(res.content[index].level, 10);
+								var filling = res.content[index].filling;
+								var allergies = res.publishers[0].allergies;
+								if (filling[layer] !== undefined && allergies.indexOf(filling[layer].name) === -1 && layer > 0){
+									text += filling[layer].name
+								}
+								if (text !== '') {
+									text += ' and '
+								}
+								else {
+									if (filling[layer-1] !== undefined && filling[layer-1].image !== '' && layer-1 !== 0){
+										text += filling[layer-1].name
+									}
+									else {
+										if (filling[level+1] !== undefined && filling[level+1].image !== ''){
+											text += filling[layer+1].name
+										}
 									}
 									if (text !== '') {
 										text += ' and '
 									}
-									else {
-										if (filling[layer-1] !== undefined && filling[layer-1].image !== '' && layer-1 !== 0){
-											text += filling[layer-1].name
-										}
-										else {
-											if (filling[level+1] !== undefined && filling[level+1].image !== ''){
-												text += filling[layer+1].name
-											}
-										}
-										if (text !== '') {
-											text += ' and '
-										}
-									}
-										
-									text += filling[0].name;
-									$('#title').val(text);
-									/*var img = new Image();//document.createElement('img');
-									img.onload = function(){
-										//context.fillRect(img,0,0,canvasWidth,canvasHeight)
-										
-										
-									}
-									img.src = imgurl;//'/images/'+drawtype+'/'+drawType+'_'+layer+'.svg';*/
-									context.fillStyle = context.drawImage(can, 0, 0, canvasWidth, canvasHeight);
-									context.fill()
-									//context.fillRect(can,0,0,canvasWidth,canvasHeight)
+								}
 									
-									//var ctx = can.getContext('2d')
-									//ctx.drawImage(img, 0, 0, width, height);
-									//alert('drew can');
-									mainCanvas.toBlob(function(blobb) {
-										var fd = new FormData();
-										fd.append("image", blobb);
-										
-										var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
+								text += filling[0].name;
+								$('#title').val(text);
 
-										$.ajax({
-											url: uploadurl,
-											type: 'POST',
-											data: fd,
-											processData: false,
-											contentType: false,
-											success: function(response) {
-												$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-												console.log('saved both')
-												uiBlogMode();
-											}
-										})
-									}, 'image/png', 0.95);
-								})
+								context.fillStyle = context.drawImage(can, 0, 0, canvasWidth, canvasHeight);
+								context.fill()
+
+								mainCanvas.toBlob(function(blobb) {
+									var fd = new FormData();
+									fd.append("image", blobb);
+									
+									var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
+
+									$.ajax({
+										url: uploadurl,
+										type: 'POST',
+										data: fd,
+										processData: false,
+										contentType: false,
+										success: function(response) {
+											$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+											console.log('saved both')
+											uiBlogMode();
+										}
+									})
+								}, 'image/png', 0.95);
 							}
 						}
 					})

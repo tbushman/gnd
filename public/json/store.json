@@ -126,7 +126,7 @@
 		{
 			"ind": 1,
 			"name": "gluten",
-			"image": "/images/info/info_1.svg",
+			"image": "",
 			"caption": "A wheat ingredient in bread",
 			"unlocked": false,
 			"spec": {
@@ -138,7 +138,7 @@
 		{
 			"ind": 2,
 			"name": "nuts",
-			"image": "/images/info/info_2.svg",
+			"image": "",
 			"caption": "Nutritious food grown in nature and on farms",
 			"unlocked": false,
 			"spec": {
@@ -150,7 +150,7 @@
 		{
 			"ind": 3,
 			"name": "dairy",
-			"image": "/images/info/info_3.svg",
+			"image": "",
 			"caption": "Also known as milk produced by cows",
 			"unlocked": false,
 			"spec": {
@@ -162,7 +162,7 @@
 		{
 			"ind": 4,
 			"name": "allergy",
-			"image": "/images/info/info_4.svg",
+			"image": "",
 			"caption": "Our body's reaction to ingredients we can't have",
 			"unlocked": false,
 			"spec": {

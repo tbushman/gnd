@@ -19,6 +19,7 @@ var Publisher = require('./models/publishers');
 var Page = require('./models/pages');
 var async = require('async');
 var favicon = require('serve-favicon');
+var helmet = require('helmet');
 mongoose.Promise = promise;
 dotenv.load();
 
@@ -33,8 +34,22 @@ if (app.get('env') === 'production') {
 			"Access-Control-Allow-Origin" : "http://localhost:80",
 			"Access-Control-Allow-Methods" : "GET, POST, HEAD",
 			"Access-Control-Allow-Headers" : "Cache-Control, Origin, Content-Type, Accept"/*,
+			"X-DNS-Prefetch-Control" : "on",*/
+			/*,
 			"Access-Control-Allow-Credentials" : true*/
 		});
+		/*app.use(helmet());
+		app.use(helmet.hsts({
+		  // Must be at least 18 weeks to be approved by Google
+		  maxAge: 10886400,
+
+		  // Must be enabled to be approved by Google
+		  includeSubDomains: true,
+		  preload: true
+		}));
+		app.use(helmet.dnsPrefetchControl({ allow: true }));
+		app.use(helmet.noCache());*/
+
 		next();
 	});
 	/*app.use(function (req, res, next) {
@@ -46,9 +61,6 @@ if (app.get('env') === 'production') {
 	});*/
 	
 }
-var helmet = require('helmet');
-app.use(helmet());
-//app.use(helmet.noCache());
 passport.use(new LocalStrategy(Publisher.authenticate()));
 // serialize and deserialize
 passport.serializeUser(function(user, done) {
