@@ -30,9 +30,9 @@ if (app.get('env') === 'production') {
 		app.disable('Strict-Transport-Security');
 		app.disable('Access-Control-Allow-Credentials');
 		res.set({
-			"Access-Control-Allow-Origin" : "*",
+			"Access-Control-Allow-Origin" : "http://localhost:80",
 			"Access-Control-Allow-Methods" : "GET, POST, HEAD",
-			"Access-Control-Allow-Headers" : "Content-Type, Accept"/*,
+			"Access-Control-Allow-Headers" : "Cache-Control, Origin, Content-Type, Accept"/*,
 			"Access-Control-Allow-Credentials" : true*/
 		});
 		next();
