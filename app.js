@@ -30,8 +30,9 @@ if (app.get('env') === 'production') {
 		app.disable('x-powered-by');
 		app.disable('Strict-Transport-Security');
 		app.disable('Access-Control-Allow-Credentials');
+		app.disable('Access-Control-Allow-Origin');
 		res.set({
-			"Access-Control-Allow-Origin" : "http://localhost:80",
+			//"Access-Control-Allow-Origin" : "//localhost:80",
 			"Access-Control-Allow-Methods" : "GET, POST, HEAD",
 			"Access-Control-Allow-Headers" : "Cache-Control, Origin, Content-Type, Accept"/*,
 			"X-DNS-Prefetch-Control" : "on",*/
@@ -165,8 +166,8 @@ app.use('/publishers/sfusd2/:urltitle/:index/images/:drawtype/:file', function(r
 		}
 		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'/'+req.params.file+'')).apply(this, arguments);
 	})
-});
-*/
+});*/
+
 app.use('/', routes);
 
 // catch 404 and forward to error handler

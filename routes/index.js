@@ -872,7 +872,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 		if (err) {
 			return next(err)
 		}
-		delete req.app.locals.type
+		req.app.locals.type = "draw"
 		return res.redirect('/api/selectlayer')
 	})
 	
