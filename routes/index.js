@@ -385,6 +385,7 @@ router.post('/chef/:pagetitle', function(req, res, next){
 })
 
 router.get('/chef/:pagetitle*', ensurePage, function (req, res, next) {
+	console.log(req.headers, req)
 	var index;
 	var outputPath = url.parse(req.url).pathname;
 	

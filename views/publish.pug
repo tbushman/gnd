@@ -143,13 +143,15 @@ block content
 			canvasHeight = window.innerHeight;
 
 			var canv = document.getElementById('canvas');
-			var id, elem, url, irr, arr;
+			var id, elem, irr, arr;
 			arr = [document.getElementById('canvas'), document.getElementById('canvas_'+drawtype+'_'+layer+'')]
 			if (pageIndex !== '') {
 				$.get('/doc/'+pageIndex+'', function(result){
 					res = result;
 					console.log(res)
 					$.each(arr, function(i, can){
+						var url;
+						console.log(can)
 						if (can && can !== null) {
 							var canid = can.getAttribute('id');
 							var cx = can.getContext('2d');
@@ -185,18 +187,18 @@ block content
 									cx.fill()
 								};
 								imgobj.src = url;
-
-							}
-							if (canid !== 'canvas' && canid !== undefined && canid !== null && canid !== '') {
-								if ('#{infowindow}' === 'edit' && irr !== undefined && irr.spec.safety !== 'bacteria') {
-									if ($('#select').hasClass('draw')) {
-										drawModeModal(canid, '#{pageindex}')
-										
+								if (canid !== 'canvas' && canid !== undefined && canid !== null && canid !== '') {
+									if ('#{infowindow}' === 'edit' && irr !== undefined && irr.spec.safety !== 'bacteria') {
+										if ($('#select').hasClass('draw')) {
+											drawModeModal(canid, '#{pageindex}')
+											
+										}
 									}
+									console.log('initializing app')
+									InitializeApp(canid, drawtype, layer)
 								}
-								console.log('initializing app')
-								InitializeApp(canid, drawtype, layer)
 							}
+							
 
 						}
 					})
@@ -360,20 +362,26 @@ block content
 			context.closePath();
 			if (drawType !== "info" && drawType !== "tools") {
 				var img = document.createElement('img');
+				img.width = canvasWidth;
+				img.height = canvasHeight;
+				img.style.width = canvasWidth + "px";
+				img.style.height = canvasHeight + "px";
 				img.onload = function(){
 					var pattern;
 					var context = eventTarget.getContext("2d");
 
-					var pCanvas = document.createElement("canvas");
-					pCanvas.width = canvasWidth;
-					pCanvas.height = canvasHeight;
-					var pContext = pCanvas.getContext("2d");
-					pContext.fillStyle = pContext.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-
-					pContext.fill();
 					//if (eventType == "touchend") {
 					if (drawType === 'filling') {
 						//context.globalCompositeOperation = 'source-over';
+						var pCanvas = document.createElement("canvas");
+						pCanvas.width = canvasWidth;
+						pCanvas.height = canvasHeight;
+						var pContext = pCanvas.getContext("2d");
+						
+						pattern = pContext.createPattern(img, 'repeat');
+						pContext.fillStyle = pattern;
+						pContext.fillRect(0,0,canvasWidth,canvasHeight)
+						//pContext.fillRect(img, 0, 0, canvasWidth, canvasHeight);
 						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_1.svg"), grabbing;');
 						context.fillStyle = context.createPattern(pCanvas, 'no-repeat');
 						context.fill()
@@ -467,8 +475,7 @@ block content
 		
 		function saveImage(can){
 			var mainCanvas = document.getElementById('canvas');
-			//var width = mainCanvas.getBoundingClientRect().width;
-			//var height = mainCanvas.getBoundingClientRect().height;
+
 			var context = mainCanvas.getContext("2d");
 			if (!HTMLCanvasElement.prototype.toBlob) {
 				Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
@@ -536,9 +543,9 @@ block content
 									
 								text += filling[0].name;
 								$('#title').val(text);
-
-								context.fillStyle = context.drawImage(can, 0, 0, canvasWidth, canvasHeight);
-								context.fill()
+								var pattern = context.createPattern(can, 'no-repeat');
+								context.fillStyle = pattern;//context.drawImage(can, 0, 0, canvasWidth, canvasHeight);
+								context.fillRect(0,0,canvasWidth,canvasHeight)
 
 								mainCanvas.toBlob(function(blobb) {
 									var fd = new FormData();
