@@ -33,19 +33,10 @@ p.tb-font-xs#info
 script(type="application/javascript").
 	var form = document.getElementById("form");
 	form.addEventListener('submit', function(event){
-	//$('#form').submit(function(event) {
 		event.preventDefault()
-		/*var fd = new FormData();
-		fd.append('description', $('#inputtext').val());
-		fd.append('title', $('#title').val())
-		fd.append('image', $('#inputimg').val())
-		if (drawtype !== '' && layer !== '') {
-			fd.append($('#inputimg_'+drawtype+'_'+layer+'').attr('name'), $('#inputimg_'+drawtype+'_'+layer+'').val())
-		}*/
+
 		var fd = new FormData(form);
-		for (var [key, value] of fd.entries()) { 
-			console.log(key, value);
-		}
+
 		$.ajax({
 			url: '/api/editcontent/'+'#{doc.urltitle}'+'/'+'#{doc.pageindex}'+'/'+'#{index}'+'/'+drawtype+'/'+layer+'',
 			enctype: 'multipart/form-data',
@@ -55,7 +46,7 @@ script(type="application/javascript").
 			contentType: false,
 			success: function(response) {
 				console.log(response)
-				//window.location.href = '/api/selectlayer'
+				window.location.href = '/api/selectlayer'
 			}
 			
 		})
