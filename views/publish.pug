@@ -187,19 +187,18 @@ block content
 									cx.fill()
 								};
 								imgobj.src = url;
-								if (canid !== 'canvas' && canid !== undefined && canid !== null && canid !== '') {
-									if ('#{infowindow}' === 'edit' && irr !== undefined && irr.spec.safety !== 'bacteria') {
-										if ($('#select').hasClass('draw')) {
-											drawModeModal(canid, '#{pageindex}')
-											
-										}
-									}
-									console.log('initializing app')
-									InitializeApp(canid, drawtype, layer)
-								}
+								
 							}
-							
-
+							if (canid !== 'canvas' && canid !== undefined && canid !== null && canid !== '') {
+								if ('#{infowindow}' === 'edit' && irr !== undefined && irr.spec.safety !== 'bacteria') {
+									if ($('#select').hasClass('draw')) {
+										drawModeModal(canid, '#{pageindex}')
+										
+									}
+								}
+								console.log('initializing app')
+								InitializeApp(canid, drawtype, layer)
+							}
 						}
 					})
 				})

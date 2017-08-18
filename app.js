@@ -47,8 +47,8 @@ if (app.get('env') === 'production') {
 		  includeSubDomains: true,
 		  preload: true
 		}));
-		app.use(helmet.dnsPrefetchControl({ allow: true }));
-		app.use(helmet.noCache());*/
+		app.use(helmet.dnsPrefetchControl({ allow: true }));*/
+		app.use(helmet.noCache());
 
 		next();
 	});
