@@ -181,6 +181,7 @@ block content
 								var imgobj = document.createElement('img');
 								imgobj.width = canvasWidth;
 								imgobj.height = canvasHeight;
+								imgobj.crossOrigin = 'anonymous';
 								imgobj.onload = function(){
 									console.log(imgobj.src, url)
 									cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
