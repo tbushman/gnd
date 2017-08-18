@@ -37,7 +37,7 @@ if (app.get('env') === 'production') {
 			"X-DNS-Prefetch-Control" : "on",*/
 			/*,
 			"Access-Control-Allow-Credentials" : true*/
-			'Cache-Control', 'private, no-cache, no-store, must-revalidate'
+			'Cache-Control' : 'private, no-cache, no-store, must-revalidate'
 		});
 		/*app.use(helmet());
 		app.use(helmet.hsts({
