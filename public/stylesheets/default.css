@@ -31,7 +31,7 @@ body {
 form {
 	overflow-x: hidden;
 }
-input, textarea {
+input[type="text"], textarea {
   line-height: normal;
 	background-color: transparent;
   border: none;
@@ -50,7 +50,7 @@ input, textarea {
   -webkit-transition: all 0.3s;
 transition: all 0.3s;
 }
-button, a[role="button"] {
+button, a[role="button"], input[type="submit"] {
 	border: 0;
   font-style: normal;
   font-size: inherit;

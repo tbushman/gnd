@@ -877,8 +877,8 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 			return next(err)
 		}
 		req.app.locals.type = "draw"
-		return res.status(200).send('ok')
-		//return res.status(303).redirect('/api/selectlayer')
+		//return res.status(200).send('ok')
+		return res.status(303).redirect('/api/selectlayer')
 	})
 	
 })

@@ -11,8 +11,7 @@ form#form.tb-u-100(enctype="multipart/form-data", method="POST", action="/api/ed
 	input(type="hidden", id="inputimg", name="image")
 	if (drawtype && contentData[drawtype][contentData.level] !== undefined)
 		input(type="hidden", id="inputimg_"+drawtype+"_"+contentData.level+"", name= contentData[drawtype][contentData.level].name)
-	button.tb-u-33.ms-Button.ms-Button--primary.block.spacer(id="submit", type="submit", ariaDescription="Save this Sandwich")
-		span.ms-Button-label Save
+	input.tb-u-100.block.spacer(id="submit", type="submit", value="Save" ariaDescription="Save this Sandwich")
 	
 if (contentData !== undefined && contentData.image !== "")
 	a.tb-u-33.ms-Button.ms-Button--primary.block.spacer(role="button", href="#", title="Menu", onclick="blogModeModal('"+contentData.image+"');")
@@ -30,25 +29,26 @@ div.tb-u-33
 
 p.tb-font-xs#info
 
-script(type="application/javascript").
-	var form = document.getElementById("form");
-	form.addEventListener('submit', function(event){
-		event.preventDefault()
+//-
+	script(type="application/javascript").
+		var form = document.getElementById("form");
+		form.addEventListener('submit', function(event){
+			event.preventDefault()
 
-		var fd = new FormData(form);
+			var fd = new FormData(form);
 
-		$.ajax({
-			url: '/api/editcontent/'+'#{doc.urltitle}'+'/'+'#{doc.pageindex}'+'/'+'#{index}'+'/'+drawtype+'/'+layer+'',
-			enctype: 'multipart/form-data',
-			type: 'POST',
-			data: fd,
-			processData: false,
-			contentType: false,
-			success: function(response) {
-				console.log(response)
-				window.location.href = '/api/selectlayer'
-			}
+			$.ajax({
+				url: '/api/editcontent/'+'#{doc.urltitle}'+'/'+'#{doc.pageindex}'+'/'+'#{index}'+'/'+drawtype+'/'+layer+'',
+				enctype: 'multipart/form-data',
+				type: 'POST',
+				data: fd,
+				processData: false,
+				contentType: false,
+				success: function(response) {
+					console.log(response)
+					window.location.href = '/api/selectlayer'
+				}
+				
+			})
 			
-		})
-		
-	});
+		});
