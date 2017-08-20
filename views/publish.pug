@@ -188,6 +188,7 @@ block content
 									cx.fill();
 									return;
 								};
+								imgobj.crossOrigin = '';
 								imgobj.src = url;
 								
 							}
@@ -446,6 +447,7 @@ block content
 					
 					
 				}
+				img.crossOrigin = '';
 				img.src = '/images/'+drawType+'/'+drawType+'_'+layer+'.svg';
 				context.restore();
 			}
