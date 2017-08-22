@@ -137,7 +137,7 @@ block content
 		var scale = 1;
 		var mousePressed = false;
 		var drawCoalesced = false;
-		var res, canvasWidth, canvasHeight;
+		var res//, canvasWidth, canvasHeight;
 		$(document).ready(function(){
 			canvasWidth = window.innerWidth;
 			canvasHeight = window.innerHeight;
@@ -187,7 +187,7 @@ block content
 									cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
 									cx.fill();
 									console.log('loaded imgobj: ')
-									console.log(can.toDataURL('image/png'))
+									//console.log(can.toDataURL('image/png'))
 									return;
 								};
 								imgobj.src = url;
@@ -201,7 +201,7 @@ block content
 									}
 								}
 								console.log('initializing app')
-								InitializeApp(canid, drawtype, layer)
+								InitializeCanvas(canid, drawtype, layer)
 							}
 						}
 					})
@@ -230,8 +230,6 @@ block content
 
 		})
 		
-		
-		
 		$(document).on('click', '#deletefeature', function(e){
 			e.preventDefault();
 			if ($('#deletefeature span').css('display') === 'block') {
@@ -249,47 +247,73 @@ block content
 				e.preventDefault();
 			}
 		})
-		function InitializeApp(aID, drawtype, layer) {
-			var elem = document.getElementById(aID);
-			//InitializeCanvas(aID, drawtype, layer);
-			if (elem) {
-				["mousedown", "mousemove", "mouseup"].forEach(function(e) {
-						elem.addEventListener(e, MouseHandler);
-				});
-				["touchstart", "touchmove", "touchend"].forEach(function(e) {
-						elem.addEventListener(e, TouchHandler);
-				});
-				window.addEventListener("resize", function(e) {
-					InitializeCanvas(aID, drawtype, layer);
-				});
-			}
-			
-		}
+		
 		function InitializeCanvas(aID, drawtype, layer) {
 			var canv = document.getElementById(aID);
-			//var context = elem.getContext("2d");
-			//elem = document.getElementById("canvas_"+drawtype+"_"+layer+"");
-			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;/*
-			if (navigator.platform.split('Mac')[1] !== undefined) {
-				newscale = 1
-			}*/
+
+			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
+			
 			var newwidth = window.innerWidth;//window.screen.width// * newscale;////window.screen.width * newscale;
 			var newheight = window.innerHeight;//// * newscale;////window.screen.height * newscale;
-
+			var canvasWidth, canvasHeight;
 			if (canv.width != newwidth || canv.height != newheight) {
 				// resizing a canvas clears it, so do it only when it's dimensions have changed.
 				canvasWidth = newwidth;
 				canvasHeight = newheight;
-				//size = Math.min(canvasWidth, canvasHeight);
 				canv.width = canvasWidth;
 				canv.height = canvasHeight;
 				canv.style.width = canvasWidth + "px";
 				canv.style.height = canvasHeight + "px";
 
+			} else {
+				canvasWidth = canv.width;
+				canvasHeight = canv.height;
 			}
+			var drawThis;
+			var img = document.createElement('img');
+			img.crossOrigin = '';
+			img.onload = function(){
+				console.log('loaded img: ')
+				//console.log(elem.toDataURL('image/png'))
+				var context = canv.getContext("2d");
+				if (drawtype === 'filling') {
+					//context.globalCompositeOperation = 'source-over';
+					img.width = canvasWidth;
+					img.height = canvasHeight;
+					img.style.width = canvasWidth + "px";
+					img.style.height = canvasHeight + "px";
+
+					drawThis = img;
+				} else {
+					var size = Math.min(canvasWidth, canvasHeight) / 2
+					img.width = size;
+					img.height = size;
+					img.style.width = size  + "px";
+					img.style.height = size  + "px";
+					drawThis = img;
+				}
+	
+				if (drawThis) {
+					["mousedown", "mousemove", "mouseup"].forEach(function(el) {
+							canv.addEventListener(el, function(e){
+								MouseHandler(e, drawThis, canvasWidth, canvasHeight)
+							});
+					});
+					["touchstart", "touchmove", "touchend"].forEach(function(el) {
+							canv.addEventListener(el, function(e){
+								TouchHandler(e, drawThis, canvasWidth, canvasHeight)
+							});
+					});
+					window.addEventListener("resize", function(e) {
+						InitializeCanvas(aID, drawtype, layer);
+					});
+				}
+			}
+			img.src = '/images/'+drawtype+'/'+drawtype+'_'+layer+'.svg';
+
 		}
 		
-		function MouseHandler(event) {
+		function MouseHandler(event, drawThis, canvasWidth, canvasHeight) {
 
 			if (event.type == "mousedown" && event.button === 0) {
 				mousePressed = true;
@@ -304,25 +328,26 @@ block content
 				
 				var eventType = event.type ==  "mousedown" ? "touchstart" :
 						event.type == "mouseup" ? "touchend" : "touchmove";
-				
-				drawTouch(event.target, fakeTouch, eventType, false);
+
+				drawTouch(event.target, fakeTouch, eventType, drawThis, canvasWidth, canvasHeight);
 				event.preventDefault();
 			}
 
 			if (event.type == "mouseup")
 				mousePressed = false;
 		}
-		function TouchHandler(event) {
+		function TouchHandler(event, drawThis, canvasWidth, canvasHeight) {
 			event.preventDefault();
 			
 			//if (!mainmenu.classList.contains('selected')) {
 				for (var i = 0; i < event.changedTouches.length; i++)
-					drawTouch(event.target, event.changedTouches[i], event.type, false);
+					drawTouch(event.target, event.changedTouches[i], event.type, drawThis, canvasWidth, canvasHeight);
 			//}
 			
 		}
 		
-		function drawTouch(eventTarget, touch, eventType, coalesced) {
+		function drawTouch(eventTarget, touch, eventType, drawThis, canvasWidth, canvasHeight) {
+			console.log(drawThis, canvasWidth)
 			var canv = document.getElementById('canvas');
 			var ctx = canv.getContext('2d');
 
@@ -356,93 +381,73 @@ block content
 				radiusY++;
 			}
 
-			context.save();
-			context.translate(touch.pageX * scale, touch.pageY * scale);
-			context.scale(1, radiusY/radiusX);
-			context.beginPath();
-			context.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
-			context.closePath();
 			if (drawType !== "info" && drawType !== "tools") {
-				var img = document.createElement('img');
-				img.crossOrigin = '';
-				img.onload = function(){
-					console.log('loaded img: ')
-					console.log(eventTarget.toDataURL('image/png'))
-					var context = eventTarget.getContext("2d");
+				if (drawType === 'filling') {
+					var pCanvas = document.createElement("canvas");
+					pCanvas.width = canvasWidth;
+					pCanvas.height = canvasHeight;
+					var pContext = pCanvas.getContext("2d");
+					pContext.drawImage(drawThis, 0, 0, canvasWidth, canvasHeight)
 
-					if (drawType === 'filling') {
-						//context.globalCompositeOperation = 'source-over';
-						img.width = canvasWidth;
-						img.height = canvasHeight;
-						img.style.width = canvasWidth + "px";
-						img.style.height = canvasHeight + "px";
-						var pCanvas = document.createElement("canvas");
-						pCanvas.width = canvasWidth;
-						pCanvas.height = canvasHeight;
-						var pContext = pCanvas.getContext("2d");
-						pContext.drawImage(img, 0, 0, canvasWidth, canvasHeight)
-						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_1.svg"), grabbing;');
-						var pPattern = context.createPattern(pCanvas, 'no-repeat');
-						context.fillStyle = pPattern;
-						context.fill()
-					}
-					if (drawType === 'substrates') {
-						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.svg"), grabbing;');
-						
-						var size = Math.min(canvasWidth, canvasHeight) / 2
-						img.width = size;
-						img.height = size;
-						img.style.width = size  + "px";
-						img.style.height = size  + "px";
-						if (layer === 0) {
-							
-							//context.globalCompositeOperation = 'destination-atop';
-							context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(pCanvas, 'no-repeat');
-							context.fill();
-							//ctx.globalCompositeOperation = 'destination-atop';
-							ctx.fillStyle = 'rgba(255,255,255,0)';//
-							ctx.fill()
-						} else {
-							//ctx.globalCompositeOperation = 'source-over';
-							if (eventType == 'touchend') {
-								var imagedata = ctx.getImageData(size, size, 1, 1);
+					var pPattern = context.createPattern(pCanvas, 'no-repeat');
+					context.fillStyle = pPattern;
+					context.fill()
+				}
+				if (drawType === 'substrates') {
+					eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.svg"), grabbing;');
 
-								var count = 0;
-								for (var x = 0; x < 1; x++) {
-									for (var y = 0; y < 1; y++) {
-										// imagedata index for each pixel in bounds
-										var pxX = (y * 1 + x) * 4;
+					if (layer === 0) {
 
-										if (imagedata.data[pxX + 3] > 0) {
-											count++
-										}
+						context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(pCanvas, 'no-repeat');
+						context.fill();
+
+						ctx.fillStyle = 'rgba(255,255,255,0)';//
+						ctx.fill()
+					} else {
+						if (eventType == 'touchend') {
+							var size = Math.min(canvasWidth, canvasHeight) / 2
+							var imagedata = ctx.getImageData(size, size, 1, 1);
+
+							var count = 0;
+							for (var x = 0; x < 1; x++) {
+								for (var y = 0; y < 1; y++) {
+									// imagedata index for each pixel in bounds
+									var pxX = (y * 1 + x) * 4;
+
+									if (imagedata.data[pxX + 3] > 0) {
+										count++
 									}
 								}
-								if (canvasWidth > canvasHeight) {
-									if (count > 0) {
-										context.fillStyle = context.drawImage(img, size+(size/2), size - (size/2), size, size);
-										context.fillRect(img, size+(size/2), size - (size/2), size, size)
-									} else {
-										context.fillStyle = context.drawImage(img, size - (size/2), size - (size/2), size, size);
-										context.fillRect(img, size - (size/2), size - (size/2), size, size)
-									}
+							}
+							if (canvasWidth > canvasHeight) {
+								if (count > 0) {
+									context.fillStyle = context.drawImage(drawThis, size+(size/2), size - (size/2), size, size);
+									context.fillRect(drawThis, size+(size/2), size - (size/2), size, size)
 								} else {
-									if (count > 0) {
-										context.fillStyle = context.drawImage(img, size, size - (size/2), size, size);
-										context.fillRect(img, size, size - (size/2), size, size)
-									} else {
-										context.fillStyle = context.drawImage(img, size - (size/1.1), size - (size/2), size, size);
-										context.fillRect(img, size - (size/1.1), size - (size/2), size, size)
-									}
+									context.fillStyle = context.drawImage(drawThis, size - (size/2), size - (size/2), size, size);
+									context.fillRect(drawThis, size - (size/2), size - (size/2), size, size)
 								}
 							} else {
-								context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(canv, 'no-repeat');
-								context.fill()
+								if (count > 0) {
+									context.fillStyle = context.drawImage(drawThis, size, size - (size/2), size, size);
+									context.fillRect(drawThis, size, size - (size/2), size, size)
+								} else {
+									context.fillStyle = context.drawImage(drawThis, size - (size/1.1), size - (size/2), size, size);
+									context.fillRect(drawThis, size - (size/1.1), size - (size/2), size, size)
+								}
 							}
+						} else {
+							context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(canv, 'no-repeat');
+							context.fill()
 						}
 					}
 				}
-				img.src = '/images/'+drawType+'/'+drawType+'_'+layer+'.svg';
+				context.save();
+				context.translate(touch.pageX * scale, touch.pageY * scale);
+				context.scale(1, radiusY/radiusX);
+				context.beginPath();
+				context.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
+				context.closePath();
 				context.restore();
 			}
 
@@ -477,7 +482,7 @@ block content
 			if (drawtype && drawtype !== undefined) {
 				can.toBlob(function(blob) {
 					var fd = new FormData();
-					console.log(blob)
+					//console.log(blob)
 					fd.append('img_'+drawtype+'_'+layer+'', blob);
 					
 					var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/'+drawtype+'/'+layer+'';
