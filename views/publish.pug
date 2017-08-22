@@ -181,13 +181,15 @@ block content
 								imgobj.width = canvasWidth;
 								imgobj.height = canvasHeight;
 								//imgobj.crossOrigin = 'anonymous';
+								imgobj.crossOrigin = '';
 								imgobj.onload = function(){
 
 									cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
 									cx.fill();
+									console.log('loaded imgobj: ')
+									console.log(can.toDataURL('image/png'))
 									return;
 								};
-								imgobj.crossOrigin = '';
 								imgobj.src = url;
 								
 							}
@@ -362,16 +364,18 @@ block content
 			context.closePath();
 			if (drawType !== "info" && drawType !== "tools") {
 				var img = document.createElement('img');
-				img.width = canvasWidth;
-				img.height = canvasHeight;
-				img.style.width = canvasWidth + "px";
-				img.style.height = canvasHeight + "px";
+				img.crossOrigin = '';
 				img.onload = function(){
-					
+					console.log('loaded img: ')
+					console.log(eventTarget.toDataURL('image/png'))
 					var context = eventTarget.getContext("2d");
 
 					if (drawType === 'filling') {
 						//context.globalCompositeOperation = 'source-over';
+						img.width = canvasWidth;
+						img.height = canvasHeight;
+						img.style.width = canvasWidth + "px";
+						img.style.height = canvasHeight + "px";
 						var pCanvas = document.createElement("canvas");
 						pCanvas.width = canvasWidth;
 						pCanvas.height = canvasHeight;
@@ -438,7 +442,6 @@ block content
 						}
 					}
 				}
-				img.crossOrigin = '';
 				img.src = '/images/'+drawType+'/'+drawType+'_'+layer+'.svg';
 				context.restore();
 			}
