@@ -182,8 +182,7 @@ block content
 								imgobj.height = canvasHeight;
 								//imgobj.crossOrigin = 'anonymous';
 								imgobj.onload = function(){
-									imgobj.src = imgobj.src;
-									//console.log(imgobj.src, url)
+
 									cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
 									cx.fill();
 									return;
@@ -314,10 +313,10 @@ block content
 		function TouchHandler(event) {
 			event.preventDefault();
 			
-			if (!mainmenu.classList.contains('selected')) {
+			//if (!mainmenu.classList.contains('selected')) {
 				for (var i = 0; i < event.changedTouches.length; i++)
 					drawTouch(event.target, event.changedTouches[i], event.type, false);
-			}
+			//}
 			
 		}
 		
@@ -354,9 +353,7 @@ block content
 				radiusX++;
 				radiusY++;
 			}
-			
-			
-			//
+
 			context.save();
 			context.translate(touch.pageX * scale, touch.pageY * scale);
 			context.scale(1, radiusY/radiusX);
@@ -370,23 +367,19 @@ block content
 				img.style.width = canvasWidth + "px";
 				img.style.height = canvasHeight + "px";
 				img.onload = function(){
-					var pattern;
+					
 					var context = eventTarget.getContext("2d");
 
-					//if (eventType == "touchend") {
 					if (drawType === 'filling') {
 						//context.globalCompositeOperation = 'source-over';
 						var pCanvas = document.createElement("canvas");
 						pCanvas.width = canvasWidth;
 						pCanvas.height = canvasHeight;
 						var pContext = pCanvas.getContext("2d");
-						
-						pattern = pContext.createPattern(img, 'repeat');
-						pContext.fillStyle = pattern;
-						pContext.fillRect(0,0,canvasWidth,canvasHeight)
-						//pContext.fillRect(img, 0, 0, canvasWidth, canvasHeight);
+						pContext.drawImage(img, 0, 0, canvasWidth, canvasHeight)
 						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_1.svg"), grabbing;');
-						context.fillStyle = context.createPattern(pCanvas, 'no-repeat');
+						var pPattern = context.createPattern(pCanvas, 'no-repeat');
+						context.fillStyle = pPattern;
 						context.fill()
 					}
 					if (drawType === 'substrates') {
@@ -399,14 +392,14 @@ block content
 						img.style.height = size  + "px";
 						if (layer === 0) {
 							
-							context.globalCompositeOperation = 'destination-atop';
+							//context.globalCompositeOperation = 'destination-atop';
 							context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(pCanvas, 'no-repeat');
 							context.fill();
-							ctx.globalCompositeOperation = 'destination-atop';
+							//ctx.globalCompositeOperation = 'destination-atop';
 							ctx.fillStyle = 'rgba(255,255,255,0)';//
 							ctx.fill()
 						} else {
-							ctx.globalCompositeOperation = 'source-over';
+							//ctx.globalCompositeOperation = 'source-over';
 							if (eventType == 'touchend') {
 								var imagedata = ctx.getImageData(size, size, 1, 1);
 
@@ -444,8 +437,6 @@ block content
 							}
 						}
 					}
-					
-					
 				}
 				img.crossOrigin = '';
 				img.src = '/images/'+drawType+'/'+drawType+'_'+layer+'.svg';
