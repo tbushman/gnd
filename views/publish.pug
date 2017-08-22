@@ -139,8 +139,8 @@ block content
 		var drawCoalesced = false;
 		var res//, canvasWidth, canvasHeight;
 		$(document).ready(function(){
-			canvasWidth = window.innerWidth;
-			canvasHeight = window.innerHeight;
+			var canvasWidth = window.innerWidth;
+			var canvasHeight = window.innerHeight;
 
 			var canv = document.getElementById('canvas');
 			var id, elem, irr, arr;
@@ -148,8 +148,9 @@ block content
 			if (pageIndex !== '') {
 				$.get('/doc/'+pageIndex+'', function(result){
 					res = result;
+
 					$.each(arr, function(i, can){
-						var url;
+						var url, drawThis;
 						console.log(can)
 						if (can && can !== null) {
 							var canid = can.getAttribute('id');
@@ -200,11 +201,54 @@ block content
 										
 									}
 								}
-								console.log('initializing app')
-								InitializeCanvas(canid, drawtype, layer)
+								var img = document.createElement('img');
+								img.crossOrigin = '';
+								img.onload = function(){
+									console.log('loaded img: ')
+									//console.log(elem.toDataURL('image/png'))
+									var context = can.getContext("2d");
+									if (drawtype === 'filling') {
+										//context.globalCompositeOperation = 'source-over';
+										img.width = canvasWidth;
+										img.height = canvasHeight;
+										img.style.width = canvasWidth + "px";
+										img.style.height = canvasHeight + "px";
+
+										drawThis = img;
+									} else {
+										var size = Math.min(canvasWidth, canvasHeight) / 2
+										img.width = size;
+										img.height = size;
+										img.style.width = size  + "px";
+										img.style.height = size  + "px";
+										drawThis = img;
+									}
+						
+									
+								}
+								img.src = '/images/'+drawtype+'/'+drawtype+'_'+layer+'.svg';
+								
 							}
+							//if (drawThis) {
+								console.log('initializing app')
+								InitializeCanvas(canid, drawtype, layer, drawThis, canvasWidth, canvasHeight);
+								["mousedown", "mousemove", "mouseup"].forEach(function(el) {
+										can.addEventListener(el, function(e){
+											MouseHandler(e, drawThis, canvasWidth, canvasHeight)
+										});
+								});
+								["touchstart", "touchmove", "touchend"].forEach(function(el) {
+										can.addEventListener(el, function(e){
+											TouchHandler(e, drawThis, canvasWidth, canvasHeight)
+										});
+								});
+								window.addEventListener("resize", function(e) {
+									InitializeCanvas(aID, drawtype, layer, drawThis, canvasWidth, canvasHeight);
+								});
+							//}
 						}
-					})
+					});
+					
 				})
 			}
 			
@@ -248,14 +292,13 @@ block content
 			}
 		})
 		
-		function InitializeCanvas(aID, drawtype, layer) {
+		function InitializeCanvas(aID, drawtype, layer, canvasWidth, canvasHeight) {
 			var canv = document.getElementById(aID);
 
 			var newscale = window.devicePixelRatio ? window.devicePixelRatio : 1;
 			
 			var newwidth = window.innerWidth;//window.screen.width// * newscale;////window.screen.width * newscale;
 			var newheight = window.innerHeight;//// * newscale;////window.screen.height * newscale;
-			var canvasWidth, canvasHeight;
 			if (canv.width != newwidth || canv.height != newheight) {
 				// resizing a canvas clears it, so do it only when it's dimensions have changed.
 				canvasWidth = newwidth;
@@ -265,51 +308,7 @@ block content
 				canv.style.width = canvasWidth + "px";
 				canv.style.height = canvasHeight + "px";
 
-			} else {
-				canvasWidth = canv.width;
-				canvasHeight = canv.height;
 			}
-			var drawThis;
-			var img = document.createElement('img');
-			img.crossOrigin = '';
-			img.onload = function(){
-				console.log('loaded img: ')
-				//console.log(elem.toDataURL('image/png'))
-				var context = canv.getContext("2d");
-				if (drawtype === 'filling') {
-					//context.globalCompositeOperation = 'source-over';
-					img.width = canvasWidth;
-					img.height = canvasHeight;
-					img.style.width = canvasWidth + "px";
-					img.style.height = canvasHeight + "px";
-
-					drawThis = img;
-				} else {
-					var size = Math.min(canvasWidth, canvasHeight) / 2
-					img.width = size;
-					img.height = size;
-					img.style.width = size  + "px";
-					img.style.height = size  + "px";
-					drawThis = img;
-				}
-	
-				if (drawThis) {
-					["mousedown", "mousemove", "mouseup"].forEach(function(el) {
-							canv.addEventListener(el, function(e){
-								MouseHandler(e, drawThis, canvasWidth, canvasHeight)
-							});
-					});
-					["touchstart", "touchmove", "touchend"].forEach(function(el) {
-							canv.addEventListener(el, function(e){
-								TouchHandler(e, drawThis, canvasWidth, canvasHeight)
-							});
-					});
-					window.addEventListener("resize", function(e) {
-						InitializeCanvas(aID, drawtype, layer);
-					});
-				}
-			}
-			img.src = '/images/'+drawtype+'/'+drawtype+'_'+layer+'.svg';
 
 		}
 		
@@ -347,7 +346,6 @@ block content
 		}
 		
 		function drawTouch(eventTarget, touch, eventType, drawThis, canvasWidth, canvasHeight) {
-			console.log(drawThis, canvasWidth)
 			var canv = document.getElementById('canvas');
 			var ctx = canv.getContext('2d');
 
@@ -528,6 +526,8 @@ block content
 								text += filling[0].name;
 								$('#title').val(text);
 								var pattern = context.createPattern(can, 'no-repeat');
+								var canvasWidth = can.width;
+								var canvasHeight = can.height;
 								context.fillStyle = pattern;//context.drawImage(can, 0, 0, canvasWidth, canvasHeight);
 								context.fillRect(0,0,canvasWidth,canvasHeight)
 
