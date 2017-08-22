@@ -33,7 +33,7 @@ if (app.get('env') === 'production') {
 		res.set({
 			//"Access-Control-Allow-Origin" : "//localhost:80",
 			'Access-Control-Allow-Methods' : 'GET, POST, HEAD, OPTIONS',
-			'Access-Control-Allow-Headers' : 'Cache-Control, Origin, Content-Type, Accept'//,/*,
+			'Access-Control-Allow-Headers' : 'Cache-Control, Origin, Content-Type, Accept'//,
 			//"X-DNS-Prefetch-Control" : "on",*/
 			/*,
 			"Access-Control-Allow-Credentials" : true*/
@@ -49,7 +49,7 @@ if (app.get('env') === 'production') {
 		  preload: true
 		}));
 		app.use(helmet.dnsPrefetchControl({ allow: true }));*/
-		//app.use(helmet.noCache({}));
+		app.use(helmet.noCache({}));
 
 		next();
 	});
