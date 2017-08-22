@@ -182,7 +182,7 @@ block content
 								imgobj.width = canvasWidth;
 								imgobj.height = canvasHeight;
 								//imgobj.crossOrigin = 'anonymous';
-								imgobj.crossOrigin = '';
+								imgobj.crossOrigin = 'Anonymous';
 								imgobj.onload = function(){
 
 									cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
@@ -197,7 +197,7 @@ block content
 											}
 										}
 										var img = document.createElement('img');
-										img.crossOrigin = '';
+										img.crossOrigin = 'Anonymous';
 										img.onload = function(){
 											console.log('loaded img: ')
 											//console.log(elem.toDataURL('image/png'))
