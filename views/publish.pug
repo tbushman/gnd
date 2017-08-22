@@ -139,135 +139,7 @@ block content
 		var drawCoalesced = false;
 		var res//, canvasWidth, canvasHeight;
 		$(document).ready(function(){
-			var canvasWidth = window.innerWidth;
-			var canvasHeight = window.innerHeight;
-
-			var canv = document.getElementById('canvas');
-			var id, elem, irr, arr;
-			arr = [document.getElementById('canvas'), document.getElementById('canvas_'+drawtype+'_'+layer+'')]
-			if (pageIndex !== '') {
-				$.get('/doc/'+pageIndex+'', function(result){
-					res = result;
-
-					$.each(arr, function(i, can){
-						var url, drawThis;
-						console.log(can)
-						if (can && can !== null) {
-							var canid = can.getAttribute('id');
-							var cx = can.getContext('2d');
-							can.width = canvasWidth;
-							can.height = canvasHeight;
-							can.style.width = canvasWidth+'px';
-							can.style.height = canvasHeight+'px';
-							if (canid === 'canvas') {
-								url = res.content[index].image;
-							} else {
-								if (drawtype !== undefined && drawtype !== '' && drawtype !== 'info' && drawtype !== 'tools' && '#{infowindow}' === 'edit') {
-									url = res.content[index][drawtype][layer].image;
-									if (res.content[index][drawtype] !== undefined) {
-										if (res.content[index][drawtype][layer+1]) {
-											irr = res.content[index][drawtype][layer+1];
-										}
-									} else {
-										irr = undefined;
-									}
-								} else {
-									irr = undefined;
-									url = undefined;
-								}
-							}
-							console.log(url)
-							if (url !== undefined && url !== '') {
-								var imgobj = document.createElement('img');
-								imgobj.width = canvasWidth;
-								imgobj.height = canvasHeight;
-								//imgobj.crossOrigin = 'anonymous';
-								imgobj.crossOrigin = 'Anonymous';
-								imgobj.onload = function(){
-
-									cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
-									cx.fill();
-									console.log('loaded imgobj: ')
-									//console.log(can.toDataURL('image/png'))
-									if (canid !== 'canvas' && canid !== undefined && canid !== null && canid !== '') {
-										if ('#{infowindow}' === 'edit' && irr !== undefined && irr.spec.safety !== 'bacteria') {
-											if ($('#select').hasClass('draw')) {
-												drawModeModal(canid, '#{pageindex}')
-												
-											}
-										}
-										var img = document.createElement('img');
-										img.crossOrigin = 'Anonymous';
-										img.onload = function(){
-											console.log('loaded img: ')
-											//console.log(elem.toDataURL('image/png'))
-											var context = can.getContext("2d");
-											if (drawtype === 'filling') {
-												//context.globalCompositeOperation = 'source-over';
-												img.width = canvasWidth;
-												img.height = canvasHeight;
-												img.style.width = canvasWidth + "px";
-												img.style.height = canvasHeight + "px";
-
-												drawThis = img;
-												console.log('initializing app')
-												console.log(canid, drawtype, layer, drawThis, canvasWidth, canvasHeight)
-												InitializeCanvas(canid, drawtype, layer, drawThis, canvasWidth, canvasHeight);
-												["mousedown", "mousemove", "mouseup"].forEach(function(el) {
-														can.addEventListener(el, function(e){
-															MouseHandler(e, drawThis, canvasWidth, canvasHeight)
-														});
-												});
-												["touchstart", "touchmove", "touchend"].forEach(function(el) {
-														can.addEventListener(el, function(e){
-															TouchHandler(e, drawThis, canvasWidth, canvasHeight)
-														});
-												});
-												window.addEventListener("resize", function(e) {
-													InitializeCanvas(aID, drawtype, layer, drawThis, canvasWidth, canvasHeight);
-												});
-											} else {
-												var size = Math.min(canvasWidth, canvasHeight) / 2
-												img.width = size;
-												img.height = size;
-												img.style.width = size  + "px";
-												img.style.height = size  + "px";
-												drawThis = img;
-												console.log('initializing app')
-												console.log(canid, drawtype, layer, drawThis, canvasWidth, canvasHeight)
-												InitializeCanvas(canid, drawtype, layer, drawThis, canvasWidth, canvasHeight);
-												["mousedown", "mousemove", "mouseup"].forEach(function(el) {
-														can.addEventListener(el, function(e){
-															MouseHandler(e, drawThis, canvasWidth, canvasHeight)
-														});
-												});
-												["touchstart", "touchmove", "touchend"].forEach(function(el) {
-														can.addEventListener(el, function(e){
-															TouchHandler(e, drawThis, canvasWidth, canvasHeight)
-														});
-												});
-												window.addEventListener("resize", function(e) {
-													InitializeCanvas(aID, drawtype, layer, drawThis, canvasWidth, canvasHeight);
-												});
-											}
-								
-											
-										}
-										img.src = '/images/'+drawtype+'/'+drawtype+'_'+layer+'.svg';
-										
-									}
-									
-									return;
-								};
-								imgobj.src = url;
-								
-							}
-							
-						}
-					});
-					
-				})
-			}
+			
 			
 			$('textarea').each(function(){
 				var text;
@@ -308,7 +180,135 @@ block content
 				e.preventDefault();
 			}
 		})
+		var canvasWidth = window.innerWidth;
+		var canvasHeight = window.innerHeight;
 		
+		var canv = document.getElementById('canvas');
+		var id, elem, irr, arr;
+		arr = [document.getElementById('canvas'), document.getElementById('canvas_'+drawtype+'_'+layer+'')]
+		if (pageIndex !== '') {
+			$.get('/doc/'+pageIndex+'', function(result){
+				res = result;
+
+				$.each(arr, function(i, can){
+					var url, drawThis;
+					console.log(can)
+					if (can && can !== null) {
+						var canid = can.getAttribute('id');
+						var cx = can.getContext('2d');
+						can.width = canvasWidth;
+						can.height = canvasHeight;
+						can.style.width = canvasWidth+'px';
+						can.style.height = canvasHeight+'px';
+						if (canid === 'canvas') {
+							url = res.content[index].image;
+						} else {
+							if (drawtype !== undefined && drawtype !== '' && drawtype !== 'info' && drawtype !== 'tools' && '#{infowindow}' === 'edit') {
+								url = res.content[index][drawtype][layer].image;
+								if (res.content[index][drawtype] !== undefined) {
+									if (res.content[index][drawtype][layer+1]) {
+										irr = res.content[index][drawtype][layer+1];
+									}
+								} else {
+									irr = undefined;
+								}
+							} else {
+								irr = undefined;
+								url = undefined;
+							}
+						}
+						console.log(url)
+						if (url !== undefined && url !== '') {
+							var imgobj = document.createElement('img');
+							imgobj.width = canvasWidth;
+							imgobj.height = canvasHeight;
+							//imgobj.crossOrigin = 'anonymous';
+							imgobj.crossOrigin = 'Anonymous';
+							imgobj.onload = function(){
+
+								cx.fillStyle = cx.drawImage(imgobj, 0, 0, canvasWidth, canvasHeight);
+								cx.fill();
+								console.log('loaded imgobj: ')
+								//console.log(can.toDataURL('image/png'))
+								if (canid !== 'canvas' && canid !== undefined && canid !== null && canid !== '') {
+									if ('#{infowindow}' === 'edit' && irr !== undefined && irr.spec.safety !== 'bacteria') {
+										if ($('#select').hasClass('draw')) {
+											drawModeModal(canid, '#{pageindex}')
+											
+										}
+									}
+									var img = document.createElement('img');
+									img.crossOrigin = 'Anonymous';
+									img.onload = function(){
+										console.log('loaded img: ')
+										//console.log(elem.toDataURL('image/png'))
+										var context = can.getContext("2d");
+										if (drawtype === 'filling') {
+											//context.globalCompositeOperation = 'source-over';
+											img.width = canvasWidth;
+											img.height = canvasHeight;
+											img.style.width = canvasWidth + "px";
+											img.style.height = canvasHeight + "px";
+
+											drawThis = img;
+											console.log('initializing app')
+											console.log(canid, drawtype, layer, drawThis, canvasWidth, canvasHeight)
+											InitializeCanvas(canid, drawtype, layer, drawThis, canvasWidth, canvasHeight);
+											["mousedown", "mousemove", "mouseup"].forEach(function(el) {
+													can.addEventListener(el, function(e){
+														MouseHandler(e, drawThis, canvasWidth, canvasHeight)
+													});
+											});
+											["touchstart", "touchmove", "touchend"].forEach(function(el) {
+													can.addEventListener(el, function(e){
+														TouchHandler(e, drawThis, canvasWidth, canvasHeight)
+													});
+											});
+											window.addEventListener("resize", function(e) {
+												InitializeCanvas(aID, drawtype, layer, drawThis, canvasWidth, canvasHeight);
+											});
+										} else {
+											var size = Math.min(canvasWidth, canvasHeight) / 2
+											img.width = size;
+											img.height = size;
+											img.style.width = size  + "px";
+											img.style.height = size  + "px";
+											drawThis = img;
+											console.log('initializing app')
+											console.log(canid, drawtype, layer, drawThis, canvasWidth, canvasHeight)
+											InitializeCanvas(canid, drawtype, layer, drawThis, canvasWidth, canvasHeight);
+											["mousedown", "mousemove", "mouseup"].forEach(function(el) {
+													can.addEventListener(el, function(e){
+														MouseHandler(e, drawThis, canvasWidth, canvasHeight)
+													});
+											});
+											["touchstart", "touchmove", "touchend"].forEach(function(el) {
+													can.addEventListener(el, function(e){
+														TouchHandler(e, drawThis, canvasWidth, canvasHeight)
+													});
+											});
+											window.addEventListener("resize", function(e) {
+												InitializeCanvas(aID, drawtype, layer, drawThis, canvasWidth, canvasHeight);
+											});
+										}
+							
+										
+									}
+									img.src = '/images/'+drawtype+'/'+drawtype+'_'+layer+'.svg';
+									
+								}
+								
+								return;
+							};
+							imgobj.src = url;
+							
+						}
+						
+					}
+				});
+				
+			})
+		}
 		function InitializeCanvas(aID, drawtype, layer, canvasWidth, canvasHeight) {
 			var canv = document.getElementById(aID);
 
