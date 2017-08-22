@@ -59,7 +59,7 @@ block content
 			if (drawtype && drawtype !== "tools" && drawtype !== "info")
 				if (menuData.publishers[0].username === loggedin)
 						
-					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab; background-image:url('"+(contentData.info[contentData.level].image !== ""? contentData.info[contentData.level].image : "")+"');")
+					canvas.canvas.layer.topRight(id="canvas_"+drawtype+"_"+layer+"", style="z-index: "+layer+"; cursor: grab;")
 			if (contentData.level === 3)
 				canvas.maincanvas.topRight(id="canvas", style="z-index: -1; background-image:url('/images/backgrounds/backgrounds_"+1+".svg');")
 			else
