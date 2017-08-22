@@ -563,7 +563,8 @@ block content
 										success: function(response) {
 											$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
 											console.log('saved both')
-											uiBlogMode();
+											window.location.href = '/api/publish'
+											//uiBlogMode();
 										}
 									})
 								}, 'image/png', 0.95);
