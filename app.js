@@ -31,35 +31,15 @@ if (app.get('env') === 'production') {
 		app.disable('Strict-Transport-Security');
 		app.disable('Access-Control-Allow-Credentials');
 		res.set({
-			//"Access-Control-Allow-Origin" : "//localhost:80",
+			'Access-Control-Allow-Origin' : '*',
 			'Access-Control-Allow-Methods' : 'GET, POST, HEAD, OPTIONS',
-			'Access-Control-Allow-Headers' : 'Cache-Control, Origin, Content-Type, Accept'//,
-			//"X-DNS-Prefetch-Control" : "on",*/
-			/*,
-			"Access-Control-Allow-Credentials" : true*/
-			//'Cache-Control' : 'private, no-cache, no-store, must-revalidate'
+			'Access-Control-Allow-Headers' : 'Cache-Control, Origin, Content-Type, Accept'
 		});
-		/*app.use(helmet());
-		app.use(helmet.hsts({
-		  // Must be at least 18 weeks to be approved by Google
-		  maxAge: 10886400,
 
-		  // Must be enabled to be approved by Google
-		  includeSubDomains: true,
-		  preload: true
-		}));
-		app.use(helmet.dnsPrefetchControl({ allow: true }));*/
 		app.use(helmet.noCache({}));
 
 		next();
 	});
-	/*app.use(function (req, res, next) {
-	    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:80');
-	    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-	    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Authorization');
-	    res.setHeader('Access-Control-Allow-Credentials', true);
-	    next()
-	});*/
 	
 }
 passport.use(new LocalStrategy(Publisher.authenticate()));
@@ -76,13 +56,13 @@ passport.deserializeUser(function(id, done) {
 		} else {
 			done(err, null);
 		}
-    });
+	});
 });
 
 var store = new MongoDBStore(
 	{
 		uri: 'mongodb://localhost/session_sfusd2',
-        collection: 'mySessions'
+		collection: 'mySessions'
 	}
 )
 store.on('error', function(error, next){
