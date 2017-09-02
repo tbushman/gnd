@@ -155,22 +155,12 @@ app.use(function (req, res, next) {
 	res.status(404).send('Not Found');
 });
 
-/*app.use(function (err, req, res) {
-
-	console.log(err.stack)
-	req.app.locals.username = null;
-	req.app.locals.userId = null;
-	req.app.locals.zoom = null;
-	req.app.locals.loggedin = null;
-	delete req.app.locals.pageTitle;
-	delete req.app.locals.drawType;
-	delete req.app.locals.layer;
-	req.logout();
+app.use(function (err, req, res) {
 	res.status(err.status || 500).send({
-	    message: err.message,
-	    error: err.status
+		message: err.message,
+		error: err.status
 	})
-});*/
+});
 
 var uri = process.env.DEVDB;
 
