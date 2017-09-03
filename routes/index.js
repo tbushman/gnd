@@ -18,6 +18,7 @@ var marked = require('marked');
 var upload = multer();
 var thestore = require('../public/json/store.json');
 var languages = require('../public/json/languages.json');
+var cors = require('cors');
 
 
 dotenv.load();
@@ -145,6 +146,7 @@ router.post('/api/uploadmedia/:pageindex/:index/:drawtype/:layer', uploadmedia.a
 	return res.status(200).send(req.files[0].path)
 })
 
+router.all(/(.+)/, cors())
 
 router.get('/doc/:pageindex', function(req, res, next){
 	var pageindex = parseInt(req.params.pageindex, 10);

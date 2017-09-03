@@ -32,11 +32,12 @@ if (app.get('env') === 'production') {
 	app.use(function(req, res, next) {
 		app.disable('x-powered-by');
 		app.disable('Strict-Transport-Security');
-		app.disable('Access-Control-Allow-Credentials');
+		//app.disable('Access-Control-Allow-Credentials');
 		res.set({
 			'Access-Control-Allow-Origin' : '*',
 			'Access-Control-Allow-Methods' : 'GET, POST, HEAD, OPTIONS',
-			'Access-Control-Allow-Headers' : 'Cache-Control, Origin, Content-Type, Accept'
+			'Access-Control-Allow-Headers' : 'Cache-Control, Origin, Content-Type, Accept',
+			'Access-Control-Allow-Credentials' : true
 		});
 
 		app.use(helmet.noCache({}));
