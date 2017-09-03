@@ -20,12 +20,15 @@ var Page = require('./models/pages');
 var async = require('async');
 var favicon = require('serve-favicon');
 var helmet = require('helmet');
+var cors = require('cors');
 mongoose.Promise = promise;
 dotenv.load();
 
 var app = express();
 if (app.get('env') === 'production') {
-	app.set('trust proxy', 1) // trust first proxy	
+	app.set('trust proxy', 1); // trust first proxy	
+	app.use(cors());
+	app.options('*', cors());
 	app.use(function(req, res, next) {
 		app.disable('x-powered-by');
 		app.disable('Strict-Transport-Security');

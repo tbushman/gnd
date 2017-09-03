@@ -27,8 +27,10 @@ block page
 	else
 		- var contentData = menuData.content[menuData.content.length-1]
 		- var index = contentData.index
-
-	- var layer = contentData.level
+	if (layer)
+		- var layer = layer
+	else
+		- var layer = contentData.level
 block content
 	
 	- var keys = ["tools", "info", "substrates", "filling"]
@@ -228,7 +230,7 @@ block content
 					console.log(cx)
 					can.style['pointer-events'] = 'auto';
 					can.style.position = 'absolute';
-					can.style['z-index'] = aID.split('_')[2];
+					can.style['z-index'] = parseInt(aID.split('_')[2], 10) + 1;
 					var brush = new Image();
 					brush.width = canvasWidth;
 					brush.height = canvasHeight;
@@ -245,11 +247,29 @@ block content
 				} else {
 					$('.menu .envel').append(can);
 					can.style['pointer-events'] = 'none';
-					can.style['z-index'] = '0';
+					can.style['z-index'] = '-1';
+					can.setAttribute('class', 'maincanvas topRight')
+					can.style['background-image'] = 'url("/images/backgrounds/backgrounds_0.svg")';
 				}
 			}
 		}
 		
+		function uiErase(urltitle, pageindex, index, drawtype, layer){
+			//var canvases = document.getElementsByTagName('canvas');
+
+			$('canvas').each(function(e){
+				var canvas = this;
+				var canvasWidth = canvas.width;
+				var canvasHeight = canvas.height;
+				var cx = canvas.getContext('2d');
+				cx.clearRect(0,0,canvasWidth,canvasHeight);
+				saveImage(canvas);
+			})
+			uiDrawMode();
+			/*$.post('/api/selectlayer/'+urltitle+'/'+pageindex+'/'+index+'/'+drawtype+'/'+layer+'', function(){
+				window.location.href = '/api/selectlayer';
+			})*/
+		}
 		
 		function MouseHandler(event, drawThis, canvasWidth, canvasHeight) {
 			if (event.type == "mousedown" && event.button === 0) {
@@ -336,8 +356,7 @@ block content
 						context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(pCanvas, 'no-repeat');
 						context.fill();
 
-						ctx.fillStyle = 'rgba(255,255,255,0)';//
-						ctx.fill()
+						ctx.clearRect(0,0,canvasWidth,canvasHeight)
 					} else {
 						if (eventType == 'touchend') {
 							var size = Math.min(canvasWidth, canvasHeight) / 2
@@ -412,13 +431,22 @@ block content
 					}
 				});
 			}
-			var layer = can.getAttribute('id').split('_')[2];
+			var layer, name, inputid;
 			var drawtype = can.getAttribute('id').split('_')[1];
+			if (can.getAttribute('id').split('_')[2]){
+				layer = can.getAttribute('id').split('_')[2];
+				name = 'img_'+drawtype+'_'+layer+''
+				inputid = 'inputimg_'+drawtype+'_'+layer+''
+			} else {
+				layer = 0;
+				name = 'image'
+				inputid = 'inputimg'
+			}
 			if (drawtype && drawtype !== undefined) {
 				can.toBlob(function(blob) {
 					var fd = new FormData();
 					//console.log(blob)
-					fd.append('img_'+drawtype+'_'+layer+'', blob);
+					fd.append(name, blob);
 					
 					var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/'+drawtype+'/'+layer+'';
 
@@ -431,47 +459,51 @@ block content
 						success: function(response) {
 							//delete blob;
 							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
-							$('#inputimg_'+drawtype+'_'+layer+'').val(imgurl);
-							var text = '';
-								
-							if (index !== '') {
-								index = parseInt(index, 10);
-								layer = parseInt(layer, 10);
-								var level = parseInt(res.content[index].level, 10);
-								var filling = res.content[index].filling;
-								var allergies = res.publishers[0].allergies;
-								if (filling[layer] !== undefined && allergies.indexOf(filling[layer].name) === -1 && layer > 0){
-									text += filling[layer].name
-								}
-								if (text !== '') {
-									text += ' and '
-								}
-								else {
-									if (filling[layer-1] !== undefined && filling[layer-1].image !== '' && layer-1 !== 0){
-										text += filling[layer-1].name
-									}
-									else {
-										if (filling[level+1] !== undefined && filling[level+1].image !== ''){
-											text += filling[layer+1].name
-										}
+							$('#'+inputid+'').val(imgurl);
+							if (drawtype !== 'main') {
+								var text = '';
+									
+								if (index !== '') {
+									index = parseInt(index, 10);
+									layer = parseInt(layer, 10);
+									var level = parseInt(res.content[index].level, 10);
+									var filling = res.content[index].filling;
+									var allergies = res.publishers[0].allergies;
+									if (filling[layer] !== undefined && allergies.indexOf(filling[layer].name) === -1 && layer > 0){
+										text += filling[layer].name
 									}
 									if (text !== '') {
 										text += ' and '
 									}
+									else {
+										if (filling[layer-1] !== undefined && filling[layer-1].image !== '' && layer-1 !== 0){
+											text += filling[layer-1].name
+										}
+										else {
+											if (filling[level+1] !== undefined && filling[level+1].image !== ''){
+												text += filling[layer+1].name
+											}
+										}
+										if (text !== '') {
+											text += ' and '
+										}
+									}
+										
+									text += filling[0].name;
+									$('#title').val(text);
 								}
-									
-								text += filling[0].name;
-								$('#title').val(text);
+								//uiBlogMode();
 								var pattern = context.createPattern(can, 'no-repeat');
 								var canvasWidth = can.width;
 								var canvasHeight = can.height;
 								context.fillStyle = pattern;//context.drawImage(can, 0, 0, canvasWidth, canvasHeight);
-								context.fillRect(0,0,canvasWidth,canvasHeight)
+																context.fillRect(0,0,canvasWidth,canvasHeight)
+								//context.drawImage(can,0,0,canvasWidth,canvasHeight)
 
-								mainCanvas.toBlob(function(blobb) {
+								mainCanvas.toBlob(function(blob) {
 									var fd = new FormData();
-									fd.append("image", blobb);
-									console.log(blobb)
+									fd.append("image", blob);
+									console.log(blob)
 									var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
 
 									$.ajax({
@@ -483,16 +515,17 @@ block content
 										success: function(response) {
 											$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
 											console.log('saved both')
-											window.location.href = '/api/publish'
-											//uiBlogMode();
+											//window.location.href = '/api/selectlayer'
+											uiBlogMode();
 										}
 									})
 								}, 'image/png', 0.95);
 							}
+							
 						}
 					})
 				}, 'image/png', 0.95);
-			} else {
+			}/* else {
 				console.log('saving main')
 
 				mainCanvas.toBlob(function(blob) {
@@ -518,8 +551,8 @@ block content
 							}
 						
 					})
-				}, 'image/png'/*, 0.95*/);
-			}
+				}, 'image/png'/*, 0.95*///);
+			//}
 		}
 		//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
 		$(document).on('touchstart, mouseover', '.translate', function (e) {

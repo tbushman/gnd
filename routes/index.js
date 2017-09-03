@@ -891,6 +891,7 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 	var index = parseInt(req.params.index, 10);
 	var drawtype = req.params.drawtype;
 	var layer = parseInt(req.params.layer, 10);
+	req.app.locals.layer = layer;
 	if (drawtype === "info") {
 		return res.redirect('/api/levelup')
 	}
@@ -925,7 +926,6 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 		var key1 = 'content.$.'+keylist[0]+'.'+levellist[0]+'.unlocked';
 		set1.$set[key1] = true;
 		req.app.locals.drawType = drawType;
-		req.app.locals.layer = level;
 		req.app.locals.pageindex = pageindex;
 		Page.findOneAndUpdate({pageindex: pageindex, content: {$elemMatch: {index: index}}}, set1, {safe: true, new: true, upsert: false}, function(error, dc){
 			if (error) {
@@ -957,21 +957,20 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 router.get('/api/levelup', function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath)
-	var layer = parseInt(req.app.locals.layer, 10)
-	layer++;
+	var level = parseInt(req.app.locals.layer, 10);
+	level++;
 	
-	req.app.locals.layer = layer;
 	var set = {$set:{}}
 	var key = 'content.$.level'
-	set.$set[key] = req.app.locals.layer;
+	set.$set[key] = level;
 	var set1 = {$set:{}}
 	var key1 = 'publishers.0.avatar';
-	set1.$set[key1] = '/images/avatars/avatar_'+req.app.locals.layer+'.svg'
+	set1.$set[key1] = '/images/avatars/avatar_'+level+'.svg';
 	Page.findOne({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, function(errr, doc){
 		if (errr) {
 			return next(errr)
 		}
-		if (layer > 2) {
+		if (level > 2) {
 			return res.redirect('/chef/'+doc.pagetitle+'/'+req.app.locals.index+'')
 		}
 		Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){
@@ -994,6 +993,8 @@ router.get('/api/levelup', function(req, res, next){
 					return res.render('publish', {
 						type: 'blog',
 						infowindow: 'doc',
+						drawtype: req.app.locals.drawType,
+						layer: parseInt(req.app.locals.layer, 10),
 						loggedin: req.app.locals.loggedin,
 						pageindex: doc.pageindex,
 						index: req.app.locals.index ? req.app.locals.index : doc.content[doc.content.length-1].index,

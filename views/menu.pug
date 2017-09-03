@@ -31,10 +31,16 @@ div.grid-header.mainHeader
 							if (contentData !== undefined)
 								each cat, i in contentData[ing]
 									if (cat.unlocked && allergies.indexOf(cat.name) === -1)
-										a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
-											.ui
-												img(src="/images/icons/"+ing+"_"+i+".svg")
-												span.tb-font-m #{cat.name}
+										if (ing === 'substrates' && i === 0)
+											a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"', function(){uiErase('"+menuData.urltitle+"',"+menuData.pageindex+","+index+",'"+drawtype+"',"+layer+"); $.post('/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})})")
+												.ui
+													img(src="/images/icons/"+ing+"_"+i+".svg")
+													span.tb-font-m #{cat.name}
+										else
+											a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
+												.ui
+													img(src="/images/icons/"+ing+"_"+i+".svg")
+													span.tb-font-m #{cat.name}
 	else
 		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="/images/menu_button.svg")
