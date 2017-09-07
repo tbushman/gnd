@@ -81,6 +81,7 @@ i, .i {
 	top: auto;
 	display: inline-block;
 	z-index: 2;
+	pointer-events: none;
 }
 #modal {
 	position: absolute;
@@ -268,12 +269,13 @@ i.fa.active {
 }
 .grid-container.blog {
 	height: var(--panelheight);
-	width: calc(100% - var(--thumbwidth));
+	/*width: calc(100% - var(--thumbwidth));*/
+	width: 100%;
 	overflow-y: scroll;
 }
 .grid-container.draw {
 	height: var(--panelheight);
-	width: calc(100% - var(--thumbwidth));
+	width: 100%;
 }
 @supports not (display:grid) {
 	.grid-container {
@@ -362,9 +364,19 @@ i.fa.active {
 	}
 }
 .grid-header.mainHeader {
-	max-width: calc(100% - var(--thumbwidth));
+	max-width: calc(100% - calc( 2 * var(--thumbwidth)));
 	background-color: rgba(255,255,255,0);
 	min-height: 80px;
+	overflow: scroll;
+	white-space: nowrap;
+	margin-right: -180px;
+}
+@supports not (display:grid) {
+	.grid-header.mainHeader {
+		float: left;
+		margin-right: 0;
+		overflow: hidden;
+	}
 }
 a.grid-header:hover {
 	color: var(--secondary);
@@ -440,6 +452,9 @@ a.grid-header:hover {
 		display: inline-block;
 		float: right;
 		position: relative;
+	}
+	#select.draw .grid-right {
+		display: none;
 	}
 }
 @supports not (position:sticky) {
@@ -740,12 +755,9 @@ a.tool {
 	width: calc(var(--thumbwidth)*1.1);
 	margin: 0 auto;
 	display: inline-block;
-	float: left;
-	position: relative;
 }
 a.tool .ui {
 	width: var(--thumbwidth);
-	display: inline-table;
 	position: relative;
 	margin: 0 auto;
 }
@@ -1060,7 +1072,10 @@ a.tool span {
 	font-size: 13px;
 	color: #999;
 }
-
+form#form {
+	width: auto;
+	min-width: 90%;
+}
 #inputtext {
 	min-height: 100px;
 }

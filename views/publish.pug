@@ -37,6 +37,7 @@ block content
 	- var allergies = menuData.publishers[0].allergies;
 	input(type="hidden", value= pageIndex, id="pageindex")
 	input(type="hidden", value= index, id="index")
+	input(type="hidden", id="erase")
 		//-
 			navigation
 	div#select(class= type)
@@ -96,15 +97,17 @@ block content
 		var datalength = #{data.length};
 		/*var doc = `#{doc}`*/
 		var index = '#{index}'
-		if (index === '' || isNaN(parseInt(index, 10))) {
+		/*if (index === '' || isNaN(parseInt(index, 10))) {
 			index = parseInt(document.getElementById('index').value, 10);
-		} else {
+		} else {*/
+		if (index !== '' && !isNaN(parseInt(index, 10))) {
 			index = parseInt(index, 10);
 		}
 		pageIndex = '#{pageindex}'
-		if (pageIndex == '' || isNaN(parseInt(pageIndex, 10))) {
+		/*if (pageIndex == '' || isNaN(parseInt(pageIndex, 10))) {
 			pageIndex = parseInt(document.getElementById('pageindex').value, 10);
-		} else {
+		} else {*/
+		if (pageIndex !== '' && !isNaN(parseInt(pageIndex, 10))) {
 			pageIndex = parseInt(pageIndex, 10);
 		}
 		console.log('this pageindex'+pageIndex)
@@ -160,16 +163,23 @@ block content
 				//main canvas
 				var mainCanvasImg = res.content[index].image;
 				//canvas [layer] (z-index)
-				var canvasLayerImg = res.content[index][drawtype][layer].image;
+				
 				
 				if (mainCanvasImg !== '' && mainCanvasImg !== undefined) {
 					var loadedMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, mainCanvasImg);
 					loadedMain.drawImg();
 				}
-				if (canvasLayerImg !== '' && canvasLayerImg !== undefined) {
-					var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
-					loadedLayer.drawImg();
-				}
+				if (window.location.href !== '/home'){
+					if (res.content[index][drawtype][layer].image !== '' && res.content[index][drawtype][layer].image !== undefined) {
+						var canvasLayerImg = res.content[index][drawtype][layer].image;
+						var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
+						loadedLayer.drawImg();
+					} else {
+						var canvasLayerImg = new Image();
+						var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
+						loadedLayer.drawImg();
+					}
+				} 
 			});
 
 		})
@@ -194,10 +204,16 @@ block content
 		
 				
 		// http://jsfiddle.net/m1erickson/cAR93/
-		
+		// load new canvas each page load to hopefully combat cors-related taintedness
 		function loadedCanvas(aID, x, y, canvasWidth, canvasHeight, url) {
 			const can = document.createElement('canvas');
 			can.setAttribute('id', aID);
+			can.setAttribute('class', 'topRight');
+			if (aID === 'canvas') {
+				can.setAttribute('class', 'maincanvas');
+			} else {
+				can.setAttribute('class', 'layer');
+			}
 			can.width = canvasWidth;
 			can.height = canvasHeight;
 			can.style.width = canvasWidth + 'px';
@@ -222,8 +238,6 @@ block content
 						cx.drawImage(newImg, x, y, canvasWidth, canvasHeight);
 					}
 				}
-				
-				//document.querySelector('.menu').appendChild(can);
 
 				if (aID !== 'canvas') {
 					$('.menu .envel').prepend(can);
@@ -235,6 +249,7 @@ block content
 					brush.width = canvasWidth;
 					brush.height = canvasHeight;
 					brush.onload = function() {
+						drawModeModal(aID, pageIndex)
 						$('#'+aID+'').on('mousedown mousemove mouseup', function(e){
 							MouseHandler(e, brush, canvasWidth, canvasHeight);
 						});
@@ -250,25 +265,23 @@ block content
 					can.style['z-index'] = '-1';
 					can.setAttribute('class', 'maincanvas topRight')
 					can.style['background-image'] = 'url("/images/backgrounds/backgrounds_0.svg")';
+					if ($('#erase').val() !== '') {
+						var brush = new Image();
+						brush.onload = function(){
+							$('#canvas').on('mousedown mousemove mouseup', function(e){
+								MouseHandler(e, brush, canvasWidth, canvasHeight);
+							});
+							$('#canvas').on('touchstart touchmove touchend', function(e){
+								TouchHandler(e, brush, canvasWidth, canvasHeight);
+							});
+						}
+					}
 				}
 			}
 		}
 		
 		function uiErase(urltitle, pageindex, index, drawtype, layer){
-			//var canvases = document.getElementsByTagName('canvas');
-
-			$('canvas').each(function(e){
-				var canvas = this;
-				var canvasWidth = canvas.width;
-				var canvasHeight = canvas.height;
-				var cx = canvas.getContext('2d');
-				cx.clearRect(0,0,canvasWidth,canvasHeight);
-				saveImage(canvas);
-			})
-			uiDrawMode();
-			/*$.post('/api/selectlayer/'+urltitle+'/'+pageindex+'/'+index+'/'+drawtype+'/'+layer+'', function(){
-				window.location.href = '/api/selectlayer';
-			})*/
+			$('#erase').val('*');
 		}
 		
 		function MouseHandler(event, drawThis, canvasWidth, canvasHeight) {
@@ -337,72 +350,93 @@ block content
 			}
 
 			if (drawType !== "info" && drawType !== "tools") {
-				if (drawType === 'filling') {
-					//var pCanvas = loadLayer(drawThis, drawtype, layer, canvasWidth, canvasHeight);
-					var pCanvas = document.createElement('canvas');
-					pCanvas.width = canvasWidth;
-					pCanvas.height = canvasHeight;
-					var pContext = pCanvas.getContext('2d');
-					pContext.drawImage(drawThis, 0, 0, canvasWidth, canvasHeight);
-					var pPattern = context.createPattern(pCanvas, 'no-repeat');
-					context.fillStyle = pPattern;
-					context.fill()
-				}
-				if (drawType === 'substrates') {
-					eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.svg"), grabbing;');
+				if ($('#erase').val() !== '') {
+					eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+0+'.svg"), grabbing;');
+					context.fillStyle = 'rgba(0,0,0,1)';
+					context.globalCompositeOperation = "destination-out";//context.createPattern(pCanvas, 'no-repeat');
+					context.fill();
+					ctx.fillStyle = 'rgba(0,0,0,1)';
+					ctx.globalCompositeOperation = "destination-out";
+					ctx.fill();
+				} else {
+					if (drawType === 'filling') {
+						//var pCanvas = loadLayer(drawThis, drawtype, layer, canvasWidth, canvasHeight);
+						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
+						var pCanvas = document.createElement('canvas');
+						pCanvas.width = canvasWidth;
+						pCanvas.height = canvasHeight;
+						var pContext = pCanvas.getContext('2d');
+						pContext.drawImage(drawThis, 0, 0, canvasWidth, canvasHeight);
+						var pPattern = context.createPattern(pCanvas, 'no-repeat');
+						context.fillStyle = pPattern;
+						context.fill()
+					}
+					if (drawType === 'substrates') {
+						console.log(drawThis)
+						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.svg"), grabbing;');
 
-					if (layer === 0) {
+						if (layer === 0) {
 
-						context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(pCanvas, 'no-repeat');
-						context.fill();
+							context.fillStyle = 'rgba(0,0,0,1)';//context.createPattern(pCanvas, 'no-repeat');
+							context.globalCompositeOperation = "destination-out";
+							context.fill();
 
-						ctx.clearRect(0,0,canvasWidth,canvasHeight)
-					} else {
-						if (eventType == 'touchend') {
-							var size = Math.min(canvasWidth, canvasHeight) / 2
-							var imagedata = ctx.getImageData(size, size, 1, 1);
+							ctx.clearRect(0,0,canvasWidth,canvasHeight);
+						} else {
+							if (eventType == 'touchend') {
+								var size = Math.min(canvasWidth, canvasHeight) / 2
+								var imagedata = ctx.getImageData(size, size, 1, 1);
 
-							var count = 0;
-							for (var x = 0; x < 1; x++) {
-								for (var y = 0; y < 1; y++) {
-									// imagedata index for each pixel in bounds
-									var pxX = (y * 1 + x) * 4;
+								var count = 0;
+								for (var x = 0; x < 1; x++) {
+									for (var y = 0; y < 1; y++) {
+										// imagedata index for each pixel in bounds
+										var pxX = (y * 1 + x) * 4;
 
-									if (imagedata.data[pxX + 3] > 0) {
-										count++
+										if (imagedata.data[pxX + 3] > 0) {
+											count++
+										}
 									}
 								}
-							}
-							if (canvasWidth > canvasHeight) {
-								if (count > 0) {
-									context.fillStyle = context.drawImage(drawThis, size+(size/2), size - (size/2), size, size);
-									context.fillRect(drawThis, size+(size/2), size - (size/2), size, size)
+								if (canvasWidth > canvasHeight) {
+									if (count > 0) {
+										context.fillStyle = context.drawImage(drawThis, size+(size/3.2), size - (size/2), size, size);
+										context.fillRect(drawThis, size+(size/2), size - (size/2), size, size)
+									} else {
+										context.fillStyle = context.drawImage(drawThis, size/3.2, size - (size/2), size, size);
+										context.fillRect(drawThis, size - (size/2), size - (size/2), size, size)
+									}
 								} else {
-									context.fillStyle = context.drawImage(drawThis, size - (size/2), size - (size/2), size, size);
-									context.fillRect(drawThis, size - (size/2), size - (size/2), size, size)
+									if (count > 0) {
+										context.fillStyle = context.drawImage(drawThis, size, size - (size/2), size, size);
+										context.fillRect(drawThis, size, size - (size/2), size, size)
+									} else {
+										context.fillStyle = context.drawImage(drawThis, size - (size/1.1), size - (size/2), size, size);
+										context.fillRect(drawThis, size - (size/1.1), size - (size/2), size, size)
+									}
 								}
 							} else {
-								if (count > 0) {
-									context.fillStyle = context.drawImage(drawThis, size, size - (size/2), size, size);
-									context.fillRect(drawThis, size, size - (size/2), size, size)
-								} else {
-									context.fillStyle = context.drawImage(drawThis, size - (size/1.1), size - (size/2), size, size);
-									context.fillRect(drawThis, size - (size/1.1), size - (size/2), size, size)
-								}
+								context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(canv, 'no-repeat');
+								context.fill()
 							}
-						} else {
-							context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(canv, 'no-repeat');
-							context.fill()
 						}
 					}
 				}
+				
 				context.save();
+				ctx.save();
 				context.translate(touch.pageX * scale, touch.pageY * scale);
+				ctx.translate(touch.pageX * scale, touch.pageY * scale);
 				context.scale(1, radiusY/radiusX);
+				ctx.scale(1, radiusY/radiusX);
 				context.beginPath();
+				ctx.beginPath();
 				context.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
+				ctx.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
 				context.closePath();
+				ctx.closePath();
 				context.restore();
+				ctx.restore();
 			}
 
 		}
@@ -525,34 +559,7 @@ block content
 						}
 					})
 				}, 'image/png', 0.95);
-			}/* else {
-				console.log('saving main')
-
-				mainCanvas.toBlob(function(blob) {
-					var fd = new FormData();
-					
-					fd.append("image", blob);
-					
-					var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
-
-					console.log(blob)
-					console.log(uploadurl)
-					$.ajax({
-						url: uploadurl,
-						type: 'POST',
-						data: fd,
-						processData: false,
-						contentType: false,
-						success: function(response) {
-							
-								$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-									//$('#form').submit();
-									uiBlogMode();//window.location.href = '/api/publish'
-							}
-						
-					})
-				}, 'image/png'/*, 0.95*///);
-			//}
+			}
 		}
 		//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
 		$(document).on('touchstart, mouseover', '.translate', function (e) {

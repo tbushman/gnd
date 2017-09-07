@@ -175,7 +175,7 @@ html
 					$.get('/doc/'+pageindex+'').done(function(result){
 						removeOldAlert();
 						removeOldModal();
-						
+						console.log(result)
 						var elem = document.getElementById(aID);
 						var drawtype = aID.split('_')[1];
 						var layer = parseInt(aID.split('_')[2], 10);
@@ -206,7 +206,7 @@ html
 							irr = ''
 							irrname = ''
 						}*/
-						if (irrname !== false && irrname !== undefined && irrname !== "soap" && ailmentname !== "cleaner") {
+						if (irrname !== false && irrname !== 'false' && irrname !== undefined && irrname !== "soap" && ailmentname !== "cleaner") {
 							
 							var text = document.createTextNode("Do you have an "+ailmentname+" to "+ irrname +"?")
 							msg.appendChild(text);
@@ -252,8 +252,10 @@ html
 								if (e.target.getAttribute('className') === 'yes') {
 									$.post('/api/allergy/'+result.pageindex+'/'+index+'/'+drawtype+'/'+layer +'').done(function(){
 										$.post('/api/nextstep/'+result.urltitle+'/'+result.pageindex+'/'+index+'/'+drawtype+'/'+parseInt(layer, 10) +'').done(function(result){
-											window.location.href = '/api/selectlayer'
+											removeOldModal();
+											return;
 										})
+										
 									})
 								} else {
 									if (e.target.getAttribute('className') === 'no') {
@@ -270,6 +272,7 @@ html
 						}
 						
 					})
+					return;
 				}
 
 		
