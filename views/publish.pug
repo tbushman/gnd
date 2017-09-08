@@ -514,8 +514,9 @@ block content
 								context.fillStyle = pattern;//
 								var mainimg = new Image();
 								if ($('#urltitle').val()) {
+									mainimg.width = canvasWidth;
+									mainimg.height = canvasHeight;
 									mainimg.onload = function() {
-										console.log(mainimg.src)
 										// draw composite
 										sContext.drawImage(mainimg, 0,0,canvasWidth,canvasHeight);
 										if ($('#erase').val() !== '*') {

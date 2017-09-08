@@ -368,7 +368,7 @@ i.fa.active {
 	}
 }
 .grid-header.mainHeader {
-	max-width: calc(100% - var(--thumbwidth));
+	max-width: 100%;
 	background-color: rgba(255,255,255,0);
 	min-height: 80px;
 	overflow: scroll;
@@ -377,7 +377,13 @@ i.fa.active {
 }
 @supports not (display:grid) {
 	.grid-header.mainHeader {
-		max-width: 100%;
+		float: left;
+		margin-right: auto;
+		overflow: hidden;
+	}
+}
+@supports not (position:sticky){
+	.grid-header.mainHeader {
 		float: left;
 		margin-right: auto;
 		overflow: hidden;
