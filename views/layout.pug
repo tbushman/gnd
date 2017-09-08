@@ -86,7 +86,21 @@ html
 					$('#select').addClass('blog');
 					$('.mainHeader .tool').css('display', 'none');
 					$('.pullquote span').css('display', 'block');
-
+					var menuIcon = document.getElementsByClassName('i')[0];
+					var mainMenu = document.getElementsByClassName('mainmenu')[0];
+					menuIcon.src = '/images/menu_button.svg';
+					mainMenu.removeAttribute('onclick');
+					mainMenu.setAttribute('id', 'save');
+					mainMenu.setAttribute('aria-labelledby', 'mainmenu');
+					mainMenu.setAttribute('class', 'mainmenu dropdown');
+					var helperText = document.createElement('a');
+					helperText.setAttribute('onclick', '$("a.dropdown.mainmenu").click();')
+					var text = document.createTextNode('Menu');
+					helperText.setAttribute('class', 'tb-font-xxl translate')
+					helperText.appendChild(text);
+					var pullquote = document.getElementsByClassName('pullquote')[0];
+					pullquote.innerHTML = '';
+					pullquote.appendChild(helperText);
 				})
 			}
 			function uiDrawMode(){
@@ -150,6 +164,29 @@ html
 						removeOldAlert();
 					}
 				}
+				function welcomeModal(){
+					removeOldAlert();
+					removeOldModal();
+					var newAlert = document.createElement("div");
+					newAlert.setAttribute("role", "alert");
+					newAlert.setAttribute("id", "modal");
+					var msg = document.createElement("p");
+					msg.setAttribute('class', 'tb-font-xxl');
+					msg.style.color = 'var(--primary)';
+					msg.style.margin = '0 auto';
+					msg.style['text-align'] = 'center'
+					var link = document.createElement('a');
+					var text = document.createTextNode('Practice making a Jelly Sandwich! Start by cleaning the board with soap.');
+					var linktext = document.createTextNode('ok!')
+					link.href = window.location.href;
+					link.appendChild(linktext);
+					msg.appendChild(text);
+					msg.appendChild(link);
+					newAlert.appendChild(msg);
+					newAlert.style['box-shadow'] =  '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)'
+					document.body.appendChild(newAlert);
+					
+				}
 				function blogModeModal(url){
 					removeOldAlert();
 					removeOldModal();
@@ -202,11 +239,8 @@ html
 						newAlert.setAttribute("id", "modal");
 						var msg = document.createElement("div");
 						
-						/* else {
-							irr = ''
-							irrname = ''
-						}*/
-						if (irrname !== false && irrname !== 'false' && irrname !== undefined && irrname !== "soap" && ailmentname !== "cleaner") {
+
+						if ($('.menu').hasClass('draw') && irrname !== false && irrname !== 'false' && irrname !== undefined && irrname !== "soap" && ailmentname !== "cleaner") {
 							
 							var text = document.createTextNode("Do you have an "+ailmentname+" to "+ irrname +"?")
 							msg.appendChild(text);
@@ -253,7 +287,8 @@ html
 									$.post('/api/allergy/'+result.pageindex+'/'+index+'/'+drawtype+'/'+layer +'').done(function(){
 										$.post('/api/nextstep/'+result.urltitle+'/'+result.pageindex+'/'+index+'/'+drawtype+'/'+parseInt(layer, 10) +'').done(function(result){
 											removeOldModal();
-											return;
+											window.location.href = '/api/selectlayer'
+											//return;
 										})
 										
 									})
@@ -271,8 +306,7 @@ html
 							})
 						}
 						
-					})
-					return;
+					});
 				}
 
 		

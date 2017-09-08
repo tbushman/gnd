@@ -17,38 +17,8 @@ if (contentData !== undefined && contentData.image !== "")
 	a.tb-u-33.ms-Button.ms-Button--primary.block.spacer(role="button", href="#", title="Menu", onclick="blogModeModal('"+contentData.image+"');")
 		span.ms-Button-label Share
 
-//-
-	div.tb-u-33
-		a.ms-Button.ms-Button--alert#deletefeature.tb-u-100(href="#", role="button")
-			span.ms-Button-label Delete Post
-			span.tb-font-s(style="display: none") This cannot be undone. Continue?
-
 div.tb-u-33
 	a.ms-Button.tb-u-100.secondary(href="/", role="button")
 		span.ms-Button-label.tb-u-100 Cancel
 
 p.tb-font-xs#info
-
-//-
-	script(type="application/javascript").
-		var form = document.getElementById("form");
-		form.addEventListener('submit', function(event){
-			event.preventDefault()
-
-			var fd = new FormData(form);
-
-			$.ajax({
-				url: '/api/editcontent/'+'#{doc.urltitle}'+'/'+'#{doc.pageindex}'+'/'+'#{index}'+'/'+drawtype+'/'+layer+'',
-				enctype: 'multipart/form-data',
-				type: 'POST',
-				data: fd,
-				processData: false,
-				contentType: false,
-				success: function(response) {
-					console.log(response)
-					window.location.href = '/api/selectlayer'
-				}
-				
-			})
-			
-		});

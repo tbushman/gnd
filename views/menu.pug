@@ -16,31 +16,26 @@ div.grid-header.mainHeader
 			
 			
 		
-		div.pullquote
-			if (contentData)
-				if (type !== "draw" && infowindow === "edit")
-					a(href="#", onclick="$('a.dropdown.mainmenu').click();")
+		
 				
-						span#continue.tb-font-xxl.translate Continue
 				
 					
-
-				else
-					if (type === "draw")
-						each ing, j in keys
-							if (contentData !== undefined)
-								each cat, i in contentData[ing]
-									if (cat.unlocked && allergies.indexOf(cat.name) === -1)
-										if (ing === 'substrates' && i === 0)
-											a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"', function(){uiErase('"+menuData.urltitle+"',"+menuData.pageindex+","+index+",'"+drawtype+"',"+layer+");})")
-												.ui
-													img(src="/images/icons/"+ing+"_"+i+".svg")
-													span.tb-font-m #{cat.name}
-										else
-											a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
-												.ui
-													img(src="/images/icons/"+ing+"_"+i+".svg")
-													span.tb-font-m #{cat.name}
+		div.pullquote
+		if (type === "draw")
+			each ing, j in keys
+				if (contentData !== undefined)
+					each cat, i in contentData[ing]
+						if (cat.unlocked && allergies.indexOf(cat.name) === -1)
+							if (ing === 'substrates' && i === 0)
+								a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"', function(){uiErase('"+menuData.urltitle+"',"+menuData.pageindex+","+index+",'"+drawtype+"',"+layer+");})")
+									.ui
+										img(src="/images/icons/"+ing+"_"+i+".svg")
+										span.tb-font-m.translate #{cat.name}
+							else
+								a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
+									.ui
+										img(src="/images/icons/"+ing+"_"+i+".svg")
+										span.tb-font-m.translate #{cat.name}
 	else
 		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="/images/menu_button.svg")

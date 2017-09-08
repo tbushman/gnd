@@ -72,47 +72,20 @@ block content
 	//-
 		initiate map + event listeners
 	script(type="text/javascript").
-		function uiBlogMode(){
-			$('div.menu.draw').removeClass('draw');
-			$('div.menu').addClass('blog');
-			$('.grid-container').removeClass('draw');
-			$('.grid-container').addClass('blog');
-			$('.grid-container').addClass('selected');
-			$('#select').removeClass('draw');
-			$('#select').addClass('blog');
-		}
-		function uiDrawMode(){
-			$('div.menu.blog').removeClass('blog');
-			$('div.menu').addClass('draw');
-			$('.grid-container').removeClass('blog');
-			$('.grid-container').addClass('draw');
-			$('.grid-container').removeClass('selected');
-			$('#select').removeClass('blog');
-			$('#select').addClass('draw');
-		}
 		const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-		/*var pageindex = '#{pageindex}'*/
 		var mainmenu = document.getElementsByClassName('menu')[0];
 		var pageIndex, drawtype, layer;
 		var datalength = #{data.length};
-		/*var doc = `#{doc}`*/
+		var infowindow = '#{infowindow}';
 		var index = '#{index}'
-		/*if (index === '' || isNaN(parseInt(index, 10))) {
-			index = parseInt(document.getElementById('index').value, 10);
-		} else {*/
 		if (index !== '' && !isNaN(parseInt(index, 10))) {
 			index = parseInt(index, 10);
 		}
 		pageIndex = '#{pageindex}'
-		/*if (pageIndex == '' || isNaN(parseInt(pageIndex, 10))) {
-			pageIndex = parseInt(document.getElementById('pageindex').value, 10);
-		} else {*/
 		if (pageIndex !== '' && !isNaN(parseInt(pageIndex, 10))) {
 			pageIndex = parseInt(pageIndex, 10);
 		}
 		console.log('this pageindex'+pageIndex)
-		//var topmargin = document.querySelector('.pullquote').getBoundingClientRect().height;
-		//$('.grid-header.mainHeader').css('height', (topmargin + 30) + 'px');
 		drawtype = '#{drawtype}'
 		layer = '#{layer}'
 		if (layer !== '') {
@@ -133,8 +106,6 @@ block content
 		var drawCoalesced = false;
 		var res//, canvasWidth, canvasHeight;
 		$(document).ready(function(){
-			
-			
 			$('textarea').each(function(){
 				var text;
 				if ($(this).val()) {
@@ -158,28 +129,38 @@ block content
 				res = result;
 				var canvasWidth = window.innerWidth;
 				var canvasHeight = window.innerHeight;
-				//brush / texture
-				//var texture = '/images/'+drawtype+'/'+drawtype+'_'+layer+'.svg';
-				//main canvas
-				var mainCanvasImg = res.content[index].image;
-				//canvas [layer] (z-index)
-				
-				
+
+				var mainCanvasImg = res.content[index].image;				
+				console.log(mainCanvasImg)
 				if (mainCanvasImg !== '' && mainCanvasImg !== undefined) {
 					var loadedMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, mainCanvasImg);
 					loadedMain.drawImg();
-				}
-				if (window.location.href !== '/home'){
-					if (res.content[index][drawtype][layer].image !== '' && res.content[index][drawtype][layer].image !== undefined) {
-						var canvasLayerImg = res.content[index][drawtype][layer].image;
-						var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
-						loadedLayer.drawImg();
-					} else {
-						var canvasLayerImg = new Image();
-						var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
-						loadedLayer.drawImg();
+					if (window.location.href !== '/home'){
+						if (res.content[index][drawtype][layer].image !== '' && res.content[index][drawtype][layer].image !== undefined) {
+							var canvasLayerImg = res.content[index][drawtype][layer].image;
+							var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
+							loadedLayer.drawImg();
+						} else {
+							var canvasLayerImg = new Image();
+							var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
+							loadedLayer.drawImg();
+						}
 					}
-				} 
+
+				} else {
+					var blankCanvas = new loadedCanvas('canvas_substrates_0', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
+					blankCanvas.drawImg();
+					var thisCanvas = document.getElementById('canvas_substrates_0');
+					var blankMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
+					blankMain.drawImg();
+					$.post('/api/selectlayer/'+res.urltitle+'/'+res.pageindex+'/'+index+'/'+drawtype+'/'+layer+'', function(){
+						if (infowindow === 'edit') {
+							welcomeModal();
+							saveImage(thisCanvas)
+						}
+					})
+					
+				}
 			});
 
 		})
@@ -206,6 +187,7 @@ block content
 		// http://jsfiddle.net/m1erickson/cAR93/
 		// load new canvas each page load to hopefully combat cors-related taintedness
 		function loadedCanvas(aID, x, y, canvasWidth, canvasHeight, url) {
+			console.log(url)
 			const can = document.createElement('canvas');
 			can.setAttribute('id', aID);
 			can.setAttribute('class', 'topRight');
@@ -446,7 +428,7 @@ block content
 		}
 		
 		function saveImage(can){
-			var mainCanvas = document.getElementById('canvas');
+			var mainCanvas = document.createElement('canvas');
 
 			var context = mainCanvas.getContext("2d");
 			if (!HTMLCanvasElement.prototype.toBlob) {
@@ -530,9 +512,10 @@ block content
 								var pattern = context.createPattern(can, 'no-repeat');
 								var canvasWidth = can.width;
 								var canvasHeight = can.height;
+								mainCanvas.width = canvasWidth;
+								mainCanvas.height = canvasHeight;
 								context.fillStyle = pattern;//context.drawImage(can, 0, 0, canvasWidth, canvasHeight);
-																context.fillRect(0,0,canvasWidth,canvasHeight)
-								//context.drawImage(can,0,0,canvasWidth,canvasHeight)
+								context.fillRect(0,0,canvasWidth,canvasHeight)
 
 								mainCanvas.toBlob(function(blob) {
 									var fd = new FormData();
@@ -551,6 +534,7 @@ block content
 											console.log('saved both')
 											//window.location.href = '/api/selectlayer'
 											uiBlogMode();
+											
 										}
 									})
 								}, 'image/png', 0.95);

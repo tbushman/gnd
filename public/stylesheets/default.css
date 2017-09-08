@@ -31,7 +31,10 @@ body {
 form {
 	overflow-x: hidden;
 }
-input[type="text"], textarea {
+form label {
+	color: #666;
+}
+input[type="text"], input[type="password"], textarea, datalist, select {
   line-height: normal;
 	background-color: transparent;
   border: none;
@@ -76,12 +79,13 @@ i, .i {
 	position: absolute;
 	margin: 0 auto;
 	left: var(--thumbwidth);
-	right: 0;
+	right: 10px;
 	bottom: calc(var(--thumbwidth)/2);
 	top: auto;
 	display: inline-block;
 	z-index: 2;
 	pointer-events: none;
+	text-align: right;
 }
 #modal {
 	position: absolute;
@@ -164,7 +168,7 @@ i, .i {
 }
 .tb-font-xxl {
 	font-family: var(--afontname), sans-serif!important;
-	font-size: calc(var(--thumbwidth) / 2);
+	font-size: calc(var(--thumbwidth) / 2.3);
 	font-weight: 300;
 }
 
@@ -681,7 +685,7 @@ a.mainmenu {
 	}
 }
 div.dropdown {
-	margin: var(--iconwidth) 0;
+	margin: calc(var(--iconwidth) * 1.5) 0;
 	background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 1)),  to(rgba(255, 255, 255, 0.3)));
 	background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.3));
 	background-color: rgba(255,255,255,0);
@@ -760,6 +764,7 @@ a.tool .ui {
 	width: var(--thumbwidth);
 	position: relative;
 	margin: 0 auto;
+	padding-top: 10px;
 }
 
 a.tool > .ui > img {
@@ -1013,8 +1018,8 @@ a.tool span {
 	right: 10px;
 	top: auto;
 	left: auto;
-	min-width: 100px;
-	max-width: 150px;
+	min-width: 80px;
+	max-width: 100px;
 	margin: 0 0 0 51%;
 	z-index:1;
 }
