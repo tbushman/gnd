@@ -36,6 +36,7 @@ block content
 	- var keys = ["tools", "info", "substrates", "filling"]
 	- var allergies = menuData.publishers[0].allergies;
 	input(type="hidden", value= pageIndex, id="pageindex")
+	input(type="hidden", value= menuData.urltitle, id="urltitle")
 	input(type="hidden", value= index, id="index")
 	input(type="hidden", id="erase")
 		//-
@@ -121,44 +122,44 @@ block content
 			$('.dropdown').not('.mainmenu').slideUp(100);
 			$('.drop').slideUp(100);
 			$('.selected').removeClass('selected');
-			
-			$.get('/doc/'+pageIndex+'', function(result){
-				//get page data
-				res = result;
-				var canvasWidth = window.innerWidth;
-				var canvasHeight = window.innerHeight;
-				// if composition not blank
-				if (res.content[index].image !== '' && res.content[index].image !== undefined) {
-					var mainCanvasImg = res.content[index].image;				
-					var loadedMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, mainCanvasImg);
-					loadedMain.drawImg();
-					console.log(window.location.href.split('/'))
-					if (window.location.href.split('/')[3] === 'api'){
-						if (res.content[index][drawtype][layer].image !== '' && res.content[index][drawtype][layer].image !== undefined) {
-							console.log(mainCanvasImg)
-							var canvasLayerImg = res.content[index][drawtype][layer].image;
-							var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
-							loadedLayer.drawImg();
-						} else {
-							var blankCanvas = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, '/images/1px.png');
-							blankCanvas.drawImg();
+			if (pageIndex !== '') {
+				$.get('/doc/'+pageIndex+'', function(result){
+					//get page data
+					res = result;
+					var canvasWidth = window.innerWidth;
+					var canvasHeight = window.innerHeight;
+					// if composition not blank
+					if (res.content[index].image !== '' && res.content[index].image !== undefined) {
+						var mainCanvasImg = res.content[index].image;				
+						var loadedMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, mainCanvasImg);
+						loadedMain.drawImg();
+						console.log(window.location.href.split('/'))
+						if (window.location.href.split('/')[3] === 'api'){
+							if (res.content[index][drawtype][layer].image !== '' && res.content[index][drawtype][layer].image !== undefined) {
+								console.log(mainCanvasImg)
+								var canvasLayerImg = res.content[index][drawtype][layer].image;
+								var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
+								loadedLayer.drawImg();
+							} else {
+								var blankCanvas = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, '/images/1px.png');
+								blankCanvas.drawImg();
+							}
+							drawModeModal('canvas_'+drawtype+'_'+layer+'', pageIndex)
 						}
-						drawModeModal('canvas_'+drawtype+'_'+layer+'', pageIndex)
-					}
 
-				} else {
-					// this is new
-					if (window.location.href.split('/')[3] === 'chef'){
-						var blankCanvas = new loadedCanvas('canvas_substrates_0', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
-						blankCanvas.drawImg();
-						var thisCanvas = document.getElementById('canvas_substrates_0');
-						var blankMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
-						blankMain.drawImg();
-						welcomeModal();
+					} else {
+						// this is new
+						if (window.location.href.split('/')[3] === 'chef'){
+							var blankCanvas = new loadedCanvas('canvas_substrates_0', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
+							blankCanvas.drawImg();
+							var thisCanvas = document.getElementById('canvas_substrates_0');
+							var blankMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
+							blankMain.drawImg();
+							welcomeModal();
+						}
 					}
-				}
-			});
-
+				});
+			}
 		})
 		
 		$('#inputtext').on('keyup', function(e){
@@ -510,39 +511,41 @@ block content
 								mainCanvas.height = canvasHeight;
 								context.fillStyle = pattern;//
 								var mainimg = new Image();
-								mainimg.onload = function() {
-									// draw composite
-									if ($('#erase').val() !== '*') {
-										context.drawImage(mainimg, 0, 0, canvasWidth, canvasHeight);
+								if ($('#urltitle').val() !== '') {
+									mainimg.onload = function() {
+										// draw composite
+										if ($('#erase').val() !== '*') {
+											context.drawImage(mainimg, 0, 0, canvasWidth, canvasHeight);
+										}
+										context.globalCompositeOperation = 'source-over';
+										
+										// draw current layer on top of composite
+										context.fillRect(0,0,canvasWidth,canvasHeight)
+
+										mainCanvas.toBlob(function(blob) {
+											var fd = new FormData();
+											fd.append("image", blob);
+											console.log(blob)
+											var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
+
+											$.ajax({
+												url: uploadurl,
+												type: 'POST',
+												data: fd,
+												processData: false,
+												contentType: false,
+												success: function(response) {
+													$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+													console.log('saved both')
+													uiBlogMode();
+													
+												}
+											})
+										}, 'image/png', 0.95);
 									}
-									context.globalCompositeOperation = 'source-over';
 									
-									// draw current layer on top of composite
-									context.fillRect(0,0,canvasWidth,canvasHeight)
-
-									mainCanvas.toBlob(function(blob) {
-										var fd = new FormData();
-										fd.append("image", blob);
-										console.log(blob)
-										var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
-
-										$.ajax({
-											url: uploadurl,
-											type: 'POST',
-											data: fd,
-											processData: false,
-											contentType: false,
-											success: function(response) {
-												$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-												console.log('saved both')
-												uiBlogMode();
-												
-											}
-										})
-									}, 'image/png', 0.95);
+									mainimg.src = '/publishers/sfusd2/'+$('#urltitle').val()+'/'+'#{pageindex}'+'/images/main/main_0.png';
 								}
-								mainimg.src = '/publishers/sfusd2/'+'#{doc.urltitle}'+'/'+'#{doc.pageindex}'+'/images/main/main_0.png';
-								
 							}
 							
 						}
