@@ -417,9 +417,9 @@ block content
 		
 		function saveImage(can){
 			var mainCanvas = document.createElement('canvas');
-
 			var context = mainCanvas.getContext("2d");
-			
+			var spareCanvas = document.createElement('canvas');
+			var sContext = spareCanvas.getContext('2d');
 			// polyfill
 			if (!HTMLCanvasElement.prototype.toBlob) {
 				Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
@@ -509,13 +509,16 @@ block content
 								var canvasHeight = can.height;
 								mainCanvas.width = canvasWidth;
 								mainCanvas.height = canvasHeight;
+								spareCanvas.width = canvasWidth;
+								spareCanvas.height = canvasHeight;
 								context.fillStyle = pattern;//
 								var mainimg = new Image();
-								if ($('#urltitle').val() !== '') {
+								if ($('#urltitle').val()) {
 									mainimg.onload = function() {
 										// draw composite
+										sContext.drawImage(mainimg, 0,0,canvasWidth,canvasHeight);
 										if ($('#erase').val() !== '*') {
-											context.drawImage(mainimg, 0, 0, canvasWidth, canvasHeight);
+											context.drawImage(spareCanvas, 0, 0, canvasWidth, canvasHeight);
 										}
 										context.globalCompositeOperation = 'source-over';
 										
