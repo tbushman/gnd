@@ -74,7 +74,9 @@ block content
 	script(type="text/javascript").
 		const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 		var mainmenu = document.getElementsByClassName('menu')[0];
+		
 		var pageIndex, drawtype, layer;
+		// server-defined variables
 		var datalength = #{data.length};
 		var infowindow = '#{infowindow}';
 		var index = '#{index}'
@@ -85,17 +87,12 @@ block content
 		if (pageIndex !== '' && !isNaN(parseInt(pageIndex, 10))) {
 			pageIndex = parseInt(pageIndex, 10);
 		}
-		console.log('this pageindex'+pageIndex)
 		drawtype = '#{drawtype}'
 		layer = '#{layer}'
 		if (layer !== '') {
 			layer = parseInt(layer, 10);
 		}
-		console.log(drawtype, layer)
-		var lMarker;
-		var medialength;
-		var classname_a;
-		var classname_b;
+		
 		// paint program adapted from https://rbyers.github.io/paint.html
 		var radiusSupported = false;
 		var nextCount = 0;
@@ -104,86 +101,76 @@ block content
 		var scale = 1;
 		var mousePressed = false;
 		var drawCoalesced = false;
-		var res//, canvasWidth, canvasHeight;
+		
+		// make page data available within document script
+		var res;
 		$(document).ready(function(){
 			$('textarea').each(function(){
 				var text;
 				if ($(this).val()) {
 					$(this).css('max-width', '100%')
 				} else {
-					//placeholder reliably contains updated text fsr
+					//placeholder reliably contains updated text while value doesn't always fsr
 					text = $(this).attr('placeholder');
 					$(this).val(text);
 					$(this).css('max-width', '100%')
 				} 
 			});
 			
-			$('.list > .ms-Panel-main').css({display: 'none'})
-			$('.list').removeClass('is-open')
-			$('.list').css({display: 'none'});
-			
+			// hide dropdown on init
 			$('.dropdown').not('.mainmenu').slideUp(100);
 			$('.drop').slideUp(100);
 			$('.selected').removeClass('selected');
+			
 			$.get('/doc/'+pageIndex+'', function(result){
+				//get page data
 				res = result;
 				var canvasWidth = window.innerWidth;
 				var canvasHeight = window.innerHeight;
-
-				var mainCanvasImg = res.content[index].image;				
-				console.log(mainCanvasImg)
-				if (mainCanvasImg !== '' && mainCanvasImg !== undefined) {
+				// if composition not blank
+				if (res.content[index].image !== '' && res.content[index].image !== undefined) {
+					var mainCanvasImg = res.content[index].image;				
 					var loadedMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, mainCanvasImg);
 					loadedMain.drawImg();
-					if (window.location.href !== '/home'){
+					console.log(window.location.href.split('/'))
+					if (window.location.href.split('/')[3] === 'api'){
 						if (res.content[index][drawtype][layer].image !== '' && res.content[index][drawtype][layer].image !== undefined) {
+							console.log(mainCanvasImg)
 							var canvasLayerImg = res.content[index][drawtype][layer].image;
 							var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
 							loadedLayer.drawImg();
 						} else {
-							var canvasLayerImg = new Image();
-							var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
-							loadedLayer.drawImg();
+							var blankCanvas = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, '/images/1px.png');
+							blankCanvas.drawImg();
 						}
+						drawModeModal('canvas_'+drawtype+'_'+layer+'', pageIndex)
 					}
 
 				} else {
-					var blankCanvas = new loadedCanvas('canvas_substrates_0', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
-					blankCanvas.drawImg();
-					var thisCanvas = document.getElementById('canvas_substrates_0');
-					var blankMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
-					blankMain.drawImg();
-					$.post('/api/selectlayer/'+res.urltitle+'/'+res.pageindex+'/'+index+'/'+drawtype+'/'+layer+'', function(){
-						if (infowindow === 'edit') {
-							welcomeModal();
-							saveImage(thisCanvas)
-						}
-					})
-					
+					// this is new
+					if (window.location.href.split('/')[3] === 'chef'){
+						var blankCanvas = new loadedCanvas('canvas_substrates_0', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
+						blankCanvas.drawImg();
+						var thisCanvas = document.getElementById('canvas_substrates_0');
+						var blankMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
+						blankMain.drawImg();
+						welcomeModal();
+					}
 				}
 			});
 
-		})
-		
-		$(document).on('click', '#deletefeature', function(e){
-			e.preventDefault();
-			if ($('#deletefeature span').css('display') === 'block') {
-				$(this).attr("href", "/api/deletefeature/"+'#{pageindex}'+"/"+'#{index}'+"");
-			} else {
-				$('#deletefeature span').css('display', 'block')
-			}
 		})
 		
 		$('#inputtext').on('keyup', function(e){
 			$('#previewtext').html(marked(e.target.value))
 		});
 		$('input').on('keydown', function(e){
+			// prevent firefox debug on slash keydown
 			if (e.key === 'Slash') {
 				e.preventDefault();
 			}
 		});
 		
-				
 		// http://jsfiddle.net/m1erickson/cAR93/
 		// load new canvas each page load to hopefully combat cors-related taintedness
 		function loadedCanvas(aID, x, y, canvasWidth, canvasHeight, url) {
@@ -192,9 +179,9 @@ block content
 			can.setAttribute('id', aID);
 			can.setAttribute('class', 'topRight');
 			if (aID === 'canvas') {
-				can.setAttribute('class', 'maincanvas');
+				can.setAttribute('class', 'topRight maincanvas');
 			} else {
-				can.setAttribute('class', 'layer');
+				can.setAttribute('class', 'topRight layer');
 			}
 			can.width = canvasWidth;
 			can.height = canvasHeight;
@@ -225,13 +212,11 @@ block content
 					$('.menu .envel').prepend(can);
 					console.log(cx)
 					can.style['pointer-events'] = 'auto';
-					can.style.position = 'absolute';
 					can.style['z-index'] = parseInt(aID.split('_')[2], 10) + 1;
 					var brush = new Image();
 					brush.width = canvasWidth;
 					brush.height = canvasHeight;
 					brush.onload = function() {
-						drawModeModal(aID, pageIndex)
 						$('#'+aID+'').on('mousedown mousemove mouseup', function(e){
 							MouseHandler(e, brush, canvasWidth, canvasHeight);
 						});
@@ -263,6 +248,7 @@ block content
 		}
 		
 		function uiErase(urltitle, pageindex, index, drawtype, layer){
+			// value queried on mousehandler for globalCompositeOperation
 			$('#erase').val('*');
 		}
 		
@@ -342,7 +328,6 @@ block content
 					ctx.fill();
 				} else {
 					if (drawType === 'filling') {
-						//var pCanvas = loadLayer(drawThis, drawtype, layer, canvasWidth, canvasHeight);
 						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
 						var pCanvas = document.createElement('canvas');
 						pCanvas.width = canvasWidth;
@@ -359,12 +344,13 @@ block content
 
 						if (layer === 0) {
 
-							context.fillStyle = 'rgba(0,0,0,1)';//context.createPattern(pCanvas, 'no-repeat');
+							context.fillStyle = 'rgba(0,0,0,1)';
 							context.globalCompositeOperation = "destination-out";
 							context.fill();
 
 							ctx.clearRect(0,0,canvasWidth,canvasHeight);
 						} else {
+							context.globalCompositeOperation = 'source-over'
 							if (eventType == 'touchend') {
 								var size = Math.min(canvasWidth, canvasHeight) / 2
 								var imagedata = ctx.getImageData(size, size, 1, 1);
@@ -372,7 +358,7 @@ block content
 								var count = 0;
 								for (var x = 0; x < 1; x++) {
 									for (var y = 0; y < 1; y++) {
-										// imagedata index for each pixel in bounds
+										// imagedata index for each pixel (should be only one)
 										var pxX = (y * 1 + x) * 4;
 
 										if (imagedata.data[pxX + 3] > 0) {
@@ -382,6 +368,7 @@ block content
 								}
 								if (canvasWidth > canvasHeight) {
 									if (count > 0) {
+										// if no substrate on left side
 										context.fillStyle = context.drawImage(drawThis, size+(size/3.2), size - (size/2), size, size);
 										context.fillRect(drawThis, size+(size/2), size - (size/2), size, size)
 									} else {
@@ -431,6 +418,8 @@ block content
 			var mainCanvas = document.createElement('canvas');
 
 			var context = mainCanvas.getContext("2d");
+			
+			// polyfill
 			if (!HTMLCanvasElement.prototype.toBlob) {
 				Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
 					value: function (callback, type, quality) {
@@ -447,13 +436,16 @@ block content
 					}
 				});
 			}
+			
 			var layer, name, inputid;
 			var drawtype = can.getAttribute('id').split('_')[1];
 			if (can.getAttribute('id').split('_')[2]){
+				// if this is a canvas layer
 				layer = can.getAttribute('id').split('_')[2];
 				name = 'img_'+drawtype+'_'+layer+''
 				inputid = 'inputimg_'+drawtype+'_'+layer+''
 			} else {
+				// if main canvas (composite)
 				layer = 0;
 				name = 'image'
 				inputid = 'inputimg'
@@ -461,9 +453,9 @@ block content
 			if (drawtype && drawtype !== undefined) {
 				can.toBlob(function(blob) {
 					var fd = new FormData();
-					//console.log(blob)
 					fd.append(name, blob);
 					
+					// endpoint uses multer
 					var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/'+drawtype+'/'+layer+'';
 
 					$.ajax({
@@ -473,7 +465,6 @@ block content
 						processData: false,
 						contentType: false,
 						success: function(response) {
-							//delete blob;
 							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
 							$('#'+inputid+'').val(imgurl);
 							if (drawtype !== 'main') {
@@ -485,6 +476,8 @@ block content
 									var level = parseInt(res.content[index].level, 10);
 									var filling = res.content[index].filling;
 									var allergies = res.publishers[0].allergies;
+									
+									// update title of sandwich
 									if (filling[layer] !== undefined && allergies.indexOf(filling[layer].name) === -1 && layer > 0){
 										text += filling[layer].name
 									}
@@ -506,38 +499,50 @@ block content
 									}
 										
 									text += filling[0].name;
+									
+									// put sandwich title in form
 									$('#title').val(text);
 								}
-								//uiBlogMode();
 								var pattern = context.createPattern(can, 'no-repeat');
 								var canvasWidth = can.width;
 								var canvasHeight = can.height;
 								mainCanvas.width = canvasWidth;
 								mainCanvas.height = canvasHeight;
-								context.fillStyle = pattern;//context.drawImage(can, 0, 0, canvasWidth, canvasHeight);
-								context.fillRect(0,0,canvasWidth,canvasHeight)
+								context.fillStyle = pattern;//
+								var mainimg = new Image();
+								mainimg.onload = function() {
+									// draw composite
+									if ($('#erase').val() !== '*') {
+										context.drawImage(mainimg, 0, 0, canvasWidth, canvasHeight);
+									}
+									context.globalCompositeOperation = 'source-over';
+									
+									// draw current layer on top of composite
+									context.fillRect(0,0,canvasWidth,canvasHeight)
 
-								mainCanvas.toBlob(function(blob) {
-									var fd = new FormData();
-									fd.append("image", blob);
-									console.log(blob)
-									var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
+									mainCanvas.toBlob(function(blob) {
+										var fd = new FormData();
+										fd.append("image", blob);
+										console.log(blob)
+										var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
 
-									$.ajax({
-										url: uploadurl,
-										type: 'POST',
-										data: fd,
-										processData: false,
-										contentType: false,
-										success: function(response) {
-											$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-											console.log('saved both')
-											//window.location.href = '/api/selectlayer'
-											uiBlogMode();
-											
-										}
-									})
-								}, 'image/png', 0.95);
+										$.ajax({
+											url: uploadurl,
+											type: 'POST',
+											data: fd,
+											processData: false,
+											contentType: false,
+											success: function(response) {
+												$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+												console.log('saved both')
+												uiBlogMode();
+												
+											}
+										})
+									}, 'image/png', 0.95);
+								}
+								mainimg.src = '/publishers/sfusd2/'+'#{doc.urltitle}'+'/'+'#{doc.pageindex}'+'/images/main/main_0.png';
+								
 							}
 							
 						}

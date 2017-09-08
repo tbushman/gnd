@@ -231,6 +231,7 @@ router.post('/register', upload.array(), function(req, res, next) {
 						req.app.locals.userId = doc._id;
 						req.app.locals.loggedin = doc.username;
 						req.app.locals.pageTitle = req.body.pagetitle;
+						req.app.locals.layer = null;
 						/*req.app.locals.drawType = null;
 						req.app.locals.layer = null;
 						delete req.app.locals.drawType;
@@ -262,6 +263,7 @@ router.post('/login', upload.array(), passport.authenticate('local'), function(r
 	
 	req.app.locals.loggedin = req.body.username;
 	req.app.locals.username = req.body.username;
+	req.app.locals.layer = null;
 	//req.app.locals.drawType = null;
 	//req.app.locals.layer = null;
 	
@@ -409,18 +411,12 @@ router.get('/chef/:pagetitle*', ensurePage, function (req, res, next) {
 				for (var l in data) {
 					datarray.push(data[l])
 				}
-				/*if (outputPath.split('/').length > 3) {
-					console.log('this index '+parseInt(outputPath.split('/')[3], 10))
-					index = parseInt(outputPath.split('/')[3], 10);
-				} else {
-					index = doc.content[doc.content.length-1].index;
-				}*/
 				if (req.isAuthenticated()) {
 					return res.render('publish', {
 						pageindex: doc.pageindex,
 						type: 'draw',
-						infowindow: 'doc',
-						drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
+						infowindow: 'edit',
+						drawtype: req.app.locals.drawType ? req.app.locals.drawType : false,
 						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
 						loggedin: req.app.locals.loggedin,
 						index: doc.content[doc.content.length-1].index,
@@ -894,9 +890,6 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 	var drawtype = req.params.drawtype;
 	var layer = parseInt(req.params.layer, 10);
 	req.app.locals.layer = layer;
-	if (drawtype === "info") {
-		return res.redirect('/api/levelup')
-	}
 	Page.findOne({pageindex: pageindex, content: {$elemMatch: {index: index}}}, function(err, pub){
 		if (err) {
 			return next(err)

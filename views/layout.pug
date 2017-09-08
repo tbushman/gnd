@@ -172,20 +172,26 @@ html
 					newAlert.setAttribute("id", "modal");
 					var msg = document.createElement("p");
 					msg.setAttribute('class', 'tb-font-xxl');
-					msg.style.color = 'var(--primary)';
+					
 					msg.style.margin = '0 auto';
 					msg.style['text-align'] = 'center'
 					var link = document.createElement('a');
-					var text = document.createTextNode('Practice making a Jelly Sandwich! Start by cleaning the board with soap.');
+					var text = document.createTextNode('Practice making a Jelly Sandwich!  \nStart by cleaning the board with soap. \n');
 					var linktext = document.createTextNode('ok!')
-					link.href = window.location.href;
+					link.href = '#';
+					link.onclick = function(){
+						removeOldAlert();
+						removeOldModal();
+						uiDrawMode();
+					}
 					link.appendChild(linktext);
-					msg.appendChild(text);
+					link.style.color = 'var(--primary)';
 					msg.appendChild(link);
+					msg.appendChild(text);
 					newAlert.appendChild(msg);
 					newAlert.style['box-shadow'] =  '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)'
 					document.body.appendChild(newAlert);
-					
+					console.log('appended modal')
 				}
 				function blogModeModal(url){
 					removeOldAlert();
