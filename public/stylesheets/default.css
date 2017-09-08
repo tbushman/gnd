@@ -368,7 +368,7 @@ i.fa.active {
 	}
 }
 .grid-header.mainHeader {
-	max-width: calc(100% - calc( 2 * var(--thumbwidth)));
+	max-width: calc(100% - var(--thumbwidth));
 	background-color: rgba(255,255,255,0);
 	min-height: 80px;
 	overflow: scroll;
@@ -377,8 +377,9 @@ i.fa.active {
 }
 @supports not (display:grid) {
 	.grid-header.mainHeader {
+		max-width: 100%;
 		float: left;
-		margin-right: 0;
+		margin-right: auto;
 		overflow: hidden;
 	}
 }
@@ -685,7 +686,7 @@ a.mainmenu {
 	}
 }
 div.dropdown {
-	margin: calc(var(--iconwidth) * 1.5) 0;
+	margin: 35px 0;
 	background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 1)),  to(rgba(255, 255, 255, 0.3)));
 	background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.3));
 	background-color: rgba(255,255,255,0);

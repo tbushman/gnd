@@ -515,6 +515,7 @@ block content
 								var mainimg = new Image();
 								if ($('#urltitle').val()) {
 									mainimg.onload = function() {
+										console.log(mainimg.src)
 										// draw composite
 										sContext.drawImage(mainimg, 0,0,canvasWidth,canvasHeight);
 										if ($('#erase').val() !== '*') {
@@ -528,7 +529,6 @@ block content
 										mainCanvas.toBlob(function(blob) {
 											var fd = new FormData();
 											fd.append("image", blob);
-											console.log(blob)
 											var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
 
 											$.ajax({
