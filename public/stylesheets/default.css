@@ -10,11 +10,22 @@
 	--nowindowmenu: 15%; 
 } 
 
+
 .primary {
 	background-color: var(--primary);
 }
 .secondary {
 	background-color: var(--secondary)!important;
+}
+a {
+	pointer-events: auto;
+	cursor: pointer;
+	text-decoration: none;
+	color: inherit;
+}
+
+a:hover {
+	color: var(--secondary);
 }
 
 html {
@@ -100,6 +111,7 @@ i, .i {
 	z-index: 2;
 	background: #fff;
 	padding: calc(var(--thumbwidth)/2);
+
 }
 .avatar {
 	max-width: 250px;
@@ -492,12 +504,7 @@ a.grid-header:hover {
 		width: 100%;
 	}
 }
-a {
-	pointer-events: auto;
-	cursor: pointer;
-	text-decoration: none;
-	color: inherit;
-}
+
 .spacer {
 	margin-top: 30px;
 }

@@ -25,10 +25,12 @@ html
 		
 		script(type="application/javascript").
 			$(document).ready(function(){
+
 				$('.dropdown').not('.mainmenu').slideUp(100);
 				$('.drop').slideUp(100);
 				
 				$('.selected').removeClass('selected');
+
 			})
 			$(document).on('click', 'canvas', function(e){
 				if ($('.menu').hasClass('blog')) {
@@ -135,8 +137,15 @@ html
 					var newAlert = document.createElement("div");
 					newAlert.setAttribute("role", "alert");
 					newAlert.setAttribute("id", "alert");
-					var msg = document.createTextNode(aMsg);
-					newAlert.appendChild(msg);
+					var msg;
+					if (aMsg.substr(0,1) === '<') {
+						newAlert.innerHTML = aMsg
+					} else {
+						msg = document.createTextNode(aMsg);
+						newAlert.appendChild(msg);
+					}
+					
+					
 					document.body.appendChild(newAlert);
 				}
 				function checkNameValidity(aID, aSearchTerm, aMsg)
