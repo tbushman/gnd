@@ -1,26 +1,24 @@
 p#info.tb-font-s(width="100%")
 //(style="float: left;")
-form#form.tb-u-100(enctype="multipart/form-data", method="POST", action="/api/editcontent/"+doc.urltitle+"/"+doc.pageindex+"/"+index+"", style="margin-bottom: 50px")
-	div.tb-u-100.ms-TextField
-		label.ms-Label Current title
-		input.ms-TextField-field(type="text", name="title", value= contentData.title)
-
+form#form.tb-u-100(enctype="multipart/form-data", method="POST", action="/api/editcontent/"+doc.urltitle+"/"+doc.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"", style="margin-bottom: 50px")
+					
 	div.tb-u-100
 		label.ms-Label Description 
 		textarea.ms-TextField-field#inputtext(type="text", name="description", value= contentData.description, placeholder= contentData.description)
 	div.tb-u-100
 		span.tb-font-s#previewtext.translate #{contentData.description}
+	input(type="hidden", id="title", name="title", value= contentData.title)
 	input(type="hidden", id="inputimg", name="image")
-	if (drawtype)
+	if (drawtype && contentData[drawtype][contentData.level] !== undefined)
 		input(type="hidden", id="inputimg_"+drawtype+"_"+contentData.level+"", name= contentData[drawtype][contentData.level].name)
-	div.tb-u-100
-		button.ms-Button.ms-Button--primary.tb-u-100.block.spacer(id="submit", type="submit", ariaDescription="Save this Sandwich")
-			span.ms-Button-label Save
-p.tb-font-xs#info
+	input.tb-u-100.block.spacer(id="submit", type="submit", value="Save" ariaDescription="Save this Sandwich")
+	
+if (contentData !== undefined && contentData.image !== "")
+	a.tb-u-33.ms-Button.ms-Button--primary.block.spacer(role="button", href="#", title="Menu", onclick="blogModeModal('"+contentData.image+"');")
+		span.ms-Button-label Share
+
 div.tb-u-33
-	a.ms-Button.ms-Button--alert#deletefeature.tb-u-100(href="#", role="button")
-		span.ms-Button-label Delete Post
-		span.tb-font-s(style="display: none") This cannot be undone. Continue?
-div.tb-u-33
-	a.ms-Button.tb-u-100(href="/", role="button")
+	a.ms-Button.tb-u-100.secondary(href="/", role="button")
 		span.ms-Button-label.tb-u-100 Cancel
+
+p.tb-font-xs#info

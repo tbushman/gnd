@@ -10,9 +10,10 @@ var Publisher = new Schema({
 	},
 	password: String,
 	avatar: String,
-  language: String
+  language: String,
+  allergies: []
 	
-}, { collection: 'sfusd' });
+}, { collection: 'sfusd2' });
 
 Publisher.plugin(passportLocalMongoose);
 

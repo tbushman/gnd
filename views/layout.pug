@@ -3,45 +3,37 @@ html
 	head
 		title= appTitle
 		meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
-		//link(rel="stylesheet", href="/stylesheets/jquery-ui.min.css")
-		//link(rel="stylesheet", href="/stylesheets/leaflet.css")
+		//meta(http-equiv="x-dns-prefetch-control" content="on")
 		link(rel="stylesheet", href="/stylesheets/default.css", type="text/css")
-		//link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css")
 		link(href="https://fonts.googleapis.com/css?family=Roboto", rel="stylesheet")
-		
 		script(type="text/javascript", src="/scripts/jquery.min.js")
-		//script(type="text/javascript", src="/scripts/jquery-ui.min.js")
-		//script(type="text/javascript", src="/scripts/leaflet.js")
 		script(type="text/javascript", src="/scripts/marked.min.js")
-		//script(src="https://use.fontawesome.com/b9a4978394.js")
 		script(type="text/javascript", src="/scripts/d3.v3.min.js")
-		//script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js")
-		//script(src="https://unpkg.com/vue/dist/vue.js")
-		//https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/forms/alerts
+		
 	body
 		block page
 			- var theStore = theStore
+			
 
 		block header
-
-		block content
 			
+		block content
+				
 
 		a#publish_logo(href="https://github.com/tbushman/sfusd" target="_blank")
 			img(src="/images/sfusdblish_logo.svg")
 		
 		script(type="application/javascript").
 			$(document).ready(function(){
-				addAlert(marked('This app is being updated at <span><a href="https://sfusd2.bli.sh" target="_blank">sfusd2.bli.sh</a>'))
+
+				$('.dropdown').not('.mainmenu').slideUp(100);
+				$('.drop').slideUp(100);
+				
+				$('.selected').removeClass('selected');
+
 			})
 			$(document).on('click', 'canvas', function(e){
 				if ($('.menu').hasClass('blog')) {
-					//				e.preventDefault();
-					//				InitializeApp();
-					
-					/*$('.dropdown').not('.mainmenu').slideUp(100);
-					$('.drop').slideUp(100);
-					$('.selected').removeClass('selected');*/
 					uiDrawMode()
 				}
 			});
@@ -64,6 +56,7 @@ html
 					} else {
 						if ($('div.menu').hasClass('blog')) {
 							$(that).next('.drop').slideUp(100);
+							
 						}
 					}
 				} else {
@@ -84,13 +77,60 @@ html
 				}
 				//e.stopPropagation();
 			});
-			function removeOldAlert()
+			function uiBlogMode(){
+				$(document).ready(function(){
+					$('.menu.draw').removeClass('draw');
+					$('.menu').addClass('blog');
+					$('.grid-container').removeClass('draw');
+					$('.grid-container').addClass('blog');
+					$('.grid-container').addClass('selected');
+					$('#select').removeClass('draw');
+					$('#select').addClass('blog');
+					$('.mainHeader .tool').css('display', 'none');
+					$('.pullquote span').css('display', 'block');
+					var menuIcon = document.getElementsByClassName('i')[0];
+					var mainMenu = document.getElementsByClassName('mainmenu')[0];
+					menuIcon.src = '/images/menu_button.svg';
+					mainMenu.removeAttribute('onclick');
+					mainMenu.setAttribute('id', 'save');
+					mainMenu.setAttribute('aria-labelledby', 'mainmenu');
+					mainMenu.setAttribute('class', 'mainmenu dropdown');
+					var helperText = document.createElement('a');
+					helperText.setAttribute('onclick', '$("a.dropdown.mainmenu").click();')
+					var text = document.createTextNode('Menu');
+					helperText.setAttribute('class', 'tb-font-xxl translate')
+					helperText.appendChild(text);
+					var pullquote = document.getElementsByClassName('pullquote')[0];
+					pullquote.innerHTML = '';
+					pullquote.appendChild(helperText);
+				})
+			}
+			function uiDrawMode(){
+				$(document).ready(function(){
+					$('.menu.blog').removeClass('blog');
+					$('.menu').addClass('draw');
+					$('.grid-container').removeClass('blog');
+					$('.grid-container').addClass('draw');
+					$('.grid-container').removeClass('selected');
+					$('#select').removeClass('blog');
+					$('#select').addClass('draw');
+					$('.mainHeader .tool').css('display', 'inline-block');
+					$('.pullquote span').css('display', 'none');
+
+			});
+			}
+				function removeOldAlert()
 				{
 					var oldAlert = document.getElementById("alert");
 					if (oldAlert)
 						document.body.removeChild(oldAlert);
 				}
-				
+				function removeOldModal()
+				{
+					var oldAlert = document.getElementById("modal");
+					if (oldAlert)
+						document.body.removeChild(oldAlert);
+				}
 				function addAlert(aMsg)
 				{
 					removeOldAlert();
@@ -133,8 +173,158 @@ html
 						removeOldAlert();
 					}
 				}
+				function welcomeModal(){
+					removeOldAlert();
+					removeOldModal();
+					var newAlert = document.createElement("div");
+					newAlert.setAttribute("role", "alert");
+					newAlert.setAttribute("id", "modal");
+					var msg = document.createElement("p");
+					msg.setAttribute('class', 'tb-font-xxl');
+					
+					msg.style.margin = '0 auto';
+					msg.style['text-align'] = 'center'
+					var link = document.createElement('a');
+					var text = document.createTextNode('Practice making a Jelly Sandwich!  \nStart by cleaning the board with soap. \n');
+					var linktext = document.createTextNode('ok!')
+					link.href = '#';
+					link.onclick = function(){
+						removeOldAlert();
+						removeOldModal();
+						uiDrawMode();
+					}
+					link.appendChild(linktext);
+					link.style.color = 'var(--primary)';
+					msg.appendChild(link);
+					msg.appendChild(text);
+					newAlert.appendChild(msg);
+					newAlert.style['box-shadow'] =  '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)'
+					document.body.appendChild(newAlert);
+					console.log('appended modal')
+				}
+				function blogModeModal(url){
+					removeOldAlert();
+					removeOldModal();
+					var newAlert = document.createElement("div");
+					newAlert.setAttribute("role", "alert");
+					newAlert.setAttribute("id", "modal");
+					var msg = document.createElement("p");
+					msg.setAttribute('class', 'tb-font-xxl');
+					msg.style.color = 'var(--primary)';
+					msg.style.margin = '0 auto';
+					msg.style['text-align'] = 'center'
+					var link = document.createElement('a');
+					var text = document.createTextNode('View and share');
+					link.href = url;
+						link.target = '_blank';
+						link.appendChild(text);
+						msg.appendChild(link)
+						newAlert.appendChild(msg);
+						newAlert.style['box-shadow'] =  '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)'
+						document.body.appendChild(newAlert);
+				}
+				function drawModeModal(aID, pageindex){
+					$.get('/doc/'+pageindex+'').done(function(result){
+						removeOldAlert();
+						removeOldModal();
+						console.log(result)
+						var elem = document.getElementById(aID);
+						var drawtype = aID.split('_')[1];
+						var layer = parseInt(aID.split('_')[2], 10);
+						var irr, irrname, ailment, ailmentname, desci, desca;
+						if ('#{index}' !== ''){
+							var index = '#{index}'
+							index = parseInt(index, 10)
+							irr = result.content[index][drawtype][layer];
+							irrname = irr.spec.safety;
+							ailment = result.content[index].info[layer];
+							ailmentname = ailment.spec.safety;
+							for (var i = 0; i < result.content[index].info.length; i++){
+								if (result.content[index].info[i].name === ailmentname) {
+									desca = result.content[index].info[i].caption
+								}
+								if (result.content[index].info[i].name === irrname) {
+									desci = result.content[index].info[i].caption
+								}
+							}
+						}
+						console.log(aID.split('_'))
+						var newAlert = document.createElement("div");
+						newAlert.setAttribute("role", "alert");
+						newAlert.setAttribute("id", "modal");
+						var msg = document.createElement("div");
+						
 
-			
+						if ($('.menu').hasClass('draw') && irrname !== false && irrname !== 'false' && irrname !== undefined && irrname !== "soap" && ailmentname !== "cleaner") {
+							
+							var text = document.createTextNode("Do you have an "+ailmentname+" to "+ irrname +"?")
+							msg.appendChild(text);
+							msg.setAttribute('class', 'translate');
+							var infomoda = document.createElement('p');
+							infomoda.setAttribute('class', 'tb-font-xxs')
+							var infomodi = document.createElement('p');
+							infomodi.setAttribute('class', 'tb-font-xxs')
+							var infoheada = document.createTextNode(ailmentname + '\n');
+							infomoda.appendChild(infoheada)
+							var infoheadi = document.createTextNode(irrname + '\n');
+							infomodi.appendChild(infoheadi)
+							var infotexta = document.createTextNode(desca + '\n');
+							var infotexti = document.createTextNode(desci + '\n');
+							var buttons = document.createElement('div');
+							//buttons.setAttribute('class', )
+							var buttoni = document.createElement('button');
+							var buttony = document.createElement('button');
+							var buttonx = document.createElement('button');
+							buttoni.setAttribute('id', 'msg')
+							buttoni.setAttribute('className', 'info')
+							buttoni.innerText = 'Info'
+							buttoni.style.background = 'var(--secondary)'
+							buttonx.setAttribute('id', 'msg')
+							buttonx.setAttribute('className', 'no')
+							buttonx.innerText = 'No'
+							buttonx.style.background = 'var(--secondary)'
+							buttony.setAttribute('id', 'msg')
+							buttony.setAttribute('className', 'yes')
+							buttony.innerText = 'Yes'
+							buttony.style.background = 'var(--primary)'
+							buttons.appendChild(buttony);
+							buttons.appendChild(buttonx);
+							buttons.appendChild(buttoni);
+							//msg != marked(msg)
+							//buttons != marked(buttons)
+							msg.appendChild(buttons);
+							newAlert.appendChild(msg);
+							document.body.appendChild(newAlert);
+							$(document).on('click','#msg', function(e){
+								e.preventDefault();
+								console.log(e.target)
+								if (e.target.getAttribute('className') === 'yes') {
+									$.post('/api/allergy/'+result.pageindex+'/'+index+'/'+drawtype+'/'+layer +'').done(function(){
+										$.post('/api/nextstep/'+result.urltitle+'/'+result.pageindex+'/'+index+'/'+drawtype+'/'+parseInt(layer, 10) +'').done(function(result){
+											removeOldModal();
+											window.location.href = '/api/selectlayer'
+											//return;
+										})
+										
+									})
+								} else {
+									if (e.target.getAttribute('className') === 'no') {
+										removeOldModal();										
+									} else {
+										msg.appendChild(infomoda)
+										msg.appendChild(infotexta)
+										msg.appendChild(infomodi)
+										msg.appendChild(infotexti)
+									}
+									
+								}
+							})
+						}
+						
+					});
+				}
+
+		
 		
 		
 		

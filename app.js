@@ -18,23 +18,34 @@ var routes = require('./routes/index');
 var Publisher = require('./models/publishers');
 var Page = require('./models/pages');
 var async = require('async');
-var Content = require('./models/content');
 var favicon = require('serve-favicon');
+var helmet = require('helmet');
+var cors = require('cors');
 mongoose.Promise = promise;
 dotenv.load();
 
 var app = express();
 if (app.get('env') === 'production') {
-	app.set('trust proxy', 1) // trust first proxy	
-	app.use(function (req, res, next) {
-	    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:80');
-	    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-	    res.setHeader('Access-Control-Allow-Headers', 'Cache-Control, Origin, X-Requested-With, Content-Type, Accept, Authorization');
-	    res.setHeader('Access-Control-Allow-Credentials', true);
-	    next()
-	});
-}
+	app.set('trust proxy', 1); // trust first proxy	
+	app.use(cors());
+	app.options('*', cors());
+	app.use(function(req, res, next) {
+		app.disable('x-powered-by');
+		app.disable('Strict-Transport-Security');
+		//app.disable('Access-Control-Allow-Credentials');
+		res.set({
+			'Access-Control-Allow-Origin' : '*',
+			'Access-Control-Allow-Methods' : 'GET, POST, HEAD, OPTIONS',
+			'Access-Control-Allow-Headers' : 'Cache-Control, Origin, Content-Type, Accept',
+			'Access-Control-Allow-Credentials' : true
+		});
 
+		app.use(helmet.noCache({}));
+
+		next();
+	});
+	
+}
 passport.use(new LocalStrategy(Publisher.authenticate()));
 // serialize and deserialize
 passport.serializeUser(function(user, done) {
@@ -43,19 +54,19 @@ passport.serializeUser(function(user, done) {
 });
 passport.deserializeUser(function(id, done) {
 	Publisher.findOne({_id: id}, function(err, user){
-    	//console.log(user);
-    	if(!err) {
+
+		if(!err) {
 			done(null, user);
 		} else {
 			done(err, null);
 		}
-    });
+	});
 });
 
 var store = new MongoDBStore(
 	{
-		uri: 'mongodb://localhost/session_sfusd',
-        collection: 'mySessions'
+		uri: 'mongodb://localhost/session_sfusd2',
+		collection: 'mySessions'
 	}
 )
 store.on('error', function(error, next){
@@ -88,68 +99,71 @@ app.locals.$ = require('jquery');
 app.locals.fs = require('fs');
 var marked = require('marked')
 app.locals.md = marked; 
-//app.locals.circularJSON = circularJSON;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../../pu/publishers')));
 app.use('/publishers', express.static(path.join(__dirname, '../../pu/publishers')));
-app.use('/publishers/sfusd', express.static(path.join(__dirname, '../../pu/publishers/sfusd')));
-app.use('/publishers/sfusd/:urltitle', function(req, res, next) {
+/*app.use('/publishers/sfusd2', express.static(path.join(__dirname, '../../pu/publishers/sfusd2')));
+app.use('/publishers/sfusd2/:urltitle', function(req, res, next) {
 	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
 		if (err) {
 			return next(err)
 		}
-		return express.static(path.join(__dirname, '../../pu/publishers/sfusd/'+req.params.urltitle+'')).apply(this, arguments);
+		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'')).apply(this, arguments);
 	})
 	
 });
 
-app.use('/publishers/sfusd/:urltitle/:index', function(req, res, next) {
+app.use('/publishers/sfusd2/:urltitle/:index', function(req, res, next) {
 	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
 		if (err) {
 			return next(err)
 		}
-		return express.static(path.join(__dirname, '../../pu/publishers/sfusd/'+req.params.urltitle+'/'+req.params.index+'')).apply(this, arguments);
+		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'')).apply(this, arguments);
 	})
 });
 
-app.use('/publishers/sfusd/:urltitle/:index/images', function(req, res, next) {
+app.use('/publishers/sfusd2/:urltitle/:index/images', function(req, res, next) {
 	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
 		if (err) {
 			return next(err)
 		}
-		return express.static(path.join(__dirname, '../../pu/publishers/sfusd/'+req.params.urltitle+'/'+req.params.index+'/images')).apply(this, arguments);
+		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'/images')).apply(this, arguments);
 	})
 });
 
-app.use('/publishers/sfusd/:urltitle/:index/images/:drawtype', function(req, res, next) {
+app.use('/publishers/sfusd2/:urltitle/:index/images/:drawtype', function(req, res, next) {
 	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
 		if (err) {
 			return next(err)
 		}
-		return express.static(path.join(__dirname, '../../pu/publishers/sfusd/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'')).apply(this, arguments);
+		console.log('static: '+req.params.drawtype)
+		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'')).apply(this, arguments);
 	})
 });
+
+app.use('/publishers/sfusd2/:urltitle/:index/images/:drawtype/:file', function(req, res, next) {
+	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'/'+req.params.file+'')).apply(this, arguments);
+	})
+});*/
 
 app.use('/', routes);
-app.use(function (err, req, res, next) {
-
-	console.log(err.stack)
-	req.app.locals.username = null;
-	req.app.locals.userId = null;
-	req.app.locals.zoom = null;
-	req.app.locals.loggedin = null;
-	delete req.app.locals.pageTitle;
-	req.logout();
-	res.status(err.status || 500).send({
-	    message: err.message,
-	    error: err.status
-	})
-});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  res.status(404).send('Not Found');
+	res.status(404).send('Not Found');
+});
+
+app.use(function (err, req, res) {
+	res.status(err.status || 500).send({
+		message: err.message,
+		error: err.status
+	})
 });
 
 var uri = process.env.DEVDB;

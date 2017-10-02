@@ -1,7 +1,7 @@
 {
-  "name": "express-vue-super-simple",
-  "version": "1.0.0",
-  "description": "super simple example for express-vue",
+  "name": "sfusd-digital-learning-integration-design",
+  "version": "0.0.1",
+  "description": "Sandwich activity",
   "main": "./bin/www",
   "directories": {
     "example": "examples"
@@ -12,26 +12,28 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/danmademe/express-vue-super-simple.git"
+    "url": "git+https://github.com/tbushman/sfusd.git"
   },
-  "author": "Daniel Cherubini",
+  "author": "tbushman",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/danmademe/express-vue/issues"
+    "url": "https://github.com/tbushman/sfusd/issues"
   },
-  "homepage": "https://github.com/danmademe/express-vue-super-simple#readme",
+  "homepage": "https://github.com/tbushman/sfusd#readme",
   "dependencies": {
     "async": "^2.5.0",
     "bluebird": "^3.5.0",
     "body-parser": "^1.15.2",
     "connect-mongodb-session": "^1.3.0",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
+    "debug": "^3.0.0",
     "dotenv": "^2.0.0",
     "express": "^4.15.2",
     "express-session": "^1.15.4",
-    "express-vue": "^3.15.1",
     "google-geolocation": "^1.0.1",
     "google-translate": "^2.0.5",
+    "helmet": "^3.8.1",
     "jquery": "^3.2.1",
     "leaflet": "^1.1.0",
     "marked": "^0.3.6",
@@ -42,7 +44,6 @@
     "multer": "^1.2.1",
     "npm": "^4.1.1",
     "passport": "^0.3.2",
-    "passport-google-oauth20": "^1.0.0",
     "passport-linkedin": "^1.0.0",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^4.0.0",
@@ -51,8 +52,5 @@
     "pug": "^2.0.0-beta9",
     "request": "^2.81.0",
     "serve-favicon": "^2.4.3"
-  },
-  "optionalDependencies": {
-    "pug": "^2.0.0-beta9"
   }
 }

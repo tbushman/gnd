@@ -1,12 +1,23 @@
 {
 	"substrates": [
 		{
-			"index": 1,
+			"ind": 0,
+			"name": "soap",
+			"image": "",
+			"caption": "Sanitizes surfaces",
+			"unlocked": true,
+			"spec": {
+				"safety": "bacteria",
+				"alt": [ ]
+			}
+		},
+		{
+			"ind": 1,
 			"name": "bread",
-			"image": "/images/substrates/substrates_0.svg",
-			"caption": "The basis of a traditional sandwich. ",
+			"image": "",
+			"caption": "The basis of a traditional sandwich",
 			"unlocked": false,
-			"info" : {
+			"spec": {
 				"safety": "gluten",
 				"alt": [
 					"rice"
@@ -14,23 +25,12 @@
 			}
 		},
 		{
-			"index": 2,
+			"ind": 2,
 			"name": "rice",
-			"image": "/images/substrates/substrates_1.svg",
-			"caption": "Wrap up a snack in sticky rice. ",
+			"image": "",
+			"caption": "Wrap up a snack in sticky rice",
 			"unlocked": false,
-			"info" : {
-				"safety": false,
-				"alt": [ ]
-			}
-		},
-		{
-			"index": 3,
-			"name": "nori",
-			"image": "/images/substrates/substrates_2.svg",
-			"caption": "Nutritious snack wrapper",
-			"unlocked": false,
-			"info" : {
+			"spec": {
 				"safety": false,
 				"alt": [ ]
 			}
@@ -38,23 +38,23 @@
 	],
 	"filling": [
 		{
-			"index": 0,
+			"ind": 0,
 			"name": "jelly",
-			"image": "/images/filling/filling_0.svg",
+			"image": "",
 			"caption": "Sweet fruit spread",
 			"unlocked": false,
-			"info" : {
+			"spec": {
 				"safety": false,
 				"alt": [ ]
 			}
 		},
 		{
-			"index": 1,
+			"ind": 1,
 			"name": "peanut butter",
-			"image": "/images/filling/filling_1.svg",
+			"image": "",
 			"caption": "A food processed from nuts",
 			"unlocked": false,
-			"info" : {
+			"spec": {
 				"safety": "nuts",
 				"alt": [
 					"cream cheese"
@@ -62,49 +62,49 @@
 			}
 		},
 		{
-			"index": 2,
+			"ind": 2,
 			"name": "cream cheese",
-			"image": "/images/filling/filling_2.svg",
+			"image": "",
 			"caption": "Tangy accompaniment",
 			"unlocked": false,
-			"info" : {
+			"spec": {
 				"safety": "dairy",
 				"alt": [
 					"tofu"
 				]
 			}
-		},
-		{
-			"index": 3,
-			"name": "tofu",
-			"image": "/images/filling/filling_3.svg",
-			"caption": "A food processed from soybeans",
-			"unlocked": false,
-			"info" : {
-				"safety": false,
-				"alt": [ ]
-			}
 		}
 	],
 	"tools": [
 		{
-			"index": 0,
+			"ind": 0,
 			"name": "cleaner",
-			"image": "/images/tools/tools_0.svg",
+			"image": "/images/tools/tools_0.png",
 			"caption": "Used to ensure sanitized surfaces",
-			"unlocked": true,
-			"info": {
-				"safety": "bacteria",
+			"unlocked": false,
+			"spec": {
+				"safety": false,
 				"alt": [ ]
 			}
 		},
 		{
-			"index": 1,
+			"ind": 1,
 			"name": "butterknife",
-			"image": "/images/tools/tools_1.svg",
+			"image": "/images/tools/tools_1.png",
 			"caption": "Used to spread sandwich toppings",
 			"unlocked": false,
-			"info": {
+			"spec": {
+				"safety": false,
+				"alt": [ ]
+			}
+		},
+		{
+			"ind": 2,
+			"name": "nori",
+			"image": "/images/substrates/substrates_2.svg",
+			"caption": "Nutritious snack wrapper",
+			"unlocked": false,
+			"spec": {
 				"safety": false,
 				"alt": [ ]
 			}
@@ -112,63 +112,63 @@
 	],
 	"info": [
 		{
-			"index": 0,
+			"ind": 0,
 			"name": "bacteria",
 			"image": "/images/info/info_0.svg",
 			"caption": "Super-small organisms that make us sick",
 			"unlocked": true,
-			"info": {
+			"spec": {
 				"safety": "cleaner",
 				"alt": [ ],
-				"unlock": "tools.1"
+				"unlock": "substrates.0"
 			}
 		},
 		{
-			"index": 1,
+			"ind": 1,
 			"name": "gluten",
-			"image": "/images/info/info_1.svg",
+			"image": "",
 			"caption": "A wheat ingredient in bread",
 			"unlocked": false,
-			"info": {
+			"spec": {
 				"safety": "allergy",
 				"alt": [ ],
-				"unlock": "substrates.1"
+				"unlock": "substrates.0"
 			}
 		},
 		{
-			"index": 2,
+			"ind": 2,
 			"name": "nuts",
-			"image": "/images/info/info_2.svg",
+			"image": "",
 			"caption": "Nutritious food grown in nature and on farms",
 			"unlocked": false,
-			"info": {
+			"spec": {
 				"safety": "allergy",
 				"alt": [ ],
-				"unlock": "filling.2"
+				"unlock": "filling.0"
 			}
 		},
 		{
-			"index": 3,
+			"ind": 3,
 			"name": "dairy",
-			"image": "/images/info/info_3.svg",
+			"image": "",
 			"caption": "Also known as milk produced by cows",
 			"unlocked": false,
-			"info": {
+			"spec": {
 				"safety": "allergy",
 				"alt": [ ],
-				"unlock": "filling.3"
+				"unlock": "filling.1"
 			}
 		},
 		{
-			"index": 4,
+			"ind": 4,
 			"name": "allergy",
-			"image": "/images/info/info_4.svg",
+			"image": "",
 			"caption": "Our body's reaction to ingredients we can't have",
 			"unlocked": false,
-			"info": {
+			"spec": {
 				"safety": "alt",
 				"alt": [ ],
-				"unlock": "substrates.2"
+				"unlock": "substrates.1"
 			}
 		}
 	]

@@ -22,7 +22,7 @@ block content
 			//e.preventDefault();
 			var check = $(this).val();
 			var url = check.replace(' ', '_');
-			$.post('/'+check).done(function(result){
+			$.post('/chef/'+check).done(function(result){
 				if (result === 'Available') {
 					$('#append').remove(); 
 					$('#response').append('<p class="tb-font-m" id="append">Available</p>');

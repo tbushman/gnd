@@ -1,64 +1,75 @@
-- var keys = ["tools", "info", "substrates", "filling"]
+- var keys = ["substrates", "filling"]
 
 div.grid-header.mainHeader
 	//if (drawtype)
 	
 	
-	if (drawtype)
-		a.mainmenu(href="#", title="Save", id="save", onclick="$.post('/api/nextstep/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"').done(function(response){if (document.getElementById('canvas_"+drawtype+"_"+layer+"') !== null) {console.log('not null!');saveImage(document.getElementById('canvas_"+drawtype+"_"+layer+"'))}})")
-			img.i(src="/images/icons/check.svg")
-	
+	if (loggedin && drawtype && loggedin === menuData.publishers[0].username)
+		- var allergies = menuData.publishers[0].allergies
+		if (contentData && type === "draw")
+			a.mainmenu(href="#", title="Save", id="save", aria-labelledby="continue", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/nextstep/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"').done(function(response){if (document.getElementsByClassName('layer')[0] !== null) {saveImage(document.getElementsByClassName('layer')[0])}})")
+				img.i(src="/images/icons/check.svg")
+		else
+			
+			a.dropdown.mainmenu(href="#", title="Menu")
+				img.i(src="/images/menu_button.svg")
+			
+			
+		
+		
+				
+				
+					
+		div.pullquote
+		if (type === "draw")
+			each ing, j in keys
+				if (contentData !== undefined)
+					each cat, i in contentData[ing]
+						if (cat.unlocked && allergies.indexOf(cat.name) === -1)
+							if (ing === 'substrates' && i === 0)
+								a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"', function(){uiErase('"+menuData.urltitle+"',"+menuData.pageindex+","+index+",'"+drawtype+"',"+layer+");})")
+									.ui
+										img(src="/images/icons/"+ing+"_"+i+".svg")
+										span.tb-font-m.translate #{cat.name}
+							else
+								a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
+									.ui
+										img(src="/images/icons/"+ing+"_"+i+".svg")
+										span.tb-font-m.translate #{cat.name}
 	else
 		a.dropdown.mainmenu(href="#", title="Menu")
 			img.i(src="/images/menu_button.svg")
 
-	
+		div.pullquote
+			if (contentData)
+				span.tb-font-xxl.translate #{contentData.description}
+
 			
-div.grid-left
+div.grid-left#tl
 	#wrapper
 		div#tlmodules.dropdown
 			a.module(href="/", title="home")
 				.ui
 					img(src="/images/icons/home.svg")
 				span.tb-font-l Home
-			if (menuData && contentData)
-				if (menuData.publishers[0].username === loggedin)
-					
-						
-					if (pageindex)
-						a.module.dropdown(title="edit")
-							.ui
-								img(src="/images/icons/edit.svg")
-							span.tb-font-l Edit
-
-							each key, j in keys
-								
-								each ing, k in contentData[key]
-									if (ing.unlocked)
-										a.module.focus.drop(href="#", onclick="document.getElementById('form_"+key+"_"+k+"').submit();")
-											.ui
-												img(src=(ing.unlocked ? "/images/icons/"+key+"_"+k+".svg" : "/images/icons/unknown.svg"))
-
+			if (loggedin && drawtype && loggedin === menuData.publishers[0].username)
+				each ing, j in keys
+					if (contentData !== undefined)
+						each cat, i in contentData[ing]
+							if (cat.unlocked && allergies.indexOf(cat.name) === -1)
+								a.module(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
+									.ui
+										img(src="/images/icons/"+ing+"_"+i+".svg")
+									span.tb-font-m.translate #{cat.name}
 									
-											//each ing, k in module
-											span.tb-font-l #{ing.name}
-											form(id="form_"+key+"_"+k+"", method="POST", enctype="multipart/form-data", action="/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+key+"/"+k+"")
-												input(type="hidden", value="1", name= ing.name)
-												input(type="hidden", id="inputimg_"+keys[j]+"_"+k+"", name= ing.name, value= ing.image)
-									
-				if (loggedin)
-					a.module(href="/logout", title="logout")
-						.ui
-							img(src="/images/icons/logout.svg")
-						span.tb-font-l Log out
-				else
-					a.module(href="/login", title="login") 
-						.ui
-							img(src="/images/icons/login.svg")
-						span.tb-font-l Login
+			if (loggedin)
+				a.module(href="/logout", title="logout")
+					.ui
+						img(src="/images/icons/logout.svg")
+					span.tb-font-l Log out
+			else
+				a.module(href="/login", title="login") 
+					.ui
+						img(src="/images/icons/login.svg")
+					span.tb-font-l Login
 				
-				//-
-					a.module(href="/register", title="register") 
-						.ui
-							i.fa.fa-id-card-o
-						span.tb-font-l Register
