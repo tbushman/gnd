@@ -13,7 +13,7 @@ var Publisher = new Schema({
   language: String,
   allergies: []
 	
-}, { collection: 'sfusd2' });
+}, { collection: 'sfusd' });
 
 Publisher.plugin(passportLocalMongoose);
 
