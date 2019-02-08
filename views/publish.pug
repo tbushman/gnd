@@ -55,7 +55,7 @@ block content
 							span.translate #{contentData.filling[contentData.level-1].name}
 							span  and 
 						else
-							if (contentData.filling[contentData.level+1] !== null)
+							if (contentData.filling[contentData.level+1])
 								span.translate #{contentData.filling[contentData.level+1].name}
 								span  and 
 				span.translate #{contentData.filling[0].name}
@@ -149,7 +149,7 @@ block content
 
 					} else {
 						// this is new
-						if (window.location.href.split('/')[3] === 'chef'){
+						if (window.location.href.split('/')[3] === 'sig'){
 							var blankCanvas = new loadedCanvas('canvas_substrates_0', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
 							blankCanvas.drawImg();
 							var thisCanvas = document.getElementById('canvas_substrates_0');
@@ -478,7 +478,7 @@ block content
 									var filling = res.content[index].filling;
 									var allergies = res.publishers[0].allergies;
 									
-									// update title of sandwich
+									// update title of signature
 									if (filling[layer] !== undefined && allergies.indexOf(filling[layer].name) === -1 && layer > 0){
 										text += filling[layer].name
 									}
@@ -501,7 +501,7 @@ block content
 										
 									text += filling[0].name;
 									
-									// put sandwich title in form
+									// put signature title in form
 									$('#title').val(text);
 								}
 								var pattern = context.createPattern(can, 'no-repeat');
@@ -548,7 +548,7 @@ block content
 										}, 'image/png', 0.95);
 									}
 									
-									mainimg.src = '/publishers/sfusd2/'+$('#urltitle').val()+'/'+'#{pageindex}'+'/images/main/main_0.png';
+									mainimg.src = '/publishers/gnd/'+$('#urltitle').val()+'/'+'#{pageindex}'+'/images/main/main_0.png';
 								}
 							}
 							
@@ -558,31 +558,31 @@ block content
 			}
 		}
 		//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
-		$(document).on('touchstart, mouseover', '.translate', function (e) {
-			var link = $(this); //preselect the link
-			if (link.hasClass('hover')) {
-				return true;
-			} else {
-				e.preventDefault();
-				link.addClass('hover');
-				$('a.taphover').not(this).removeClass('hover');
-				var text = link.html();
-				if (text.split('<')[1] === undefined) {
-					text = encodeURIComponent(text);
-					$.post('/translate/'+text+'').then(function(result){
-						console.log(result)
-						addAlert(result);
-					})
-				}
-				return false;
-			}
-		});
-		$(document).on('touchend, mouseleave', '.translate', function (e){
-			var link = $(this); //preselect the link
-			if (link.hasClass('hover')) {
-				$('.translate').removeClass('hover');
-			}
-			removeOldAlert()
-			return true;
-		});
+		//- $(document).on('touchstart, mouseover', '.translate', function (e) {
+		//- 	var link = $(this); //preselect the link
+		//- 	if (link.hasClass('hover')) {
+		//- 		return true;
+		//- 	} else {
+		//- 		e.preventDefault();
+		//- 		link.addClass('hover');
+		//- 		$('a.taphover').not(this).removeClass('hover');
+		//- 		var text = link.html();
+		//- 		if (text.split('<')[1] === undefined) {
+		//- 			text = encodeURIComponent(text);
+		//- 			$.post('/translate/'+text+'').then(function(result){
+		//- 				console.log(result)
+		//- 				addAlert(result);
+		//- 			})
+		//- 		}
+		//- 		return false;
+		//- 	}
+		//- });
+		//- $(document).on('touchend, mouseleave', '.translate', function (e){
+		//- 	var link = $(this); //preselect the link
+		//- 	if (link.hasClass('hover')) {
+		//- 		$('.translate').removeClass('hover');
+		//- 	}
+		//- 	removeOldAlert()
+		//- 	return true;
+		//- });
 		

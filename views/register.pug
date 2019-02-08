@@ -6,10 +6,12 @@ block content
 		
 		div.menu(class="blog")
 			
-			div.topLeft
-			div.canvas.topRight(style="background-image:url('/images/avatars/avatar_"+2+".svg')")
-				div.overtext sandwich
-				div.blogname School
+			div.topLeft(style="background-image:url('/images/backgrounds/backgrounds_1.svg')")
+			div.canvas.topRight
+				//(style="background-color:#bad80a")
+				//(style="background-image:url('/images/avatars/avatar_"+2+".svg')")
+				div.overtext signature
+				div.blogname Tool
 				
 				
 		div.grid-container(class="blog")
@@ -22,7 +24,7 @@ block content
 			//e.preventDefault();
 			var check = $(this).val();
 			var url = check.replace(' ', '_');
-			$.post('/chef/'+check).done(function(result){
+			$.post('/sig/'+check).done(function(result){
 				if (result === 'Available') {
 					$('#append').remove(); 
 					$('#response').append('<p class="tb-font-m" id="append">Available</p>');

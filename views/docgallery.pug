@@ -31,7 +31,7 @@ div.grid-right
 								img(src= contentData.image !== "" ? contentData.image : menuData.publishers[0].avatar, style="width: auto; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
 
 					else
-						a.tool(href="/chef/"+menuData.pagetitle+"/"+contentData.index+"")
+						a.tool(href="/sig/"+menuData.pagetitle+"/"+contentData.index+"")
 							.ui
 								img(src= contentData.image !== "" ? contentData.image : menuData.publishers[0].avatar, style="width: auto; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
 
@@ -67,8 +67,8 @@ div.grid-right
 					
 		else
 			each entry, k in menuData.content
-				a.tb-font-m.tb-u-100(href="/chef/"+menuData.pagetitle+"", title="Go to "+menuData.pagetitle+"") #{menuData.pagetitle}
-				a.tool(href="/chef/"+menuData.pagetitle+"/"+entry.index+"")
+				a.tb-font-m.tb-u-100(href="/sig/"+menuData.pagetitle+"", title="Go to "+menuData.pagetitle+"") #{menuData.pagetitle}
+				a.tool(href="/sig/"+menuData.pagetitle+"/"+entry.index+"")
 					.ui
 						img(src= entry.image !== "" ? entry.image : menuData.publishers[0].avatar, style="width: auto; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
 

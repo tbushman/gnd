@@ -18,10 +18,10 @@ if (menu === 'login')
 if (menu === 'register')
 	div.grid-right
 		div.tb-u-100
-			p.tb-font-xl Choose a nickname for your Chef:
+			p.tb-font-xl Your Name:
 			div.input-field#response
-				label.ms-Label Chef
-				input.ms-TextField-field(type="text", name="pagetitle", id="pagetitle", aria-required="true", onblur="checkNameValidity('pagetitle', '!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alpha-numeric characters only, please');")
+				label.ms-Label Name
+				input.ms-TextField-field(type="text", name="pagetitle", id="pagetitle", aria-required="true", onblur="checkNameValidity('pagetitle', '\d!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alphabetic characters only, please');")
 				a.btn.waves-effect.waves-light(role="button") Check availability
 				hr
 			div#registersection(style="display: none")
@@ -57,13 +57,13 @@ if (menu === 'home')
 	div.grid-right
 		div.tb-u-100
 			each entry, i in data
-				a.grid-header(href="/chef/"+entry.pagetitle+"")
-					p.tb-font-l Chef 
+				a.grid-header(href="/sig/"+entry.pagetitle+"")
+					p.tb-font-l Name 
 						span.tb-font-l #{entry.pagetitle}
 				div.grid-left
 					if (entry.content[entry.content.length-1] !== undefined)
 						if (entry.content[entry.content.length-1].image !== "")
-							a.thumbnail.gallery(href="/chef/"+entry.pagetitle+"")
+							a.thumbnail.gallery(href="/sig/"+entry.pagetitle+"")
 								img(src= entry.content[entry.content.length-1].image, alt=""+entry.pagetitle+"'s "+ranks[entry.content.length-1]+" snack")
 
 				div.grid-right

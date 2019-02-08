@@ -2,36 +2,12 @@
 	"substrates": [
 		{
 			"ind": 0,
-			"name": "soap",
+			"name": "cleaner",
 			"image": "",
 			"caption": "Sanitizes surfaces",
 			"unlocked": true,
 			"spec": {
-				"safety": "bacteria",
-				"alt": [ ]
-			}
-		},
-		{
-			"ind": 1,
-			"name": "bread",
-			"image": "",
-			"caption": "The basis of a traditional sandwich",
-			"unlocked": false,
-			"spec": {
-				"safety": "gluten",
-				"alt": [
-					"rice"
-				]
-			}
-		},
-		{
-			"ind": 2,
-			"name": "rice",
-			"image": "",
-			"caption": "Wrap up a snack in sticky rice",
-			"unlocked": false,
-			"spec": {
-				"safety": false,
+				"safety": "mistake",
 				"alt": [ ]
 			}
 		}
@@ -39,9 +15,9 @@
 	"filling": [
 		{
 			"ind": 0,
-			"name": "jelly",
+			"name": "felt",
 			"image": "",
-			"caption": "Sweet fruit spread",
+			"caption": "Felt tip pen",
 			"unlocked": false,
 			"spec": {
 				"safety": false,
@@ -50,37 +26,22 @@
 		},
 		{
 			"ind": 1,
-			"name": "peanut butter",
+			"name": "ballpoint",
 			"image": "",
-			"caption": "A food processed from nuts",
+			"caption": "Ballpoint pen",
 			"unlocked": false,
 			"spec": {
-				"safety": "nuts",
-				"alt": [
-					"cream cheese"
-				]
-			}
-		},
-		{
-			"ind": 2,
-			"name": "cream cheese",
-			"image": "",
-			"caption": "Tangy accompaniment",
-			"unlocked": false,
-			"spec": {
-				"safety": "dairy",
-				"alt": [
-					"tofu"
-				]
+				"safety": false,
+				"alt": [ ]
 			}
 		}
 	],
 	"tools": [
 		{
 			"ind": 0,
-			"name": "cleaner",
+			"name": "eraser",
 			"image": "/images/tools/tools_0.png",
-			"caption": "Used to ensure sanitized surfaces",
+			"caption": "Used to correct mistakes",
 			"unlocked": false,
 			"spec": {
 				"safety": false,
@@ -89,20 +50,9 @@
 		},
 		{
 			"ind": 1,
-			"name": "butterknife",
+			"name": "pen",
 			"image": "/images/tools/tools_1.png",
-			"caption": "Used to spread sandwich toppings",
-			"unlocked": false,
-			"spec": {
-				"safety": false,
-				"alt": [ ]
-			}
-		},
-		{
-			"ind": 2,
-			"name": "nori",
-			"image": "/images/substrates/substrates_2.svg",
-			"caption": "Nutritious snack wrapper",
+			"caption": "Used to sign your name",
 			"unlocked": false,
 			"spec": {
 				"safety": false,
@@ -113,62 +63,14 @@
 	"info": [
 		{
 			"ind": 0,
-			"name": "bacteria",
+			"name": "mistake",
 			"image": "/images/info/info_0.svg",
-			"caption": "Super-small organisms that make us sick",
+			"caption": "Undesired scribble",
 			"unlocked": true,
 			"spec": {
-				"safety": "cleaner",
+				"safety": "eraser",
 				"alt": [ ],
 				"unlock": "substrates.0"
-			}
-		},
-		{
-			"ind": 1,
-			"name": "gluten",
-			"image": "",
-			"caption": "A wheat ingredient in bread",
-			"unlocked": false,
-			"spec": {
-				"safety": "allergy",
-				"alt": [ ],
-				"unlock": "substrates.0"
-			}
-		},
-		{
-			"ind": 2,
-			"name": "nuts",
-			"image": "",
-			"caption": "Nutritious food grown in nature and on farms",
-			"unlocked": false,
-			"spec": {
-				"safety": "allergy",
-				"alt": [ ],
-				"unlock": "filling.0"
-			}
-		},
-		{
-			"ind": 3,
-			"name": "dairy",
-			"image": "",
-			"caption": "Also known as milk produced by cows",
-			"unlocked": false,
-			"spec": {
-				"safety": "allergy",
-				"alt": [ ],
-				"unlock": "filling.1"
-			}
-		},
-		{
-			"ind": 4,
-			"name": "allergy",
-			"image": "",
-			"caption": "Our body's reaction to ingredients we can't have",
-			"unlocked": false,
-			"spec": {
-				"safety": "alt",
-				"alt": [ ],
-				"unlock": "substrates.1"
 			}
 		}
 	]

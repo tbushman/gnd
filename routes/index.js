@@ -27,9 +27,10 @@ const googleTranslate = require('google-translate')(process.env.GOOGLE_KEY);
 
 //middleware
 function ensureAuthenticated(req, res, next) {
+	console.log(req.isAuthenticated())
 	if (req.isAuthenticated()) {
-		req.app.locals.user = req.user;
-		req.app.locals.loggedin = req.user.username;
+		req.session.user = req.user;
+		req.session.loggedin = req.user.username;
 		return next();
 	}
 	return res.redirect('/login');
@@ -43,7 +44,7 @@ function ensurePage(req, res, next) {
 		if (!err && page === null) {
 			return res.redirect('/')
 		}
-		req.app.locals.pageindex = page.pageindex;
+		req.session.pageindex = page.pageindex;
 		return next();
 
 	});
@@ -67,7 +68,7 @@ function ensureUser(req, res, next) {
 		if (err) {
 			return next(err);
 		}
-		if (page.publishers[0].username === req.app.locals.loggedin) {
+		if (page.publishers[0].username === req.session.loggedin) {
 			return next();
 		}
 		
@@ -80,14 +81,14 @@ function ensureUser(req, res, next) {
 //if not, go to global profile (home)
 router.get('/', function (req, res) {
 	
-	req.app.locals.theStore = thestore;
+	req.session.theStore = thestore;
 
-	if (req.app.locals.loggedin !== undefined) {
-		delete req.app.locals.pageTitle;
+	if (req.session.loggedin !== undefined) {
+		delete req.session.pageTitle;
 		if (req.isAuthenticated()) {
-			req.app.locals.userId = req.user._id;
-			req.app.locals.loggedin = req.user.username;
-			req.app.locals.username = req.user.username;
+			req.session.userId = req.user._id;
+			req.session.loggedin = req.user.username;
+			req.session.username = req.user.username;
 			return res.redirect('/api/publish')
 		} else {
 			return res.redirect('/home');
@@ -95,7 +96,7 @@ router.get('/', function (req, res) {
 
 
 	} else {
-		delete req.app.locals.pageTitle;
+		delete req.session.pageTitle;
 		return res.redirect('/home')
 	}
 });
@@ -106,7 +107,7 @@ var storage = multer.diskStorage({
 			if (err) {
 				console.log(err)
 			}
-			var p = ''+publishers+'/pu/publishers/sfusd2/'+ doc.urltitle +'/'+req.params.index+'/images/'+(req.params.drawtype ? req.params.drawtype : 'main')+''
+			var p = ''+publishers+'/pu/publishers/gnd/'+ doc.urltitle +'/'+req.params.index+'/images/'+(req.params.drawtype ? req.params.drawtype : 'main')+''
 
 			fs.access(p, function(err) {
 
@@ -151,7 +152,7 @@ router.all(/(.+)/, cors())
 router.get('/doc/:pageindex', function(req, res, next){
 	var pageindex = parseInt(req.params.pageindex, 10);
 	var index = parseInt(req.params.index, 10);
-	req.app.locals.pageindex = pageindex;
+	req.session.pageindex = pageindex;
 	Page.findOne({pageindex: pageindex}, function(err, doc){
 		if (err) {
 			return next(err)
@@ -168,7 +169,7 @@ router.get('/item/:pageindex/:index/:drawtype/:layer', function(req, res, next){
 	var layer = parseInt(req.params.layer, 10);
 	var pageindex = parseInt(req.params.pageindex, 10);
 	var index = parseInt(req.params.index, 10);
-	req.app.locals.pageindex = pageindex;
+	req.session.pageindex = pageindex;
 	Page.findOne({pageindex: pageindex, content: {$elemMatch:{index: index}}}, function(err, doc){
 		if (err) {
 			return next(err)
@@ -179,8 +180,8 @@ router.get('/item/:pageindex/:index/:drawtype/:layer', function(req, res, next){
 });
 
 router.get('/register', function(req, res) {
-	delete req.app.locals.loggedin;
-	req.app.locals.theStore = thestore;
+	delete req.session.loggedin;
+	req.session.theStore = thestore;
 	googleTranslate.getSupportedLanguages(function(err, languageCodes) {
 		var langs = [];
 		for (var i = 0; i < languageCodes.length; i++) {
@@ -198,16 +199,16 @@ router.get('/register', function(req, res) {
 
 router.post('/register', upload.array(), function(req, res, next) {
 	var langs = [];
-	googleTranslate.getSupportedLanguages(function(err, languageCodes) {
-		
-		for (var i = 0; i < languageCodes.length; i++) {
-			if (languages[languageCodes[i]] !== undefined) {
-				var obj = languages[languageCodes[i]];
-				obj.code = languageCodes[i];
-				langs.push(obj)
-			}
-			
-		}
+	// googleTranslate.getSupportedLanguages(function(err, languageCodes) {
+	// 
+	// 	for (var i = 0; i < languageCodes.length; i++) {
+	// 		if (languages[languageCodes[i]] !== undefined) {
+	// 			var obj = languages[languageCodes[i]];
+	// 			obj.code = languageCodes[i];
+	// 			langs.push(obj)
+	// 		}
+	// 
+	// 	}
 		if (!req.body.pagetitle) {
 			//upload.array() has not yet been fs-ed.
 			return res.render('register', {info: 'You must provide a nickname.', languages: langs})
@@ -219,61 +220,61 @@ router.post('/register', upload.array(), function(req, res, next) {
 			}
 			Publisher.register(new Publisher({ username : req.body.username, avatar: '/images/avatars/avatar_1.svg', language: req.body.languages }), req.body.password, function(err, user) {
 				if (err) {
-					return res.render('register', {info: "Sorry. That Chef already exists. Try again.", languages: langs});
+					return res.render('register', {info: "Sorry. That Name already exists. Try again.", languages: langs});
 				}
-				req.app.locals.username = req.body.username;
+				req.session.username = req.body.username;
 				passport.authenticate('local')(req, res, function () {
 					Publisher.findOne({username: req.body.username}, function(error, doc){
 						if (error) {
 							return next(error)
 						}
-						req.app.locals.user = req.user;
-						req.app.locals.userId = doc._id;
-						req.app.locals.loggedin = doc.username;
-						req.app.locals.pageTitle = req.body.pagetitle;
-						req.app.locals.layer = null;
-						/*req.app.locals.drawType = null;
-						req.app.locals.layer = null;
-						delete req.app.locals.drawType;
-						delete req.app.locals.layer;*/
+						req.session.user = req.user;
+						req.session.userId = doc._id;
+						req.session.loggedin = doc.username;
+						req.session.pageTitle = req.body.pagetitle;
+						req.session.layer = null;
+						/*req.session.drawType = null;
+						req.session.layer = null;
+						delete req.session.drawType;
+						delete req.session.layer;*/
 						return res.redirect('/api/publish')
 					})
 				});
 			});
 		})
-	})
+	// })
 	
 });
 
 router.post('/reserve/:pagetitle', function(req, res, next){
-	req.app.locals.pageTitle = decodeURIComponent(req.params.pagetitle);
-	return res.status(200).send(req.app.locals.pageTitle);
+	req.session.pageTitle = decodeURIComponent(req.params.pagetitle);
+	return res.status(200).send(req.session.pageTitle);
 })
 
 router.get('/login', function(req, res, next){
-	req.app.locals.theStore = thestore;
+	req.session.theStore = thestore;
 
 	return res.render('login', {
 		user: req.user
 	});
 });
 
-router.post('/login', upload.array(), passport.authenticate('local'), function(req, res, next) {
+router.post('/login', upload.array(), passport.authenticate('local', {failureRedirect: '/register'}), function(req, res, next) {
 	
 	
-	req.app.locals.loggedin = req.body.username;
-	req.app.locals.username = req.body.username;
-	req.app.locals.layer = null;
-	//req.app.locals.drawType = null;
-	//req.app.locals.layer = null;
-	
-	Page.findOne({publishers: {$elemMatch:{username:req.body.username}}}, function(err, doc){
+	req.session.loggedin = req.body.username;
+	req.session.username = req.body.username;
+	req.session.layer = null;
+	//req.session.drawType = null;
+	//req.session.layer = null;
+	console.log(req.body.username)
+	Page.findOne({publishers: {$elemMatch:{username:req.body.username}}}).lean().exec(function(err, doc){
 			if (err) {
 				return next(err)
 			}
-			req.app.locals.pageTitle = doc.pagetitle;
-			req.app.locals.pageindex = doc.pageindex; 
-			req.app.locals.urltitle = doc.urltitle; 
+			req.session.pageTitle = doc.pagetitle;
+			req.session.pageindex = doc.pageindex; 
+			req.session.urltitle = doc.urltitle; 
 			return res.redirect('/api/publish');
 	})
 
@@ -282,15 +283,15 @@ router.post('/login', upload.array(), passport.authenticate('local'), function(r
 
 router.get('/logout', function(req, res) {
 
-	req.app.locals.username = null;
-	req.app.locals.userId = null;
-	req.app.locals.zoom = null;
-	req.app.locals.loggedin = null;
-	req.app.locals.pageTitle = null;
-	req.app.locals.drawtype = null;
-	req.app.locals.drawType = null;
-	req.app.locals.level = null;
-	req.app.locals.layer = null;
+	req.session.username = null;
+	req.session.userId = null;
+	req.session.zoom = null;
+	req.session.loggedin = null;
+	req.session.pageTitle = null;
+	req.session.drawtype = null;
+	req.session.drawType = null;
+	req.session.level = null;
+	req.session.layer = null;
 	req.logout();
 	if (req.user || req.session) {
 		req.user = null;
@@ -310,7 +311,7 @@ router.get('/logout', function(req, res) {
 
 router.all('/translate/:text', function(req, res, next){
 
-	googleTranslate.translate(decodeURIComponent(req.params.text), 'en', req.app.locals.user ? req.app.locals.user.language : 'es', function(err, translation){
+	googleTranslate.translate(decodeURIComponent(req.params.text), 'en', req.session.user ? req.session.user.language : 'es', function(err, translation){
 		if (err) {
 			console.log(err)
 		}
@@ -321,7 +322,7 @@ router.all('/translate/:text', function(req, res, next){
 
 router.get('/home', function(req, res, next) {
 	//todo test null vs delete
-	//delete req.app.locals.pageTitle;
+	//delete req.session.pageTitle;
 
 	var info;
 	// Get data
@@ -357,7 +358,7 @@ router.get('/home', function(req, res, next) {
 				//theStore: thestore,
 				type: 'blog',
 				infowindow: 'home',
-				loggedin: req.app.locals.loggedin,
+				loggedin: req.session.loggedin,
 				data: datarray,
 				index: index,
 				info: info
@@ -375,7 +376,7 @@ router.get('/home', function(req, res, next) {
 	})
 })
 
-router.post('/chef/:pagetitle', function(req, res, next){
+router.post('/sig/:pagetitle', function(req, res, next){
 	Page.find({pagetitle: decodeURIComponent(req.params.pagetitle)}, function(error, pages){
 		if (error) {
 			return next(error)
@@ -388,7 +389,7 @@ router.post('/chef/:pagetitle', function(req, res, next){
 	})
 })
 
-router.get('/chef/:pagetitle*', ensurePage, function (req, res, next) {
+router.get('/sig/:pagetitle*', ensurePage, function (req, res, next) {
 	console.log(req.headers)
 	var index;
 	var outputPath = url.parse(req.url).pathname;
@@ -416,9 +417,9 @@ router.get('/chef/:pagetitle*', ensurePage, function (req, res, next) {
 						pageindex: doc.pageindex,
 						type: 'draw',
 						infowindow: 'edit',
-						drawtype: req.app.locals.drawType ? req.app.locals.drawType : false,
-						layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
-						loggedin: req.app.locals.loggedin,
+						drawtype: req.session.drawType ? req.session.drawType : false,
+						layer: req.session.layer ? req.session.layer : doc.content[doc.content.length-1].level,
+						loggedin: req.session.loggedin,
 						index: doc.content[doc.content.length-1].index,
 						doc: doc,
 						data: datarray,
@@ -456,7 +457,7 @@ router.get('/api/publish', function(req, res, next) {
 				if (err) {
 					return next(err)
 				}
-				Page.find({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(er, pages){
+				Page.find({publishers: {$elemMatch: {username: req.session.loggedin}}}, function(er, pages){
 					if (er) {
 						next(er)
 					}
@@ -470,18 +471,18 @@ router.get('/api/publish', function(req, res, next) {
 				infowindow = 'doc';
 				//dummy automatic first content entry
 				
-				var urltitle = req.app.locals.pageTitle !== undefined ? req.app.locals.pageTitle.replace(' ', '_') : null;
-				req.app.locals.urltitle = urltitle;
+				var urltitle = req.session.pageTitle !== undefined ? req.session.pageTitle.replace(' ', '_') : null;
+				req.session.urltitle = urltitle;
 				var page = new Page({
 					pageindex: data.length,
-					pagetitle: req.app.locals.pageTitle,
+					pagetitle: req.session.pageTitle,
 					urltitle: urltitle ? urltitle : '',
 					content: [ {
 						index: 0,
 						pid: data.length,
-						user: req.app.locals.user._id,
+						user: req.session.user._id,
 						title: thestore.info[0].name + ' ' + thestore.tools[0].name,
-						description: 'My first sandwich',
+						description: 'My signature',
 						level: 0,
 						info: thestore.info,
 						substrates: thestore.substrates,
@@ -491,40 +492,40 @@ router.get('/api/publish', function(req, res, next) {
 						
 					} ],
 					publishers: [{
-						_id: req.app.locals.user._id,
-						username: req.app.locals.user.username,
-						avatar: req.app.locals.user.avatar,
-						language: req.app.locals.user.language,
+						_id: req.session.user._id,
+						username: req.session.user.username,
+						avatar: req.session.user.avatar,
+						language: req.session.user.language,
 						allergies: []
 					}]
 				});
-				req.app.locals.index = 0;
+				req.session.index = 0;
 				page.save(function(error){
 					if (error) {
 						return next(error)
 					} else {
-						Page.find({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(er, pages){
+						Page.find({publishers: {$elemMatch: {username: req.session.loggedin}}}, function(er, pages){
 							if (er) {
 								next(er)
 							}
-							req.app.locals.pageId = page._id;
-							req.app.locals.userId = req.app.locals.user._id;
+							req.session.pageId = page._id;
+							req.session.userId = req.session.user._id;
 							cb(null, data, pages, page, page.pageindex, infowindow)
 						})
 					}
 				})
 			} else {
 				infowindow = 'data';
-				Page.findOne({publishers: {$elemMatch: {username: req.app.locals.loggedin}}}, function(err, doc){
+				Page.findOne({publishers: {$elemMatch: {username: req.session.loggedin}}}, function(err, doc){
 					if (err) {
 						return next(err)
 					}
-					if (!req.app.locals.index) {
-						req.app.locals.index = doc.content[doc.content.length-1].index;
+					if (!req.session.index) {
+						req.session.index = doc.content[doc.content.length-1].index;
 					}
-					req.app.locals.pageindex = doc.pageindex;
-					req.app.locals.pageTitle = doc.pagetitle;
-					req.app.locals.urltitle = doc.pagetitle.replace(' ', '_')
+					req.session.pageindex = doc.pageindex;
+					req.session.pageTitle = doc.pagetitle;
+					req.session.urltitle = doc.pagetitle.replace(' ', '_')
 						cb(null, data, pages, doc, doc.pageindex, 'doc')
 					
 				})
@@ -534,18 +535,18 @@ router.get('/api/publish', function(req, res, next) {
 		if (err) {
 			return next(err)
 		}
-		req.app.locals.drawType = req.app.locals.drawType ? req.app.locals.drawType : "substrates";
-		req.app.locals.layer = req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level;
+		req.session.drawType = req.session.drawType ? req.session.drawType : "substrates";
+		req.session.layer = req.session.layer ? req.session.layer : doc.content[doc.content.length-1].level;
 		return res.render('publish', {
 			type: 'blog',
 			infowindow: infowindow,
-			loggedin: req.app.locals.loggedin,
+			loggedin: req.session.loggedin,
 			pageindex: pageindex ? pageindex : data[data.length-1].pageindex,
 			index: doc ? doc.content.length-1 : false,
 			data: [].map.call(data, function(d){return d}),
 			doc: doc ? doc : pages[0],
-			drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
-			layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
+			drawtype: req.session.drawType ? req.session.drawType : "info",
+			layer: req.session.layer ? req.session.layer : doc.content[doc.content.length-1].level,
 			info: 'hi'
 		})
 	})
@@ -565,7 +566,7 @@ router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res
 				if (er) {
 					return next(er)
 				}
-				Page.find({'publishers.username': req.app.locals.loggedin}, function(error, data){
+				Page.find({'publishers.username': req.session.loggedin}, function(error, data){
 					if (error) {
 						return next(error)
 					}
@@ -576,7 +577,7 @@ router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res
 					return res.render('publish', {
 						type: 'blog',
 						infowindow: 'doc',
-						loggedin: req.app.locals.loggedin,
+						loggedin: req.session.loggedin,
 						pageindex: doc.pageindex,
 						index: 0,
 						data: datarray,
@@ -609,13 +610,13 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 			return res.render('publish', {
 				type: 'blog',
 				infowindow: 'edit',
-				loggedin: req.app.locals.loggedin ? req.app.locals.loggedin : false,
+				loggedin: req.session.loggedin ? req.session.loggedin : false,
 				pageindex: doc.pageindex,
 				index: doc.content.length-1,
 				doc: doc,
 				data: datarray,
-				drawtype: req.app.locals.drawType ? req.app.locals.drawType : 'info',
-				layer: req.app.locals.layer ? req.app.locals.layer : false,
+				drawtype: req.session.drawType ? req.session.drawType : 'info',
+				layer: req.session.layer ? req.session.layer : false,
 				info: 'Edit your entry.'
 			})
 		})
@@ -624,10 +625,10 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 
 router.get('/api/selectlayer', function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
-	if (!req.app.locals.urltitle){
+	if (!req.session.urltitle){
 		return res.redirect('/api/publish')
 	}
-	Page.findOne({urltitle: req.app.locals.urltitle, content: {$elemMatch: {index: req.app.locals.index}}}, function(err, doc){
+	Page.findOne({urltitle: req.session.urltitle, content: {$elemMatch: {index: req.session.index}}}, function(err, doc){
 		if (err) {
 			return next(err)
 		}
@@ -641,13 +642,13 @@ router.get('/api/selectlayer', function(req, res, next){
 				datarray.push(data[l])
 			}
 			return res.render('publish', {
-				type: req.app.locals.type ? req.app.locals.type : 'blog',
+				type: req.session.type ? req.session.type : 'blog',
 				infowindow: 'edit',
-				drawtype: req.app.locals.drawType ? req.app.locals.drawType : "info",
-				layer: req.app.locals.layer ? req.app.locals.layer : doc.content[doc.content.length-1].level,
-				loggedin: req.app.locals.loggedin,
+				drawtype: req.session.drawType ? req.session.drawType : "info",
+				layer: req.session.layer ? req.session.layer : doc.content[doc.content.length-1].level,
+				loggedin: req.session.loggedin,
 				pageindex: doc.pageindex,
-				index: req.app.locals.index,
+				index: req.session.index,
 				doc: doc,
 				data: datarray,
 				info: ':)'
@@ -656,7 +657,7 @@ router.get('/api/selectlayer', function(req, res, next){
 	})
 })
 router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', function(req, res, next){
-	//delete req.app.locals.layer;
+	//delete req.session.layer;
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath)
 	var index = parseInt(req.params.index, 10);
@@ -664,12 +665,12 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', func
 	var urltitle = req.params.urltitle;
 	
 	var drawtype = req.params.drawtype;
-	req.app.locals.index = index;
-	req.app.locals.layer = layer;
-	req.app.locals.drawType = drawtype;
-	req.app.locals.urltitle = urltitle;
-	req.app.locals.type = 'draw'
-	req.app.locals.pageindex = parseInt(req.params.pageindex, 10);
+	req.session.index = index;
+	req.session.layer = layer;
+	req.session.drawType = drawtype;
+	req.session.urltitle = urltitle;
+	req.session.type = 'draw'
+	req.session.pageindex = parseInt(req.params.pageindex, 10);
 	Page.find({}, function(errrr, data){
 		if (errrr) {
 			return next(errrr)
@@ -688,7 +689,7 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', func
 				if (er) {
 					return next(er)
 				}
-				req.app.locals.drawType = drawtype;
+				req.session.drawType = drawtype;
 				console.log(req.body)
 				var drawtypes = ["substrates", "filling"];
 				var keys = Object.keys(req.body);
@@ -719,7 +720,7 @@ router.all('/api/selectlayer/:urltitle/:pageindex/:index/:drawtype/:layer', func
 						drawtype: drawtype,
 						layer: layer,
 						infowindow: 'edit',
-						loggedin: req.app.locals.loggedin,
+						loggedin: req.session.loggedin,
 						pagetitle: doc.pagetitle,
 						pageindex: doc.pageindex,
 						index: index,
@@ -738,7 +739,7 @@ router.post('/api/allergy/:pageindex/:index/:drawtype/:level', function(req, res
 	console.log(outputPath)
 
 	var pageindex = parseInt(req.params.pageindex, 10);
-	Page.findOne({pageindex:pageindex, publishers: {$elemMatch:{username: req.app.locals.loggedin}}}, function(er, pub){
+	Page.findOne({pageindex:pageindex, publishers: {$elemMatch:{username: req.session.loggedin}}}, function(er, pub){
 		if (er){
 			return next(er)
 		}
@@ -748,7 +749,7 @@ router.post('/api/allergy/:pageindex/:index/:drawtype/:level', function(req, res
 		var push = {$push:{}};
 		var key = 'publishers.$.allergies';
 		push.$push[key] = pub.content[index][drawtype][level].name;
-		Page.findOneAndUpdate({pageindex:pageindex, publishers: {$elemMatch:{username: req.app.locals.loggedin}}}, push, {safe: true, new: true, upsert: false}, function(err, doc){
+		Page.findOneAndUpdate({pageindex:pageindex, publishers: {$elemMatch:{username: req.session.loggedin}}}, push, {safe: true, new: true, upsert: false}, function(err, doc){
 			if (err){
 				return next(err)
 			}
@@ -765,13 +766,13 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 	var description = req.body.description;
 	var body = req.body;
 	var drawType = req.params.drawtype;
-	req.app.locals.drawType = drawType;
-	req.app.locals.layer = parseInt(req.params.level, 10);
+	req.session.drawType = drawType;
+	req.session.layer = parseInt(req.params.level, 10);
 	//console.log(drawType)
 	var level = parseInt(req.params.level, 10);
 	var pageindex = parseInt(req.params.pageindex, 10);
-	req.app.locals.pageindex = pageindex;
-	req.app.locals.urltitle = req.params.urltitle;
+	req.session.pageindex = pageindex;
+	req.session.urltitle = req.params.urltitle;
 	async.waterfall([
 		function(cb){
 			Page.findOne({pageindex: pageindex}, function(err, pub) {
@@ -874,7 +875,7 @@ router.post('/api/editcontent/:urltitle/:pageindex/:index/:drawtype/:level', upl
 		if (err) {
 			return next(err)
 		}
-		req.app.locals.type = "draw"
+		req.session.type = "draw"
 		//return res.status(200).send('ok')
 		return res.status(303).redirect('/api/selectlayer')
 	})
@@ -889,7 +890,7 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 	var index = parseInt(req.params.index, 10);
 	var drawtype = req.params.drawtype;
 	var layer = parseInt(req.params.layer, 10);
-	req.app.locals.layer = layer;
+	req.session.layer = layer;
 	Page.findOne({pageindex: pageindex, content: {$elemMatch: {index: index}}}, function(err, pub){
 		if (err) {
 			return next(err)
@@ -920,8 +921,8 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 		var set1 = {$set: {}};
 		var key1 = 'content.$.'+keylist[0]+'.'+levellist[0]+'.unlocked';
 		set1.$set[key1] = true;
-		req.app.locals.drawType = drawType;
-		req.app.locals.pageindex = pageindex;
+		req.session.drawType = drawType;
+		req.session.pageindex = pageindex;
 		Page.findOneAndUpdate({pageindex: pageindex, content: {$elemMatch: {index: index}}}, set1, {safe: true, new: true, upsert: false}, function(error, dc){
 			if (error) {
 				return next(error)
@@ -935,8 +936,8 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 					datarray.push(data[l])
 				}
 				if (Number.isNaN(layer) || levellist[0] === thestore[drawtype].length - 1) {
-					req.app.locals.drawType = drawtype === 'filling' ? 'substrates':'filling';
-					req.app.locals.layer = 0;
+					req.session.drawType = drawtype === 'filling' ? 'substrates':'filling';
+					req.session.layer = 0;
 					//return res.redirect('/api/selectlayer')
 					//return res.redirect('/api/levelup')
 					//return res.redirect('/api/nextstep/'+urltitle+'/'+pageindex+'/'+index+'/'+(drawtype === 'filling' ? 'substrates':'filling')+'/0')
@@ -952,7 +953,7 @@ router.post('/api/nextstep/:urltitle/:pageindex/:index/:drawtype/:layer', functi
 router.get('/api/levelup', function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath)
-	var level = parseInt(req.app.locals.layer, 10);
+	var level = parseInt(req.session.layer, 10);
 	level++;
 	
 	var set = {$set:{}}
@@ -961,19 +962,19 @@ router.get('/api/levelup', function(req, res, next){
 	var set1 = {$set:{}}
 	var key1 = 'publishers.0.avatar';
 	set1.$set[key1] = '/images/avatars/avatar_'+level+'.svg';
-	Page.findOne({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, function(errr, doc){
+	Page.findOne({pageindex: req.session.pageindex, content: {$elemMatch: {index: req.session.index}}}, function(errr, doc){
 		if (errr) {
 			return next(errr)
 		}
 		if (level > 2) {
-			return res.redirect('/chef/'+doc.pagetitle+'/'+req.app.locals.index+'')
+			return res.redirect('/sig/'+doc.pagetitle+'/'+req.session.index+'')
 		}
-		Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){
+		Page.findOneAndUpdate({pageindex: req.session.pageindex, content: {$elemMatch: {index: req.session.index}}}, set, {safe: true, new: true, upsert: false}, function(err, doc){
 			if (err) {
 				return next(err)
 			}
 			
-			Page.findOneAndUpdate({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, set1, {safe: true, new: true, upsert: false}, function(err, doc){
+			Page.findOneAndUpdate({pageindex: req.session.pageindex, content: {$elemMatch: {index: req.session.index}}}, set1, {safe: true, new: true, upsert: false}, function(err, doc){
 				if (err) {
 					return next(err)
 				}
@@ -988,11 +989,11 @@ router.get('/api/levelup', function(req, res, next){
 					return res.render('publish', {
 						type: 'blog',
 						infowindow: 'doc',
-						drawtype: req.app.locals.drawType,
-						layer: parseInt(req.app.locals.layer, 10),
-						loggedin: req.app.locals.loggedin,
+						drawtype: req.session.drawType,
+						layer: parseInt(req.session.layer, 10),
+						loggedin: req.session.loggedin,
 						pageindex: doc.pageindex,
-						index: req.app.locals.index ? req.app.locals.index : doc.content[doc.content.length-1].index,
+						index: req.session.index ? req.session.index : doc.content[doc.content.length-1].index,
 						doc: doc,
 						data: datarray,
 						info: ':)'
@@ -1009,7 +1010,7 @@ router.all('/api/done', function(req, res, next){
 		if (er){
 			return next(er)
 		}
-		Page.findOne({pageindex: req.app.locals.pageindex, content: {$elemMatch: {index: req.app.locals.index}}}, function(err, doc){
+		Page.findOne({pageindex: req.session.pageindex, content: {$elemMatch: {index: req.session.index}}}, function(err, doc){
 			if (err){
 				return next(err)
 			}

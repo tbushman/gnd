@@ -42,7 +42,7 @@ var Page = new Schema({
 	} ],
 	publishers: []
 	
-}, { collection: 'sfusdpages' });
+}, { collection: 'gndpages' });
 
 //Page.index({ 'content.$.index': 1 }, { unique: true, dropDups: true });
 module.exports = mongoose.model('Page', Page);

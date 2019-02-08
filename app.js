@@ -65,7 +65,8 @@ passport.deserializeUser(function(id, done) {
 
 var store = new MongoDBStore(
 	{
-		uri: 'mongodb://localhost/session_sfusd2',
+		mongooseConnection: mongoose.connection,
+		uri: 'mongodb://localhost/session_gnd',
 		collection: 'mySessions'
 	}
 )
@@ -74,17 +75,18 @@ store.on('error', function(error, next){
 });
 
 var sess = {
-	secret: '12345QWERTY-SECRET',
+	secret: process.env.SESSIONSECRET,
 	name: 'nodecookie',
 	resave: false,
 	saveUninitialized: false,
-	store: store
+	store: store,
+	cookie: { maxAge: 180 * 60 * 1000 }
 }
 app.use(cookieParser(sess.secret));
+app.use(session(sess));
 
 // session middleware configuration
 // see https://github.com/expressjs/session
-app.use(session(sess));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -92,7 +94,7 @@ app.use(passport.session());
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.locals.appTitle = 'SFUSD Design';
+app.locals.appTitle = 'Signature Tool';
 app.use(favicon(path.join(__dirname, 'public/img', 'favicon.ico')));
 app.locals.moment = require('moment');
 app.locals.$ = require('jquery');
@@ -104,53 +106,59 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '../../pu/publishers')));
 app.use('/publishers', express.static(path.join(__dirname, '../../pu/publishers')));
-/*app.use('/publishers/sfusd2', express.static(path.join(__dirname, '../../pu/publishers/sfusd2')));
-app.use('/publishers/sfusd2/:urltitle', function(req, res, next) {
+/*app.use('/publishers/gnd', express.static(path.join(__dirname, '../../pu/publishers/gnd')));
+app.use('/publishers/gnd/:urltitle', function(req, res, next) {
 	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
 		if (err) {
 			return next(err)
 		}
-		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'')).apply(this, arguments);
+		return express.static(path.join(__dirname, '../../pu/publishers/gnd/'+req.params.urltitle+'')).apply(this, arguments);
 	})
 	
 });
 
-app.use('/publishers/sfusd2/:urltitle/:index', function(req, res, next) {
+app.use('/publishers/gnd/:urltitle/:index', function(req, res, next) {
 	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
 		if (err) {
 			return next(err)
 		}
-		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'')).apply(this, arguments);
+		return express.static(path.join(__dirname, '../../pu/publishers/gnd/'+req.params.urltitle+'/'+req.params.index+'')).apply(this, arguments);
 	})
 });
 
-app.use('/publishers/sfusd2/:urltitle/:index/images', function(req, res, next) {
+app.use('/publishers/gnd/:urltitle/:index/images', function(req, res, next) {
 	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
 		if (err) {
 			return next(err)
 		}
-		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'/images')).apply(this, arguments);
+		return express.static(path.join(__dirname, '../../pu/publishers/gnd/'+req.params.urltitle+'/'+req.params.index+'/images')).apply(this, arguments);
 	})
 });
 
-app.use('/publishers/sfusd2/:urltitle/:index/images/:drawtype', function(req, res, next) {
+app.use('/publishers/gnd/:urltitle/:index/images/:drawtype', function(req, res, next) {
 	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
 		if (err) {
 			return next(err)
 		}
 		console.log('static: '+req.params.drawtype)
-		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'')).apply(this, arguments);
+		return express.static(path.join(__dirname, '../../pu/publishers/gnd/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'')).apply(this, arguments);
 	})
 });
 
-app.use('/publishers/sfusd2/:urltitle/:index/images/:drawtype/:file', function(req, res, next) {
+app.use('/publishers/gnd/:urltitle/:index/images/:drawtype/:file', function(req, res, next) {
 	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
 		if (err) {
 			return next(err)
 		}
-		return express.static(path.join(__dirname, '../../pu/publishers/sfusd2/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'/'+req.params.file+'')).apply(this, arguments);
+		return express.static(path.join(__dirname, '../../pu/publishers/gnd/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'/'+req.params.file+'')).apply(this, arguments);
 	})
 });*/
+
+app.use(function(req, res, next) {
+	
+	res.locals.session = req.session;
+	next();
+});
 
 app.use('/', routes);
 
