@@ -218,7 +218,7 @@ router.post('/register', upload.array(), function(req, res, next) {
 			if (err) {
 				return next(err)
 			}
-			Publisher.register(new Publisher({ username : req.body.username, avatar: '/images/avatars/avatar_1.svg', language: req.body.languages }), req.body.password, function(err, user) {
+			Publisher.register(new Publisher({ username : req.body.username, avatar: '/images/publish_logo_sq.svg', language: req.body.languages }), req.body.password, function(err, user) {
 				if (err) {
 					return res.render('register', {info: "Sorry. That Name already exists. Try again.", languages: langs});
 				}
@@ -544,7 +544,7 @@ router.get('/api/publish', function(req, res, next) {
 			pageindex: pageindex ? pageindex : data[data.length-1].pageindex,
 			index: doc ? doc.content.length-1 : false,
 			data: [].map.call(data, function(d){return d}),
-			doc: doc ? doc : pages[0],
+			// doc: doc ? doc : pages[0],
 			drawtype: req.session.drawType ? req.session.drawType : "info",
 			layer: req.session.layer ? req.session.layer : doc.content[doc.content.length-1].level,
 			info: 'hi'
@@ -616,7 +616,7 @@ router.get('/api/editcontent/:urltitle/:pageindex/:index', ensureUser, function(
 				doc: doc,
 				data: datarray,
 				drawtype: req.session.drawType ? req.session.drawType : 'info',
-				layer: req.session.layer ? req.session.layer : false,
+				layer: req.session.layer ? req.session.layer : null,
 				info: 'Edit your entry.'
 			})
 		})
@@ -959,9 +959,12 @@ router.get('/api/levelup', function(req, res, next){
 	var set = {$set:{}}
 	var key = 'content.$.level'
 	set.$set[key] = level;
-	var set1 = {$set:{}}
-	var key1 = 'publishers.0.avatar';
-	set1.$set[key1] = '/images/avatars/avatar_'+level+'.svg';
+	// var p = ''+publishers+'/pu/publishers/gnd/'+ doc.urltitle +'/'+req.params.index+'/images/'+(req.params.drawtype ? req.params.drawtype : 'main')+'';
+	// var isP = fs.existsSync(p);
+	// 
+	// var set1 = {$set:{}}
+	// var key1 = 'publishers.0.avatar';
+	// set1.$set[key1] = '/images/avatars/avatar_'+level+'.svg';
 	Page.findOne({pageindex: req.session.pageindex, content: {$elemMatch: {index: req.session.index}}}, function(errr, doc){
 		if (errr) {
 			return next(errr)
@@ -974,10 +977,10 @@ router.get('/api/levelup', function(req, res, next){
 				return next(err)
 			}
 			
-			Page.findOneAndUpdate({pageindex: req.session.pageindex, content: {$elemMatch: {index: req.session.index}}}, set1, {safe: true, new: true, upsert: false}, function(err, doc){
-				if (err) {
-					return next(err)
-				}
+			// Page.findOneAndUpdate({pageindex: req.session.pageindex, content: {$elemMatch: {index: req.session.index}}}, set1, {safe: true, new: true, upsert: false}, function(err, doc){
+			// 	if (err) {
+			// 		return next(err)
+			// 	}
 				Page.find({}, function(er, data){
 					if (er) {
 						return next(er)
@@ -999,7 +1002,7 @@ router.get('/api/levelup', function(req, res, next){
 						info: ':)'
 					})
 				})
-			})
+			// })
 		})
 	})
 	

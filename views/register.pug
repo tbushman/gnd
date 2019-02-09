@@ -9,7 +9,6 @@ block content
 			div.topLeft(style="background-image:url('/images/backgrounds/backgrounds_1.svg')")
 			div.canvas.topRight
 				//(style="background-color:#bad80a")
-				//(style="background-image:url('/images/avatars/avatar_"+2+".svg')")
 				div.overtext signature
 				div.blogname Tool
 				
@@ -17,38 +16,4 @@ block content
 		div.grid-container(class="blog")
 			include menu.pug
 			include datagallery.pug
-
-	script(type="text/javascript").
-		
-		$('#pagetitle').on('blur', function(e){
-			//e.preventDefault();
-			var check = $(this).val();
-			var url = check.replace(' ', '_');
-			$.post('/sig/'+check).done(function(result){
-				if (result === 'Available') {
-					$('#append').remove(); 
-					$('#response').append('<p class="tb-font-m" id="append">Available</p>');
-					$.post('/reserve/'+check+'');
-					$('#loginsection').css('display', 'block');
-					$('#registersection').css('display', 'block')
-					$('#pagetitle2').val(check);
-					
-				} else {
-					$('#append').remove(); 
-					$('#response').append('<p class="tb-font-m" id="append">That blog name is taken.</p>')
-				}
-			})
-		});
-		$(document).on('click', '.canvas', function(e){
-			if ($('#tlmodules').hasClass('selected')) {
-				//				e.preventDefault();
-				//				InitializeApp();
-				$('.menu').css('height', 'var(--windowmenu)');
-				$('div.dropdown').slideUp(100);
-				$('.drop').slideUp(100);
-				$('.selected').removeClass('selected');
-			} else {
-				//				InitializeApp();
-			}
-		})
-		
+			#response

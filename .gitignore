@@ -3,4 +3,5 @@ node_modules
 .idea
 *.sock
 gnddb
+sfusddb
 .env

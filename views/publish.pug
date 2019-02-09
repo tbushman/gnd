@@ -1,562 +1,524 @@
 extends layout
 block page
-	- var ranks = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"];
-	- var keys = ["tools", "info", "substrates", "filling"]
-
 	if (doc)
 		
 		- var menu = 'doc'
-		- var menuData = doc
-		- var pageIndex = pageindex
 	else
 		if (loggedin)
 			if (pageindex)
 				- var menu = 'doc'
-				- var pageIndex = pageindex
-				- var menuData = data[pageindex]
 			else
 				- var menu = 'home'
-				- var pageIndex = data[data.length-1].pageindex
-				- var menuData = data[data.length-1]
 		else
 			- var menu = 'home'
-			- var pageIndex = data[data.length-1].pageindex
-			- var menuData = data[data.length-1]
-	if (index)
-		- var contentData = menuData.content[index]
-	else
-		- var contentData = menuData.content[menuData.content.length-1]
-		- var index = contentData.index
-	if (layer)
-		- var layer = layer
-	else
-		- var layer = contentData.level
 block content
 	
-	- var keys = ["tools", "info", "substrates", "filling"]
-	- var allergies = menuData.publishers[0].allergies;
-	input(type="hidden", value= pageIndex, id="pageindex")
-	input(type="hidden", value= menuData.urltitle, id="urltitle")
-	input(type="hidden", value= index, id="index")
-	input(type="hidden", id="erase")
-		//-
-			navigation
-	div#select(class= type)
-		div.menu(class= type)
+	div#select(:class="type")
+		div.menu(:class="type")
 
-			div.overtext #{menuData.pagetitle}
-			div.blogname
-				if (contentData.filling[contentData.level] !== undefined && drawtype)
-					if (allergies.length && allergies.indexOf(contentData.filling[contentData.level].name) === -1 && contentData.level > 0)
-						span.translate #{contentData.filling[contentData.level].name}
-						span  and 
-					else
-						if (contentData.filling[contentData.level-1] !== undefined && contentData.level - 1 > 0)
-							span.translate #{contentData.filling[contentData.level-1].name}
-							span  and 
-						else
-							if (contentData.filling[contentData.level+1])
-								span.translate #{contentData.filling[contentData.level+1].name}
-								span  and 
-				span.translate #{contentData.filling[0].name}
+			div.overtext(v-text="(doc && index && doc.content[index] ? doc.pagetitle : '"+appTitle+"')")
+			div.blogname(v-text="(doc && index && doc.content[index] ? doc.content[index].filling[level] : '')")
 			div.envel
+				canvas#maincanvas.maincanvas.topRight(:style="{cursor: getCursor()}")
 			div.topLeft
 		
-		div.grid-container(class= type)
-
+		div.grid-container(:class="type" v-if="doc")
+			- console.log('blrg')
 			include menu.pug
-			if (doc)
-				include docgallery.pug
-			else
-				include datagallery.pug
+			include docgallery.pug
+		div.grid-container(:class="type" v-else-if="!doc")
+			- menu = 'home'
+			include menu.pug
+			include datagallery.pug
 
 	//-
 		initiate map + event listeners
 	script(type="text/javascript").
-		const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-		var mainmenu = document.getElementsByClassName('menu')[0];
-		
-		var pageIndex, drawtype, layer;
-		// server-defined variables
-		var datalength = #{data.length};
-		var infowindow = '#{infowindow}';
-		var index = '#{index}'
-		if (index !== '' && !isNaN(parseInt(index, 10))) {
-			index = parseInt(index, 10);
-		}
-		pageIndex = '#{pageindex}'
-		if (pageIndex !== '' && !isNaN(parseInt(pageIndex, 10))) {
-			pageIndex = parseInt(pageIndex, 10);
-		}
-		drawtype = '#{drawtype}'
-		layer = '#{layer}'
-		if (layer !== '') {
-			layer = parseInt(layer, 10);
-		}
-		
-		// paint program adapted from https://rbyers.github.io/paint.html
-		var radiusSupported = false;
-		var nextCount = 0;
-		var touchMap = {};
-		var foundRotationAngle = false;
-		var scale = 1;
-		var mousePressed = false;
-		var drawCoalesced = false;
-		
-		// make page data available within document script
-		var res;
-		$(document).ready(function(){
-			$('textarea').each(function(){
-				var text;
-				if ($(this).val()) {
-					$(this).css('max-width', '100%')
-				} else {
-					//placeholder reliably contains updated text while value doesn't always fsr
-					text = $(this).attr('placeholder');
-					$(this).val(text);
-					$(this).css('max-width', '100%')
-				} 
-			});
-			
-			// hide dropdown on init
-			$('.dropdown').not('.mainmenu').slideUp(100);
-			$('.drop').slideUp(100);
-			$('.selected').removeClass('selected');
-			if (pageIndex !== '') {
-				$.get('/doc/'+pageIndex+'', function(result){
-					//get page data
-					res = result;
-					var canvasWidth = window.innerWidth;
-					var canvasHeight = window.innerHeight;
-					// if composition not blank
-					if (res.content[index].image !== '' && res.content[index].image !== undefined) {
-						var mainCanvasImg = res.content[index].image;				
-						var loadedMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, mainCanvasImg);
-						loadedMain.drawImg();
-						console.log(window.location.href.split('/'))
-						if (window.location.href.split('/')[3] === 'api'){
-							if (res.content[index][drawtype][layer].image !== '' && res.content[index][drawtype][layer].image !== undefined) {
-								console.log(mainCanvasImg)
-								var canvasLayerImg = res.content[index][drawtype][layer].image;
-								var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
-								loadedLayer.drawImg();
-							} else {
-								var blankCanvas = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, '/images/1px.png');
-								blankCanvas.drawImg();
-							}
-							drawModeModal('canvas_'+drawtype+'_'+layer+'', pageIndex)
-						}
-
-					} else {
-						// this is new
-						if (window.location.href.split('/')[3] === 'sig'){
-							var blankCanvas = new loadedCanvas('canvas_substrates_0', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
-							blankCanvas.drawImg();
-							var thisCanvas = document.getElementById('canvas_substrates_0');
-							var blankMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
-							blankMain.drawImg();
-							welcomeModal();
-						}
-					}
-				});
-			}
-		})
-		
-		$('#inputtext').on('keyup', function(e){
-			$('#previewtext').html(marked(e.target.value))
-		});
-		$('input').on('keydown', function(e){
-			// prevent firefox debug on slash keydown
-			if (e.key === 'Slash') {
-				e.preventDefault();
-			}
-		});
-		
-		// http://jsfiddle.net/m1erickson/cAR93/
-		// load new canvas each page load to hopefully combat cors-related taintedness
-		function loadedCanvas(aID, x, y, canvasWidth, canvasHeight, url) {
-			console.log(url)
-			const can = document.createElement('canvas');
-			can.setAttribute('id', aID);
-			can.setAttribute('class', 'topRight');
-			if (aID === 'canvas') {
-				can.setAttribute('class', 'topRight maincanvas');
-			} else {
-				can.setAttribute('class', 'topRight layer');
-			}
-			can.width = canvasWidth;
-			can.height = canvasHeight;
-			can.style.width = canvasWidth + 'px';
-			can.style.height = canvasHeight + 'px';
-			var cx = can.getContext('2d');
-			this.x = x;
-			this.y = y;
-			this.width = canvasWidth;
-			this.height = canvasHeight;
-			this.url = url;
-			this.image = new Image();
-			this.image.src = this.url;
-			this.drawImg = function() {
-				if (this.image.complete && this.image.naturalHeight !== 0) {
-					cx.drawImage(this.image, x, y, canvasWidth, canvasHeight);					
-				} else {
-					var newImg = new Image();
-					newImg.src = url;
-					newImg.width = canvasWidth;
-					newImg.height = canvasHeight;
-					newImg.onload = function() {
-						cx.drawImage(newImg, x, y, canvasWidth, canvasHeight);
-					}
-				}
-
-				if (aID !== 'canvas') {
-					$('.menu .envel').prepend(can);
-					console.log(cx)
-					can.style['pointer-events'] = 'auto';
-					can.style['z-index'] = parseInt(aID.split('_')[2], 10) + 1;
-					var brush = new Image();
-					brush.width = canvasWidth;
-					brush.height = canvasHeight;
-					brush.onload = function() {
-						$('#'+aID+'').on('mousedown mousemove mouseup', function(e){
-							MouseHandler(e, brush, canvasWidth, canvasHeight);
-						});
-						$('#'+aID+'').on('touchstart touchmove touchend', function(e){
-							TouchHandler(e, brush, canvasWidth, canvasHeight);
-						});
-					}
-					brush.src = '/images/'+drawtype+'/'+drawtype+'_'+layer+'.svg';
-					
-				} else {
-					$('.menu .envel').append(can);
-					can.style['pointer-events'] = 'none';
-					can.style['z-index'] = '-1';
-					can.setAttribute('class', 'maincanvas topRight')
-					can.style['background-image'] = 'url("/images/backgrounds/backgrounds_0.svg")';
-					if ($('#erase').val() !== '') {
-						var brush = new Image();
-						brush.onload = function(){
-							$('#canvas').on('mousedown mousemove mouseup', function(e){
-								MouseHandler(e, brush, canvasWidth, canvasHeight);
-							});
-							$('#canvas').on('touchstart touchmove touchend', function(e){
-								TouchHandler(e, brush, canvasWidth, canvasHeight);
-							});
-						}
-					}
-				}
-			}
-		}
-		
-		function uiErase(urltitle, pageindex, index, drawtype, layer){
-			// value queried on mousehandler for globalCompositeOperation
-			$('#erase').val('*');
-		}
-		
-		function MouseHandler(event, drawThis, canvasWidth, canvasHeight) {
-			if (event.type == "mousedown" && event.button === 0) {
-				mousePressed = true;
-			}
-				
-			if (mousePressed && event.button === 0) {
-				var fakeTouch = {
-					identifier : 10,
-					pageX : event.pageX,
-					pageY : event.pageY
-				};
-				
-				var eventType = event.type ==  "mousedown" ? "touchstart" :
-						event.type == "mouseup" ? "touchend" : "touchmove";
-
-				drawTouch(event.target, fakeTouch, eventType, drawThis, canvasWidth, canvasHeight);
-				event.preventDefault();
-			}
-
-			if (event.type == "mouseup")
-				mousePressed = false;
-		}
-		function TouchHandler(event, drawThis, canvasWidth, canvasHeight) {
-			event.preventDefault();
-			
-			for (var i = 0; i < event.changedTouches.length; i++) {
-				drawTouch(event.target, event.changedTouches[i], event.type, drawThis, canvasWidth, canvasHeight);
-			}
-			
-		}
-		
-		function drawTouch(eventTarget, touch, eventType, drawThis, canvasWidth, canvasHeight) {
-			var drawType = eventTarget.getAttribute('id').split('_')[1];
-			var layer = parseInt(eventTarget.getAttribute('id').split('_')[2], 10);
-			var canv = document.getElementById('canvas');
-			var ctx = canv.getContext('2d');
-
-			var context = eventTarget.getContext("2d");
-
-			if (!(touch.identifier in touchMap)) {
-				touchMap[touch.identifier] = nextCount;
-				nextCount++;
-			}
-
-			// Polyfill non-standard properties
-			if (!("radiusX" in touch) && "webkitRadiusX" in touch)
-				touch.radiusX = touch.webkitRadiusX;
-			if (!("radiusY" in touch) && "webkitRadiusY" in touch)
-				touch.radiusY = touch.webkitRadiusY;
-			if (!("rotationAngle" in touch) && "webkitRotationAngle" in touch)
-				touch.rotationAngle = touch.webkitRotationAngle;
-			if (!("force" in touch) && "webkitForce" in touch)
-				touch.force = touch.webkitForce;
-
-			var radiusX = 35;
-			var radiusY = 35;
-			var rotationAngle = getAdjustedRotationAngle(touch.rotationAngle);
-			foundRotationAngle = foundRotationAngle || rotationAngle;
-			
-			// Try to avoid start/end ellipses overlapping exactly
-			if (eventType == "touchend") {
-				radiusX++;
-				radiusY++;
-			}
-
-			if (drawType !== "info" && drawType !== "tools") {
-				if ($('#erase').val() !== '') {
-					eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+0+'.svg"), grabbing;');
-					context.fillStyle = 'rgba(0,0,0,1)';
-					context.globalCompositeOperation = "destination-out";//context.createPattern(pCanvas, 'no-repeat');
-					context.fill();
-					ctx.fillStyle = 'rgba(0,0,0,1)';
-					ctx.globalCompositeOperation = "destination-out";
-					ctx.fill();
-				} else {
-					if (drawType === 'filling') {
-						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
-						var pCanvas = document.createElement('canvas');
-						pCanvas.width = canvasWidth;
-						pCanvas.height = canvasHeight;
-						var pContext = pCanvas.getContext('2d');
-						pContext.drawImage(drawThis, 0, 0, canvasWidth, canvasHeight);
-						var pPattern = context.createPattern(pCanvas, 'no-repeat');
-						context.fillStyle = pPattern;
-						context.fill()
-					}
-					if (drawType === 'substrates') {
-						console.log(drawThis)
-						eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.svg"), grabbing;');
-
-						if (layer === 0) {
-
-							context.fillStyle = 'rgba(0,0,0,1)';
-							context.globalCompositeOperation = "destination-out";
-							context.fill();
-
-							ctx.clearRect(0,0,canvasWidth,canvasHeight);
-						} else {
-							context.globalCompositeOperation = 'source-over'
-							if (eventType == 'touchend') {
-								var size = Math.min(canvasWidth, canvasHeight) / 2
-								var imagedata = ctx.getImageData(size, size, 1, 1);
-
-								var count = 0;
-								for (var x = 0; x < 1; x++) {
-									for (var y = 0; y < 1; y++) {
-										// imagedata index for each pixel (should be only one)
-										var pxX = (y * 1 + x) * 4;
-
-										if (imagedata.data[pxX + 3] > 0) {
-											count++
-										}
-									}
-								}
-								if (canvasWidth > canvasHeight) {
-									if (count > 0) {
-										// if no substrate on left side
-										context.fillStyle = context.drawImage(drawThis, size+(size/3.2), size - (size/2), size, size);
-										context.fillRect(drawThis, size+(size/2), size - (size/2), size, size)
-									} else {
-										context.fillStyle = context.drawImage(drawThis, size/3.2, size - (size/2), size, size);
-										context.fillRect(drawThis, size - (size/2), size - (size/2), size, size)
-									}
-								} else {
-									if (count > 0) {
-										context.fillStyle = context.drawImage(drawThis, size, size - (size/2), size, size);
-										context.fillRect(drawThis, size, size - (size/2), size, size)
-									} else {
-										context.fillStyle = context.drawImage(drawThis, size - (size/1.1), size - (size/2), size, size);
-										context.fillRect(drawThis, size - (size/1.1), size - (size/2), size, size)
-									}
-								}
-							} else {
-								context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(canv, 'no-repeat');
-								context.fill()
-							}
-						}
-					}
-				}
-				
-				context.save();
-				ctx.save();
-				context.translate(touch.pageX * scale, touch.pageY * scale);
-				ctx.translate(touch.pageX * scale, touch.pageY * scale);
-				context.scale(1, radiusY/radiusX);
-				ctx.scale(1, radiusY/radiusX);
-				context.beginPath();
-				ctx.beginPath();
-				context.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
-				ctx.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
-				context.closePath();
-				ctx.closePath();
-				context.restore();
-				ctx.restore();
-			}
-
-		}
-		
-		function getAdjustedRotationAngle(angle) {
-			return angle * Math.PI / 180;
-		}
-		
-		function saveImage(can){
-			var mainCanvas = document.createElement('canvas');
-			var context = mainCanvas.getContext("2d");
-			var spareCanvas = document.createElement('canvas');
-			var sContext = spareCanvas.getContext('2d');
-			// polyfill
-			if (!HTMLCanvasElement.prototype.toBlob) {
-				Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-					value: function (callback, type, quality) {
-
-						var binStr = atob( this.toDataURL(type, quality).split(',')[1] ),
-							len = binStr.length,
-							arr = new Uint8Array(len);
-
-						for (var i = 0; i < len; i++ ) {
-							arr[i] = binStr.charCodeAt(i);
-						}
-
-						callback( new Blob( [arr], {type: type || 'image/png'} ) );
-					}
-				});
-			}
-			
-			var layer, name, inputid;
-			var drawtype = can.getAttribute('id').split('_')[1];
-			if (can.getAttribute('id').split('_')[2]){
-				// if this is a canvas layer
-				layer = can.getAttribute('id').split('_')[2];
-				name = 'img_'+drawtype+'_'+layer+''
-				inputid = 'inputimg_'+drawtype+'_'+layer+''
-			} else {
-				// if main canvas (composite)
-				layer = 0;
-				name = 'image'
-				inputid = 'inputimg'
-			}
-			if (drawtype && drawtype !== undefined) {
-				can.toBlob(function(blob) {
-					var fd = new FormData();
-					fd.append(name, blob);
-					
-					// endpoint uses multer
-					var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/'+drawtype+'/'+layer+'';
-
-					$.ajax({
-						url: uploadurl,
-						type: 'POST',
-						data: fd,
-						processData: false,
-						contentType: false,
-						success: function(response) {
-							var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
-							$('#'+inputid+'').val(imgurl);
-							if (drawtype !== 'main') {
-								var text = '';
-									
-								if (index !== '') {
-									index = parseInt(index, 10);
-									layer = parseInt(layer, 10);
-									var level = parseInt(res.content[index].level, 10);
-									var filling = res.content[index].filling;
-									var allergies = res.publishers[0].allergies;
-									
-									// update title of signature
-									if (filling[layer] !== undefined && allergies.indexOf(filling[layer].name) === -1 && layer > 0){
-										text += filling[layer].name
-									}
-									if (text !== '') {
-										text += ' and '
-									}
-									else {
-										if (filling[layer-1] !== undefined && filling[layer-1].image !== '' && layer-1 !== 0){
-											text += filling[layer-1].name
-										}
-										else {
-											if (filling[level+1] !== undefined && filling[level+1].image !== ''){
-												text += filling[layer+1].name
-											}
-										}
-										if (text !== '') {
-											text += ' and '
-										}
-									}
-										
-									text += filling[0].name;
-									
-									// put signature title in form
-									$('#title').val(text);
-								}
-								var pattern = context.createPattern(can, 'no-repeat');
-								var canvasWidth = can.width;
-								var canvasHeight = can.height;
-								mainCanvas.width = canvasWidth;
-								mainCanvas.height = canvasHeight;
-								spareCanvas.width = canvasWidth;
-								spareCanvas.height = canvasHeight;
-								context.fillStyle = pattern;//
-								var mainimg = new Image();
-								if ($('#urltitle').val()) {
-									mainimg.width = canvasWidth;
-									mainimg.height = canvasHeight;
-									mainimg.onload = function() {
-										// draw composite
-										sContext.drawImage(mainimg, 0,0,canvasWidth,canvasHeight);
-										if ($('#erase').val() !== '*') {
-											context.drawImage(spareCanvas, 0, 0, canvasWidth, canvasHeight);
-										}
-										context.globalCompositeOperation = 'source-over';
-										
-										// draw current layer on top of composite
-										context.fillRect(0,0,canvasWidth,canvasHeight)
-
-										mainCanvas.toBlob(function(blob) {
-											var fd = new FormData();
-											fd.append("image", blob);
-											var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
-
-											$.ajax({
-												url: uploadurl,
-												type: 'POST',
-												data: fd,
-												processData: false,
-												contentType: false,
-												success: function(response) {
-													$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
-													console.log('saved both')
-													uiBlogMode();
-													
-												}
-											})
-										}, 'image/png', 0.95);
-									}
-									
-									mainimg.src = '/publishers/gnd/'+$('#urltitle').val()+'/'+'#{pageindex}'+'/images/main/main_0.png';
-								}
-							}
-							
-						}
-					})
-				}, 'image/png', 0.95);
-			}
-		}
+				//- const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+		//- var mainmenu = document.getElementsByClassName('menu')[0];
+		//- 
+		//- var pageIndex, drawtype, layer;
+		//- // server-defined variables
+		//- var datalength = #{data.length};
+		//- var infowindow = '#{infowindow}';
+		//- var index = '#{index}'
+		//- if (index !== '' && !isNaN(parseInt(index, 10))) {
+		//- 	index = parseInt(index, 10);
+		//- }
+		//- pageIndex = '#{pageindex}'
+		//- if (pageIndex !== '' && !isNaN(parseInt(pageIndex, 10))) {
+		//- 	pageIndex = parseInt(pageIndex, 10);
+		//- }
+		//- drawtype = '#{drawtype}'
+		//- layer = '#{layer}'
+		//- if (layer !== '') {
+		//- 	layer = parseInt(layer, 10);
+		//- }
+		//- 
+		//- // paint program adapted from https://rbyers.github.io/paint.html
+		//- var radiusSupported = false;
+		//- var nextCount = 0;
+		//- var touchMap = {};
+		//- var foundRotationAngle = false;
+		//- var scale = 1;
+		//- var mousePressed = false;
+		//- var drawCoalesced = false;
+		//- 
+		//- // make page data available within document script
+		//- var res;
+		//- $(document).ready(function(){
+		//- 	// TODO use innerHTML
+		//- 	//- $('textarea').each(function(){
+		//- 	//- 	var text;
+		//- 	//- 	if ($(this).val()) {
+		//- 	//- 		$(this).css('max-width', '100%')
+		//- 	//- 	} else {
+		//- 	//- 		//placeholder reliably contains updated text while value doesn't always fsr
+		//- 	//- 		text = $(this).attr('placeholder');
+		//- 	//- 		$(this).val(text);
+		//- 	//- 		$(this).css('max-width', '100%')
+		//- 	//- 	} 
+		//- 	//- });
+		//- 
+		//- 	// hide dropdown on init
+		//- 	$('.dropdown').not('.mainmenu').slideUp(100);
+		//- 	$('.drop').slideUp(100);
+		//- 	$('.selected').removeClass('selected');
+		//- 	if (pageIndex !== '') {
+		//- 		$.get('/doc/'+pageIndex+'', function(result){
+		//- 			//get page data
+		//- 			res = result;
+		//- 			var canvasWidth = window.innerWidth;
+		//- 			var canvasHeight = window.innerHeight;
+		//- 			// if composition not blank
+		//- 			if (res.content[index].image !== '' && res.content[index].image !== undefined) {
+		//- 				var mainCanvasImg = res.content[index].image;				
+		//- 				var loadedMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, mainCanvasImg);
+		//- 				loadedMain.drawImg();
+		//- 				console.log(window.location.href.split('/'))
+		//- 				if (window.location.href.split('/')[3] === 'api'){
+		//- 					if (res.content[index][drawtype][layer].image !== '' && res.content[index][drawtype][layer].image !== undefined) {
+		//- 						console.log(mainCanvasImg)
+		//- 						var canvasLayerImg = res.content[index][drawtype][layer].image;
+		//- 						var loadedLayer = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, canvasLayerImg);
+		//- 						loadedLayer.drawImg();
+		//- 					} else {
+		//- 						var blankCanvas = new loadedCanvas('canvas_'+drawtype+'_'+layer+'', 0, 0, canvasWidth, canvasHeight, '/images/1px.png');
+		//- 						blankCanvas.drawImg();
+		//- 					}
+		//- 					drawModeModal('canvas_'+drawtype+'_'+layer+'', pageIndex)
+		//- 				}
+		//- 
+		//- 			} else {
+		//- 				// this is new
+		//- 				if (window.location.href.split('/')[3] === 'sig'){
+		//- 					var blankCanvas = new loadedCanvas('canvas_substrates_0', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
+		//- 					blankCanvas.drawImg();
+		//- 					var thisCanvas = document.getElementById('canvas_substrates_0');
+		//- 					var blankMain = new loadedCanvas('canvas', 0, 0, canvasWidth, canvasHeight, '/images/info/info_0.svg');
+		//- 					blankMain.drawImg();
+		//- 					welcomeModal();
+		//- 				}
+		//- 			}
+		//- 		});
+		//- 	}
+		//- })
+		//- 
+		//- $('#inputtext').on('keyup', function(e){
+		//- 	$('#previewtext').html(marked(e.target.value))
+		//- });
+		//- $('input').on('keydown', function(e){
+		//- 	// prevent firefox debug on slash keydown
+		//- 	if (e.key === 'Slash') {
+		//- 		e.preventDefault();
+		//- 	}
+		//- });
+		//- 
+		//- // http://jsfiddle.net/m1erickson/cAR93/
+		//- // load new canvas each page load to hopefully combat cors-related taintedness
+		//- function loadedCanvas(aID, x, y, canvasWidth, canvasHeight, url) {
+		//- 	console.log(url)
+		//- 	const can = document.createElement('canvas');
+		//- 	can.setAttribute('id', aID);
+		//- 	can.setAttribute('class', 'topRight');
+		//- 	if (aID === 'canvas') {
+		//- 		can.setAttribute('class', 'topRight maincanvas');
+		//- 	} else {
+		//- 		can.setAttribute('class', 'topRight layer');
+		//- 	}
+		//- 	can.width = canvasWidth;
+		//- 	can.height = canvasHeight;
+		//- 	can.style.width = canvasWidth + 'px';
+		//- 	can.style.height = canvasHeight + 'px';
+		//- 	var cx = can.getContext('2d');
+		//- 	this.x = x;
+		//- 	this.y = y;
+		//- 	this.width = canvasWidth;
+		//- 	this.height = canvasHeight;
+		//- 	this.url = url;
+		//- 	this.image = new Image();
+		//- 	this.image.src = this.url;
+		//- 	this.drawImg = function() {
+		//- 		if (this.image.complete && this.image.naturalHeight !== 0) {
+		//- 			cx.drawImage(this.image, x, y, canvasWidth, canvasHeight);					
+		//- 		} else {
+		//- 			var newImg = new Image();
+		//- 			newImg.src = url;
+		//- 			newImg.width = canvasWidth;
+		//- 			newImg.height = canvasHeight;
+		//- 			newImg.onload = function() {
+		//- 				cx.drawImage(newImg, x, y, canvasWidth, canvasHeight);
+		//- 			}
+		//- 		}
+		//- 
+		//- 		if (aID !== 'canvas') {
+		//- 			$('.menu .envel').prepend(can);
+		//- 			console.log(cx)
+		//- 			can.style['pointer-events'] = 'auto';
+		//- 			can.style['z-index'] = parseInt(aID.split('_')[2], 10) + 1;
+		//- 			var brush = new Image();
+		//- 			brush.width = canvasWidth;
+		//- 			brush.height = canvasHeight;
+		//- 			brush.onload = function() {
+		//- 				$('#'+aID+'').on('mousedown mousemove mouseup', function(e){
+		//- 					MouseHandler(e, brush, canvasWidth, canvasHeight);
+		//- 				});
+		//- 				$('#'+aID+'').on('touchstart touchmove touchend', function(e){
+		//- 					TouchHandler(e, brush, canvasWidth, canvasHeight);
+		//- 				});
+		//- 			}
+		//- 			brush.src = '/images/'+drawtype+'/'+drawtype+'_'+layer+'.svg';
+		//- 
+		//- 		} else {
+		//- 			$('.menu .envel').append(can);
+		//- 			can.style['pointer-events'] = 'none';
+		//- 			can.style['z-index'] = '-1';
+		//- 			can.setAttribute('class', 'maincanvas topRight')
+		//- 			can.style['background-image'] = 'url("/images/backgrounds/backgrounds_0.svg")';
+		//- 			if ($('#erase').val() !== '') {
+		//- 				var brush = new Image();
+		//- 				brush.onload = function(){
+		//- 					$('#canvas').on('mousedown mousemove mouseup', function(e){
+		//- 						MouseHandler(e, brush, canvasWidth, canvasHeight);
+		//- 					});
+		//- 					$('#canvas').on('touchstart touchmove touchend', function(e){
+		//- 						TouchHandler(e, brush, canvasWidth, canvasHeight);
+		//- 					});
+		//- 				}
+		//- 			}
+		//- 		}
+		//- 	}
+		//- }
+		//- 
+		//- function uiErase(urltitle, pageindex, index, drawtype, layer){
+		//- 	// value queried on mousehandler for globalCompositeOperation
+		//- 	$('#erase').val('*');
+		//- }
+		//- 
+		//- function MouseHandler(event, drawThis, canvasWidth, canvasHeight) {
+		//- 	if (event.type == "mousedown" && event.button === 0) {
+		//- 		mousePressed = true;
+		//- 	}
+		//- 
+		//- 	if (mousePressed && event.button === 0) {
+		//- 		var fakeTouch = {
+		//- 			identifier : 10,
+		//- 			pageX : event.pageX,
+		//- 			pageY : event.pageY
+		//- 		};
+		//- 
+		//- 		var eventType = event.type ==  "mousedown" ? "touchstart" :
+		//- 				event.type == "mouseup" ? "touchend" : "touchmove";
+		//- 
+		//- 		drawTouch(event.target, fakeTouch, eventType, drawThis, canvasWidth, canvasHeight);
+		//- 		event.preventDefault();
+		//- 	}
+		//- 
+		//- 	if (event.type == "mouseup")
+		//- 		mousePressed = false;
+		//- }
+		//- function TouchHandler(event, drawThis, canvasWidth, canvasHeight) {
+		//- 	event.preventDefault();
+		//- 
+		//- 	for (var i = 0; i < event.changedTouches.length; i++) {
+		//- 		drawTouch(event.target, event.changedTouches[i], event.type, drawThis, canvasWidth, canvasHeight);
+		//- 	}
+		//- 
+		//- }
+		//- 
+		//- function drawTouch(eventTarget, touch, eventType, drawThis, canvasWidth, canvasHeight) {
+		//- 	var drawType = eventTarget.getAttribute('id').split('_')[1];
+		//- 	var layer = parseInt(eventTarget.getAttribute('id').split('_')[2], 10);
+		//- 	var canv = document.getElementById('canvas');
+		//- 	var ctx = canv.getContext('2d');
+		//- 
+		//- 	var context = eventTarget.getContext("2d");
+		//- 
+		//- 	if (!(touch.identifier in touchMap)) {
+		//- 		touchMap[touch.identifier] = nextCount;
+		//- 		nextCount++;
+		//- 	}
+		//- 
+		//- 	// Polyfill non-standard properties
+		//- 	if (!("radiusX" in touch) && "webkitRadiusX" in touch)
+		//- 		touch.radiusX = touch.webkitRadiusX;
+		//- 	if (!("radiusY" in touch) && "webkitRadiusY" in touch)
+		//- 		touch.radiusY = touch.webkitRadiusY;
+		//- 	if (!("rotationAngle" in touch) && "webkitRotationAngle" in touch)
+		//- 		touch.rotationAngle = touch.webkitRotationAngle;
+		//- 	if (!("force" in touch) && "webkitForce" in touch)
+		//- 		touch.force = touch.webkitForce;
+		//- 
+		//- 	var radiusX = 35;
+		//- 	var radiusY = 35;
+		//- 	var rotationAngle = getAdjustedRotationAngle(touch.rotationAngle);
+		//- 	foundRotationAngle = foundRotationAngle || rotationAngle;
+		//- 
+		//- 	// Try to avoid start/end ellipses overlapping exactly
+		//- 	if (eventType == "touchend") {
+		//- 		radiusX++;
+		//- 		radiusY++;
+		//- 	}
+		//- 
+		//- 	if (drawType !== "info" && drawType !== "tools") {
+		//- 		if ($('#erase').val() !== '') {
+		//- 			eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+0+'.svg"), grabbing;');
+		//- 			context.fillStyle = 'rgba(0,0,0,1)';
+		//- 			context.globalCompositeOperation = "destination-out";//context.createPattern(pCanvas, 'no-repeat');
+		//- 			context.fill();
+		//- 			ctx.fillStyle = 'rgba(0,0,0,1)';
+		//- 			ctx.globalCompositeOperation = "destination-out";
+		//- 			ctx.fill();
+		//- 		} else {
+		//- 			if (drawType === 'filling') {
+		//- 				eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
+		//- 				var pCanvas = document.createElement('canvas');
+		//- 				pCanvas.width = canvasWidth;
+		//- 				pCanvas.height = canvasHeight;
+		//- 				var pContext = pCanvas.getContext('2d');
+		//- 				pContext.drawImage(drawThis, 0, 0, canvasWidth, canvasHeight);
+		//- 				var pPattern = context.createPattern(pCanvas, 'no-repeat');
+		//- 				context.fillStyle = pPattern;
+		//- 				context.fill()
+		//- 			}
+		//- 			if (drawType === 'substrates') {
+		//- 				console.log(drawThis)
+		//- 				eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+layer+'.svg"), grabbing;');
+		//- 
+		//- 				if (layer === 0) {
+		//- 
+		//- 					context.fillStyle = 'rgba(0,0,0,1)';
+		//- 					context.globalCompositeOperation = "destination-out";
+		//- 					context.fill();
+		//- 
+		//- 					ctx.clearRect(0,0,canvasWidth,canvasHeight);
+		//- 				} else {
+		//- 					context.globalCompositeOperation = 'source-over'
+		//- 					if (eventType == 'touchend') {
+		//- 						var size = Math.min(canvasWidth, canvasHeight) / 2
+		//- 						var imagedata = ctx.getImageData(size, size, 1, 1);
+		//- 
+		//- 						var count = 0;
+		//- 						for (var x = 0; x < 1; x++) {
+		//- 							for (var y = 0; y < 1; y++) {
+		//- 								// imagedata index for each pixel (should be only one)
+		//- 								var pxX = (y * 1 + x) * 4;
+		//- 
+		//- 								if (imagedata.data[pxX + 3] > 0) {
+		//- 									count++
+		//- 								}
+		//- 							}
+		//- 						}
+		//- 						if (canvasWidth > canvasHeight) {
+		//- 							if (count > 0) {
+		//- 								// if no substrate on left side
+		//- 								context.fillStyle = context.drawImage(drawThis, size+(size/3.2), size - (size/2), size, size);
+		//- 								context.fillRect(drawThis, size+(size/2), size - (size/2), size, size)
+		//- 							} else {
+		//- 								context.fillStyle = context.drawImage(drawThis, size/3.2, size - (size/2), size, size);
+		//- 								context.fillRect(drawThis, size - (size/2), size - (size/2), size, size)
+		//- 							}
+		//- 						} else {
+		//- 							if (count > 0) {
+		//- 								context.fillStyle = context.drawImage(drawThis, size, size - (size/2), size, size);
+		//- 								context.fillRect(drawThis, size, size - (size/2), size, size)
+		//- 							} else {
+		//- 								context.fillStyle = context.drawImage(drawThis, size - (size/1.1), size - (size/2), size, size);
+		//- 								context.fillRect(drawThis, size - (size/1.1), size - (size/2), size, size)
+		//- 							}
+		//- 						}
+		//- 					} else {
+		//- 						context.fillStyle = 'rgba(255,255,255,0)'//context.createPattern(canv, 'no-repeat');
+		//- 						context.fill()
+		//- 					}
+		//- 				}
+		//- 			}
+		//- 		}
+		//- 
+		//- 		context.save();
+		//- 		ctx.save();
+		//- 		context.translate(touch.pageX * scale, touch.pageY * scale);
+		//- 		ctx.translate(touch.pageX * scale, touch.pageY * scale);
+		//- 		context.scale(1, radiusY/radiusX);
+		//- 		ctx.scale(1, radiusY/radiusX);
+		//- 		context.beginPath();
+		//- 		ctx.beginPath();
+		//- 		context.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
+		//- 		ctx.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
+		//- 		context.closePath();
+		//- 		ctx.closePath();
+		//- 		context.restore();
+		//- 		ctx.restore();
+		//- 	}
+		//- 
+		//- }
+		//- 
+		//- function getAdjustedRotationAngle(angle) {
+		//- 	return angle * Math.PI / 180;
+		//- }
+		//- 
+		//- function saveImage(can){
+		//- 	var mainCanvas = document.createElement('canvas');
+		//- 	var context = mainCanvas.getContext("2d");
+		//- 	var spareCanvas = document.createElement('canvas');
+		//- 	var sContext = spareCanvas.getContext('2d');
+		//- 	// polyfill
+		//- 	if (!HTMLCanvasElement.prototype.toBlob) {
+		//- 		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+		//- 			value: function (callback, type, quality) {
+		//- 
+		//- 				var binStr = atob( this.toDataURL(type, quality).split(',')[1] ),
+		//- 					len = binStr.length,
+		//- 					arr = new Uint8Array(len);
+		//- 
+		//- 				for (var i = 0; i < len; i++ ) {
+		//- 					arr[i] = binStr.charCodeAt(i);
+		//- 				}
+		//- 
+		//- 				callback( new Blob( [arr], {type: type || 'image/png'} ) );
+		//- 			}
+		//- 		});
+		//- 	}
+		//- 
+		//- 	var layer, name, inputid;
+		//- 	var drawtype = can.getAttribute('id').split('_')[1];
+		//- 	if (can.getAttribute('id').split('_')[2]){
+		//- 		// if this is a canvas layer
+		//- 		layer = can.getAttribute('id').split('_')[2];
+		//- 		name = 'img_'+drawtype+'_'+layer+''
+		//- 		inputid = 'inputimg_'+drawtype+'_'+layer+''
+		//- 	} else {
+		//- 		// if main canvas (composite)
+		//- 		layer = 0;
+		//- 		name = 'image'
+		//- 		inputid = 'inputimg'
+		//- 	}
+		//- 	if (drawtype && drawtype !== undefined) {
+		//- 		can.toBlob(function(blob) {
+		//- 			var fd = new FormData();
+		//- 			fd.append(name, blob);
+		//- 
+		//- 			// endpoint uses multer
+		//- 			var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/'+drawtype+'/'+layer+'';
+		//- 
+		//- 			$.ajax({
+		//- 				url: uploadurl,
+		//- 				type: 'POST',
+		//- 				data: fd,
+		//- 				processData: false,
+		//- 				contentType: false,
+		//- 				success: function(response) {
+		//- 					var imgurl = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
+		//- 					$('#'+inputid+'').val(imgurl);
+		//- 					if (drawtype !== 'main') {
+		//- 						var text = '';
+		//- 
+		//- 						if (index !== '') {
+		//- 							index = parseInt(index, 10);
+		//- 							layer = parseInt(layer, 10);
+		//- 							var level = parseInt(res.content[index].level, 10);
+		//- 							var filling = res.content[index].filling;
+		//- 							var allergies = res.publishers[0].allergies;
+		//- 
+		//- 							// update title of signature
+		//- 							if (filling[layer] !== undefined && allergies.indexOf(filling[layer].name) === -1 && layer > 0){
+		//- 								text += filling[layer].name
+		//- 							}
+		//- 							if (text !== '') {
+		//- 								text += ' and '
+		//- 							}
+		//- 							else {
+		//- 								if (filling[layer-1] !== undefined && filling[layer-1].image !== '' && layer-1 !== 0){
+		//- 									text += filling[layer-1].name
+		//- 								}
+		//- 								else {
+		//- 									if (filling[level+1] !== undefined && filling[level+1].image !== ''){
+		//- 										text += filling[layer+1].name
+		//- 									}
+		//- 								}
+		//- 								if (text !== '') {
+		//- 									text += ' and '
+		//- 								}
+		//- 							}
+		//- 
+		//- 							text += filling[0].name;
+		//- 
+		//- 							// put signature title in form
+		//- 							$('#title').val(text);
+		//- 						}
+		//- 						var pattern = context.createPattern(can, 'no-repeat');
+		//- 						var canvasWidth = can.width;
+		//- 						var canvasHeight = can.height;
+		//- 						mainCanvas.width = canvasWidth;
+		//- 						mainCanvas.height = canvasHeight;
+		//- 						spareCanvas.width = canvasWidth;
+		//- 						spareCanvas.height = canvasHeight;
+		//- 						context.fillStyle = pattern;//
+		//- 						var mainimg = new Image();
+		//- 						if ($('#urltitle').val()) {
+		//- 							mainimg.width = canvasWidth;
+		//- 							mainimg.height = canvasHeight;
+		//- 							mainimg.onload = function() {
+		//- 								// draw composite
+		//- 								sContext.drawImage(mainimg, 0,0,canvasWidth,canvasHeight);
+		//- 								if ($('#erase').val() !== '*') {
+		//- 									context.drawImage(spareCanvas, 0, 0, canvasWidth, canvasHeight);
+		//- 								}
+		//- 								context.globalCompositeOperation = 'source-over';
+		//- 
+		//- 								// draw current layer on top of composite
+		//- 								context.fillRect(0,0,canvasWidth,canvasHeight)
+		//- 
+		//- 								mainCanvas.toBlob(function(blob) {
+		//- 									var fd = new FormData();
+		//- 									fd.append("image", blob);
+		//- 									var uploadurl = '/api/uploadmedia/'+'#{pageindex}'+'/'+'#{index}'+'/main/0';
+		//- 
+		//- 									$.ajax({
+		//- 										url: uploadurl,
+		//- 										type: 'POST',
+		//- 										data: fd,
+		//- 										processData: false,
+		//- 										contentType: false,
+		//- 										success: function(response) {
+		//- 											$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+		//- 											console.log('saved both')
+		//- 											uiBlogMode();
+		//- 
+		//- 										}
+		//- 									})
+		//- 								}, 'image/png', 0.95);
+		//- 							}
+		//- 
+		//- 							mainimg.src = '/publishers/gnd/'+$('#urltitle').val()+'/'+'#{pageindex}'+'/images/main/main_0.png';
+		//- 						}
+		//- 					}
+		//- 
+		//- 				}
+		//- 			})
+		//- 		}, 'image/png', 0.95);
+		//- 	}
+		//- }
 		//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
 		//- $(document).on('touchstart, mouseover', '.translate', function (e) {
 		//- 	var link = $(this); //preselect the link

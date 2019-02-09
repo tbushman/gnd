@@ -1,21 +1,18 @@
 p#info.tb-font-s(width="100%")
 //(style="float: left;")
-form#form.tb-u-100(enctype="multipart/form-data", method="POST", action="/api/editcontent/"+doc.urltitle+"/"+doc.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"", style="margin-bottom: 50px")
+form#form.tb-u-100(
+	v-if="doc && index && doc.content[index]"
+	enctype="multipart/form-data", method="POST", 
+	:action="'/api/editcontent/'+doc.urltitle+'/'+doc.pageindex+'/'+index+'/'+drawtype+'/'+doc.content[index].level", style="margin-bottom: 50px")
 					
 	div.tb-u-100
 		label.ms-Label Description 
-		textarea.ms-TextField-field#inputtext(type="text", name="description", value= contentData.description, placeholder= contentData.description)
+		textarea.ms-TextField-field#inputtext(type="text", name="description", v-text="doc.content[index].description", :placeholder="doc.content[index].description")
 	div.tb-u-100
-		span.tb-font-s#previewtext.translate #{contentData.description}
-	input(type="hidden", id="title", name="title", value= contentData.title)
+		span.tb-font-s#previewtext.translate(v-text="doc.content[index].description")
+	input(type="hidden", id="title", name="title", :value="doc.content[index].title")
 	input(type="hidden", id="inputimg", name="image")
-	if (drawtype && contentData[drawtype][contentData.level] !== undefined)
-		input(type="hidden", id="inputimg_"+drawtype+"_"+contentData.level+"", name= contentData[drawtype][contentData.level].name)
-	input.tb-u-100.block.spacer(id="submit", type="submit", value="Save" ariaDescription="Save this Sandwich")
-	
-if (contentData !== undefined && contentData.image !== "")
-	a.tb-u-33.ms-Button.ms-Button--primary.block.spacer(role="button", href="#", title="Menu", onclick="blogModeModal('"+contentData.image+"');")
-		span.ms-Button-label Share
+	input.tb-u-100.block.spacer(id="submit", type="submit", value="Save" ariaDescription="Save this signature")
 
 div.tb-u-33
 	a.ms-Button.tb-u-100.secondary(href="/", role="button")

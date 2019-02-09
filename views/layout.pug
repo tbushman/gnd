@@ -6,24 +6,24 @@ html
 		//meta(http-equiv="x-dns-prefetch-control" content="on")
 		link(rel="stylesheet", href="/stylesheets/default.css", type="text/css")
 		link(href="https://fonts.googleapis.com/css?family=Roboto", rel="stylesheet")
+		script(src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js")
 		script(type="text/javascript", src="/scripts/jquery.min.js")
 		script(type="text/javascript", src="/scripts/marked.min.js")
 		script(type="text/javascript", src="/scripts/d3.v3.min.js")
-		
+		script(type="text/javascript", src="/scripts/moment-with-locales.min.js")
+
 	body
 		block page
 			- var theStore = theStore
 			
-
 		block header
-			
 		block content
 				
 
 		a#publish_logo(href="https://github.com/tbushman/gnd" target="_blank")
 			img(src="/images/publish_logo.svg")
 		
-		script(type="application/javascript").
+		script(type="text/javascript").
 			$(document).ready(function(){
 
 				$('.dropdown').not('.mainmenu').slideUp(100);
@@ -32,11 +32,11 @@ html
 				$('.selected').removeClass('selected');
 
 			})
-			$(document).on('click', 'canvas', function(e){
-				if ($('.menu').hasClass('blog')) {
-					uiDrawMode()
-				}
-			});
+			//- $(document).on('click', 'canvas', function(e){
+			//- 	if ($('.menu').hasClass('blog')) {
+			//- 		uiDrawMode()
+			//- 	}
+			//- });
 			//drop-down event listener
 			$(document).on('click', '.dropdown', function (e) { 
 				//e.preventDefault();
@@ -67,265 +67,265 @@ html
 						$(that).next('.drop').slideDown(200);
 					}
 				}
-				if ($('div.menu').hasClass('draw')) {
-					
-					uiBlogMode()
-				} else {
-					if ($('div.menu').hasClass('blog')) {
-						uiBlogMode()
-					}
-				}
+				//- if ($('div.menu').hasClass('draw')) {
+				//- 
+				//- 	//- uiBlogMode()
+				//- } else {
+				//- 	if ($('div.menu').hasClass('blog')) {
+				//- 		uiBlogMode()
+				//- 	}
+				//- }
 				//e.stopPropagation();
 			});
-			function uiBlogMode(){
-				$(document).ready(function(){
-					$('.menu.draw').removeClass('draw');
-					$('.menu').addClass('blog');
-					$('.grid-container').removeClass('draw');
-					$('.grid-container').addClass('blog');
-					$('.grid-container').addClass('selected');
-					$('#select').removeClass('draw');
-					$('#select').addClass('blog');
-					$('.mainHeader .tool').css('display', 'none');
-					$('.pullquote span').css('display', 'block');
-					var menuIcon = document.getElementsByClassName('i')[0];
-					var mainMenu = document.getElementsByClassName('mainmenu')[0];
-					menuIcon.src = '/images/menu_button.svg';
-					mainMenu.removeAttribute('onclick');
-					mainMenu.setAttribute('id', 'save');
-					mainMenu.setAttribute('aria-labelledby', 'mainmenu');
-					mainMenu.setAttribute('class', 'mainmenu dropdown');
-					var helperText = document.createElement('a');
-					helperText.setAttribute('onclick', '$("a.dropdown.mainmenu").click();')
-					var text = document.createTextNode('Menu');
-					helperText.setAttribute('class', 'tb-font-xxl translate')
-					helperText.appendChild(text);
-					var pullquote = document.getElementsByClassName('pullquote')[0];
-					pullquote.innerHTML = '';
-					pullquote.appendChild(helperText);
-				})
-			}
-			function uiDrawMode(){
-				$(document).ready(function(){
-					$('.menu.blog').removeClass('blog');
-					$('.menu').addClass('draw');
-					$('.grid-container').removeClass('blog');
-					$('.grid-container').addClass('draw');
-					$('.grid-container').removeClass('selected');
-					$('#select').removeClass('blog');
-					$('#select').addClass('draw');
-					$('.mainHeader .tool').css('display', 'inline-block');
-					$('.pullquote span').css('display', 'none');
 
-			});
-			}
-				function removeOldAlert()
-				{
-					var oldAlert = document.getElementById("alert");
-					if (oldAlert)
-						document.body.removeChild(oldAlert);
-				}
-				function removeOldModal()
-				{
-					var oldAlert = document.getElementById("modal");
-					if (oldAlert)
-						document.body.removeChild(oldAlert);
-				}
-				function addAlert(aMsg)
-				{
-					removeOldAlert();
-					var newAlert = document.createElement("div");
-					newAlert.setAttribute("role", "alert");
-					newAlert.setAttribute("id", "alert");
-					var msg;
-					if (aMsg.substr(0,1) === '<') {
-						newAlert.innerHTML = aMsg
-					} else {
-						msg = document.createTextNode(aMsg);
-						newAlert.appendChild(msg);
+
+		script(type="text/javascript").
+			
+			Vue.prototype.moment = moment;
+			Vue.prototype.marked = marked;
+			
+			new Vue({ el: '#select',
+				data() {
+					return { 
+						months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+						pageIndex: null,
+						//- drawtype: null,
+						layer: null,
+						data: this.parseObj(!{JSON.stringify(data)}),
+						doc: this.parseObj(!{JSON.stringify(doc)}),
+						infowindow: this.parseObj(!{JSON.stringify(infowindow)}),
+						index: this.parseObj(!{JSON.stringify(index)}),
+						pageIndex: this.parseObj(!{JSON.stringify(pageIndex)}),
+						drawtype: this.parseObj(!{JSON.stringify(drawtype)}),
+						type: this.parseObj(!{JSON.stringify(type)}),
+						layer: this.parseObj(!{JSON.stringify(layer)}),
+						radiusSupported: false,
+						nextCount: 0,
+						touchMap: {},
+						foundRotationAngle: false,
+						scale: 1,
+						mousePressed: false,
+						drawCoalesced: false,
+						loadedLayer: this.loadedCanvas(),
+						can: null,
+						ctx: null,
+						image: null,
+						cW: window.innerWidth,
+						cH: window.innerHeight,
+						rX: 35,
+						rY: 35,
+						erase: false,
+						cursor: 'pointer',
+						mode: 'blog',
+						ranks: ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"],
+						keys: ["tools", "filling"],
+						loggedin: this.parseObj(!{JSON.stringify(session.loggedin)}),
+						info: ''
 					}
-					
-					
-					document.body.appendChild(newAlert);
-				}
-				function checkNameValidity(aID, aSearchTerm, aMsg)
-				{
-					var elem = document.getElementById(aID);
-					for (var i = 0; i < elem.value.length; i++) {
-						if (aSearchTerm.indexOf(elem.value.charAt(i)) !== -1) {
-							elem.setAttribute("aria-invalid", "true");
-							addAlert(aMsg);
-						} else {
-							elem.setAttribute("aria-invalid", "false");
-							removeOldAlert();
+				},
+				mounted() {
+					var self = this;
+					if (!self.image && self.doc && self.doc.content[self.index]) {
+						self.drawImg();
+					}
+				},
+				methods: {
+					parseObj(ob) {
+						if (!ob) return null;
+						return ob;
+					},
+					getCursor() {
+						var self = this;
+						if (self.cursor !== 'pointer') {
+							return "url('/images/icons/tools/tools_"+(self.erase ? 0 : 1)+".svg'), "+self.cursor+""
 						}
-					}
-				}
-				function checkEmailValidity(aID, aSearchTerm, aMsg)
-				{
-					var elem = document.getElementById(aID);
-					console.log(aSearchTerm)
-					if (elem.value.indexOf(aSearchTerm) === -1) {
-						elem.setAttribute("aria-invalid", "true");
-						addAlert(aMsg);
-					} else {
-						elem.setAttribute("aria-invalid", "false");
-						removeOldAlert();
-					}
-				}
-				function welcomeModal(){
-					removeOldAlert();
-					removeOldModal();
-					var newAlert = document.createElement("div");
-					newAlert.setAttribute("role", "alert");
-					newAlert.setAttribute("id", "modal");
-					var msg = document.createElement("p");
-					msg.setAttribute('class', 'tb-font-xxl');
-					
-					msg.style.margin = '0 auto';
-					msg.style['text-align'] = 'center'
-					var link = document.createElement('a');
-					var text = document.createTextNode('Practice signing your name!  \nStart by erasing. \n');
-					var linktext = document.createTextNode('ok!')
-					link.href = '#';
-					link.onclick = function(){
-						removeOldAlert();
-						removeOldModal();
-						uiDrawMode();
-					}
-					link.appendChild(linktext);
-					link.style.color = 'var(--primary)';
-					msg.appendChild(link);
-					msg.appendChild(text);
-					newAlert.appendChild(msg);
-					newAlert.style['box-shadow'] =  '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)'
-					document.body.appendChild(newAlert);
-					console.log('appended modal')
-				}
-				function blogModeModal(url){
-					removeOldAlert();
-					removeOldModal();
-					var newAlert = document.createElement("div");
-					newAlert.setAttribute("role", "alert");
-					newAlert.setAttribute("id", "modal");
-					var msg = document.createElement("p");
-					msg.setAttribute('class', 'tb-font-xxl');
-					msg.style.color = 'var(--primary)';
-					msg.style.margin = '0 auto';
-					msg.style['text-align'] = 'center'
-					var link = document.createElement('a');
-					var text = document.createTextNode('View and share');
-					link.href = url;
-						link.target = '_blank';
-						link.appendChild(text);
-						msg.appendChild(link)
-						newAlert.appendChild(msg);
-						newAlert.style['box-shadow'] =  '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)'
-						document.body.appendChild(newAlert);
-				}
-				function drawModeModal(aID, pageindex){
-					$.get('/doc/'+pageindex+'').done(function(result){
-						removeOldAlert();
-						removeOldModal();
-						console.log(result)
-						var elem = document.getElementById(aID);
-						var drawtype = aID.split('_')[1];
-						var layer = parseInt(aID.split('_')[2], 10);
-						var irr, irrname, ailment, ailmentname, desci, desca;
-						if ('#{index}' !== ''){
-							var index = '#{index}'
-							index = parseInt(index, 10)
-							irr = result.content[index][drawtype][layer];
-							irrname = irr.spec.safety;
-							ailment = result.content[index].info[layer];
-							ailmentname = ailment.spec.safety;
-							for (var i = 0; i < result.content[index].info.length; i++){
-								if (result.content[index].info[i].name === ailmentname) {
-									desca = result.content[index].info[i].caption
-								}
-								if (result.content[index].info[i].name === irrname) {
-									desci = result.content[index].info[i].caption
-								}
+					},
+					drawImg() {
+						var self = this;
+						self.image = new Image();
+						self.image.src = self.doc.content[self.index].image;
+						if (self.image.complete && self.image.naturalHeight !== 0) {
+							cx.drawImage(self.image, 0, 0, self.cW, self.cH);
+						} else {
+							self.image.onload = function () {
+								cx.drawImage(self.image, 0, 0, self.cW, self.cH);
 							}
 						}
-						console.log(aID.split('_'))
-						var newAlert = document.createElement("div");
-						newAlert.setAttribute("role", "alert");
-						newAlert.setAttribute("id", "modal");
-						var msg = document.createElement("div");
-						
+						//- this.drawImg = function() {
+						//- 
+						//- }
 
-						if ($('.menu').hasClass('draw') && irrname !== false && irrname !== 'false' && irrname !== undefined && irrname !== "soap" && ailmentname !== "cleaner") {
+					},
+					loadedCanvas() {
+						
+					},
+					startD(e) {
+						var self = this;
+						if (!can) {
+							self.can = e.target;
+							self.ctx = can.getContext('2d');
+						}
+					},
+					endD(e) {
+						
+					},
+					mouseHandler(event) {
+						if (event.type == "mousedown" && event.button === 0) {
+							self.mousePressed = true;
+						}
 							
-							var text = document.createTextNode("Do you have an "+ailmentname+" to "+ irrname +"?")
-							msg.appendChild(text);
-							msg.setAttribute('class', 'translate');
-							var infomoda = document.createElement('p');
-							infomoda.setAttribute('class', 'tb-font-xxs')
-							var infomodi = document.createElement('p');
-							infomodi.setAttribute('class', 'tb-font-xxs')
-							var infoheada = document.createTextNode(ailmentname + '\n');
-							infomoda.appendChild(infoheada)
-							var infoheadi = document.createTextNode(irrname + '\n');
-							infomodi.appendChild(infoheadi)
-							var infotexta = document.createTextNode(desca + '\n');
-							var infotexti = document.createTextNode(desci + '\n');
-							var buttons = document.createElement('div');
-							//buttons.setAttribute('class', )
-							var buttoni = document.createElement('button');
-							var buttony = document.createElement('button');
-							var buttonx = document.createElement('button');
-							buttoni.setAttribute('id', 'msg')
-							buttoni.setAttribute('className', 'info')
-							buttoni.innerText = 'Info'
-							buttoni.style.background = 'var(--secondary)'
-							buttonx.setAttribute('id', 'msg')
-							buttonx.setAttribute('className', 'no')
-							buttonx.innerText = 'No'
-							buttonx.style.background = 'var(--secondary)'
-							buttony.setAttribute('id', 'msg')
-							buttony.setAttribute('className', 'yes')
-							buttony.innerText = 'Yes'
-							buttony.style.background = 'var(--primary)'
-							buttons.appendChild(buttony);
-							buttons.appendChild(buttonx);
-							buttons.appendChild(buttoni);
-							//msg != marked(msg)
-							//buttons != marked(buttons)
-							msg.appendChild(buttons);
-							newAlert.appendChild(msg);
-							document.body.appendChild(newAlert);
-							$(document).on('click','#msg', function(e){
-								e.preventDefault();
-								console.log(e.target)
-								if (e.target.getAttribute('className') === 'yes') {
-									$.post('/api/allergy/'+result.pageindex+'/'+index+'/'+drawtype+'/'+layer +'').done(function(){
-										$.post('/api/nextstep/'+result.urltitle+'/'+result.pageindex+'/'+index+'/'+drawtype+'/'+parseInt(layer, 10) +'').done(function(result){
-											removeOldModal();
-											window.location.href = '/api/selectlayer'
-											//return;
-										})
-										
-									})
+						if (self.mousePressed && event.button === 0) {
+							var fakeTouch = {
+								identifier : 10,
+								pageX : event.pageX,
+								pageY : event.pageY
+							};
+							
+							var eventType = event.type ==  "mousedown" ? "touchstart" :
+									event.type == "mouseup" ? "touchend" : "touchmove";
+
+							drawTouch(event.target, fakeTouch, eventType, self.image);
+							event.preventDefault();
+						}
+
+						if (event.type == "mouseup")
+							mousePressed = false;
+					},
+					touchHandler(event) {
+						event.preventDefault();
+						
+						for (var i = 0; i < event.changedTouches.length; i++) {
+							drawTouch(event.target, event.changedTouches[i], event.type, self.image);
+						}
+						
+					},
+					drawTouch(eventTarget, touch, eventType, drawThis) {
+						var self = this;
+						var drawType = 'filling';
+						var layer = 0;
+
+						//- if (!(touch.identifier in self.touchMap)) {
+						//- 	self.touchMap[touch.identifier] = self.nextCount;
+						//- 	self.nextCount++;
+						//- }
+
+						//- // Polyfill non-standard properties
+						//- if (!("radiusX" in touch) && "webkitRadiusX" in touch)
+						//- 	touch.radiusX = touch.webkitRadiusX;
+						//- if (!("radiusY" in touch) && "webkitRadiusY" in touch)
+						//- 	touch.radiusY = touch.webkitRadiusY;
+						//- if (!("rotationAngle" in touch) && "webkitRotationAngle" in touch)
+						//- 	touch.rotationAngle = touch.webkitRotationAngle;
+						//- if (!("force" in touch) && "webkitForce" in touch)
+						//- 	touch.force = touch.webkitForce;
+						//- 
+						//- var rotationAngle = getAdjustedRotationAngle(touch.rotationAngle);
+						//- foundRotationAngle = foundRotationAngle || rotationAngle;
+						//- 
+						//- // Try to avoid start/end ellipses overlapping exactly
+						//- if (eventType == "touchend") {
+						//- 	self.rX++;
+						//- 	self.rY++;
+						//- }
+						self.cursor = 'grabbing'
+
+						if (
+							self.erase
+							//- $('#erase').val() !== ''
+						) {
+							self.ctx.fillStyle = 'rgba(0,0,0,1)';
+							self.ctx.globalCompositeOperation = "destination-out";//context.createPattern(pCanvas, 'no-repeat');
+							self.ctx.fill();
+						} else {
+							eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
+							var pCanvas = document.createElement('canvas');
+							pCanvas.width = self.cW;
+							pCanvas.height = self.cH;
+							var pContext = pCanvas.getContext('2d');
+							pself.ctx.drawImage(drawThis, 0, 0, self.cW, self.cH);
+							var pPattern = self.ctx.createPattern(pCanvas, 'no-repeat');
+							self.ctx.fillStyle = pPattern;
+							self.ctx.fill()
+							
+						}
+						
+						self.ctx.save();
+						self.ctx.translate(touch.pageX * scale, touch.pageY * scale);
+						self.ctx.scale(1, radiusY/radiusX);
+						self.ctx.beginPath();
+						self.ctx.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
+						self.ctx.closePath();
+						self.ctx.restore();
+
+					},
+					getAdjustedRotationAngle(angle) {
+						return angle * Math.PI / 180;
+					},
+					saveImage(){
+						var self = this;
+						self.can.toBlob(function(blob) {
+							var fd = new FormData();
+							fd.append(name, blob);
+							
+							// endpoint uses multer
+							var uploadurl = '/api/uploadmedia/'+self.pageIndex+'/'+self.index+'/'+self.drawtype+'/'+self.layer+'';
+
+							$.ajax({
+								url: uploadurl,
+								type: 'POST',
+								data: fd,
+								processData: false,
+								contentType: false,
+								success: function(response) {
+									$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+									self.mode = 'blog';
+								}
+							})
+						}, 'image/png', 0.95);
+					},
+					uiBlogMode(){
+						var self = this;
+						self.type = 'blog'
+					},
+					checkNameValidity(event, aSearchTerm, aMsg)
+					{
+						var elem = event.target;//document.getElementById(aID);
+						for (var i = 0; i < elem.value.length; i++) {
+							if (aSearchTerm.indexOf(elem.value.charAt(i)) !== -1) {
+								elem.setAttribute("aria-invalid", "true");
+								addAlert(aMsg);
+							} else {
+								elem.setAttribute("aria-invalid", "false");
+								//- removeOldAlert();
+							}
+							var check = elem.value
+							//var check = $(elem).val();
+							var url = check.replace(' ', '_');
+							$.post('/sig/'+check).done(function(result){
+								if (result === 'Available') {
+									$('#append').remove(); 
+									$('#response').append('<p class="tb-font-m" id="append">Available</p>');
+									$.post('/reserve/'+check+'');
+									$('#loginsection').css('display', 'block');
+									$('#registersection').css('display', 'block')
+									$('#pagetitle2').val(check);
+					
 								} else {
-									if (e.target.getAttribute('className') === 'no') {
-										removeOldModal();										
-									} else {
-										msg.appendChild(infomoda)
-										msg.appendChild(infotexta)
-										msg.appendChild(infomodi)
-										msg.appendChild(infotexti)
-									}
-									
+									$('#append').remove(); 
+									$('#response').append('<p class="tb-font-m" id="append">That blog name is taken.</p>')
 								}
 							})
 						}
-						
-					});
+					},
+					checkEmailValidity(aID, aSearchTerm, aMsg)
+					{
+						var elem = document.getElementById(aID);
+						console.log(aSearchTerm)
+						if (elem.value.indexOf(aSearchTerm) === -1) {
+							elem.setAttribute("aria-invalid", "true");
+						} else {
+							elem.setAttribute("aria-invalid", "false");
+						}
+					}
 				}
-
-		
-		
-		
-		
-		
+			});

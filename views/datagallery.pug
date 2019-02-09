@@ -1,3 +1,4 @@
+- console.log('this is the menu')
 if (menu === 'login')
 	div.grid-right
 		div.tb-u-100
@@ -21,7 +22,7 @@ if (menu === 'register')
 			p.tb-font-xl Your Name:
 			div.input-field#response
 				label.ms-Label Name
-				input.ms-TextField-field(type="text", name="pagetitle", id="pagetitle", aria-required="true", onblur="checkNameValidity('pagetitle', '\d!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alphabetic characters only, please');")
+				input.ms-TextField-field(type="text", name="pagetitle", id="pagetitle", aria-required="true", @blur="checkNameValidity($event, '\d!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alphabetic characters only, please');")
 				a.btn.waves-effect.waves-light(role="button") Check availability
 				hr
 			div#registersection(style="display: none")
@@ -32,16 +33,17 @@ if (menu === 'register')
 					input#avatarurl(type="hidden", name="avatar")
 					div.tb-u-100.input-field
 						label.ms-Label Username
-						input.ms-TextField-field.is-required(type="text", name="username", maxlength="40", id="username", aria-required="true", onblur="checkNameValidity('username', '!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alpha-numeric characters only, please');")
-					div.tb-u-100.input-field
-						label.ms-Label(for="languages") Language
-							datalist#theselanguages
-							
-							select(name="languages")
-								each lang, i in languages
-									option(value= lang.code) #{lang.nativeName}
-										span --
-										span #{lang.name}
+						input.ms-TextField-field.is-required(type="text", name="username", maxlength="40", id="username", aria-required="true", 
+							@blur="checkNameValidity($event, '!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alpha-numeric characters only, please');")
+					//- div.tb-u-100.input-field
+					//- 	label.ms-Label(for="languages") Language
+					//- 		datalist#theselanguages
+					//- 
+					//- 		select(name="languages")
+					//- 			each lang, i in languages
+					//- 				option(value= lang.code) #{lang.nativeName}
+					//- 					span --
+					//- 					span #{lang.name}
 						//input.ms-TextField-field.is-required(type="text", list="theselanguages", id="languages")
 
 
@@ -51,28 +53,26 @@ if (menu === 'register')
 					p
 					button.btn.waves-effect.waves-light#submitregister(type="submit", ariaDescription="Register") Register
 		div.tb-u-100
-			#info #{info}
+			#info(v-text="info")
 			
 if (menu === 'home')
 	div.grid-right
 		div.tb-u-100
-			each entry, i in data
-				a.grid-header(href="/sig/"+entry.pagetitle+"")
-					p.tb-font-l Name 
-						span.tb-font-l #{entry.pagetitle}
-				div.grid-left
-					if (entry.content[entry.content.length-1] !== undefined)
-						if (entry.content[entry.content.length-1].image !== "")
-							a.thumbnail.gallery(href="/sig/"+entry.pagetitle+"")
-								img(src= entry.content[entry.content.length-1].image, alt=""+entry.pagetitle+"'s "+ranks[entry.content.length-1]+" snack")
+			a.grid-header(v-for="(entry, i) in data" :href="'/sig/'+entry.pagetitle")
+				p.tb-font-l Name 
+					span.tb-font-l(v-text="entry.pagetitle")
+			div.grid-left(v-for="(entry, i) in data" v-if="entry.content[0]")
+				a.thumbnail.gallery(v-if="entry.content[entry.content.length-1].image !== ''" :href="'/sig/'+entry.pagetitle")
+					img(:src="entry.content[entry.content.length-1].image", :alt="entry.pagetitle + ranks[entry.content.length-1]+' signature'")
 
-				div.grid-right
+				div.grid-right(v-if="entry")
 					p.tb-font-s by 
-						span.tb-font-xxs #{entry.publishers[0].username}
-					if (entry.content[entry.content.length-1] !== undefined)
-						p.tb-font-s
-							!= md(entry.content[entry.content.length-1].description)
-						span &nbsp ...
+						span.tb-font-xxs(v-text="entry.publishers[0].username")
+					p.tb-font-s(v-if="entry.content[entry.content.length-1] !== undefined"
+						v-html="marked(entry.content[entry.content.length-1].description)")
+					span &nbsp ...
 				div.grid-footer
 					
 			hr
+
+- console.log(menu)

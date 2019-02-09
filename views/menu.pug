@@ -3,47 +3,22 @@
 // type = "draw" || "blog"
 div.grid-header.mainHeader
 	//if (drawtype)
+	a.mainmenu(v-if="(doc && index && doc.content[index] && type === 'draw' && loggedin === doc.publishers[0].username)", href="#", title="Save", id="save", aria-labelledby="continue", 
+		@click="saveImage()"
+		)
+		//				onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/nextstep/"+doc.urltitle+"/"+doc.pageindex+"/"+index+"/"+drawtype+"/"+layer+"').done(function(response){if (document.getElementsByClassName('layer')[0] !== null) {saveImage(document.getElementsByClassName('layer')[0])}})"
+		img.i(src="/images/icons/check.svg")
 	
-	
-	if (loggedin && drawtype && loggedin === menuData.publishers[0].username)
-		- var allergies = menuData.publishers[0].allergies
-		if (contentData && type === "draw")
-			a.mainmenu(href="#", title="Save", id="save", aria-labelledby="continue", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/nextstep/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"').done(function(response){if (document.getElementsByClassName('layer')[0] !== null) {saveImage(document.getElementsByClassName('layer')[0])}})")
-				img.i(src="/images/icons/check.svg")
-		else
-			
-			a.dropdown.mainmenu(href="#", title="Menu")
-				img.i(src="/images/menu_button.svg")
-			
-			
-		
-		
-				
-				
-					
-		div.pullquote
-		if (type === "draw")
-			each ing, j in keys
-				if (contentData !== undefined)
-					each cat, i in contentData[ing]
-						if (cat.unlocked && allergies.indexOf(cat.name) === -1)
-							if (ing === 'substrates' && i === 0)
-								a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"', function(){uiErase('"+menuData.urltitle+"',"+menuData.pageindex+","+index+",'"+drawtype+"',"+layer+");})")
-									.ui
-										img(src="/images/icons/"+ing+"_"+i+".svg")
-										span.tb-font-m.translate #{cat.name}
-							else
-								a.tool(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
-									.ui
-										img(src="/images/icons/"+ing+"_"+i+".svg")
-										span.tb-font-m.translate #{cat.name}
-	else
-		a.dropdown.mainmenu(href="#", title="Menu")
-			img.i(src="/images/menu_button.svg")
-
-		div.pullquote
-			if (contentData)
-				span.tb-font-xxl.translate #{contentData.description}
+	a.dropdown.mainmenu(v-else, href="#", title="Menu")
+		img.i(src="/images/menu_button.svg")
+	//- a.mainmenu(v-else-if="type === 'draw'" href="#", title="Menu")
+	//- 	img.i(src="/images/menu_button.svg")
+	div.pullquote
+	//- a.tool(v-if="doc && index && doc.content[index] && type === 'draw'", v-for="(ing, j) in keys", href="#", @click="initBrush(ing)")
+	//- 	//onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"', function(){uiErase('"+menuData.urltitle+"',"+menuData.pageindex+","+index+",'"+drawtype+"',"+layer+");})"
+	//- 	.ui(v-for="(cat, i) in doc.content[index][ing]" v-if="cat.unlocked")
+	//- 		img(:src="'/images/icons/'+ing+'_'+i+'.svg'")
+	//- 		span.tb-font-m.translate(v-text="cat.name")
 
 			
 div.grid-left#tl
@@ -53,16 +28,6 @@ div.grid-left#tl
 				.ui
 					img(src="/images/icons/home.svg")
 				span.tb-font-l Home
-			if (loggedin && drawtype && loggedin === menuData.publishers[0].username)
-				each ing, j in keys
-					if (contentData !== undefined)
-						each cat, i in contentData[ing]
-							if (cat.unlocked && allergies.indexOf(cat.name) === -1)
-								a.module(href="#", onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+ing+"/"+i+"', function(){window.location.href= '/api/selectlayer'})")
-									.ui
-										img(src="/images/icons/"+ing+"_"+i+".svg")
-									span.tb-font-m.translate #{cat.name}
-									
 			if (loggedin)
 				a.module(href="/logout", title="logout")
 					.ui
@@ -73,4 +38,4 @@ div.grid-left#tl
 					.ui
 						img(src="/images/icons/login.svg")
 					span.tb-font-l Login
-				
+

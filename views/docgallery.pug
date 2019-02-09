@@ -1,89 +1,76 @@
-- var marked = marked
+//- - var marked = marked
 
-div.grid-right
-	if (infowindow === 'edit')
-		include docedit.pug
-	else
-		if (pageindex)
-			div.grid-container.inner
-				div.grid-header
-
-					p.tb-font-xl
-						
-						if (contentData.filling[contentData.level] !== undefined && allergies.indexOf(contentData.filling[contentData.level].name) === -1)
-							span.translate #{contentData.filling[contentData.level].name}
-							span  and 
-						else
-							if (contentData.filling[contentData.level-1] !== null)
-								span.translate #{contentData.filling[contentData.level-1].name}
-								span  and 
-							else
-								if (contentData.filling[contentData.level+1] !== null)
-									span.translate #{contentData.filling[contentData.level+1].name}
-									span  and 
-						
-						span #{contentData.filling[0].name}
-
-				div.grid-left(style="padding: 6px 0 0 6px;")
-					if (menuData.publishers[0].username === loggedin)
-						a.tool(href="#", onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"', function(){ window.location.href = '/api/selectlayer'});")
-							.ui
-								img(src= contentData.image !== "" ? contentData.image : menuData.publishers[0].avatar, style="width: auto; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
-
-					else
-						a.tool(href="/sig/"+menuData.pagetitle+"/"+contentData.index+"")
-							.ui
-								img(src= contentData.image !== "" ? contentData.image : menuData.publishers[0].avatar, style="width: auto; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
-
-				div.grid-right
-					- var count = 0
-					each item, i in contentData.info
-						- var allergies = menuData.publishers[0].allergies;
-						if (item.unlocked && item.spec.unlock)
-							- var drawtyp = item.spec.unlock.split('.')[0]
-							- var drawind = parseInt(item.spec.unlock.split('.')[1], 10)
-							- var nextind = drawind + 1
-							- count++
-							if (allergies.indexOf(contentData[drawtyp][drawind].name) === -1 && allergies.indexOf(contentData[drawtyp][nextind].name) === -1 && allergies.indexOf(item.name) === -1)
-								p.tb-font-l
-									!= md(item.name.toUpperCase())
-								p.tb-font-s.translate #{item.caption}
-								
-									
-									//if (drawind === contentData[drawType][i].ind)
-							span.tb-font-xxs Use the 
-							if (allergies.indexOf(contentData[drawtyp][drawind].name) === -1)
-								span.tb-font-xxs #{contentData[drawtyp][drawind].name}
-							else
-								span.tb-font-xxs #{contentData[drawtyp][drawind+1].name}
-							if (i !== 0)
-								span.tb-font-xxs  or the 
-								if (allergies.indexOf(contentData[drawtyp][nextind].name) === -1)
-									span.tb-font-xxs #{contentData[drawtyp][nextind].name}
-								else
-									span.tb-font-xxs #{contentData[drawtyp][nextind+1].name}
-
-				div.grid-footer
-					
-		else
-			each entry, k in menuData.content
-				a.tb-font-m.tb-u-100(href="/sig/"+menuData.pagetitle+"", title="Go to "+menuData.pagetitle+"") #{menuData.pagetitle}
-				a.tool(href="/sig/"+menuData.pagetitle+"/"+entry.index+"")
-					.ui
-						img(src= entry.image !== "" ? entry.image : menuData.publishers[0].avatar, style="width: auto; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
-
-				//-
-					if (loggedin && loggedin === menuData.publishers[0].username)
-						div(style="padding: 10px 0 0 10px")
-							a.tb-font-m(style="margin: 6px 0 0 6px;z-index: 0;", href="/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"", title="Edit "+menuData.pagetitle+"")
-								img(src="/images/tools/tools_"+entry.level+".svg")
-				br
-				p.tb-font-s.hideoverlap #{entry.title}
-				if (entry.description)
-					p.tb-font-xs.hideoverlap #{entry.description}
-				
-				
-
-				hr
+div.grid-right(v-if="infowindow === 'edit'")
+	include docedit.pug
+div.grid-right(v-else-if="infowindow !== 'edit'")
+	//- if (infowindow === 'edit')
+	//- 
+	//- else
+	div.grid-container.inner
+		div.grid-header(v-if="pageIndex")
+		
+			p.tb-font-xl(v-if="doc && index && doc.content[index]" v-text="doc.content[index].filling[level].name")
+		
+		
+		div.grid-left(style="padding: 6px 0 0 6px;")
+			//onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"', function(){ window.location.href = '/api/selectlayer'});"
+			a.tool(v-if="doc.publishers[0].username === loggedin" href="#")
+				.ui
+					img(:src="(doc.content[index].image !== '' ? doc.content[index].image : doc.publishers[0].avatar)", style="width: auto; height: 100%;", :alt="doc.pagetitle+' '+ranks[index]+' signature'")
+			
+			a.tool(:href="'/sig/'+doc.pagetitle+'/'+index+''")
+				.ui
+					img(:src="(doc.content[index].image !== '' ? doc.content[index].image : doc.publishers[0].avatar)", style="width: auto; height: 100%;", :alt="doc.pagetitle+' '+ranks[index]+' signature'")
+		
+//- 	//- div.grid-right
+//- 	//- 	- var count = 0
+//- 	//- 	each item, i in contentData.info
+//- 	//- 		- var allergies = menuData.publishers[0].allergies;
+//- 	//- 		if (item.unlocked && item.spec.unlock)
+//- 	//- 			- var drawtyp = item.spec.unlock.split('.')[0]
+//- 	//- 			- var drawind = parseInt(item.spec.unlock.split('.')[1], 10)
+//- 	//- 			- var nextind = drawind + 1
+//- 	//- 			- count++
+//- 	//- 			if (allergies.indexOf(contentData[drawtyp][drawind].name) === -1 && allergies.indexOf(contentData[drawtyp][nextind].name) === -1 && allergies.indexOf(item.name) === -1)
+//- 	//- 				p.tb-font-l
+//- 	//- 					!= md(item.name.toUpperCase())
+//- 	//- 				p.tb-font-s.translate #{item.caption}
+//- 	//- 
+//- 	//- 
+//- 	//- 					//if (drawind === contentData[drawType][i].ind)
+//- 	//- 			span.tb-font-xxs Use the 
+//- 	//- 			if (allergies.indexOf(contentData[drawtyp][drawind].name) === -1)
+//- 	//- 				span.tb-font-xxs #{contentData[drawtyp][drawind].name}
+//- 	//- 			else
+//- 	//- 				span.tb-font-xxs #{contentData[drawtyp][drawind+1].name}
+//- 	//- 			if (i !== 0)
+//- 	//- 				span.tb-font-xxs  or the 
+//- 	//- 				if (allergies.indexOf(contentData[drawtyp][nextind].name) === -1)
+//- 	//- 					span.tb-font-xxs #{contentData[drawtyp][nextind].name}
+//- 	//- 				else
+//- 	//- 					span.tb-font-xxs #{contentData[drawtyp][nextind+1].name}
+//- 
+//- 	div.grid-footer
+//- 
+//- //- else
+//- //- 	each entry, k in menuData.content
+//- //- 		a.tb-font-m.tb-u-100(href="/sig/"+menuData.pagetitle+"", title="Go to "+menuData.pagetitle+"") #{menuData.pagetitle}
+//- //- 		a.tool(href="/sig/"+menuData.pagetitle+"/"+entry.index+"")
+//- //- 			.ui
+//- //- 				img(src= entry.image !== "" ? entry.image : menuData.publishers[0].avatar, style="width: auto; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
+//- //- 
+//- //- 		//-
+//- //- 			if (loggedin && loggedin === menuData.publishers[0].username)
+//- //- 				div(style="padding: 10px 0 0 10px")
+//- //- 					a.tb-font-m(style="margin: 6px 0 0 6px;z-index: 0;", href="/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"", title="Edit "+menuData.pagetitle+"")
+//- //- 						img(src="/images/tools/tools_"+entry.level+".svg")
+//- //- 		br
+//- //- 		p.tb-font-s.hideoverlap #{entry.title}
+//- //- 		if (entry.description)
+//- //- 			p.tb-font-xs.hideoverlap #{entry.description}
+//- //- 
+//- //- 
+//- //- 
+//- //- 		hr
 		
 div.grid-footer
