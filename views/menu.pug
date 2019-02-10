@@ -3,20 +3,20 @@
 // type = "draw" || "blog"
 div.grid-header.mainHeader
 	//if (drawtype)
-	a.mainmenu(v-if="(doc && index && doc.content[index] && type === 'draw' && loggedin === doc.publishers[0].username)", href="#", title="Save", id="save", aria-labelledby="continue", 
+	a.mainmenu(v-if="(doc && index && doc.properties && type === 'draw' && loggedin === doc.publishers[0].username)", href="#", title="Save", id="save", aria-labelledby="continue", 
 		@click="saveImage()"
 		)
 		//				onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/nextstep/"+doc.urltitle+"/"+doc.pageindex+"/"+index+"/"+drawtype+"/"+layer+"').done(function(response){if (document.getElementsByClassName('layer')[0] !== null) {saveImage(document.getElementsByClassName('layer')[0])}})"
 		img.i(src="/images/icons/check.svg")
 	
-	a.dropdown.mainmenu(v-else, href="#", title="Menu")
+	a.dropdown.mainmenu(v-else :class="(!type ? 'blog' : 'draw')" href="#" title="Menu" @click="dropdown($event)")
 		img.i(src="/images/menu_button.svg")
 	//- a.mainmenu(v-else-if="type === 'draw'" href="#", title="Menu")
 	//- 	img.i(src="/images/menu_button.svg")
 	div.pullquote
-	//- a.tool(v-if="doc && index && doc.content[index] && type === 'draw'", v-for="(ing, j) in keys", href="#", @click="initBrush(ing)")
+	//- a.tool(v-if="doc && index && doc.properties && type === 'draw'", v-for="(ing, j) in keys", href="#", @click="initBrush(ing)")
 	//- 	//onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"', function(){uiErase('"+menuData.urltitle+"',"+menuData.pageindex+","+index+",'"+drawtype+"',"+layer+");})"
-	//- 	.ui(v-for="(cat, i) in doc.content[index][ing]" v-if="cat.unlocked")
+	//- 	.ui(v-for="(cat, i) in doc.properties[ing]" v-if="cat.unlocked")
 	//- 		img(:src="'/images/icons/'+ing+'_'+i+'.svg'")
 	//- 		span.tb-font-m.translate(v-text="cat.name")
 

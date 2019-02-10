@@ -3,10 +3,9 @@ block page
 	- var menu = "login"
 block content
 	div#select(class="blog")
-		div.menu(class="blog")
-			
-			div.topLeft
-			div.topRight
+		
+		include includes/header.pug
+
 		div.grid-container.blog
 			include menu.pug
 			include datagallery.pug

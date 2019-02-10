@@ -1,16 +1,16 @@
 p#info.tb-font-s(width="100%")
 //(style="float: left;")
 form#form.tb-u-100(
-	v-if="doc && index && doc.content[index]"
+	v-if="doc && index && doc.properties"
 	enctype="multipart/form-data", method="POST", 
-	:action="'/api/editcontent/'+doc.urltitle+'/'+doc.pageindex+'/'+index+'/'+drawtype+'/'+doc.content[index].level", style="margin-bottom: 50px")
+	:action="'/api/editcontent/'+doc.urltitle+'/'+doc.pageindex+'/'+index+'/'+drawtype+'/'+doc.properties.level", style="margin-bottom: 50px")
 					
 	div.tb-u-100
 		label.ms-Label Description 
-		textarea.ms-TextField-field#inputtext(type="text", name="description", v-text="doc.content[index].description", :placeholder="doc.content[index].description")
+		textarea.ms-TextField-field#inputtext(type="text", name="description", v-text="doc.properties.description", :placeholder="doc.properties.description")
 	div.tb-u-100
-		span.tb-font-s#previewtext.translate(v-text="doc.content[index].description")
-	input(type="hidden", id="title", name="title", :value="doc.content[index].title")
+		span.tb-font-s#previewtext.translate(v-text="doc.properties.description")
+	input(type="hidden", id="title", name="title", :value="doc.properties.title")
 	input(type="hidden", id="inputimg", name="image")
 	input.tb-u-100.block.spacer(id="submit", type="submit", value="Save" ariaDescription="Save this signature")
 

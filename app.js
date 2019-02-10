@@ -20,9 +20,19 @@ var Page = require('./models/pages');
 var async = require('async');
 var favicon = require('serve-favicon');
 var helmet = require('helmet');
+var multer = require('multer');
+var csrf = require('csurf');
 var cors = require('cors');
 mongoose.Promise = promise;
 dotenv.load();
+
+var parseForm = bodyParser.urlencoded({ extended: false });
+var parseJSONBody = bodyParser.json();
+var parseBody = [parseJSONBody, parseForm];
+var upload = multer();
+
+var csrfProtection = csrf({ cookie: true });
+
 
 var app = express();
 if (app.get('env') === 'production') {
@@ -159,6 +169,9 @@ app.use(function(req, res, next) {
 	res.locals.session = req.session;
 	next();
 });
+app.get(/^(\/|\/register$|\/login$|\/api\/new|\/api\/editcontent)/, csrfProtection);
+// ensure multer parses before csrf
+app.post(/^(\/register$|\/login$|\/api\/editcontent)/, upload.array(), parseBody, csrfProtection);
 
 app.use('/', routes);
 

@@ -6,79 +6,27 @@ html
 		//meta(http-equiv="x-dns-prefetch-control" content="on")
 		link(rel="stylesheet", href="/stylesheets/default.css", type="text/css")
 		link(href="https://fonts.googleapis.com/css?family=Roboto", rel="stylesheet")
-		script(src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js")
+		link(rel="stylesheet", href="/stylesheets/leaflet.css")
+		link(rel="stylesheet", href="/stylesheets/leaflet.draw.css")
 		script(type="text/javascript", src="/scripts/jquery.min.js")
+		script(src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js")
 		script(type="text/javascript", src="/scripts/marked.min.js")
 		script(type="text/javascript", src="/scripts/d3.v3.min.js")
 		script(type="text/javascript", src="/scripts/moment-with-locales.min.js")
+		script(type="text/javascript", src="/scripts/leaflet.js")
+		script(type="text/javascript", src="/scripts/Path.Drag.js")
+		script(type="text/javascript", src="/scripts/Leaflet.Editable.js")
 
 	body
 		block page
-			- var theStore = theStore
 			
 		block header
 		block content
 				
-
+		#map
 		a#publish_logo(href="https://github.com/tbushman/gnd" target="_blank")
 			img(src="/images/publish_logo.svg")
 		
-		script(type="text/javascript").
-			$(document).ready(function(){
-
-				$('.dropdown').not('.mainmenu').slideUp(100);
-				$('.drop').slideUp(100);
-				
-				$('.selected').removeClass('selected');
-
-			})
-			//- $(document).on('click', 'canvas', function(e){
-			//- 	if ($('.menu').hasClass('blog')) {
-			//- 		uiDrawMode()
-			//- 	}
-			//- });
-			//drop-down event listener
-			$(document).on('click', '.dropdown', function (e) { 
-				//e.preventDefault();
-				console.log(e.target)
-				var that, main;
-				if ($(this).hasClass('mainmenu')) {
-					that = $('#tlmodules.dropdown');
-					main = true;
-				} else {
-					that = this;
-					main = false;
-				}
-				if ($(that).hasClass('selected')) {
-					if (main && $('div.menu').hasClass('blog')) {
-						$(that).slideUp(100);
-						$(that).removeClass("selected");
-					} else {
-						if ($('div.menu').hasClass('blog')) {
-							$(that).next('.drop').slideUp(100);
-							
-						}
-					}
-				} else {
-					if (main && $('div.menu').hasClass('blog')) {
-						$(that).slideDown(200);
-						$(that).addClass('selected');
-					} else {
-						$(that).next('.drop').slideDown(200);
-					}
-				}
-				//- if ($('div.menu').hasClass('draw')) {
-				//- 
-				//- 	//- uiBlogMode()
-				//- } else {
-				//- 	if ($('div.menu').hasClass('blog')) {
-				//- 		uiBlogMode()
-				//- 	}
-				//- }
-				//e.stopPropagation();
-			});
-
-
 		script(type="text/javascript").
 			
 			Vue.prototype.moment = moment;
@@ -88,17 +36,26 @@ html
 				data() {
 					return { 
 						months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-						pageIndex: null,
-						//- drawtype: null,
-						layer: null,
+						pu: this.ifNullThenObj(!{JSON.stringify(pu)}),//{properties: {}},
+						dat: this.parseObj(!{JSON.stringify(dat)}),
 						data: this.parseObj(!{JSON.stringify(data)}),
 						doc: this.parseObj(!{JSON.stringify(doc)}),
 						infowindow: this.parseObj(!{JSON.stringify(infowindow)}),
 						index: this.parseObj(!{JSON.stringify(index)}),
 						pageIndex: this.parseObj(!{JSON.stringify(pageIndex)}),
 						drawtype: this.parseObj(!{JSON.stringify(drawtype)}),
-						type: this.parseObj(!{JSON.stringify(type)}),
+						type: this.parseStr(!{JSON.stringify(type)}),
 						layer: this.parseObj(!{JSON.stringify(layer)}),
+						rep: {
+							// TODO map: ['Community Organizer'],
+							'ZIP4': ['resident', 'landlord', 'Community Organizer'],
+							City: ['Council Member', 'Mayor'],
+							State: ['House of Representatives', 'Senate'],
+							County: ['Council Member', 'Mayor']
+						},
+						//- pageIndex: null,
+						//- drawtype: null,
+						layer: null,
 						radiusSupported: false,
 						nextCount: 0,
 						touchMap: {},
@@ -120,7 +77,21 @@ html
 						ranks: ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"],
 						keys: ["tools", "filling"],
 						loggedin: this.parseObj(!{JSON.stringify(session.loggedin)}),
-						info: ''
+						info: '',
+						accordions: (this.parseObj(!{JSON.stringify(dat)}) !== '' && this.parseBool(!{JSON.stringify(exports)}) ? this.parseObj(!{JSON.stringify(dat)}).map(function(data){return data.map(function(doc){return doc.index})}) : 
+							(
+								this.parseObj(!{JSON.stringify(dat)}) !== '' ?
+								[
+									this.parseObj(!{JSON.stringify(dat)}).map(function(data){return []})
+								] :
+								[[]]
+							)
+						),
+						ff: this.parseObj(!{JSON.stringify(ff)}),
+						uploadchtitle: null,
+						dragind: null,
+						latlngs: null,
+						repitem: []
 					}
 				},
 				mounted() {
@@ -128,11 +99,155 @@ html
 					if (!self.image && self.doc && self.doc.content[self.index]) {
 						self.drawImg();
 					}
+					document.addEventListener('keydown', function(event) {
+					  var keyName = event.key;
+						if (keyName === 'Enter') event.preventDefault()
+					  //alert('keypress event\n\n' + 'key: ' + keyName);
+					});
+					$(document).on('click', '.href', function(e){
+						e.stopPropagation();
+					});
+					$(document).ready(function(){
+
+						$('.dropdown').not('.mainmenu').slideUp(100);
+						$('.drop').slideUp(100);
+						
+						$('.selected').removeClass('selected');
+
+					});
+					self.sliderImg()
+
+					self.loadMap(function(dataLayer){
+						/*if (!map) return;
+						self.map = map;
+						self.dataLayer = dataLayer;*/
+						if (!dataLayer) return;
+						self.dataLayer = dataLayer
+						//- var point = self.map.latLngToLayerPoint(new L.LatLng(self.doc.geometry.coordinates[0], self.doc.geometry.coordinates[1]))
+						var bounds = self.dataLayer.getBounds();
+						self.map.fitBounds(bounds);
+						self.dataLayer.enableEdit();
+						self.lMarker = L.marker(map.getCenter(), {draggable: true}).addTo(self.map);
+						self.panZoom();
+					})
+					
+					//- $(document).on('click', 'canvas', function(e){
+					//- 	if ($('.menu').hasClass('blog')) {
+					//- 		uiDrawMode()
+					//- 	}
+					//- });
+					//drop-down event listener
+					//- $(document).on('click', '.dropdown', function (e) { 
+					//- 
+					//- 	//- if ($('div.menu').hasClass('draw')) {
+					//- 	//- 
+					//- 	//- 	//- uiBlogMode()
+					//- 	//- } else {
+					//- 	//- 	if ($('div.menu').hasClass('blog')) {
+					//- 	//- 		uiBlogMode()
+					//- 	//- 	}
+					//- 	//- }
+					//- 	//e.stopPropagation();
+					//- });
 				},
 				methods: {
-					parseObj(ob) {
-						if (!ob) return null;
+					ifNullThenObj(ob) {
+						if (!ob) return {properties: {placetype:'', title:''}};
 						return ob;
+					},
+					parseBool: function(item) {
+						if (!item) return false;
+						return true;
+					},
+					parseStr(item) {
+						if (!item) return '';
+						return item;
+					},
+					parseObj(ob) {
+						if (!ob) return '';
+						return ob;
+					},
+					sliderImg(){
+						var self = this;
+						if ($('#slider')[0]) {
+							setInterval(function(){
+								$('#slider').css('opacity',0);
+								setTimeout(function(){
+									if (self.sliderIndex > 3) {
+										self.sliderIndex = 1
+									} else {
+										self.sliderIndex += 1;
+									}
+									setTimeout(function(){
+										$('#slider').css('opacity',1);
+									},2000)
+									
+								},2000)
+							},10000)
+						}
+					},
+					dropdown(e) {
+						var self = this;
+						//e.preventDefault();
+						console.log(e.target)
+						var that, main;
+						if ($(e.target).hasClass('mainmenu')) {
+							that = $('#tlmodules.dropdown');
+							main = true;
+						} else {
+							that = e.target;
+							main = false;
+						}
+						console.log(that, main)
+						if ($(that).hasClass('selected')) {
+							if (main && $('div.menu').hasClass('blog')) {
+								$(that).slideUp(100);
+								$(that).removeClass("selected");
+							} else {
+								if ($('div.menu').hasClass('blog')) {
+									$(that).next('.drop').slideUp(100);
+									
+								}
+							}
+						} else {
+							if (main && $('div.menu').hasClass('blog')) {
+								$(that).slideDown(200);
+								$(that).addClass('selected');
+							} else {
+								self.type = 'blog';
+								$(that).next('.drop').slideDown(200);
+							}
+						}
+					},
+					changeTitle(e) {
+						var self = this;
+						//- if (!self.pu.properties.title) {
+						self.pu.properties.title = e.target.value
+					},
+					changePlace(e) {
+						var self = this;
+						var etargetvalue = e.target.value;
+						console.log(e)
+						console.log(e.target.value)
+						console.log(self.rep[e.target.value])
+
+						if (!self.pu.properties) {
+							self.pu.properties = {}
+							self.pu.properties.placetype = etargetvalue
+						} else {
+							self.pu.properties.placetype = etargetvalue
+						}
+						self.repitem = self.rep[etargetvalue]
+						console.log(self.repitem)
+					},
+					accordion: function(n, ind) {
+						var self = this;
+						if (self.accordions[n].indexOf(ind) === -1) {
+							self.accordions[n].push(ind);
+							self.accordions[n].sort();
+						} else {
+							self.accordions[n].splice(self.accordions[n].indexOf(ind), 1);
+						}
 					},
 					getCursor() {
 						var self = this;
@@ -283,22 +398,18 @@ html
 							})
 						}, 'image/png', 0.95);
 					},
-					uiBlogMode(){
-						var self = this;
-						self.type = 'blog'
-					},
-					checkNameValidity(event, aSearchTerm, aMsg)
+					checkNameValidity(aSearchTerm, aMsg, event)
 					{
 						var elem = event.target;//document.getElementById(aID);
 						for (var i = 0; i < elem.value.length; i++) {
 							if (aSearchTerm.indexOf(elem.value.charAt(i)) !== -1) {
 								elem.setAttribute("aria-invalid", "true");
-								addAlert(aMsg);
+								//- addAlert(aMsg);
 							} else {
 								elem.setAttribute("aria-invalid", "false");
 								//- removeOldAlert();
 							}
-							var check = elem.value
+							var check = elem.value;
 							//var check = $(elem).val();
 							var url = check.replace(' ', '_');
 							$.post('/sig/'+check).done(function(result){
@@ -317,15 +428,178 @@ html
 							})
 						}
 					},
-					checkEmailValidity(aID, aSearchTerm, aMsg)
+					checkEmailValidity(e)
 					{
-						var elem = document.getElementById(aID);
-						console.log(aSearchTerm)
-						if (elem.value.indexOf(aSearchTerm) === -1) {
-							elem.setAttribute("aria-invalid", "true");
-						} else {
+						var elem = e.target;//document.getElementById(aID);
+						//- console.log(aSearchTerm)
+						var rX = new RegExp('/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/')
+						if (rX.test(elem.value)) {
 							elem.setAttribute("aria-invalid", "false");
+						} else {
+							elem.setAttribute("aria-invalid", "true");
 						}
-					}
+					},
+					loadMap(cb) { 
+						var self = this, dataLayer, 
+						map = new L.map('map', { 
+							//- maxBounds: L.latLngBounds([L.LatLng(43,-122),L.LatLng(-7,-188)]),
+							center: [
+								(!self.position ? 40.7608 : self.position.lat),
+								(!self.position ? -111.8910 : self.position.lng)
+							],
+							zoomControl: false, 
+							zoom: (!self.position ? 6 : self.position.zoom), minZoom: 4,	maxZoom: 18,
+							editable: true,
+							renderer: L.canvas(),
+							preferCanvas: true
+						});
+						L.control.zoom({ position:'bottomleft' }).addTo(map);
+						var opts = { 
+							attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+							renderer: L.canvas({padding:0.5}),
+							bounds: map.getBounds().pad(1000)
+						};
+						var t = 'https://api.mapbox.com/styles/v1/tbushman/ciq7gm0ov008kbfm580v9mm9c/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidGJ1c2htYW4iLCJhIjoiSmI0aU94OCJ9.SZytljBzoWupPUYeu_OR9A'
+						L.tileLayer(t, opts).addTo(map);
+
+						map.on('zoomend', function(){ 
+							if (self.doc) self.setView(self.doc, self.di, self.ei, self.mi) 
+						});
+						self.map = map;
+						if (!self.dataLayer && self.data) {
+							self.loadFeatures(self.data, cb);
+						} else { 
+							cb(self.dataLayer); 
+						} 
+					},
+
+					/*************** Begin utility and maintenance  scripts ***************/
+					rxOrNo(arr) { 
+						// TODO -- better conditional for whole planet
+						return ( arr[0] < arr[1] ? arr.reverse() : arr ) 
+					},
+					rxArr(arr) {
+						var self = this;
+						if (!Array.isArray(arr[0])) return self.rxOrNo(arr);
+						var rxa = arr.map(function(ar){ if (!Array.isArray(ar[0])) { 
+							return self.rxOrNo(ar) } else if (Array.isArray(ar)) {
+								return ar.map(function(a){ if (!Array.isArray(a[0])) { 
+									return self.rxOrNo(a) } else if (Array.isArray(a)) {
+										return a.map(function(b){ if (!Array.isArray(b[0])) { 
+											return self.rxOrNo(b) } else if (Array.isArray(b)) {
+												return b.map(function(c){ 
+							if (!Array.isArray(c[0])) {return self.rxOrNo(c) }
+							else {return} })} else {return} })} else {return} })} else {return}
+						});
+						return arr; 
+					} /*Leaflet requires reversed geo-coordinate (lat, lng)*/,
+					evalTime(time) {/*some time ranges in data require difference calc*/
+						if (typeof time === 'Array') {
+							let ntime = eval(time[0] - time[1])
+							time = ntime;
+						} else if (typeof time === 'Number') {
+
+						} else {
+							let now = new Date(), nYear = now.getFullYear(), nMonth = now.getMonth(), nDay = now.getDate();
+							let then = new Date(time), yr = then.getFullYear(), mo = then.getMonth(), dy = then.getDate();
+							const is30 = [8,3,5,10];
+							const is31 = [0,2,4,6,7,9,11];
+							const is28 = [1];
+							let l = 0;
+							function lp(d){
+								let ret;
+								ret = (l % 4 === 0 ? (d / 28) : (d / 29));
+								return ret;
+							}
+							time = (nYear - yr) - (( nMonth / 11 ) - ( mo / 11 )  ) + ( 
+								( is30.indexOf(nMonth) === -1 ?
+										( is31.indexOf(nMonth) === -1 ?
+									 			lp(nDay) : (nDay / 31)
+										) :
+										( nDay / 30 )
+								) 
+								- 
+								( is30.indexOf(mo) === -1 ?
+										( is31.indexOf(mo) === -1 ?
+									 			(dy / 28) : (dy / 31)
+										) :
+										( dy / 30 ) 
+								)
+							)
+						}
+						return time; 
+					},
+					debounceF(fn) { /* skittle scroll speed */ 
+						clearTimeout(this.dTimeout);
+						this.dTimeout = setTimeout(fn, 1000); 
+					},
+					loadFeatures(ft, cb) {
+						var self = this, dataLayer;
+						var customIcon = L.icon({
+							iconUrl: '/images/buttonmarker.svg',
+							iconSize: [33, 33]
+						});
+					
+						if (self.dataLayer) self.dataLayer.remove(); 
+						if (ft.length && self.map) { 
+							dataLayer = L.featureGroup();
+							ft.forEach(function(f, i) {
+								var opts = { 
+									radius: 11, weight: 1, fillOpacity: 0.1,
+									color: '#fff', fillColor: 'var(--highlight)', opacity: 1 }
+								var coords = f.geometry.coordinates;
+								// geojson uses [lng, lat] and Leaflet uses [lat, lng]
+								var cd = self.rxArr(coords);
+								if (f.geometry.type === 'Point') { 
+									var c = L.circleMarker(cd, opts ).on('click', function(){
+										return self.setView(f, i, null, 0)
+									});
+									c.addTo(dataLayer);
+								} else { 
+									var p = L.polygon(cd, opts).on('click', function(){
+										return self.setView(f, i, null, 0)
+									});
+									p.addTo(dataLayer); 
+								} 
+							});
+							self.map.addLayer(dataLayer);
+						} 
+						cb(dataLayer); 
+					} /*map geatures*/,
+					refreshMap(cd){ 
+						var self = this, 
+						lat,
+						lng,
+						center = self.map.getCenter();
+						if (self.shape && self.shape !== '') {
+							self.shape.remove();
+						}
+						if (!cd) { 
+							lat = center.lat; lng = center.lng;
+						} else if (Array.isArray(cd[0])) {
+							self.shape = L.polygon(cd).addTo(self.map);
+							lat = self.shape.getBounds().getCenter().lat;
+							lng = self.shape.getBounds().getCenter().lng;
+						} else { 
+							lat = cd[0]; lng = cd[1]; 
+						}
+					// console.log(lat, lng)
+						if (lat && lng) { 
+							let latlng = new L.LatLng(lat, lng), nl;
+							var n = self.map.latLngToLayerPoint(latlng), 
+							x = n.x, 
+							y = n.y,
+							dL = (self.skittle.x - (self.wWidth/2)), 
+							dB = (self.wHeight/2) - self.skittle.y;
+								//- self.skittle.y - self.wHeight;
+							// if (self.res) { /* if screen width < 1000 -- responsive skittle offset*/
+								nl = self.map.layerPointToLatLng(L.point((x-dL), (y+dB)));
+							// } else { 
+							//	nl = latlng 
+							//}
+							self.map.panTo(nl);
+							self.position.zoom = self.map.getZoom(); 
+						}
+					},
 				}
 			});

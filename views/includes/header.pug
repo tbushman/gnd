@@ -1,0 +1,17 @@
+if (menu === "register" || menu === "login")
+	div.menu(class="blog")
+		
+		div.topLeft(style="background-image:url('/images/backgrounds/backgrounds_1.svg')")
+		div.canvas.topRight
+			//(style="background-color:#bad80a")
+			div.overtext signature
+			div.blogname Tool
+else
+	div.menu(:class="type")
+
+		div.overtext(v-text="(doc && index && doc.properties ? doc.properties.title : '"+appTitle+"')")
+		div.blogname(v-text="(doc && index && doc.pagetitle ? doc.pagetitle : '')")
+		div.envel
+			canvas#maincanvas.maincanvas.topRight(:style="{cursor: getCursor()}")
+		div.topLeft
+	

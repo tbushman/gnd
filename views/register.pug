@@ -4,15 +4,9 @@ block page
 block content
 	div#select(class="blog")
 		
-		div.menu(class="blog")
-			
-			div.topLeft(style="background-image:url('/images/backgrounds/backgrounds_1.svg')")
-			div.canvas.topRight
-				//(style="background-color:#bad80a")
-				div.overtext signature
-				div.blogname Tool
-				
-				
+		
+		include includes/header.pug
+
 		div.grid-container(class="blog")
 			include menu.pug
 			include datagallery.pug
