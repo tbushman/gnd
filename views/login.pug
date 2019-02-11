@@ -2,10 +2,9 @@ extends layout
 block page
 	- var menu = "login"
 block content
-	div#select(class="blog")
+	div#select(class="blog", style="pointer-events: all;")
 		
 		include includes/header.pug
-
 		div.grid-container.blog
 			include menu.pug
 			include datagallery.pug

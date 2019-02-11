@@ -4,34 +4,38 @@ html
 		title= appTitle
 		meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
 		//meta(http-equiv="x-dns-prefetch-control" content="on")
-		link(rel="stylesheet", href="/stylesheets/default.css", type="text/css")
-		link(href="https://fonts.googleapis.com/css?family=Roboto", rel="stylesheet")
+		link(rel="stylesheet", href="/stylesheets/gpo.css", type="text/css")
+		link(rel="stylesheet", href="/stylesheets/style.css", type="text/css")
+		link(href="https://fonts.googleapis.com/css?family=Overpass,Merriweather", rel="stylesheet")
 		link(rel="stylesheet", href="/stylesheets/leaflet.css")
 		link(rel="stylesheet", href="/stylesheets/leaflet.draw.css")
 		script(type="text/javascript", src="/scripts/jquery.min.js")
 		script(src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js")
+		script(type="text/javascript", src="/scripts/vue-pick-a-date.js")
 		script(type="text/javascript", src="/scripts/marked.min.js")
 		script(type="text/javascript", src="/scripts/d3.v3.min.js")
 		script(type="text/javascript", src="/scripts/moment-with-locales.min.js")
 		script(type="text/javascript", src="/scripts/leaflet.js")
 		script(type="text/javascript", src="/scripts/Path.Drag.js")
 		script(type="text/javascript", src="/scripts/Leaflet.Editable.js")
+		script(type='text/javascript', src='/scripts/leaflet-image_0_4_0.js')
 
-	body
+	body(style="pointer-events: none;")
 		block page
 			
 		block header
 		block content
 				
-		#map
+		#map(style="pointer-events: all;")
 		a#publish_logo(href="https://github.com/tbushman/gnd" target="_blank")
 			img(src="/images/publish_logo.svg")
 		
 		script(type="text/javascript").
-			
 			Vue.prototype.moment = moment;
 			Vue.prototype.marked = marked;
-			
+			Vue.prototype.$ = $;
+			Vue.prototype.DatePicker = DatePicker;
+			Vue.use(DatePicker);
 			new Vue({ el: '#select',
 				data() {
 					return { 
@@ -91,7 +95,13 @@ html
 						uploadchtitle: null,
 						dragind: null,
 						latlngs: null,
-						repitem: []
+						repitem: [],
+						avail: null,
+						pickerbegin: false,
+						pickerend: false,
+						beginDate: '',
+						endDate: '',
+						zoom: 6
 					}
 				},
 				mounted() {
@@ -115,21 +125,31 @@ html
 						$('.selected').removeClass('selected');
 
 					});
-					self.sliderImg()
-
-					self.loadMap(function(dataLayer){
-						/*if (!map) return;
-						self.map = map;
-						self.dataLayer = dataLayer;*/
-						if (!dataLayer) return;
-						self.dataLayer = dataLayer
-						//- var point = self.map.latLngToLayerPoint(new L.LatLng(self.doc.geometry.coordinates[0], self.doc.geometry.coordinates[1]))
-						var bounds = self.dataLayer.getBounds();
-						self.map.fitBounds(bounds);
-						self.dataLayer.enableEdit();
-						self.lMarker = L.marker(map.getCenter(), {draggable: true}).addTo(self.map);
-						self.panZoom();
-					})
+					self.sliderImg();
+					if (!self.doc) {
+						if (self.data) {
+							self.doc = self.data[0]
+							console.log(self.doc)
+						}
+						//- self.doc = (!self.data ? (!self.dat ? '': self.dat[0][0]) : self.data[0]);
+					}
+					if (self.doc) {
+						self.loadMap(function(dataLayer){
+							/*if (!map) return;
+							self.map = map;
+							self.dataLayer = dataLayer;*/
+							if (!dataLayer) return;
+							self.dataLayer = dataLayer
+							//- var point = self.map.latLngToLayerPoint(new L.LatLng(self.doc.geometry.coordinates[0], self.doc.geometry.coordinates[1]))
+							var bounds = self.dataLayer.getBounds();
+							self.map.fitBounds(bounds);
+							console.log(dataLayer)
+							if (dataLayer)
+								self.dataLayer.enableEdit();
+							self.lMarker = L.marker(self.map.getCenter(), {draggable: true}).addTo(self.map);
+							//- self.panZoom();
+						})
+					}
 					
 					//- $(document).on('click', 'canvas', function(e){
 					//- 	if ($('.menu').hasClass('blog')) {
@@ -151,8 +171,24 @@ html
 					//- });
 				},
 				methods: {
+					formatDate(date){
+						return moment(date).utc().format();
+					},
+					pickerOpen(which){
+						var self = this;
+						if (which === 'begin') {
+							self.pickerend = false;
+							self.pickerbegin = true;
+							self.beginDate = moment().utc().format()
+						}else {
+							self.pickerbegin = false;
+							self.pickerend = true;
+							self.endDate = moment().utc().format()
+
+						}
+					},
 					ifNullThenObj(ob) {
-						if (!ob) return {properties: {placetype:'', title:''}};
+						if (!ob) return {properties: {placetype:'', title:'', time: {begin:moment().utc().format(), end: moment().utc().format()}}};
 						return ob;
 					},
 					parseBool: function(item) {
@@ -218,6 +254,16 @@ html
 								$(that).next('.drop').slideDown(200);
 							}
 						}
+					},
+					setBegin(e) {
+						var self = this;
+						if (!self.pu.properties.time) self.properties.time = {};
+						self.pu.properties.time.begin = e.target.value; 
+					},
+					setEnd(e) {
+						var self = this;
+						if (!self.pu.properties.time) self.properties.time = {};
+						self.pu.properties.time.end = e.target.value; 
 					},
 					changeTitle(e) {
 						var self = this;
@@ -400,6 +446,7 @@ html
 					},
 					checkNameValidity(aSearchTerm, aMsg, event)
 					{
+						var self = this;
 						var elem = event.target;//document.getElementById(aID);
 						for (var i = 0; i < elem.value.length; i++) {
 							if (aSearchTerm.indexOf(elem.value.charAt(i)) !== -1) {
@@ -409,21 +456,15 @@ html
 								elem.setAttribute("aria-invalid", "false");
 								//- removeOldAlert();
 							}
-							var check = elem.value;
+						}
+						var check = elem.value;
+						if (check !== '') {
 							//var check = $(elem).val();
 							var url = check.replace(' ', '_');
 							$.post('/sig/'+check).done(function(result){
-								if (result === 'Available') {
-									$('#append').remove(); 
-									$('#response').append('<p class="tb-font-m" id="append">Available</p>');
+								self.avail = (result === 'Available')
+								if (self.avail) {
 									$.post('/reserve/'+check+'');
-									$('#loginsection').css('display', 'block');
-									$('#registersection').css('display', 'block')
-									$('#pagetitle2').val(check);
-					
-								} else {
-									$('#append').remove(); 
-									$('#response').append('<p class="tb-font-m" id="append">That blog name is taken.</p>')
 								}
 							})
 						}
@@ -443,12 +484,13 @@ html
 						var self = this, dataLayer, 
 						map = new L.map('map', { 
 							//- maxBounds: L.latLngBounds([L.LatLng(43,-122),L.LatLng(-7,-188)]),
-							center: [
-								(!self.position ? 40.7608 : self.position.lat),
-								(!self.position ? -111.8910 : self.position.lng)
-							],
+							center: L.latLngBounds([
+								(!self.doc.geometry.coordinates[1] ? 40.7608 : self.doc.geometry.coordinates[1]),
+								(!self.doc.geometry.coordinates[0] ? -111.8910 : self.doc.geometry.coordinates[0])
+							]).getCenter(),
 							zoomControl: false, 
-							zoom: (!self.position ? 6 : self.position.zoom), minZoom: 4,	maxZoom: 18,
+							zoom: 6,//(!self.position ? 6 : self.position.zoom), 
+							minZoom: 4,	maxZoom: 18,
 							editable: true,
 							renderer: L.canvas(),
 							preferCanvas: true
@@ -463,7 +505,7 @@ html
 						L.tileLayer(t, opts).addTo(map);
 
 						map.on('zoomend', function(){ 
-							if (self.doc) self.setView(self.doc, self.di, self.ei, self.mi) 
+							if (self.doc) self.refreshMap(self.rxArr(self.doc.geometry.coordinates)) 
 						});
 						self.map = map;
 						if (!self.dataLayer && self.data) {
@@ -491,6 +533,7 @@ html
 							if (!Array.isArray(c[0])) {return self.rxOrNo(c) }
 							else {return} })} else {return} })} else {return} })} else {return}
 						});
+						console.log(arr)
 						return arr; 
 					} /*Leaflet requires reversed geo-coordinate (lat, lng)*/,
 					evalTime(time) {/*some time ranges in data require difference calc*/
@@ -541,29 +584,81 @@ html
 						});
 					
 						if (self.dataLayer) self.dataLayer.remove(); 
-						if (ft.length && self.map) { 
-							dataLayer = L.featureGroup();
-							ft.forEach(function(f, i) {
-								var opts = { 
-									radius: 11, weight: 1, fillOpacity: 0.1,
-									color: '#fff', fillColor: 'var(--highlight)', opacity: 1 }
-								var coords = f.geometry.coordinates;
-								// geojson uses [lng, lat] and Leaflet uses [lat, lng]
-								var cd = self.rxArr(coords);
-								if (f.geometry.type === 'Point') { 
-									var c = L.circleMarker(cd, opts ).on('click', function(){
-										return self.setView(f, i, null, 0)
-									});
-									c.addTo(dataLayer);
-								} else { 
-									var p = L.polygon(cd, opts).on('click', function(){
-										return self.setView(f, i, null, 0)
-									});
-									p.addTo(dataLayer); 
-								} 
-							});
-							self.map.addLayer(dataLayer);
-						} 
+						var dataLayer = L.GeoJSON.geometryToLayer(self.doc, {
+									// MongoDB stores coordinates as [lng, lat]
+									// Leaflet uses [lat, lng]
+									
+									onEachFeature: function (feature, layer) {
+										if (feature.geometry.type === 'Point') {
+										}
+										if (feature.geometry.type === 'Polygon') {
+											//layer.setLatLngs(self.doc.geometry.coordinates[0])
+											//self.latlngs = layer.getLatLngs()
+										}
+										
+									},
+									geometryToLayer: function(feature) {
+										if (feature.geometry.type === 'Polygon') {
+											//console.log(feature.geometry.type )
+											var geojsonPolygonOptions = {
+												fillColor: 'var(--highlight)',
+												color: '#fff',
+												weight: 2,
+												opacity: 1,
+												fillOpacity: 0.8,
+												className: feature._id
+												
+											};
+											var polygon = L.polygon(self.rxArr(feature.geometry.coordinates), geojsonPolygonOptions);
+											//polygon.enableEdit();
+											//polygon.on('dblclick', L.DomEvent.stop).on('dblclick', dataLayer.toggleEdit);
+											return polygon;
+										}
+									},
+									pointToLayer: function (feature, latlng) {
+										if (feature.geometry.type === 'Point') {
+											//console.log(feature)
+											var geojsonMarkerOptions = {
+												radius: 11,
+												fillColor: 'var(--highlight)',
+												color: '#fff',
+												weight: 2,
+												opacity: 1,
+												fillOpacity: 0.8,
+												className: feature._id+'@'+map.latLngToLayerPoint(latlng).x+','+map.latLngToLayerPoint(latlng).y+''
+											};
+											var circleMarker = L.circleMarker(latlng, geojsonMarkerOptions);
+											return circleMarker;
+										}
+										
+									}
+								})//.addTo(map);
+								
+								//cb(map, dataLayer)
+								self.map.addLayer(dataLayer);
+						//- if (ft.length && self.map) { 
+						//- 	dataLayer = L.featureGroup();
+						//- 	ft.forEach(function(f, i) {
+						//- 		var opts = { 
+						//- 			radius: 11, weight: 1, fillOpacity: 0.1,
+						//- 			color: '#fff', fillColor: 'var(--highlight)', opacity: 1 }
+						//- 		var coords = f.geometry.coordinates;
+						//- 		// geojson uses [lng, lat] and Leaflet uses [lat, lng]
+						//- 		var cd = self.rxArr(coords);
+						//- 		if (f.geometry.type === 'Point') { 
+						//- 			var c = L.circleMarker(cd, opts ).on('click', function(){
+						//- 				return self.setView(f, i, null, 0)
+						//- 			});
+						//- 			c.addTo(dataLayer);
+						//- 		} else { 
+						//- 			var p = L.polygon(cd, opts).on('click', function(){
+						//- 				return self.setView(f, i, null, 0)
+						//- 			});
+						//- 			p.addTo(dataLayer); 
+						//- 		} 
+						//- 	});
+						//- 	self.map.addLayer(dataLayer);
+						//- } 
 						cb(dataLayer); 
 					} /*map geatures*/,
 					refreshMap(cd){ 
@@ -586,19 +681,9 @@ html
 					// console.log(lat, lng)
 						if (lat && lng) { 
 							let latlng = new L.LatLng(lat, lng), nl;
-							var n = self.map.latLngToLayerPoint(latlng), 
-							x = n.x, 
-							y = n.y,
-							dL = (self.skittle.x - (self.wWidth/2)), 
-							dB = (self.wHeight/2) - self.skittle.y;
-								//- self.skittle.y - self.wHeight;
-							// if (self.res) { /* if screen width < 1000 -- responsive skittle offset*/
-								nl = self.map.layerPointToLatLng(L.point((x-dL), (y+dB)));
-							// } else { 
-							//	nl = latlng 
-							//}
-							self.map.panTo(nl);
-							self.position.zoom = self.map.getZoom(); 
+							
+							self.map.panTo(latlng);
+							self.zoom = self.map.getZoom(); 
 						}
 					},
 				}

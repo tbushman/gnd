@@ -1,10 +1,10 @@
 var mongoose = require('mongoose'),
+		Publisher = require('mongoose-geojson-schema'),
 		Schema = mongoose.Schema,
 		passportLocalMongoose = require('passport-local-mongoose'),
-		Content = require('mongoose-geojson-schema'),
 		Signature = require('./signatures.js');
 
-var Publisher = new Schema({
+var schema = new Schema({
 	username: {
 		type: String,
 		unique: true,
@@ -16,15 +16,30 @@ var Publisher = new Schema({
 	email: String,
 	sig: [Signature],
 	geometry: Schema.Types.Polygon,
+	admin: Boolean,
 	properties: {
 		place: String,
 		placetype: String,
 		title: String,
-		givenName: String
+		givenName: String,
+		time: {
+			begin: Date,
+			end: Date
+		}
 	}
 	
 }, { collection: 'gnd' });
-Publisher.index({ geometry: '2dsphere' });
-Publisher.plugin(passportLocalMongoose);
+schema.index({ geometry: '2dsphere' });
+schema.plugin(passportLocalMongoose);
+// geometry: {
+// 	type: {
+// 		type: String,
+// 		enum: ['MultiPolygon'],
+// 		required: true
+// 	},
+// 	coordinates: {
+// 		type: [[Number]]
+// 	}
+// },
 
-module.exports = mongoose.model('Publisher', Publisher);
+module.exports = mongoose.model('Publisher', schema);

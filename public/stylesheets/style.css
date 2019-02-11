@@ -3,7 +3,8 @@
 	--primary: #BAD80A; 
 	--secondary: #C5E3F7; 
 	--panelheight: 85%; 
-	--fontname: 'Roboto'; 
+	--fontname: 'Overpass';
+	--serif: 'Merriweather';
 	--thumbwidth: 70px; 
 	--iconwidth: 32px;
 	--windowmenu: 85%; 
@@ -291,6 +292,50 @@ i.fa.active {
 	margin: 0 auto;
 	text-align: center;
 }
+*[class^='tb-1'], *[class^='tb-0'] {
+	padding-right: 0;
+
+	display: inline-block;
+	margin: 0 auto;
+	width: auto;
+	height: auto;
+	box-sizing: border-box;
+	/*pointer-events: auto;*/
+	overflow-x: hidden;
+	overflow-y: hidden;
+	vertical-align: top;
+} 
+
+*[class^='tb-10-'] {
+	width: 100%;
+}
+*[class^='tb-09-'] {
+	width: 90%;
+}
+*[class^='tb-08-'] {
+	width: 80%;
+}
+*[class^='tb-07-'] {
+	width: 70%;
+}
+*[class^='tb-06-'] {
+	width: 60%;
+}
+*[class^='tb-05-'] {
+	width: 50%;
+}
+*[class^='tb-04-'] {
+	width: 40%;
+}
+*[class^='tb-03-'] {
+	width: 30%;
+}
+*[class^='tb-02-'] {
+	width: 20%;
+}
+*[class^='tb-01-'] {
+	width: 10%;
+}
 
 #hide .tb-font-xxs {
 	font-size: 8px;
@@ -395,7 +440,7 @@ a.accordion:hover .ui path {
 	grid-template-columns: auto minmax(-webkit-max-content, 0px) minmax(100%, 180px);
 	grid-template-columns: auto minmax(max-content, 0px) minmax(100%, 180px);
 	grid-template-rows: minmax(-webkit-max-content, var(--thumbwidth)) minmax(-webkit-max-content, 100%) var(--thumbwidth);
-	grid-template-rows: minmax(max-content, var(--thumbwidth)) minmax(max-content, 100%) var(--thumbwidth);
+	grid-template-rows: minmax(max-content, var(--thumbwidth)) minmax(max-content, 100%) calc(var(--thumbwidth) * 1.5);
 	background-color: rgba(255,255,255,0);
 	background-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 0, rgba(255, 255, 255, 0) calc(var(--thumbwidth) / 2), rgba(255, 255, 255, 0.9) calc(var(--thumbwidth) / 2));
 	pointer-events: auto;
@@ -409,12 +454,13 @@ a.accordion:hover .ui path {
 	top: auto;
 	min-height: var(--panelheight);
 	overflow-x: hidden;
+	overflow-y: hidden;
 }
 .grid-container.blog {
 	height: var(--panelheight);
 	/*width: calc(100% - var(--thumbwidth));*/
 	width: 100%;
-	overflow-y: scroll;
+	/* overflow-y: scroll; */
 }
 .grid-container.draw {
 	height: var(--panelheight);
@@ -509,10 +555,8 @@ a.accordion:hover .ui path {
 .grid-header.mainHeader {
 	max-width: 100%;
 	background-color: rgba(255,255,255,0);
-	min-height: 80px;
 	overflow: scroll;
 	white-space: nowrap;
-	margin-right: -180px;
 }
 @supports not (display:grid) {
 	.grid-header.mainHeader {
@@ -553,6 +597,8 @@ a.grid-header:hover {
 	grid-area: mid;
 	overflow: hidden;
 	background-color: rgba(255,255,255,0);
+	font-family: var(--serif), serif!important;
+	padding-right: 10px!important;
 }
 @supports not (display:grid) {
 	.grid-mid {
@@ -1168,8 +1214,30 @@ a.tool span {
 	width: 100%;
 	height: auto;
 }
-.picker__select--year {
+/* .picker__select--year {
 	overflow-y: scroll;
+} */
+
+#dateend_root {
+	/* width: 100vw;
+	height: 100vh; */
+}
+
+/* .picker__holder, .picker__frame {
+	-webkit-transform: translateY(0)!important;
+
+	-ms-transform: translateY(0)!important;
+
+	transform: translateY(0)!important;
+}
+.picker__frame {
+	opacity: 1;
+} */
+.picker__holder {
+	display: none;
+}
+.picker__button--today, .picker__button--clear {
+	display: none;
 }
 #arrows {
 	pointer-events: none;

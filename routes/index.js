@@ -536,7 +536,13 @@ router.post('/register', function(req, res, next) {
 			if (err) {
 				return next(err)
 			}
-			Publisher.register(new Publisher({ username : req.body.username, avatar: '/images/publish_logo_sq.svg', language: req.body.languages, properties: { givenName: encodeURIComponent(req.body.givenName), title: req.body.title, place: req.body.place } }), req.body.password, function(err, user) {
+			var admin;
+			if (req.body.username === 'tbushman') {
+				admin = true;
+			} else {
+				admin = false;
+			}
+			Publisher.register(new Publisher({ username : req.body.username, avatar: '/images/publish_logo_sq.svg', language: req.body.languages, admin: admin, properties: { givenName: encodeURIComponent(req.body.givenName), title: req.body.title, place: req.body.place } }), req.body.password, function(err, user) {
 				if (err) {
 					return res.render('register', {info: "Sorry. That Name already exists. Try again.", languages: langs});
 				}
@@ -588,9 +594,9 @@ router.get('/logout', function(req, res, next) {
 			req.session.loggedin = null;
 			req.session.failedAttempt = false;
 			req.logout();
-			next(null)
+			next(null, req)
 		},
-		function(next) {
+		function(req, next) {
 			if (req.user || req.session) {
 				req.user = null;
 				req.session.destroy(function(err){
@@ -628,6 +634,19 @@ router.get('/login', function(req, res, next){
 		user: req.user
 	});
 });
+
+router.post('/sig/:givenName', function(req, res, next){
+	Publisher.find({'properties.givenName': decodeURIComponent(req.params.givenName)}, function(error, pages){
+		if (error) {
+			return next(error)
+		}
+		if (!error && pages.length > 0) {
+			return res.send('This name is in use.')
+		}
+		return res.send('Available')
+
+	})
+})
 
 router.all('/translate/:text', function(req, res, next){
 
@@ -701,7 +720,7 @@ router.get('/home', getDat, function(req, res, next) {
 router.get('/api/publish', function(req, res, next) {
 
 	var outputPath = url.parse(req.url).pathname;
-	async.waterfall([
+	asynk.waterfall([
 		function(cb) {
 			Publisher.findOne({_id: req.session.userId}, function(err, pu){
 				if (err) {
@@ -714,14 +733,6 @@ router.get('/api/publish', function(req, res, next) {
 					cb(null, pu, pages)
 				})
 			})
-		},
-		function(pu, pages, cb) {
-			if (pages.length === 0) {
-				if (pu.admin) {
-					return res.redirect('/api/new/'+0+'')
-				}
-			}
-			cb(null, pu, pages)
 		}
 	], function(err, pu, pages){
 		if (err) {
@@ -809,6 +820,7 @@ router.get('/menu/:title/:chapter', function(req, res, next){
 		return res.render('publish', {
 			menu: 'data',
 			dat: [data],
+			data: data,
 			loggedin: req.session.loggedin
 		})
 	})
@@ -818,13 +830,30 @@ router.get('/menu/:title/:chapter', function(req, res, next){
 router.get('/api/new/:chind', async function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
 	var coastlines = //await //JSON.stringify(
-		require(''+path.join(__dirname, '/..')+'/public/json/coastlines.js').features
+		require(''+path.join(__dirname, '/..')+'/public/json/coastlines.json').features
 	//);
-	console.log(coastlines)
-	var multiPolygon = await coastlines.features.map(function(ft) {
-		return ft.geometry.coordinates
+	// console.log(coastlines)
+	var keys = await Object.keys(coastlines[0])
+	// var multiPolygon = [
+	// 	[[ -153.5, 18 ], [ -153.5, 21 ], [ -157, 21 ], [ -157, 18 ], [ -153.5, 18 ]]
+	// ]
+	// console.log(keys);
+	var multiPolygon = await coastlines.map(function(ft) {
+		if (Array.isArray(ft.geometry.coordinates)) {
+			// console.log(ft.geometry.coordinates)
+			return ft.geometry.coordinates			
+		} else {
+			console.log('doh')
+			console.log(ft)
+			return;
+		}
 	});
-	var hRes = await require(''+path.join(__dirname, '/..')+'/public/html/gnd.html')
+	// console.log(multiPolygon)
+	//if (!multiPolygon) return res.redirect('/logout')
+	var hRes = //await JSON.stringify(
+		//require(
+			await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/html/gnd.html', 'utf8')
+	//)
 	//console.log(outputPath)
 	var csrf = req.csrfToken();
 	Content.find({}).sort( { index: 1 } ).exec(async function(err, data){
@@ -836,9 +865,9 @@ router.get('/api/new/:chind', async function(req, res, next){
 				return next(err)
 			}
 			if (chunk.length) return res.redirect('/');
-			await fs.copySync(''+path.join(__dirname, '/..')+'/public/images/publish_logo_sq.jpg', ''+publishers+'/pu/publishers/gnd/images/thumbs/'+(data.length)+'/thumb_0.png')
-			await fs.copySync(''+path.join(__dirname, '/..')+'/public/images/publish_logo_sq.jpg', ''+publishers+'/pu/publishers/gnd/images/full/'+(data.length)+'/img_0.png')
-			var content = new Content({
+			await fs.copySync(''+path.join(__dirname, '/..')+'/public/images/publish_logo_sq.svg', ''+publishers+'/pu/publishers/gnd/images/thumbs/'+(data.length)+'/thumb_0.png')
+			await fs.copySync(''+path.join(__dirname, '/..')+'/public/images/publish_logo_sq.svg', ''+publishers+'/pu/publishers/gnd/images/full/'+(data.length)+'/img_0.png')
+			var content = await new Content({
 				type: 'Feature',
 				index: data.length,
 				// db
@@ -883,13 +912,21 @@ router.get('/api/new/:chind', async function(req, res, next){
 					sig: [ ]	
 				},
 				geometry: {
-					type: 'MultiPolygon',
-					coordinates: JSON.parse(JSON.stringify(multiPolygon))
+					type: 'Polygon',
+					coordinates: 
+						// JSON.stringify(
+							[[[ -153.5, 18 ], [ -153.5, 21 ], [ -157, 21 ], [ -157, 18 ], [ -153.5, 18 ]]]
+						// )
+					//JSON.parse(JSON.stringify(
+						//multiPolygon
+					//))
 				}
 			});
+			console.log(content.geometry)
 			content.save(function(err){
 				if (err) {
 					console.log(err)
+					return next(err)
 				}
 				Content.find({}).sort( { index: 1 } ).exec(function(err, data){
 					if (err) {
@@ -1040,8 +1077,8 @@ router.post('/api/editcontent/:id', function(req, res, next){
 					sig: sig
 				},
 				geometry: {
-					type: "MultiPolygon",
-					coordinates: JSON.parse(body.latlng)
+					type: "Polygon",
+					coordinates: JSON.parse(JSON.stringify(body.latlng))
 				}
 			}
 			

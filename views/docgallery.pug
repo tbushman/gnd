@@ -1,27 +1,26 @@
 //- - var marked = marked
-
 div.grid-right(v-if="infowindow === 'edit'")
 	include docedit.pug
 div.grid-right(v-else-if="infowindow !== 'edit'")
 	//- if (infowindow === 'edit')
 	//- 
 	//- else
-	div.grid-container.inner
-		div.grid-header(v-if="pageIndex")
-		
-			p.tb-font-xl(v-if="doc && index && doc.properties" v-text="doc.properties.title")
-		
-		
-		div.grid-left(style="padding: 6px 0 0 6px;")
-			span(v-html="marked(doc.properties.description)")
-			div.row
-				div.tb-03-m0(v-for="(sig, s) in doc.sig")
-					//- img(:src="sig.img")
-					span.tb-font-s(v-text="'/'+sig.givenName+'/'")
-		div.grid-footer
-			a.img(@click="initSig(doc._id)", title="Sign")
-				.ui
-					img(src="/images/icons/edit.svg")
+	//- div.grid-container.inner.row
+	div.grid-header(v-if="pageIndex")
+	
+		p.tb-font-xl(v-if="doc && index && doc.properties" v-text="doc.properties.title")
+	
+	
+	div.grid-mid(style="padding: 6px 0 0 6px;")
+		span.tb-10-m0(v-html="marked(doc.properties.description)")
+		div.row
+			div.tb-03-m0(v-for="(sig, s) in doc.sig")
+				//- img(:src="sig.img")
+				span.tb-font-s(v-text="'/'+sig.givenName+'/'")
+div.grid-footer
+	a.img(@click="initSig(doc._id)", title="Sign")
+		.ui
+			img(src="/images/icons/edit.svg")
 						
 			//onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"', function(){ window.location.href = '/api/selectlayer'});"
 			//- a.tool(v-if="doc.publishers[0].username === loggedin" href="#")
@@ -83,4 +82,4 @@ div.grid-right(v-else-if="infowindow !== 'edit'")
 //- //- 
 //- //- 		hr
 		
-div.grid-footer
+//- div.grid-footer

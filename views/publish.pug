@@ -14,12 +14,14 @@ block page
 				- var menu = 'home'
 block content
 	
-	div#select(:class="type")
+	div#select(:class="type", style="pointer-events: auto;")
 		include includes/header.pug
+
 		div.grid-container(:class="type" v-if="doc")
 			- console.log('blrg')
 			include menu.pug
 			include docgallery.pug
+			
 		div.grid-container(:class="type" v-else-if="!doc")
 			- menu = 'home'
 			include menu.pug
