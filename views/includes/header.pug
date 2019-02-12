@@ -10,8 +10,8 @@ if (menu === "register" || menu === "login")
 else
 	div.menu(:class="type")
 
-		div.overtext(v-text="(doc && index && doc.properties ? doc.properties.title : '"+appTitle+"')")
-		div.blogname(v-text="(doc && index && doc.pagetitle ? doc.pagetitle : '')")
+		div.overtext(v-text="(dat && dat[0][0] && dat[0][0].title.str !== '' ? ((parseInt(dat[0][0].title.ind, 10) + 1) + 'th ' + dat[0][0].title.str) : '"+appTitle+"')")
+		//- div.blogname(v-text="(doc && doc.pagetitle ? doc.pagetitle : '')")
 		div.envel
 			canvas#maincanvas.maincanvas.topRight(:style="{cursor: getCursor()}")
 		div.topLeft

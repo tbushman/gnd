@@ -33,20 +33,20 @@ var schema = new Schema({
 			begin: Date,
 			end: Date
 		},
-		media: [
-			{
-				index: Number,
-				name: String,
-				image: String,
-				image_abs: String,
-				thumb: String,
-				thumb_abs: String,
-				caption: String,
-				postscript: String,
-				url: String,
-				orientation: String
-			}
-		],
+		// media: [
+		// 	{
+		// 		index: Number,
+		// 		name: String,
+		// 		image: String,
+		// 		image_abs: String,
+		// 		thumb: String,
+		// 		thumb_abs: String,
+		// 		caption: String,
+		// 		postscript: String,
+		// 		url: String,
+		// 		orientation: String
+		// 	}
+		// ],
 		footnotes: [ ],
 		sig: [Signatures]
 	}

@@ -1,7 +1,7 @@
 p#info.tb-font-s(width="100%")
 //(style="float: left;")
 form#form.tb-u-100(
-	v-if="doc && index && doc.properties"
+	v-if="doc && doc.properties"
 	enctype="multipart/form-data", method="POST", 
 	:action="'/api/editcontent/'+doc.urltitle+'/'+doc.pageindex+'/'+index+'/'+drawtype+'/'+doc.properties.level", style="margin-bottom: 50px")
 					

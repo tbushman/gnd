@@ -1,85 +1,37 @@
-//- - var marked = marked
-div.grid-right(v-if="infowindow === 'edit'")
-	include docedit.pug
-div.grid-right(v-else-if="infowindow !== 'edit'")
-	//- if (infowindow === 'edit')
-	//- 
-	//- else
-	//- div.grid-container.inner.row
-	div.grid-header(v-if="pageIndex")
-	
-		p.tb-font-xl(v-if="doc && index && doc.properties" v-text="doc.properties.title")
-	
-	
-	div.grid-mid(style="padding: 6px 0 0 6px;")
-		span.tb-10-m0(v-html="marked(doc.properties.description)")
-		div.row
-			div.tb-03-m0(v-for="(sig, s) in doc.sig")
-				//- img(:src="sig.img")
-				span.tb-font-s(v-text="'/'+sig.givenName+'/'")
-div.grid-footer
-	a.img(@click="initSig(doc._id)", title="Sign")
-		.ui
-			img(src="/images/icons/edit.svg")
-						
-			//onclick="$.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+contentData.level+"', function(){ window.location.href = '/api/selectlayer'});"
-			//- a.tool(v-if="doc.publishers[0].username === loggedin" href="#")
-			//- 	.ui
-			//- 		img(:src="(doc.properties.media[mi].image !== '' ? doc.properties.media[mi].image : doc.publishers[0].avatar)", style="width: auto; height: 100%;", :alt="doc.pagetitle+' '+ranks[index]+' signature'")
-			//- 
-			//- a.tool(:href="'/sig/'+doc.pagetitle+'/'+index+''")
-			//- 	.ui
-			//- 		img(:src="(doc.properties.media[mi].image !== '' ? doc.properties.media[mi].image : doc.publishers[0].avatar)", style="width: auto; height: 100%;", :alt="doc.pagetitle+' '+ranks[index]+' signature'")
+if (menu === 'edit')
+	div.grid-right
+		include docedit.pug
+if (menu === 'sign')
+	div.grid-right
+		div.grid-header
+			
+			a.img(@click="setDrawType('filling', $event)", title="Sign")
+				.ui
+					img(src="/images/filling/filling_0.svg")
+			
+			a.img(@click="setDrawType('substrates', $event)", title="Erase")
+				.ui
+					img(src="/images/filling/tools_0.svg")
+if (menu === 'doc')
 		
-//- 	//- div.grid-right
-//- 	//- 	- var count = 0
-//- 	//- 	each item, i in contentData.info
-//- 	//- 		- var allergies = menuData.publishers[0].allergies;
-//- 	//- 		if (item.unlocked && item.spec.unlock)
-//- 	//- 			- var drawtyp = item.spec.unlock.split('.')[0]
-//- 	//- 			- var drawind = parseInt(item.spec.unlock.split('.')[1], 10)
-//- 	//- 			- var nextind = drawind + 1
-//- 	//- 			- count++
-//- 	//- 			if (allergies.indexOf(contentData[drawtyp][drawind].name) === -1 && allergies.indexOf(contentData[drawtyp][nextind].name) === -1 && allergies.indexOf(item.name) === -1)
-//- 	//- 				p.tb-font-l
-//- 	//- 					!= md(item.name.toUpperCase())
-//- 	//- 				p.tb-font-s.translate #{item.caption}
-//- 	//- 
-//- 	//- 
-//- 	//- 					//if (drawind === contentData[drawType][i].ind)
-//- 	//- 			span.tb-font-xxs Use the 
-//- 	//- 			if (allergies.indexOf(contentData[drawtyp][drawind].name) === -1)
-//- 	//- 				span.tb-font-xxs #{contentData[drawtyp][drawind].name}
-//- 	//- 			else
-//- 	//- 				span.tb-font-xxs #{contentData[drawtyp][drawind+1].name}
-//- 	//- 			if (i !== 0)
-//- 	//- 				span.tb-font-xxs  or the 
-//- 	//- 				if (allergies.indexOf(contentData[drawtyp][nextind].name) === -1)
-//- 	//- 					span.tb-font-xxs #{contentData[drawtyp][nextind].name}
-//- 	//- 				else
-//- 	//- 					span.tb-font-xxs #{contentData[drawtyp][nextind+1].name}
-//- 
-//- 	div.grid-footer
-//- 
-//- //- else
-//- //- 	each entry, k in menuData.content
-//- //- 		a.tb-font-m.tb-u-100(href="/sig/"+menuData.pagetitle+"", title="Go to "+menuData.pagetitle+"") #{menuData.pagetitle}
-//- //- 		a.tool(href="/sig/"+menuData.pagetitle+"/"+entry.index+"")
-//- //- 			.ui
-//- //- 				img(src= entry.image !== "" ? entry.image : menuData.publishers[0].avatar, style="width: auto; height: 100%;", alt=""+menuData.pagetitle+"'s "+ranks[contentData.index]+" snack")
-//- //- 
-//- //- 		//-
-//- //- 			if (loggedin && loggedin === menuData.publishers[0].username)
-//- //- 				div(style="padding: 10px 0 0 10px")
-//- //- 					a.tb-font-m(style="margin: 6px 0 0 6px;z-index: 0;", href="/api/editcontent/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"", title="Edit "+menuData.pagetitle+"")
-//- //- 						img(src="/images/tools/tools_"+entry.level+".svg")
-//- //- 		br
-//- //- 		p.tb-font-s.hideoverlap #{entry.title}
-//- //- 		if (entry.description)
-//- //- 			p.tb-font-xs.hideoverlap #{entry.description}
-//- //- 
-//- //- 
-//- //- 
-//- //- 		hr
+	div.grid-right(v-else-if="infowindow !== 'edit'")
+		//- if (infowindow === 'edit')
+		//- 
+		//- else
+		//- div.grid-container.inner.row
+		div.grid-header(v-if="pageIndex")
 		
-//- div.grid-footer
+			p.tb-font-xl(v-if="doc && doc.properties" v-text="doc.properties.title")
+		
+		
+		div.grid-mid(style="padding: 6px 0 0 6px;")
+			span.tb-10-m0(v-html="marked(doc.properties.description)")
+			div.row
+				div.tb-03-m0(v-for="(sig, s) in doc.sig")
+					//- img(:src="sig.img")
+					span.tb-font-s(v-text="'/'+sig.givenName+'/'")
+	div.grid-footer
+		a.img(@click="initSig(doc._id)", title="Sign")
+			.ui
+				img(src="/images/icons/edit.svg")
+		p.tb-font-xs.hideoverlap(v-text="'/'+sig.givenName+'/'")

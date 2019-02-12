@@ -6,11 +6,20 @@ var Signature = new Schema({
 	lat: Number,
 	lng: Number,
 	bin: String,
-	img: String,
 	pu: String,
 	username: String,
 	givenName: String,
-	documentId: String
+	documentId: String,	
+	index: Number,
+	image: String,
+	image_abs: String,
+	thumb: String,
+	thumb_abs: String,
+	caption: String,
+	postscript: String,
+	url: String,
+	orientation: String
+
 })
 
 module.exports = Signature;

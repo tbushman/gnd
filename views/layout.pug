@@ -16,9 +16,6 @@ html
 		script(type="text/javascript", src="/scripts/d3.v3.min.js")
 		script(type="text/javascript", src="/scripts/moment-with-locales.min.js")
 		script(type="text/javascript", src="/scripts/leaflet.js")
-		script(type="text/javascript", src="/scripts/Path.Drag.js")
-		script(type="text/javascript", src="/scripts/Leaflet.Editable.js")
-		script(type='text/javascript', src='/scripts/leaflet-image_0_4_0.js')
 
 	body(style="pointer-events: none;")
 		block page
@@ -40,16 +37,21 @@ html
 				data() {
 					return { 
 						months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+						menu: this.parseObj(!{JSON.stringify(menu)}),
 						pu: this.ifNullThenObj(!{JSON.stringify(pu)}),//{properties: {}},
 						dat: this.parseObj(!{JSON.stringify(dat)}),
 						data: this.parseObj(!{JSON.stringify(data)}),
 						doc: this.parseObj(!{JSON.stringify(doc)}),
-						infowindow: this.parseObj(!{JSON.stringify(infowindow)}),
-						index: this.parseObj(!{JSON.stringify(index)}),
-						pageIndex: this.parseObj(!{JSON.stringify(pageIndex)}),
+						dids: [],
+						did: (this.parseObj(!{JSON.stringify(doc)}) === '' ? 0 : this.parseObj(!{JSON.stringify(doc)}).index),
+						//- infowindow: this.parseObj(!{JSON.stringify(infowindow)}),
+						//- index: this.parseObj(!{JSON.stringify(index)}),
+						//- pageIndex: this.parseObj(!{JSON.stringify(pageIndex)}),
+						// substrates, filling
 						drawtype: this.parseObj(!{JSON.stringify(drawtype)}),
+						// blog, draw, map
 						type: this.parseStr(!{JSON.stringify(type)}),
-						layer: this.parseObj(!{JSON.stringify(layer)}),
+						//- layer: this.parseObj(!{JSON.stringify(layer)}),
 						rep: {
 							// TODO map: ['Community Organizer'],
 							'ZIP4': ['resident', 'landlord', 'Community Organizer'],
@@ -66,8 +68,8 @@ html
 						foundRotationAngle: false,
 						scale: 1,
 						mousePressed: false,
-						drawCoalesced: false,
-						loadedLayer: this.loadedCanvas(),
+						//- drawCoalesced: false,
+						//- loadedLayer: this.loadedCanvas(),
 						can: null,
 						ctx: null,
 						image: null,
@@ -75,22 +77,14 @@ html
 						cH: window.innerHeight,
 						rX: 35,
 						rY: 35,
-						erase: false,
+						// favor drawType
+						//- erase: false,
 						cursor: 'pointer',
-						mode: 'blog',
+						//- mode: 'blog',
 						ranks: ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"],
 						keys: ["tools", "filling"],
 						loggedin: this.parseObj(!{JSON.stringify(session.loggedin)}),
 						info: '',
-						accordions: (this.parseObj(!{JSON.stringify(dat)}) !== '' && this.parseBool(!{JSON.stringify(exports)}) ? this.parseObj(!{JSON.stringify(dat)}).map(function(data){return data.map(function(doc){return doc.index})}) : 
-							(
-								this.parseObj(!{JSON.stringify(dat)}) !== '' ?
-								[
-									this.parseObj(!{JSON.stringify(dat)}).map(function(data){return []})
-								] :
-								[[]]
-							)
-						),
 						ff: this.parseObj(!{JSON.stringify(ff)}),
 						uploadchtitle: null,
 						dragind: null,
@@ -101,7 +95,17 @@ html
 						pickerend: false,
 						beginDate: '',
 						endDate: '',
-						zoom: 6
+						zoom: 6,
+						sliderIndex: 0,
+						accordions: (this.parseObj(!{JSON.stringify(dat)}) !== '' && this.parseBool(!{JSON.stringify(exports)}) ? this.parseObj(!{JSON.stringify(dat)}).map(function(data){return data.map(function(doc){return doc.index})}) : 
+							(
+								this.parseObj(!{JSON.stringify(dat)}) !== '' ?
+								[
+									this.parseObj(!{JSON.stringify(dat)}).map(function(data){return []})
+								] :
+								[[]]
+							)
+						)
 					}
 				},
 				mounted() {
@@ -126,11 +130,21 @@ html
 
 					});
 					self.sliderImg();
+					self.dids = (self.data && self.data !== '' ? self.data.map(function(doc){
+						return doc.index;
+					}) : [(!self.doc || self.doc === '' ? 0 : self.doc.index)] );
+					self.dids.sort();
 					if (!self.doc) {
 						if (self.data) {
 							self.doc = self.data[0]
 							console.log(self.doc)
+						} else {
+							if (self.dat[0]) {
+								self.data = [].concat.apply([], self.dat);
+							}
 						}
+						self.dids = [self.doc.index];
+						self.did = 0;
 						//- self.doc = (!self.data ? (!self.dat ? '': self.dat[0][0]) : self.data[0]);
 					}
 					if (self.doc) {
@@ -150,7 +164,35 @@ html
 							//- self.panZoom();
 						})
 					}
-					
+					//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
+					//- $(document).on('touchstart, mouseover', '.translate', function (e) {
+					//- 	var link = $(this); //preselect the link
+					//- 	if (link.hasClass('hover')) {
+					//- 		return true;
+					//- 	} else {
+					//- 		e.preventDefault();
+					//- 		link.addClass('hover');
+					//- 		$('a.taphover').not(this).removeClass('hover');
+					//- 		var text = link.html();
+					//- 		if (text.split('<')[1] === undefined) {
+					//- 			text = encodeURIComponent(text);
+					//- 			$.post('/translate/'+text+'').then(function(result){
+					//- 				console.log(result)
+					//- 				addAlert(result);
+					//- 			})
+					//- 		}
+					//- 		return false;
+					//- 	}
+					//- });
+					//- $(document).on('touchend, mouseleave', '.translate', function (e){
+					//- 	var link = $(this); //preselect the link
+					//- 	if (link.hasClass('hover')) {
+					//- 		$('.translate').removeClass('hover');
+					//- 	}
+					//- 	removeOldAlert()
+					//- 	return true;
+					//- });
+
 					//- $(document).on('click', 'canvas', function(e){
 					//- 	if ($('.menu').hasClass('blog')) {
 					//- 		uiDrawMode()
@@ -317,6 +359,21 @@ html
 						//- }
 
 					},
+					setDrawType(drawType, e) {
+						var self = this;
+						self.drawType = drawType;
+						self.menu = 'draw';
+						//- switch(self.menu) {
+						//- 	case 'draw':
+						//- 		break;
+						//- 	case 'blog':
+						//- 		break;
+						//- 	case 'map':
+						//- 		break;
+						//- 	default:
+						//- 
+						//- }
+					},
 					loadedCanvas() {
 						
 					},
@@ -350,7 +407,7 @@ html
 						}
 
 						if (event.type == "mouseup")
-							mousePressed = false;
+							self.mousePressed = false;
 					},
 					touchHandler(event) {
 						event.preventDefault();
@@ -362,7 +419,7 @@ html
 					},
 					drawTouch(eventTarget, touch, eventType, drawThis) {
 						var self = this;
-						var drawType = 'filling';
+						var drawType = self.drawType;//'filling';
 						var layer = 0;
 
 						//- if (!(touch.identifier in self.touchMap)) {
@@ -391,9 +448,10 @@ html
 						self.cursor = 'grabbing'
 
 						if (
-							self.erase
+							self.drawType === 'substrates' && self.mousePressed
 							//- $('#erase').val() !== ''
 						) {
+							eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+0+'.svg"), grabbing;');
 							self.ctx.fillStyle = 'rgba(0,0,0,1)';
 							self.ctx.globalCompositeOperation = "destination-out";//context.createPattern(pCanvas, 'no-repeat');
 							self.ctx.fill();
@@ -461,7 +519,7 @@ html
 						if (check !== '') {
 							//var check = $(elem).val();
 							var url = check.replace(' ', '_');
-							$.post('/sig/'+check).done(function(result){
+							$.post('/check/'+check).done(function(result){
 								self.avail = (result === 'Available')
 								if (self.avail) {
 									$.post('/reserve/'+check+'');
@@ -480,6 +538,12 @@ html
 							elem.setAttribute("aria-invalid", "true");
 						}
 					},
+					panZoom: function(){
+						var self = this;
+						$.post('/panzoom/'+self.map.getCenter().lat+'/'+self.map.getCenter().lng+'/'+self.map.getZoom()+'', function(result){
+						})
+					},
+
 					loadMap(cb) { 
 						var self = this, dataLayer, 
 						map = new L.map('map', { 
@@ -491,7 +555,7 @@ html
 							zoomControl: false, 
 							zoom: 6,//(!self.position ? 6 : self.position.zoom), 
 							minZoom: 4,	maxZoom: 18,
-							editable: true,
+							editable: true,//(self.pu && self.pu.admin),
 							renderer: L.canvas(),
 							preferCanvas: true
 						});
@@ -686,5 +750,227 @@ html
 							self.zoom = self.map.getZoom(); 
 						}
 					},
+					toggleEdit: function(ind) {
+						var self = this;
+						this.edit = (!this.edit ? ind : null);
+					},
+					addMapBlob: function() {
+						var self = this;
+						var ind = self.doc.properties.media.length;
+						$('div.centerallwrap').css('pointer-events', 'auto')
+						self.dataLayer.disableEdit();
+						self.addNewMedia(self.doc._id, ind, function(){
+							//var canvas = document.querySelector('canvas.leaflet-zoom-animated');
+							leafletImage(self.map, function(err, canvas){
+								if (err) {
+									return console.log(err)
+								}
+								$('a[id*=deletemedia]').hide();
+								var im = new Image()
+								im.src = canvas.toDataURL('image/png');
+								im.onload = function(){
+									self.checkImage(im, canvas, im.width, im.height, 1025, 1025, ind, 'map');
+									setTimeout(function(){
+										var img = document.querySelector('img#return'+ind+'');
+										var can = $('#canvas'+ind+'')[0];
+										var w = img.width;
+										var h = img.height;
+										can.width = w;
+										can.height = h;
+										var ctx = can.getContext("2d");
+										ctx.drawImage(img, 0, 0, w, h);
+										self.uploadBlob(img, can, ind, function(){
+											//console.log(canvas)
+											var dataurl = can.toDataURL("image/png", 0.8);
+											self.doc.properties.media[ind].thumb = dataurl.replace(/data:image\/png;base64,/, '');
+										})
+											/**/
+										
+										
+									},2000)
+								}
+								
+							})
+							
+							
+							
+						});
+						
+					},
+					//- addNewSignature(id, index, cb) {
+					//- 	var self = this;
+					//- 	$.post('/api/newsignature/'+id+'/'+index+'', function(res) {
+					//- 		self.doc.properties.sig.push(res);
+					//- 		cb()
+					//- 	})
+					//- },
+					addNewMedia: function(id, index, cb) {
+						var self = this;
+						$.post('/api/newmedia/'+id+'/'+index+'', function(res) {
+							self.doc.properties.media.push(res);
+							cb()
+						})
+					},
+					handleFile: function(did, index) {
+						var self = this;
+						self.did = did;
+						self.file = document.getElementById('media_'+index).files[0];
+						self.processImage(index);
+					},
+					processImage: function(imgindex) {
+						var self = this;
+						var dataurl = null;
+						var file = self.file;
+						if (!file) return;
+						var imagefile = file.type;
+						var imageTypes= ["image/jpeg","image/png","image/jpg","image/svg+xml"];
+						if(imageTypes.indexOf(imagefile) === -1) {
+							$("#info").html("<span class='msg-error'>Please Select A valid Image File</span><br /><span>Only jpeg, jpg, png, and pdf types allowed</span>");
+							return false;
+							
+						} else {
+							var reader = new FileReader();
+							
+							reader.onloadend = function(e) {
+								var img = document.getElementById('return'+imgindex+'');
+								img.src = e.target.result;
+								var type = imagefile.split('image/')[1];
+								img.onload = function() {
+									$('#media').val('');
+									var can = $('#canvas'+imgindex+'')[0];
+									var maxWidth = 1025 ;
+									var maxHeight = 1025 ;
+									var w = img.width;
+									var h = img.height;
+									can.width = w;
+									can.height = h;
+									var ctx = can.getContext("2d");
+									ctx.drawImage(img, 0, 0);
+									self.checkImage(img, can, w, h, maxWidth, maxHeight, imgindex, type);
+								}
+								
+							}
+							reader.readAsDataURL(file);
+						}
+					},
+					checkImage: function(img, can, w, h, maxWidth, maxHeight, imgindex, imgtype) {
+						var self = this;
+						if (h > maxHeight || w > maxWidth) {
+							self.reSize(img, can, w, h, maxWidth, maxHeight, imgindex, imgtype)
+						} else {
+							if (imgtype === 'map') {
+								var im = document.querySelector('img#return'+imgindex+'');
+								im.setAttribute('src', can.toDataURL('image/png'))
+							} else {
+								if (maxHeight === 400) {
+									self.drawThumb(img, can, w, h, imgindex, imgtype)
+								} else {
+									self.drawFull(img, can, w, h, imgindex, imgtype)
+								}
+							}
+						}
+						
+					},
+					reSize: function(img, can, w, h, maxWidth, maxHeight, imgindex, imgtype){
+						can.height = h*0.99;
+						can.width = w*0.99;
+
+						var can2 = document.createElement('canvas');
+						can2.width = w*0.99;
+						can2.height = h*0.99;
+						var ctx2 = can2.getContext('2d');
+						var ctx = can.getContext('2d');
+						ctx2.drawImage(img, 0, 0, w*0.99, h*0.99);
+						ctx.drawImage(can2, 0, 0, w*0.99, h*0.99, 0, 0, w*0.99, h*0.99);
+						w = w*0.99;
+						h = h*0.99;
+						img.width = w;
+						img.height = h;
+						this.checkImage(img, can, w, h, maxWidth, maxHeight, imgindex, imgtype)
+					},
+					uploadBlob: function(img, can, imgindex, cb) {
+						var self = this;
+						var orientation = 'portrait'
+						if (can.width > can.height) { 
+							orientation = 'landscape' 
+						} else { 
+							orientation = 'portrait' 
+						}
+
+						if (!HTMLCanvasElement.prototype.toBlob) {
+						 Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+							value: function (callback, type, quality) {
+								var binStr = atob( this.toDataURL(type, quality).split(',')[1] ),
+								len = binStr.length,
+								arr = new Uint8Array(len);
+								for (var i = 0; i < len; i++ ) {
+									arr[i] = binStr.charCodeAt(i);
+								}
+								callback( new Blob( [arr], {type: type || 'image/png'} ) );
+							}
+						 });
+						}
+						can.toBlob(function(blob) {
+							var fd = new FormData();
+							fd.append("img", blob);
+							var uploadurl = '/api/uploadmedia/'+self.doc.index+'/'+imgindex+'/png';
+							$.ajax({
+								url: uploadurl,
+								type: 'POST',
+								data: fd,
+								processData: false,
+								contentType: false,
+									success: function(response) { 
+									img.onload = function () {
+										self.doc.properties.media[imgindex].image_abs = response;
+										self.doc.properties.media[imgindex].image = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
+										self.doc.properties.media[imgindex].thumb_abs = response;
+										self.doc.properties.media[imgindex].thumb = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
+										self.doc.properties.media[imgindex].orientation = orientation;
+										cb();
+									}
+									img.src = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
+								}
+							})
+						}, 'image/png');
+					},
+					drawFull: function(img, can, w, h, imgindex, imgtype) {
+						var self = this;
+						can.height = h;
+						can.width = w;
+						var ctx = can.getContext('2d');
+						console.log(w,h)
+						ctx.drawImage(img, 0, 0, w, h);
+						self.uploadBlob(img, can, imgindex, function(){
+							var can = $('#canvas'+imgindex+'')[0];
+							var maxWidth = 400 ;
+							var maxHeight = 400 ;
+							var w = img.width;
+							var h = img.height;
+
+							self.checkImage(img, can, w, h, maxWidth, maxHeight, imgindex, imgtype);
+						})
+						
+					},
+					drawThumb: function(img, can, w, h, imgindex, imgtype) {
+						var self = this;
+						can.height = h;
+						can.width = w;
+						var ctx = can.getContext('2d');
+						
+						ctx.drawImage(img, 0, 0, w, h);
+						var dataurl = can.toDataURL("image/png", 0.8);
+						setTimeout(function(){
+							self.doc.properties.media[imgindex].thumb = dataurl.replace(/data:image\/png;base64,/, '');
+							//$('#inputthumb'+imgindex+'').val(dataurl.replace(/data:image\/png;base64,/, ''));
+							
+						}, 100);
+					},
+
 				}
 			});
+		
+		script(type='text/javascript', src='/scripts/leaflet-image_0_4_0.js')
+		script(type="text/javascript", src="/scripts/Leaflet.Editable.js")
+		script(type="text/javascript", src="/scripts/Path.Drag.js")
+

@@ -1,17 +1,17 @@
 extends layout
 block page
-	if (!menu)
-		if (doc)
-			
-			- var menu = 'doc'
-		else
-			if (loggedin)
-				if (pageindex)
-					- var menu = 'doc'
-				else
-					- var menu = 'home'
-			else
-				- var menu = 'home'
+	//- if (!menu)
+	//- 	if (doc)
+	//- 
+	//- 		- var menu = 'doc'
+	//- 	else
+	//- 		if (loggedin)
+	//- 			if (pageindex)
+	//- 				- var menu = 'doc'
+	//- 			else
+	//- 				- var menu = 'home'
+	//- 		else
+	//- 			- var menu = 'home'
 block content
 	
 	div#select(:class="type", style="pointer-events: auto;")
@@ -22,41 +22,30 @@ block content
 			include menu.pug
 			include docgallery.pug
 			
-		div.grid-container(:class="type" v-else-if="!doc")
-			- menu = 'home'
+		div.grid-container(:class="type" v-else-if="dat")
+			//- - menu = 'home'
 			include menu.pug
 			include datagallery.pug
+		
+		
+		div.grid-container(:class="type" v-else-if="pu")
+			//- - menu = 'home'
+			include menu.pug
+			//- include mydata.pug
+			//- if (pu)
+			//- 	- menu = 'data'
+			div.grid-mid(v-if="menu === 'pu'")
+				p.tb-font-s(v-text="'My Information'")
+				include includes/puedit.pug
+			div.grid-mid
+				p.tb-font-s(v-text="'Documents I have signed'")
+				include datagallery.pug
+			div.grid-left
+				p.tb-font-s(v-text="'All documents'")
+				if (dat)
+					- menu = 'home'
+					include datagallery.pug
 
 	//-
 		initiate map + event listeners
-	script(type="text/javascript").
-
-		//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
-		//- $(document).on('touchstart, mouseover', '.translate', function (e) {
-		//- 	var link = $(this); //preselect the link
-		//- 	if (link.hasClass('hover')) {
-		//- 		return true;
-		//- 	} else {
-		//- 		e.preventDefault();
-		//- 		link.addClass('hover');
-		//- 		$('a.taphover').not(this).removeClass('hover');
-		//- 		var text = link.html();
-		//- 		if (text.split('<')[1] === undefined) {
-		//- 			text = encodeURIComponent(text);
-		//- 			$.post('/translate/'+text+'').then(function(result){
-		//- 				console.log(result)
-		//- 				addAlert(result);
-		//- 			})
-		//- 		}
-		//- 		return false;
-		//- 	}
-		//- });
-		//- $(document).on('touchend, mouseleave', '.translate', function (e){
-		//- 	var link = $(this); //preselect the link
-		//- 	if (link.hasClass('hover')) {
-		//- 		$('.translate').removeClass('hover');
-		//- 	}
-		//- 	removeOldAlert()
-		//- 	return true;
-		//- });
 		

@@ -42,20 +42,20 @@ var storage = multer.diskStorage({
 			p = ''+publishers+'/pu/publishers/gnd/images/full/'+req.params.index+''
 			q = ''+publishers+'/pu/publishers/gnd/images/thumbs/'+req.params.index+''
 
-		} else if (req.params.type === 'csv') {
-			p = ''+publishers+'/pu/publishers/gnd/csv/'+req.params.id+''
-			q = ''+publishers+'/pu/publishers/gnd/csv/thumbs/'+req.params.id+''
-			
-		} else if (req.params.type === 'txt') {
-			p = ''+publishers+'/pu/publishers/gnd/txt'
-			q = ''+publishers+'/pu/publishers/gnd/txt/thumbs'
-		} else if (req.params.type === 'doc') {
-			var os = require('os');
-			p = os.tmpdir() + '/gdoc';
-			q = ''+publishers+'/pu/publishers/gnd/tmp';
-		} else if (req.params.type === 'docx') {
-			p = ''+publishers+'/pu/publishers/gnd/docx'
-			q = null;//''+publishers+'/pu/publishers/gnd/word/thumbs'
+		// } else if (req.params.type === 'csv') {
+		// 	p = ''+publishers+'/pu/publishers/gnd/csv/'+req.params.id+''
+		// 	q = ''+publishers+'/pu/publishers/gnd/csv/thumbs/'+req.params.id+''
+		// 
+		// } else if (req.params.type === 'txt') {
+		// 	p = ''+publishers+'/pu/publishers/gnd/txt'
+		// 	q = ''+publishers+'/pu/publishers/gnd/txt/thumbs'
+		// } else if (req.params.type === 'doc') {
+		// 	var os = require('os');
+		// 	p = os.tmpdir() + '/gdoc';
+		// 	q = ''+publishers+'/pu/publishers/gnd/tmp';
+		// } else if (req.params.type === 'docx') {
+		// 	p = ''+publishers+'/pu/publishers/gnd/docx'
+		// 	q = null;//''+publishers+'/pu/publishers/gnd/word/thumbs'
 		} else {
 			p = ''+publishers+'/pu/publishers/gnd/images/full/'+req.params.index+''
 			q = ''+publishers+'/pu/publishers/gnd/images/thumbs/'+req.params.index+''
@@ -95,12 +95,14 @@ var storage = multer.diskStorage({
 	filename: function (req, file, cb) {
 		if (req.params.type === 'png') {
 			cb(null, 'img_' + req.params.counter + '.png')
-		} else if (req.params.type === 'csv') {
-			cb(null, 'csv_' + req.params.id + '.csv')
-		} else if (req.params.type === 'txt') {
-			cb(null, 'txt_' + Date.now() + '.txt')
-		} else if (req.params.type === 'docx') {
-			cb(null, 'docx_'+Date.now()+'.docx')
+		// } else if (req.params.type === 'csv') {
+		// 	cb(null, 'csv_' + req.params.id + '.csv')
+		// } else if (req.params.type === 'txt') {
+		// 	cb(null, 'txt_' + Date.now() + '.txt')
+		// } else if (req.params.type === 'docx') {
+		// 	cb(null, 'docx_'+Date.now()+'.docx')
+		} else if (req.params.type === 'svg') {
+			cb(null, 'docx_'+Date.now()+'.svg')
 		}
   }
 });
@@ -437,6 +439,16 @@ function getDat(req, res, next){
 	})
 }
 
+function ensureAuthenticated(req, res, next) {
+	console.log(req.isAuthenticated())
+	if (req.isAuthenticated()) {
+		req.session.userId = req.user._id;
+		req.session.loggedin = req.user.username;
+		return next();
+	}
+	return res.redirect('/login');
+}
+
 function ensureAdmin(req, res, next) {
 	//console.log(req.isAuthenticated())
 	if (!req.isAuthenticated()) {
@@ -635,7 +647,7 @@ router.get('/login', function(req, res, next){
 	});
 });
 
-router.post('/sig/:givenName', function(req, res, next){
+router.post('/check/:givenName', function(req, res, next){
 	Publisher.find({'properties.givenName': decodeURIComponent(req.params.givenName)}, function(error, pages){
 		if (error) {
 			return next(error)
@@ -714,38 +726,7 @@ router.get('/home', getDat, function(req, res, next) {
 			})
 			
 		});
-})
-
-// data
-router.get('/api/publish', function(req, res, next) {
-
-	var outputPath = url.parse(req.url).pathname;
-	asynk.waterfall([
-		function(cb) {
-			Publisher.findOne({_id: req.session.userId}, function(err, pu){
-				if (err) {
-					cb(err);
-				}
-				Content.find({signatures: {$elemMatch:{pu:pu._id}}}, function(err, pages){
-					if (err) {
-						cb(err)
-					}
-					cb(null, pu, pages)
-				})
-			})
-		}
-	], function(err, pu, pages){
-		if (err) {
-			return next(err)
-		}
-		return res.render('publish', {
-			loggedin: pu.username,
-			menu: 'data',
-			dat: [pages],
-			pu: pu
-		})
-	})
-})
+});
 
 // doc
 router.get('/list/:id/:mi', function(req, res, next){
@@ -825,6 +806,175 @@ router.get('/menu/:title/:chapter', function(req, res, next){
 		})
 	})
 	
+});
+
+router.get('/profile/:username', function(req, res, next) {
+	Content.find({}).sort({'properties.time.end': 1}).lean().exec(function(err, data){
+		if (err) {return next(err)}
+		Publisher.findOne({_id: req.session.userId}, function(err, pu){
+			if (err) {
+				return next(err)
+			}
+			return res.render('publish', {
+				dat: [data],
+				data: data,
+				// doc: doc,
+				pu: pu,
+				type: 'blog', //'blog' //'map'
+				// drawType: 'filling', //'substrates',
+				menu: 'data' //home, login, register, data, doc, pu?
+			})
+		})
+	})
+})
+// //every edit-access api checks auth
+router.all('/api/*', ensureAuthenticated, ensureAdmin)
+
+router.all('/sig/*', ensureAuthenticated)
+
+router.get('/sig/:id', function(req, res, next){
+	Content.find({}).sort({'properties.time.end': 1}).lean().exec(function(err, data){
+		if (err) {return next(err)}
+		Content.findOne({_id: req.params.id}, function(err, doc){
+			if (err) {return next(err)}
+			Publisher.findOne({_id: req.session.userId}, function(err, pu){
+				if (err) {
+					return next(err)
+				}
+				return res.render('publish', {
+					// data: data,
+					doc: doc,
+					pu: pu,
+					type: 'draw', //'blog' //'map'
+					drawType: 'filling', //'substrates',
+					menu: 'sign'
+				})
+			})
+		})
+	})
+})
+
+router.get('/sig/editprofile', function(req, res, next){
+	Content.find({}).sort({'properties.time.end': 1}).lean().exec(function(err, data){
+		if (err) {return next(err)}
+		Publisher.findOne({_id: req.session.userId}, function(err, pu){
+			if (err) {
+				return next(err)
+			}
+			return res.render('publish', {
+				dat: [data],
+				data: data,
+				// doc: doc,
+				pu: pu,
+				type: 'blog', //'blog' //'map'
+				// drawType: 'filling', //'substrates',
+				menu: 'pu', //home, login, register, data, doc, pu?
+				csrfToken: req.csrfToken()
+			})
+		})
+	})
+})
+
+// save edits
+router.post('/sig/editprofile', function(req, res, next){
+	var body = req.body;
+	var username = req.user.username;
+	//console.log(Object.keys(body))
+	asynk.waterfall([
+		function(next) {
+			var imgurl = ''+publishers+'/publishers/'+ req.user.username +'/images/avatar/'+ req.user.username + '.png';
+			if (body.avatar.substring(0,1) !== "/") {
+				var imgbuf = new Buffer(body.avatar, 'base64'); // decode
+
+				fs.writeFile(imgurl, imgbuf, function(err) {
+					if (err) {
+						console.log("err", err);
+					}
+					imgurl = imgurl.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '')
+					next(null, imgurl, body)
+				})
+			} else {
+				imgurl = imgurl.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '')
+				next(null, imgurl, body)
+			}
+			
+		},
+		function(imgurl, body, next) {
+			
+			Publisher.findOne({_id: req.user._id}, function(err, pu){
+				if (err) {
+					return next(err)
+				}
+				var keys = Object.keys(body);
+				keys.splice(Object.keys(body).indexOf('avatar'), 1);
+				//console.log(keys)
+				for (var i in keys) {
+					if (pu[keys[i]] !== body[keys[i]]) {
+						if (keys[i] === 'tags') {
+							//console.log(body[keys[i]].split(','))
+							if (!Array.isArray(body[keys[i]].split(','))) {
+								pu[keys[i]] = [body[keys[i]].split(',')]
+							} else {
+								pu[keys[i]] = body[keys[i]].split(',')
+							}
+							
+						} else {
+							pu[keys[i]] = body[keys[i]]
+						}
+					}
+				}
+				next(null, pu, imgurl)
+			})
+		},
+		function(pu, imgurl, next) {
+			pu.avatar = imgurl;
+			pu.save(function(err){
+				if (err) {
+					next(err)
+				} else {
+					next(null, pu)
+				}
+				
+			})
+			}
+			
+	], function(err, pu){
+		if (err) {
+			return next(err)
+		}
+		return res.redirect('/profile/'+pu.username)
+	})
+})
+
+// data
+router.get('/api/publish', function(req, res, next) {
+
+	var outputPath = url.parse(req.url).pathname;
+	asynk.waterfall([
+		function(cb) {
+			Publisher.findOne({_id: req.session.userId}, function(err, pu){
+				if (err) {
+					cb(err);
+				}
+				Content.find({signatures: {$elemMatch:{pu:pu._id}}}, function(err, pages){
+					if (err) {
+						cb(err)
+					}
+					cb(null, pu, pages)
+				})
+			})
+		}
+	], function(err, pu, pages){
+		if (err) {
+			return next(err)
+		}
+		return res.render('publish', {
+			loggedin: pu.username,
+			menu: 'data',
+			dat: [pages],
+			pu: pu
+		})
+	})
 })
 
 router.get('/api/new/:chind', async function(req, res, next){
@@ -1548,19 +1698,6 @@ module.exports = router;
 // 	})
 // })
 // 
-// router.post('/sig/:pagetitle', function(req, res, next){
-// 	Page.find({pagetitle: decodeURIComponent(req.params.pagetitle)}, function(error, pages){
-// 		if (error) {
-// 			return next(error)
-// 		}
-// 		if (!error && pages.length > 0) {
-// 			return res.send('This blog name is taken.')
-// 		}
-// 		return res.send('Available')
-// 
-// 	})
-// })
-// 
 // router.get('/sig/:pagetitle*', ensurePage, function (req, res, next) {
 // 	console.log(req.headers)
 // 	var index;
@@ -1616,8 +1753,6 @@ module.exports = router;
 // 	})
 // });
 // 
-// //every edit-access api checks auth
-// router.all('/api/*', ensureAuthenticated)
 // 
 // 
 // router.all('/api/deletefeature/:pageindex/:index', ensureUser, function(req, res, next) {

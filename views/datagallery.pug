@@ -17,96 +17,17 @@ if (menu === 'login')
 			
 			p.tb-font-xl First time here?
 			a.btn.waves-effect.waves-light(href="/register", role="button", ariaDescription="Register") Register
-if (menu === 'register')
+if (menu === 'register' || menu === 'pu')
 	div.grid-right
 		div.tb-u-100
-			p.tb-font-xl Your Name:
-			div#registersection
-				form#form(enctype="multipart/form-data", method="POST", action="/register", style="margin-bottom: 50px")
-					input(type="hidden", name="_csrf", value= csrfToken)
-					input#svgurl(type="hidden", name="svg")
-					input#avatarurl(type="hidden", name="avatar")
-					div.tb-u-100.input-field
-						label.ms-Label Full Name
-						input.ms-TextField-field(type="text", name="givenName", id="givenName", aria-required="true", @blur="checkNameValidity('\d!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alphabetic characters only, please', $event)", required, style="margin: 0 0 5px 0;")
-						//- a.btn.waves-effect.waves-light(role="button", @click="") Check availability
-						//- p(v-if="avail === true")
-						div.input-field#response(style="margin: 0 0 20px 0;")
-							span(v-text="(avail ? 'Available' : '')")
-					
-						//div.tb-u-100.input-field
-						label.ms-Label I represent a 
-						select(@change="changePlace($event)", required)
-							option(disabled, value= "") Place type
-							option(v-for="(item, i) in Object.keys(rep)", :value="item", :selected="(pu.properties && pu.properties.placetype === item ? 'selected' : false)", v-html="item")
-					
-						p(v-if="avail")
-							p(v-if="!pu.properties")
-
-							p(v-else-if="pu.properties.placetype !== ''")
-								div.tb-u-100.input-field(v-for="(item, i) in Object.keys(rep)", v-if="pu.properties.placetype === item")
-									label.ms-Label(v-text="'The '+item+' you represent'")
-									input.ms-TextField-field(v-if="item === 'ZIP4'", type="text", name="place", id="place", aria-required="true", @blur="checkNameValidity('\D!@#$%^*()+=[]\\\';,./{}|\<>?:', 'Format ZIP Code as numbers separated by a dash. Example: 00000-1111', $event)", required)
-									input.ms-TextField-field(v-else, :type="'text'", name="place", id="place", aria-required="true", @blur="checkNameValidity('\d!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alphabetic characters only, please', $event)", required)
-									p &nbsp
-									p(v-if="repitem.length > 0")
-									label.ms-Label Title
-									select(name="title", @change="changeTitle($event)")
-										option(disabled, value= "") Title
-										option(v-for="(ti, j) in repitem", :selected="(pu.properties && pu.properties.title === ti ? 'selected' : false)", :value="ti", v-text="ti")
-									label.ms-Label(for="datebegin") Term begin
-									//
-									input(type="text", name="datebegin", id="datebegin", :placeholder="(pu.properties.time ? moment(pu.properties.time.begin).utc().format() : 'Select your term begin date')", 
-										@change="setBegin($event)",
-										:value="beginDate",
-										@focus="pickerOpen('begin')"
-										)
-									date-picker#datebegin(v-if="pickerbegin", :format="formatDate", v-model="beginDate", @close="pickerbegin = false"
-										min="1900-1-1"
-										max="2050-1-1"
-									)
-									label.ms-Label(for="dateend") Term end
-									// 
-									input(type="text", name="dateend", id="dateend", :placeholder="(pu.properties.time ? moment(pu.properties.time.end).utc().format() : 'Select your term end date')", 
-										@change="setEnd($event)",
-										:value="endDate",
-										@focus="pickerOpen('end')"
-										)
-									date-picker#dateend(v-if="pickerend", :format="formatDate", v-model="endDate", @close="pickerend = false"
-										min="1900-1-1"
-										max="2050-1-1"
-									)
-							div.tb-u-100.input-field
-								label.ms-Label Username
-								input.ms-TextField-field.is-required(type="text", name="username", maxlength="40", id="username", aria-required="true", 
-									@blur="checkNameValidity('\s!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alpha-numeric characters only, please', $event)", required)
-							//- div.tb-u-100.input-field
-							//- 	label.ms-Label(for="languages") Language
-							//- 		datalist#theselanguages
-							//- 
-							//- 		select(name="languages")
-							//- 			each lang, i in languages
-							//- 				option(value= lang.code) #{lang.nativeName}
-							//- 					span --
-							//- 					span #{lang.name}
-								//input.ms-TextField-field.is-required(type="text", list="theselanguages", id="languages")
-							
-							div.tb-u-100.input-field
-								label.ms-Label Email
-								//									@blur="checkEmailValidity()", 
-
-								input.ms-TextField-field.is-required(type="email", name="email", id="email", aria-required="true", 
-									required)
-							div.tb-u-100.input-field.is-required
-								label.ms-Label Password
-								input.ms-TextField-field.is-required(type="password", name="password", aria-required="true", required)
-							p
-							button.btn.waves-effect.waves-light#submitregister(type="submit", ariaDescription="Register") Register
-						//- div.input-field#response
-						//- p(v-if="!avail && pu.properties.placetype !== ''")
-						//- 
-						//- 	div.input-field#response
-						//- 		hr(v-html="marked('<p>Name already in use for the given jurisdiction. You may try a different jurisdiction or <a href=`/login`>Log in</a>.</p>')")
+			p.tb-font-xl Your Information:
+			div#registersection(v-if="menu === 'register' || menu === 'pu'")
+				include includes/puedit.pug
+				//- div.input-field#response
+				//- p(v-if="!avail && pu.properties.placetype !== ''")
+				//- 
+				//- 	div.input-field#response
+				//- 		hr(v-html="marked('<p>Name already in use for the given jurisdiction. You may try a different jurisdiction or <a href=`/login`>Log in</a>.</p>')")
 
 		div.tb-u-100
 			#info(v-text="info")
@@ -117,7 +38,7 @@ if (menu === 'data')
 		div.tb-u-100
 			//- 		a.grid-header
 			div.grid-mid
-				maintitle.centerall
+				div.centerall
 					div.slidercontainer(style="position:relative;height:auto;width:100%;")
 						img#slider(style="width:100%;height:auto; transition-property: opacity; transition-duration:2s;margin-top:20px;position:absolute;z-index:1", v-bind:src="'/publishers/gnd/images/full/img_'+sliderIndex+'.png'")
 						img(style="width:100%;height:auto;margin-top:20px;position:relative;z-index:0;", v-bind:src="'/images/publish_logo_sq.svg'")
@@ -127,14 +48,14 @@ if (menu === 'data')
 							div(v-on:click="navigateTo('/')")
 								a(v-bind:href="'/'")
 									header.row.tb-font-l Title 
-										bd.bd(v-text="data[0].title.ind")
+										span.bd(v-text="data[0].title.ind")
 										span(v-text="' '") 
 										span(v-text="data[0].title.str")
 							div
 							div
 								a(v-bind:href="'/menu/'+data[0].title.ind+'/'+data[0].chapter.ind+''")
 									header.row.tb-font-l Chapter 
-										bd.bd(v-text="data[0].chapter.ind")
+										span.bd(v-text="data[0].chapter.ind")
 										span(v-text="' '")
 										span(v-text="data[0].chapter.str")
 							div
@@ -156,11 +77,11 @@ if (menu === 'data')
 								
 								div.tb-11-m0.tb-07-m1.tb-font-m
 									a.href(v-bind:href="'/list/'+doc._id+'/null'", style="display:block;padding:0 0 0 105px;text-indent:-105px;")
-										bd.bd(v-if="doc.title", v-text="doc.title.ind+'.'+doc.chapter.ind+'.'+doc.section.ind", style="width: 100px;display:inline-block;text-indent:0;")
+										span.bd(v-if="doc.title", v-text="doc.title.ind+'.'+doc.chapter.ind+'.'+doc.section.ind", style="width: 100px;display:inline-block;text-indent:0;")
 										span(v-text="' '")
 										span(v-html="doc.section.str")
 								div.tb-11-m0.tb-03-m1
-									breadcrumbs(v-if="doc.properties")
+									div.breadcrumbs(v-if="doc.properties")
 										a(v-bind:href="'/menu/'+doc.title.ind+'/'+null+''")
 											span.tb-font-xxs(v-bind:style="{display:'inline-block'}", v-text="doc.title.str")
 										span.tb-font-xxs(v-text="' > '")
@@ -190,7 +111,7 @@ if (menu === 'data')
 	//- 		hr
 if (menu === "home")
 	div(v-if="dat && dat.length && Array.isArray(dat[0])" v-for="(ch,n) in dat", v-bind:id="n", v-bind:key="n")
-		div
+		div(v-if="ch[0]")
 			div
 				a(v-bind:href="'/menu/'+ch[0].title.ind+'/'+ch[0].chapter.ind+''")
 					header.row.tb-font-l
