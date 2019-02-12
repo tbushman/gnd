@@ -523,7 +523,7 @@ router.get('/register', function(req, res) {
 		// 	}
 		// 
 		// }
-		return res.render('register', {csrfToken: req.csrfToken(), info: 'Thank you', action: 'login', languages: langs } );
+		return res.render('register', {csrfToken: req.csrfToken(), info: 'Thank you', action: 'login', languages: langs, avail: false } );
 
 	// });
 });
@@ -554,7 +554,7 @@ router.post('/register', function(req, res, next) {
 			} else {
 				admin = false;
 			}
-			Publisher.register(new Publisher({ username : req.body.username, avatar: '/images/publish_logo_sq.svg', language: req.body.languages, admin: admin, properties: { givenName: encodeURIComponent(req.body.givenName), title: req.body.title, place: req.body.place } }), req.body.password, function(err, user) {
+			Publisher.register(new Publisher({ username : req.body.username, avatar: '/images/publish_logo_sq.svg', language: req.body.languages, admin: admin, email: req.body.email, properties: { givenName: req.body.givenName, title: req.body.title, place: req.body.place, placetype: req.body.placetype, time: { begin: req.body.datebegin, end: req.body.dateend } } }), req.body.password, function(err, user) {
 				if (err) {
 					return res.render('register', {info: "Sorry. That Name already exists. Try again.", languages: langs});
 				}
@@ -742,6 +742,8 @@ router.get('/list/:id/:mi', function(req, res, next){
 			if (req.isAuthenticated()) {
 				return res.render('publish', {
 					csrfToken: req.csrfToken(),
+					pu: req.user,
+					type: 'blog',
 					menu: 'doc',
 					loggedin: req.session.loggedin,
 					dat: [data],
@@ -751,6 +753,7 @@ router.get('/list/:id/:mi', function(req, res, next){
 			} else {
 				return res.render('publish', {
 					menu: 'doc',
+					type: 'blog',
 					loggedin: req.session.loggedin,
 					dat: [data],
 					doc: doc,
@@ -800,7 +803,7 @@ router.get('/menu/:title/:chapter', function(req, res, next){
 		})
 		return res.render('publish', {
 			menu: 'data',
-			dat: [data],
+			// dat: [data],
 			data: data,
 			loggedin: req.session.loggedin
 		})
@@ -816,12 +819,12 @@ router.get('/profile/:username', function(req, res, next) {
 				return next(err)
 			}
 			return res.render('publish', {
-				dat: [data],
+				// dat: [data],
 				data: data,
 				// doc: doc,
 				pu: pu,
 				type: 'blog', //'blog' //'map'
-				// drawType: 'filling', //'substrates',
+				// drawtype: 'filling', //'substrates',
 				menu: 'data' //home, login, register, data, doc, pu?
 			})
 		})
@@ -832,7 +835,7 @@ router.all('/api/*', ensureAuthenticated, ensureAdmin)
 
 router.all('/sig/*', ensureAuthenticated)
 
-router.get('/sig/:id', function(req, res, next){
+router.get('/sig/publish/:id', function(req, res, next){
 	Content.find({}).sort({'properties.time.end': 1}).lean().exec(function(err, data){
 		if (err) {return next(err)}
 		Content.findOne({_id: req.params.id}, function(err, doc){
@@ -846,7 +849,7 @@ router.get('/sig/:id', function(req, res, next){
 					doc: doc,
 					pu: pu,
 					type: 'draw', //'blog' //'map'
-					drawType: 'filling', //'substrates',
+					drawtype: 'filling', //'substrates',
 					menu: 'sign'
 				})
 			})
@@ -862,14 +865,17 @@ router.get('/sig/editprofile', function(req, res, next){
 				return next(err)
 			}
 			return res.render('publish', {
-				dat: [data],
-				data: data,
+				// dat: [data],
+				// data: data,
 				// doc: doc,
+				loggedin: req.session.loggedin,
 				pu: pu,
 				type: 'blog', //'blog' //'map'
-				// drawType: 'filling', //'substrates',
+				// drawtype: 'filling', //'substrates',
 				menu: 'pu', //home, login, register, data, doc, pu?
 				csrfToken: req.csrfToken()
+				// ,
+				// avail: true
 			})
 		})
 	})
@@ -947,9 +953,10 @@ router.post('/sig/editprofile', function(req, res, next){
 })
 
 // data
-router.get('/api/publish', function(req, res, next) {
+router.get('/api/publish', getDat, function(req, res, next) {
 
 	var outputPath = url.parse(req.url).pathname;
+	var dat = req.dat;
 	asynk.waterfall([
 		function(cb) {
 			Publisher.findOne({_id: req.session.userId}, function(err, pu){
@@ -960,18 +967,19 @@ router.get('/api/publish', function(req, res, next) {
 					if (err) {
 						cb(err)
 					}
-					cb(null, pu, pages)
+					cb(null, pu, pages, dat)
 				})
 			})
 		}
-	], function(err, pu, pages){
+	], function(err, pu, pages, dat){
 		if (err) {
 			return next(err)
 		}
 		return res.render('publish', {
 			loggedin: pu.username,
-			menu: 'data',
-			dat: [pages],
+			menu: 'dat',
+			data: (pages.length ? pages : null),
+			dat: dat,
 			pu: pu
 		})
 	})
@@ -1022,7 +1030,7 @@ router.get('/api/new/:chind', async function(req, res, next){
 				index: data.length,
 				// db
 				title: {
-					ind: 115,
+					ind: (115 + chunk.length),
 					str: 'United States Congress' 
 				},
 				chapter: {
@@ -1034,7 +1042,7 @@ router.get('/api/new/:chind', async function(req, res, next){
 					str: (chunk.length === 0 ? 'H. RES.' : chunk[0].section.str) 
 				},
 				properties: {
-					section: '115.'+(chunk.length === 0 ? "1" : chunk[0].chapter.ind)+'.'+(chunk.length === 0 ? '109' : (108 + chunk.length)),
+					section: (115 + chunk.length)+'.'+(chunk.length === 0 ? '109' : (108 + chunk.length)),
 					published: true,
 					// label: (chunk.length === 0 ? 'Recognizing the duty of the Federal Government to create a Green New Deal.' : chunk[0].properties.label)
 					// 'Edit Subtitle',
@@ -1046,19 +1054,19 @@ router.get('/api/new/:chind', async function(req, res, next){
 						begin: moment().utc().format(),
 						end: moment().add(1, 'hours').utc().format()
 					},
-					media: [
-						{
-							index: 0,
-							name: 'Sample image',
-							image_abs: ''+publishers+'/pu/publishers/gnd/images/full/'+(data.length)+'/img_0.png',
-							image: '/publishers/gnd/images/thumbs/'+(data.length)+'/thumb_0.png',
-							thumb_abs: ''+publishers+'/pu/publishers/gnd/images/thumbs/'+(data.length)+'/thumb_0.png',
-							thumb: '/publishers/gnd/images/thumbs/'+(data.length)+'/thumb_0.png',
-							caption: 'Sample caption',
-							postscript: 'Sample postscript',
-							url: 'https://pu.bli.sh'
-						}
-					],
+					// media: [
+					// 	{
+					// 		index: 0,
+					// 		name: 'Sample image',
+					// 		image_abs: ''+publishers+'/pu/publishers/gnd/images/full/'+(data.length)+'/img_0.png',
+					// 		image: '/publishers/gnd/images/thumbs/'+(data.length)+'/thumb_0.png',
+					// 		thumb_abs: ''+publishers+'/pu/publishers/gnd/images/thumbs/'+(data.length)+'/thumb_0.png',
+					// 		thumb: '/publishers/gnd/images/thumbs/'+(data.length)+'/thumb_0.png',
+					// 		caption: 'Sample caption',
+					// 		postscript: 'Sample postscript',
+					// 		url: 'https://pu.bli.sh'
+					// 	}
+					// ],
 					sig: [ ]	
 				},
 				geometry: {
@@ -1120,71 +1128,11 @@ router.post('/api/editcontent/:id', function(req, res, next){
 				if (!pu) {
 					return res.redirect('/')
 				}
-				var thumburls = [];
-				var count = 0;
-				var i = 0;
-				for (var i in keys) {
-					var thiskey = 'thumb'+count+'';
-					if (keys[i] === thiskey) {
-						//console.log(body[thiskey])
-						var thisbody = body[thiskey];
-						if (thisbody && thisbody.split('').length > 100) {
-							var thumbbuf = new Buffer(body[thiskey], 'base64'); // decode
-							var thumburl = ''+publishers+'/pu/publishers/gnd/images/thumbs/'+doc.index+'/thumb_'+count+'.png'
-							thumburls.push(thumburl.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''))
-							count++;
-							fs.writeFile(thumburl, thumbbuf, function(err) {
-								if(err) {
-									console.log("err", err);
-								} 
-							})
-
-						} else {
-								thumburls.push(body[thiskey])
-								count++
-						}						
-					} else {
-						count = count;
-					}
-				}
-				next(null, doc, thumburls, body, keys, pu)
+				next(null, doc, body, keys, pu)
 				
 			})
 		},
-		function(doc, thumburls, body, keys, pu, next) {
-			var imgs = [];
-			var orientations = [];
-			var count = 0;
-			for (var k = 0; k < keys.length; k++) {
-				var thiskey = 'img'+count+'';
-				var thiso = 'orientation'+count+'';
-				if (keys[k] === thiskey) {
-					imgs.push(body[keys[k]])
-					orientations.push(body[thiso]);
-					count++;
-				}
-			}
-			//console.log(imgs)
-			next(null, doc, thumburls, imgs, orientations, body, keys, pu)
-		},
-		function(doc, thumburls, imgs, orientations, body, keys, pu, next) {
-			var footnotes = [];
-			var count = 0;
-			for (var k = 0; k < keys.length; k++) {
-				
-				var thatkey = 'footnote'+count+''
-				if (keys[k] === thatkey) {
-					console.log(body[thatkey])
-					if (body[thatkey]) {
-						footnotes.push(body[thatkey])
-						count++;
-					}
-				}
-
-			}
-			next(null, doc, thumburls, imgs, orientations, footnotes, body, pu)
-		},
-		function(doc, thumburls, imgs, orientations, footnotes, body, pu, next) {
+		function(doc, body, pu, count, next) {
 			console.log(footnotes)
 			var straight = function(str) {
 				return str.replace(/(\d\s*)&rdquo;/g, '$1\"').replace(/(\d\s*)&rsquo;/g, "$1'")
@@ -1193,9 +1141,10 @@ router.post('/api/editcontent/:id', function(req, res, next){
 				body.description
 			//);
 
-			var newdate = new Date();
-			var sig = (body.signature ? doc.properties.sig.push(body.signature) : doc.properties.sig)//pu.admin ? 
+			// var newdate = new Date();
+			// var sig = (body.signature ? doc.properties.sig.push() : doc.properties.sig)//pu.admin ? 
 			//console.log(desc, body.description);
+			// Publisher.findOne({_id: req}$project: {sig:1}])
 			var entry = {
 				_id: doc._id,
 				type: "Feature",
@@ -1222,50 +1171,27 @@ router.post('/api/editcontent/:id', function(req, res, next){
 						begin: new Date(body.datebegin),
 						end: moment().utc().format()
 					},
-					media: [],
-					footnotes: footnotes,
-					sig: sig
+					// media: [],
+					footnotes: footnotes
 				},
 				geometry: {
 					type: "Polygon",
 					coordinates: JSON.parse(JSON.stringify(body.latlng))
-				}
+				},
+				sig: doc.properties.sig
 			}
 			
 			//console.log(body.latlng)
 			//console.log(entry)
 			var entrymedia = []
-			var thumbs = thumburls;
-			var count = 0;
-			if (thumbs.length > 0) {
-				for (var i = 0; i < thumbs.length; i++) {
-					var media;
-					
-					media = {
-						index: count,
-						name: (body['img'+i+'_name'] ? curly(body['img'+i+'_name']) : ''),
-						image: imgs[i],
-						image_abs: path.join(publishers, '/pu'+imgs[i]),
-						iframe: (!body['iframe'+i+''] ? null : body['iframe'+i+'']),
-						thumb: thumbs[i],
-						thumb_abs: path.join(publishers, '/pu'+thumbs[i]),
-						caption: (body['img'+i+'_caption'] ? curly(body['img'+i+'_caption']) : ''),
-						postscript: (body['img'+i+'_postscript'] ? curly(body['img'+i+'_postscript']) : ''),
-						featured: body['img'+i+'_featured'],
-						orientation: orientations[i]
-					}
-
-					entrymedia.push(media)
-					count++
-				}
-			}
+			
 			entry = JSON.parse(JSON.stringify(entry))
 			var set1 = {$set: {}};
 			set1.$set['properties'] = entry.properties;
 
-			var key2 = 'properties.media';
-			var set2 = {$set: {}};
-			set2.$set[key2] = entrymedia;
+			// var key2 = 'sig';
+			// var set2 = {$set: {}};
+			// set2.$set[key2] = entrymedia;
 
 			var set3 = {$set: {}};
 			set3.$set['geometry'] = entry.geometry;
@@ -1283,10 +1209,10 @@ router.post('/api/editcontent/:id', function(req, res, next){
 				if (err) {
 					next(err) 
 				}
-				Content.findOneAndUpdate({_id: doc._id}, set2, options, function(errr, doc) {
-					if (errr) {
-						next(errr)
-					}
+				// Content.findOneAndUpdate({_id: doc._id}, set2, options, function(errr, doc) {
+				// 	if (errr) {
+				// 		next(errr)
+				// 	}
 					Content.findOneAndUpdate({_id: doc._id}, set3, options, function(errr, doc) {
 						if (errr) {
 							next(errr)
@@ -1311,7 +1237,7 @@ router.post('/api/editcontent/:id', function(req, res, next){
 						
 						
 					})
-				})
+				// })
 			})
 			
 		}
@@ -1726,7 +1652,7 @@ module.exports = router;
 // 						pageindex: doc.pageindex,
 // 						type: 'draw',
 // 						infowindow: 'edit',
-// 						drawtype: req.session.drawType ? req.session.drawType : false,
+// 						drawtype: req.session.drawtype ? req.session.drawtype : false,
 // 						layer: req.session.layer ? req.session.layer : doc.content[doc.content.length-1].level,
 // 						loggedin: req.session.loggedin,
 // 						index: doc.content[doc.content.length-1].index,
@@ -1818,7 +1744,7 @@ module.exports = router;
 // 				index: doc.content.length-1,
 // 				doc: doc,
 // 				data: datarray,
-// 				drawtype: req.session.drawType ? req.session.drawType : 'info',
+// 				drawtype: req.session.drawtype ? req.session.drawtype : 'info',
 // 				layer: req.session.layer ? req.session.layer : null,
 // 				info: 'Edit your entry.'
 // 			})
@@ -1847,7 +1773,7 @@ module.exports = router;
 // 			return res.render('publish', {
 // 				type: req.session.type ? req.session.type : 'blog',
 // 				infowindow: 'edit',
-// 				drawtype: req.session.drawType ? req.session.drawType : "info",
+// 				drawtype: req.session.drawtype ? req.session.drawtype : "info",
 // 				layer: req.session.layer ? req.session.layer : doc.content[doc.content.length-1].level,
 // 				loggedin: req.session.loggedin,
 // 				pageindex: doc.pageindex,
@@ -1870,7 +1796,7 @@ module.exports = router;
 // 	var drawtype = req.params.drawtype;
 // 	req.session.index = index;
 // 	req.session.layer = layer;
-// 	req.session.drawType = drawtype;
+// 	req.session.drawtype = drawtype;
 // 	req.session.urltitle = urltitle;
 // 	req.session.type = 'draw'
 // 	req.session.pageindex = parseInt(req.params.pageindex, 10);
@@ -1892,7 +1818,7 @@ module.exports = router;
 // 				if (er) {
 // 					return next(er)
 // 				}
-// 				req.session.drawType = drawtype;
+// 				req.session.drawtype = drawtype;
 // 				console.log(req.body)
 // 				var drawtypes = ["substrates", "filling"];
 // 				var keys = Object.keys(req.body);
@@ -1968,10 +1894,10 @@ module.exports = router;
 // 	var title = req.body.title;
 // 	var description = req.body.description;
 // 	var body = req.body;
-// 	var drawType = req.params.drawtype;
-// 	req.session.drawType = drawType;
+// 	var drawtype = req.params.drawtype;
+// 	req.session.drawtype = drawtype;
 // 	req.session.layer = parseInt(req.params.level, 10);
-// 	//console.log(drawType)
+// 	//console.log(drawtype)
 // 	var level = parseInt(req.params.level, 10);
 // 	var pageindex = parseInt(req.params.pageindex, 10);
 // 	req.session.pageindex = pageindex;
@@ -1991,7 +1917,7 @@ module.exports = router;
 // 
 // 				for (var j = 0; j < contentdata.info.length; j++) {
 // 
-// 					if (contentdata.info[j].spec.unlock === ''+drawType+'.'+level+'') {
+// 					if (contentdata.info[j].spec.unlock === ''+drawtype+'.'+level+'') {
 // 
 // 						contentdata.info[j].unlocked = true;
 // 
@@ -2001,25 +1927,25 @@ module.exports = router;
 // 						//console.log('unlocked ' +contentdata.info[j].name)
 // 					}
 // 				}
-// 				cb(null, body, contentdata, keys, drawType, index, pageindex)
+// 				cb(null, body, contentdata, keys, drawtype, index, pageindex)
 // 			})
 // 		},
-// 		function(body, contentdata, keys, drawType, index, pageindex, cb){
+// 		function(body, contentdata, keys, drawtype, index, pageindex, cb){
 // 			var drawThis, drawInd, drawName
-// 			//console.log(contentdata[drawType].length)
+// 			//console.log(contentdata[drawtype].length)
 // 			var drawInds = [];
-// 			for (var q = 0; q < contentdata[drawType].length; q++) {
-// 				//console.log(keys, contentdata[drawType][q].name)
-// 				if (keys.indexOf(contentdata[drawType][q].name) != -1) {
+// 			for (var q = 0; q < contentdata[drawtype].length; q++) {
+// 				//console.log(keys, contentdata[drawtype][q].name)
+// 				if (keys.indexOf(contentdata[drawtype][q].name) != -1) {
 // 					//console.log('image hea')
-// 					drawThis = contentdata[drawType][q];
+// 					drawThis = contentdata[drawtype][q];
 // 					drawInd = parseInt(drawThis.ind, 10);
 // 					drawName = drawThis.name;
-// 					contentdata[drawType][q].unlocked = true;
-// 					if (q === contentdata[drawType].length - 1) {
+// 					contentdata[drawtype][q].unlocked = true;
+// 					if (q === contentdata[drawtype].length - 1) {
 // 						var contentkeys = ["substrates", "filling"];
 // 						for (var i = 0; i < contentkeys.length; i++){
-// 							if (contentkeys[i] !== drawType) {
+// 							if (contentkeys[i] !== drawtype) {
 // 								contentdata[contentkeys[i]][0].unlocked = true;
 // 							}
 // 
@@ -2032,9 +1958,9 @@ module.exports = router;
 // 
 // 			}
 // 
-// 			if (contentdata[drawType].length > drawInd+1 ){
-// 				//console.log(contentdata[drawType][drawInd].name)
-// 				contentdata[drawType][drawInd+1].unlocked = true;
+// 			if (contentdata[drawtype].length > drawInd+1 ){
+// 				//console.log(contentdata[drawtype][drawInd].name)
+// 				contentdata[drawtype][drawInd+1].unlocked = true;
 // 			}
 // 			cb(null, body, contentdata, keys, drawName, index, pageindex)
 // 
@@ -2119,12 +2045,12 @@ module.exports = router;
 // 		console.log(keylist)
 // 		console.log('levellist')
 // 		console.log(levellist)
-// 		var drawType = keylist[0] !== undefined ? keylist[0] : "info";
+// 		var drawtype = keylist[0] !== undefined ? keylist[0] : "info";
 // 		var level = levellist[0] !== undefined ? levellist[0] : layer;
 // 		var set1 = {$set: {}};
 // 		var key1 = 'content.$.'+keylist[0]+'.'+levellist[0]+'.unlocked';
 // 		set1.$set[key1] = true;
-// 		req.session.drawType = drawType;
+// 		req.session.drawtype = drawtype;
 // 		req.session.pageindex = pageindex;
 // 		Page.findOneAndUpdate({pageindex: pageindex, content: {$elemMatch: {index: index}}}, set1, {safe: true, new: true, upsert: false}, function(error, dc){
 // 			if (error) {
@@ -2139,7 +2065,7 @@ module.exports = router;
 // 					datarray.push(data[l])
 // 				}
 // 				if (Number.isNaN(layer) || levellist[0] === thestore[drawtype].length - 1) {
-// 					req.session.drawType = drawtype === 'filling' ? 'substrates':'filling';
+// 					req.session.drawtype = drawtype === 'filling' ? 'substrates':'filling';
 // 					req.session.layer = 0;
 // 					//return res.redirect('/api/selectlayer')
 // 					//return res.redirect('/api/levelup')
@@ -2195,7 +2121,7 @@ module.exports = router;
 // 					return res.render('publish', {
 // 						type: 'blog',
 // 						infowindow: 'doc',
-// 						drawtype: req.session.drawType,
+// 						drawtype: req.session.drawtype,
 // 						layer: parseInt(req.session.layer, 10),
 // 						loggedin: req.session.loggedin,
 // 						pageindex: doc.pageindex,

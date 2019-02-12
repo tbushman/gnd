@@ -47,9 +47,9 @@ var schema = new Schema({
 		// 		orientation: String
 		// 	}
 		// ],
-		footnotes: [ ],
-		sig: [Signatures]
-	}
+		footnotes: [ ]
+	},
+	sig: [Signatures]
 }, { collection: 'content' });
 schema.index({ geometry: '2dsphere' });
 module.exports = mongoose.model('Content', schema);

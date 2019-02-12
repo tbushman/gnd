@@ -10,9 +10,17 @@ if (menu === "register" || menu === "login")
 else
 	div.menu(:class="type")
 
-		div.overtext(v-text="(dat && dat[0][0] && dat[0][0].title.str !== '' ? ((parseInt(dat[0][0].title.ind, 10) + 1) + 'th ' + dat[0][0].title.str) : '"+appTitle+"')")
-		//- div.blogname(v-text="(doc && doc.pagetitle ? doc.pagetitle : '')")
+		div.overtext(v-text="(dat && dat[0][0] && dat[0][0].title.str !== '' ? ((parseInt(dat[0][0].title.ind, 10) + 1) + 'th ' + dat[0][0].title.str) : (doc && doc.section ? (parseInt(doc.title.ind, 10) + 1)+'.'+(parseInt(doc.chapter.ind, 10) + 1)+'.'+(parseInt(doc.section.ind, 10) + 1) :'"+appTitle+"'))")
+		div.blogname(v-text="(doc && doc.section ? (doc.title.str+'.'+doc.chapter.str+'.'+doc.section.str) : '')")
 		div.envel
-			canvas#maincanvas.maincanvas.topRight(:style="{cursor: getCursor()}")
+			img#img(:style="{'pointer-events':'none',width: (cW + 'px'), height: (cH+'px'), position: 'absolute', 'z-index': -999}", :src="(drawtype==='substrates' ? '/images/substrates/substrates_0.svg' : '/images/filling/filling_0.svg')")
+			canvas#maincanvas.maincanvas.topRight(:style="{cursor: getCursor()}",
+				@mousedown="mouseHandler",
+				@mousemove="mouseHandler",
+				@mouseleave="mouseHandler",
+				@touchstart="touchHandler",
+				@touchmove="touchHandler",
+				@touchend="touchHandler"
+			)
 		div.topLeft
 	

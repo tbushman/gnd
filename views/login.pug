@@ -7,4 +7,20 @@ block content
 		include includes/header.pug
 		div.grid-container.blog
 			include menu.pug
-			include datagallery.pug
+			div.grid-right
+				div.tb-u-100
+					form(enctype="multipart/form-data", method="POST", action="/login")
+						input(type="hidden", name="_csrf", value= csrfToken)
+						div.input-field
+							label.ms-Label Username
+							input.ms-TextField-field(type="text", name="username")
+						div.input-field
+							label.ms-Label.tb-u-100 Password
+							input.ms-TextField-field(type="password", name="password")
+						p
+						button.btn.waves-effect.waves-light(type="submit", ariaDescription="Log in") Log in
+					p
+					hr
+					
+					p.tb-font-xl First time here?
+					a.btn.waves-effect.waves-light(href="/register", role="button", ariaDescription="Register") Register

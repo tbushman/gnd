@@ -16,6 +16,7 @@ html
 		script(type="text/javascript", src="/scripts/d3.v3.min.js")
 		script(type="text/javascript", src="/scripts/moment-with-locales.min.js")
 		script(type="text/javascript", src="/scripts/leaflet.js")
+		script(type="text/javascript", src="/scripts/Leaflet.Editable.js")
 
 	body(style="pointer-events: none;")
 		block page
@@ -77,7 +78,7 @@ html
 						cH: window.innerHeight,
 						rX: 35,
 						rY: 35,
-						// favor drawType
+						// favor drawtype
 						//- erase: false,
 						cursor: 'pointer',
 						//- mode: 'blog',
@@ -90,14 +91,15 @@ html
 						dragind: null,
 						latlngs: null,
 						repitem: [],
-						avail: null,
+						avail: this.parseBool(!{JSON.stringify(avail)}),
 						pickerbegin: false,
 						pickerend: false,
 						beginDate: '',
 						endDate: '',
 						zoom: 6,
 						sliderIndex: 0,
-						accordions: (this.parseObj(!{JSON.stringify(dat)}) !== '' && this.parseBool(!{JSON.stringify(exports)}) ? this.parseObj(!{JSON.stringify(dat)}).map(function(data){return data.map(function(doc){return doc.index})}) : 
+						n: 0,
+						accordions: 
 							(
 								this.parseObj(!{JSON.stringify(dat)}) !== '' ?
 								[
@@ -105,14 +107,13 @@ html
 								] :
 								[[]]
 							)
-						)
 					}
 				},
 				mounted() {
 					var self = this;
-					if (!self.image && self.doc && self.doc.content[self.index]) {
-						self.drawImg();
-					}
+					//- if (!self.image && self.doc && self.doc.sig.length) {
+					//- 	self.drawImg();
+					//- }
 					document.addEventListener('keydown', function(event) {
 					  var keyName = event.key;
 						if (keyName === 'Enter') event.preventDefault()
@@ -147,6 +148,19 @@ html
 						self.did = 0;
 						//- self.doc = (!self.data ? (!self.dat ? '': self.dat[0][0]) : self.data[0]);
 					}
+					if (self.pu && self.pu.properties.time) {
+						self.beginDate = moment(self.pu.properties.time.begin).utc().format();
+						self.endDate = moment(self.pu.properties.time.end).utc().format();
+					}
+					if (self.pu && self.pu.properties.title) {
+						
+						self.changePlace({
+							target: {value:self.pu.properties.title}
+						});
+					}
+					if (!self.image) {
+						self.image = $('#img')[0]
+					}
 					if (self.doc) {
 						self.loadMap(function(dataLayer){
 							/*if (!map) return;
@@ -164,68 +178,21 @@ html
 							//- self.panZoom();
 						})
 					}
-					//http://www.hnldesign.nl/work/code/mouseover-hover-on-touch-devices-using-jquery/
-					//- $(document).on('touchstart, mouseover', '.translate', function (e) {
-					//- 	var link = $(this); //preselect the link
-					//- 	if (link.hasClass('hover')) {
-					//- 		return true;
-					//- 	} else {
-					//- 		e.preventDefault();
-					//- 		link.addClass('hover');
-					//- 		$('a.taphover').not(this).removeClass('hover');
-					//- 		var text = link.html();
-					//- 		if (text.split('<')[1] === undefined) {
-					//- 			text = encodeURIComponent(text);
-					//- 			$.post('/translate/'+text+'').then(function(result){
-					//- 				console.log(result)
-					//- 				addAlert(result);
-					//- 			})
-					//- 		}
-					//- 		return false;
-					//- 	}
-					//- });
-					//- $(document).on('touchend, mouseleave', '.translate', function (e){
-					//- 	var link = $(this); //preselect the link
-					//- 	if (link.hasClass('hover')) {
-					//- 		$('.translate').removeClass('hover');
-					//- 	}
-					//- 	removeOldAlert()
-					//- 	return true;
-					//- });
-
-					//- $(document).on('click', 'canvas', function(e){
-					//- 	if ($('.menu').hasClass('blog')) {
-					//- 		uiDrawMode()
-					//- 	}
-					//- });
-					//drop-down event listener
-					//- $(document).on('click', '.dropdown', function (e) { 
-					//- 
-					//- 	//- if ($('div.menu').hasClass('draw')) {
-					//- 	//- 
-					//- 	//- 	//- uiBlogMode()
-					//- 	//- } else {
-					//- 	//- 	if ($('div.menu').hasClass('blog')) {
-					//- 	//- 		uiBlogMode()
-					//- 	//- 	}
-					//- 	//- }
-					//- 	//e.stopPropagation();
-					//- });
 				},
 				methods: {
 					formatDate(date){
 						return moment(date).utc().format();
 					},
-					pickerOpen(which){
+					pickerOpen(which, time){
 						var self = this;
 						if (which === 'begin') {
 							self.pickerend = false;
 							self.pickerbegin = true;
-							self.beginDate = moment().utc().format()
+							self.beginDate = (time !== '' ? moment(time).utc().format() : moment().utc().format())
 						}else {
 							self.pickerbegin = false;
 							self.pickerend = true;
-							self.endDate = moment().utc().format()
+							self.endDate = (time !== '' ? moment(time).utc().format() : moment().utc().format())
 
 						}
 					},
@@ -299,12 +266,12 @@ html
 					},
 					setBegin(e) {
 						var self = this;
-						if (!self.pu.properties.time) self.properties.time = {};
+						if (!self.pu.properties.time) self.pu.properties.time = {};
 						self.pu.properties.time.begin = e.target.value; 
 					},
 					setEnd(e) {
 						var self = this;
-						if (!self.pu.properties.time) self.properties.time = {};
+						if (!self.pu.properties.time) self.pu.properties.time = {};
 						self.pu.properties.time.end = e.target.value; 
 					},
 					changeTitle(e) {
@@ -340,28 +307,36 @@ html
 					getCursor() {
 						var self = this;
 						if (self.cursor !== 'pointer') {
-							return "url('/images/icons/tools/tools_"+(self.erase ? 0 : 1)+".svg'), "+self.cursor+""
+							return "url('/images/tools/tools_"+(self.drawtype === 'substrates' ? 0 : 1)+".svg'), "+self.cursor+""
 						}
 					},
-					drawImg() {
+					initSig() {
 						var self = this;
-						self.image = new Image();
-						self.image.src = self.doc.content[self.index].image;
-						if (self.image.complete && self.image.naturalHeight !== 0) {
-							cx.drawImage(self.image, 0, 0, self.cW, self.cH);
-						} else {
-							self.image.onload = function () {
-								cx.drawImage(self.image, 0, 0, self.cW, self.cH);
-							}
-						}
+						self.type = 'draw';
+						self.drawtype = 'filling';
+						
+
+					},
+					drawImg(cb) {
+						var self = this;
+						var img = new Image();
+						img.src = (self.drawtype === 'filling' ? '/images/filling/filling_0.svg' : '/images/substrates/substrates_0.svg')//self.doc.content[self.index].image;
+						cb(img)
+						//- if (self.image.complete && self.image.naturalHeight !== 0) {
+						//- 	cx.drawImage(self.image, 0, 0, self.cW, self.cH);
+						//- } else {
+						//- 	self.image.onload = function () {
+						//- 		cx.drawImage(self.image, 0, 0, self.cW, self.cH);
+						//- 	}
+						//- }
 						//- this.drawImg = function() {
 						//- 
 						//- }
 
 					},
-					setDrawType(drawType, e) {
+					setDrawType(drawtype, e) {
 						var self = this;
-						self.drawType = drawType;
+						self.drawtype = drawtype;
 						self.menu = 'draw';
 						//- switch(self.menu) {
 						//- 	case 'draw':
@@ -379,7 +354,7 @@ html
 					},
 					startD(e) {
 						var self = this;
-						if (!can) {
+						if (!self.can) {
 							self.can = e.target;
 							self.ctx = can.getContext('2d');
 						}
@@ -388,6 +363,7 @@ html
 						
 					},
 					mouseHandler(event) {
+						var self = this;
 						if (event.type == "mousedown" && event.button === 0) {
 							self.mousePressed = true;
 						}
@@ -398,81 +374,75 @@ html
 								pageX : event.pageX,
 								pageY : event.pageY
 							};
+							//- console.log(fakeTouch)
+							var eventType = (event.type ===  "mousedown" ? "touchstart" :
+									(event.type == "mouseup" ? "touchend" : "touchmove"));
 							
-							var eventType = event.type ==  "mousedown" ? "touchstart" :
-									event.type == "mouseup" ? "touchend" : "touchmove";
-
-							drawTouch(event.target, fakeTouch, eventType, self.image);
-							event.preventDefault();
+							//- self.image.onload = function() {
+								self.drawTouch(event.target, fakeTouch, eventType, self.image);
+								event.preventDefault();
+							//- }
 						}
 
 						if (event.type == "mouseup")
 							self.mousePressed = false;
 					},
 					touchHandler(event) {
+						var self = this;
 						event.preventDefault();
 						
 						for (var i = 0; i < event.changedTouches.length; i++) {
-							drawTouch(event.target, event.changedTouches[i], event.type, self.image);
+							self.drawTouch(event.target, event.changedTouches[i], event.type, self.image);
 						}
 						
 					},
 					drawTouch(eventTarget, touch, eventType, drawThis) {
 						var self = this;
-						var drawType = self.drawType;//'filling';
+						var drawtype = self.drawtype;//'filling';
 						var layer = 0;
-
-						//- if (!(touch.identifier in self.touchMap)) {
-						//- 	self.touchMap[touch.identifier] = self.nextCount;
-						//- 	self.nextCount++;
-						//- }
-
-						//- // Polyfill non-standard properties
-						//- if (!("radiusX" in touch) && "webkitRadiusX" in touch)
-						//- 	touch.radiusX = touch.webkitRadiusX;
-						//- if (!("radiusY" in touch) && "webkitRadiusY" in touch)
-						//- 	touch.radiusY = touch.webkitRadiusY;
-						//- if (!("rotationAngle" in touch) && "webkitRotationAngle" in touch)
-						//- 	touch.rotationAngle = touch.webkitRotationAngle;
-						//- if (!("force" in touch) && "webkitForce" in touch)
-						//- 	touch.force = touch.webkitForce;
-						//- 
-						//- var rotationAngle = getAdjustedRotationAngle(touch.rotationAngle);
-						//- foundRotationAngle = foundRotationAngle || rotationAngle;
-						//- 
-						//- // Try to avoid start/end ellipses overlapping exactly
-						//- if (eventType == "touchend") {
-						//- 	self.rX++;
-						//- 	self.rY++;
-						//- }
+						self.can = eventTarget;
+						self.can.width = self.cW;
+						self.can.height = self.cH;
+						self.can.style.width = self.cW + 'px'
+						self.can.style.height = self.cH + 'px'
+						self.ctx = self.can.getContext('2d');
+						if (eventType === "touchend") {
+							self.rX++;
+							self.rY++;
+							
+						}
 						self.cursor = 'grabbing'
-
+						//- console.log(self.image)
 						if (
-							self.drawType === 'substrates' && self.mousePressed
+							self.drawtype === 'substrates'
 							//- $('#erase').val() !== ''
 						) {
-							eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+0+'.svg"), grabbing;');
+							//- eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+0+'.svg"), grabbing;');
 							self.ctx.fillStyle = 'rgba(0,0,0,1)';
 							self.ctx.globalCompositeOperation = "destination-out";//context.createPattern(pCanvas, 'no-repeat');
 							self.ctx.fill();
 						} else {
-							eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
+							self.ctx.globalCompositeOperation = "destination-in";
+							//- eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
 							var pCanvas = document.createElement('canvas');
 							pCanvas.width = self.cW;
 							pCanvas.height = self.cH;
+							pCanvas.style.width = self.cW + 'px';
+							pCanvas.style.height = self.cH + 'px';
 							var pContext = pCanvas.getContext('2d');
-							pself.ctx.drawImage(drawThis, 0, 0, self.cW, self.cH);
-							var pPattern = self.ctx.createPattern(pCanvas, 'no-repeat');
+							pContext.drawImage(drawThis, 0, 0, self.cW, self.cH);
+							var pPattern = self.ctx.createPattern(pCanvas, 'repeat');
 							self.ctx.fillStyle = pPattern;
+							//- console.log(self.ctx)
 							self.ctx.fill()
 							
 						}
 						
 						self.ctx.save();
-						self.ctx.translate(touch.pageX * scale, touch.pageY * scale);
-						self.ctx.scale(1, radiusY/radiusX);
+						self.ctx.translate(touch.pageX, touch.pageY);
+						self.ctx.scale(1, self.rY/self.rX);
 						self.ctx.beginPath();
-						self.ctx.arc(0, 0, radiusX, 0, 2.0 * Math.PI, false);
+						self.ctx.arc(0, 0, self.rX, 0, 2.0 * Math.PI, false);
 						self.ctx.closePath();
 						self.ctx.restore();
 
@@ -502,7 +472,7 @@ html
 							})
 						}, 'image/png', 0.95);
 					},
-					checkNameValidity(aSearchTerm, aMsg, event)
+					checkNameValidity(type, aSearchTerm, aMsg, event)
 					{
 						var self = this;
 						var elem = event.target;//document.getElementById(aID);
@@ -523,6 +493,11 @@ html
 								self.avail = (result === 'Available')
 								if (self.avail) {
 									$.post('/reserve/'+check+'');
+									if (self.pu[type]) {
+										self.pu[type] = check;
+									} else if (self.pu.properties[type]) {
+										self.pu.properties[type] = check;
+									}
 								}
 							})
 						}
@@ -548,10 +523,14 @@ html
 						var self = this, dataLayer, 
 						map = new L.map('map', { 
 							//- maxBounds: L.latLngBounds([L.LatLng(43,-122),L.LatLng(-7,-188)]),
-							center: L.latLngBounds([
-								(!self.doc.geometry.coordinates[1] ? 40.7608 : self.doc.geometry.coordinates[1]),
-								(!self.doc.geometry.coordinates[0] ? -111.8910 : self.doc.geometry.coordinates[0])
-							]).getCenter(),
+							center: (!self.doc || !self.doc.geometry.coordinates ? L.latLngBounds([40.7608, -111.8910]).getCenter() : L.latLngBounds(self.rxArr(self.doc.geometry.coordinates)).getCenter() ),
+
+							//- L.latLngBounds(
+								//- [
+								//- 	(!self.doc.geometry.coordinates[1] ? 40.7608 : self.doc.geometry.coordinates[1]),
+								//- 	(!self.doc.geometry.coordinates[0] ? -111.8910 : self.doc.geometry.coordinates[0])
+								//- ]
+															//- ).getCenter(),
 							zoomControl: false, 
 							zoom: 6,//(!self.position ? 6 : self.position.zoom), 
 							minZoom: 4,	maxZoom: 18,
@@ -559,6 +538,7 @@ html
 							renderer: L.canvas(),
 							preferCanvas: true
 						});
+						//- console.log(map)
 						L.control.zoom({ position:'bottomleft' }).addTo(map);
 						var opts = { 
 							attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
@@ -700,29 +680,6 @@ html
 								
 								//cb(map, dataLayer)
 								self.map.addLayer(dataLayer);
-						//- if (ft.length && self.map) { 
-						//- 	dataLayer = L.featureGroup();
-						//- 	ft.forEach(function(f, i) {
-						//- 		var opts = { 
-						//- 			radius: 11, weight: 1, fillOpacity: 0.1,
-						//- 			color: '#fff', fillColor: 'var(--highlight)', opacity: 1 }
-						//- 		var coords = f.geometry.coordinates;
-						//- 		// geojson uses [lng, lat] and Leaflet uses [lat, lng]
-						//- 		var cd = self.rxArr(coords);
-						//- 		if (f.geometry.type === 'Point') { 
-						//- 			var c = L.circleMarker(cd, opts ).on('click', function(){
-						//- 				return self.setView(f, i, null, 0)
-						//- 			});
-						//- 			c.addTo(dataLayer);
-						//- 		} else { 
-						//- 			var p = L.polygon(cd, opts).on('click', function(){
-						//- 				return self.setView(f, i, null, 0)
-						//- 			});
-						//- 			p.addTo(dataLayer); 
-						//- 		} 
-						//- 	});
-						//- 	self.map.addLayer(dataLayer);
-						//- } 
 						cb(dataLayer); 
 					} /*map geatures*/,
 					refreshMap(cd){ 
@@ -971,6 +928,5 @@ html
 			});
 		
 		script(type='text/javascript', src='/scripts/leaflet-image_0_4_0.js')
-		script(type="text/javascript", src="/scripts/Leaflet.Editable.js")
 		script(type="text/javascript", src="/scripts/Path.Drag.js")
 

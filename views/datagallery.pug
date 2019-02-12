@@ -1,121 +1,70 @@
 - console.log('this is the menu')
-if (menu === 'login')
-	div.grid-right
-		div.tb-u-100
-			form(enctype="multipart/form-data", method="POST", action="/login")
-				input(type="hidden", name="_csrf", value= csrfToken)
-				div.input-field
-					label.ms-Label Username
-					input.ms-TextField-field(type="text", name="username")
-				div.input-field
-					label.ms-Label.tb-u-100 Password
-					input.ms-TextField-field(type="password", name="password")
-				p
-				button.btn.waves-effect.waves-light(type="submit", ariaDescription="Log in") Log in
-			p
-			hr
-			
-			p.tb-font-xl First time here?
-			a.btn.waves-effect.waves-light(href="/register", role="button", ariaDescription="Register") Register
-if (menu === 'register' || menu === 'pu')
-	div.grid-right
-		div.tb-u-100
-			p.tb-font-xl Your Information:
-			div#registersection(v-if="menu === 'register' || menu === 'pu'")
-				include includes/puedit.pug
-				//- div.input-field#response
-				//- p(v-if="!avail && pu.properties.placetype !== ''")
-				//- 
-				//- 	div.input-field#response
-				//- 		hr(v-html="marked('<p>Name already in use for the given jurisdiction. You may try a different jurisdiction or <a href=`/login`>Log in</a>.</p>')")
+div.grid-right
+	
+	div.tb-u-100
+		//- 		a.grid-header
+		div.grid-mid
+			div.centerall
+				
+				div(v-if="data.length > 0")
+					div
+						a(v-bind:href="'/'")
+							header.row.tb-font-l
+								span.bd(v-text="(parseInt(data[0].title.ind, 10) + 1)+'th'")
+								span(v-text="' '") 
+								span(v-text="data[0].title.str")
 
-		div.tb-u-100
-			#info(v-text="info")
-			
-if (menu === 'data')
-	div.grid-right
-		
-		div.tb-u-100
-			//- 		a.grid-header
-			div.grid-mid
-				div.centerall
-					div.slidercontainer(style="position:relative;height:auto;width:100%;")
-						img#slider(style="width:100%;height:auto; transition-property: opacity; transition-duration:2s;margin-top:20px;position:absolute;z-index:1", v-bind:src="'/publishers/gnd/images/full/img_'+sliderIndex+'.png'")
-						img(style="width:100%;height:auto;margin-top:20px;position:relative;z-index:0;", v-bind:src="'/images/publish_logo_sq.svg'")
-
-					div(v-if="dat.length > 0", v-for="(data, n) in dat", v-bind:id="n")
-						div
-							div(v-on:click="navigateTo('/')")
-								a(v-bind:href="'/'")
-									header.row.tb-font-l Title 
-										span.bd(v-text="data[0].title.ind")
-										span(v-text="' '") 
-										span(v-text="data[0].title.str")
-							div
-							div
-								a(v-bind:href="'/menu/'+data[0].title.ind+'/'+data[0].chapter.ind+''")
-									header.row.tb-font-l Chapter 
-										span.bd(v-text="data[0].chapter.ind")
-										span(v-text="' '")
-										span(v-text="data[0].chapter.str")
-							div
-								a.slidercontainer(v-if="data[0].section.ind === '000'", v-bind:href="'/list/'+data[0]._id+'/null'", style="position:relative;height:auto;width:100%;")
-									img(style="width:100%;height:auto;margin-top:20px;position:relative;z-index:0;display:block;", v-bind:src="data[0].properties.media[0].image")
-						
-						section.headline.headrule(
-							v-for="(doc, i) in data",
-							v-if="doc.section.ind !== '000'",
-							v-bind:id="doc.section.ind", 
-							style="margin-top: 15px; position:relative;")
-							a.accordion(v-on:click="accordion(n, doc.index)", style="pointer-events: auto; width: 100%; height: 100%; position: absolute;display:table-cell;vertical-align:bottom;")
-								div.ui(style="width: 23px; top:35px;position:absolute;display:block;padding-top:5px;")
-									svg(v-bind:style="(accordions[n].indexOf(doc.index) !== -1 ? {transform: 'rotate(180deg)'} : {transform: 'rotate(0deg)'})", xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
-										path(d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z")
-							div(style="position:relative;")
-								div.tb-11-m0
-									span(v-html="marked(doc.properties.description)")
-								
-								div.tb-11-m0.tb-07-m1.tb-font-m
-									a.href(v-bind:href="'/list/'+doc._id+'/null'", style="display:block;padding:0 0 0 105px;text-indent:-105px;")
-										span.bd(v-if="doc.title", v-text="doc.title.ind+'.'+doc.chapter.ind+'.'+doc.section.ind", style="width: 100px;display:inline-block;text-indent:0;")
-										span(v-text="' '")
-										span(v-html="doc.section.str")
-								div.tb-11-m0.tb-03-m1
-									div.breadcrumbs(v-if="doc.properties")
-										a(v-bind:href="'/menu/'+doc.title.ind+'/'+null+''")
-											span.tb-font-xxs(v-bind:style="{display:'inline-block'}", v-text="doc.title.str")
-										span.tb-font-xxs(v-text="' > '")
-										a(v-bind:href="'/menu/'+doc.title.ind+'/'+doc.chapter.ind+''")
-											span.tb-font-xxs(v-text="doc.chapter.str")
-										span.tb-font-xxs(v-text="' > '")
-										a(v-bind:href="'/list/'+doc._id+'/null'")
-											span.tb-font-xxs(v-text="doc.section.str")
-			div.grid-footer
-	//- div.grid-right
-	//- 	div.tb-u-100
-	//- 		a.grid-header(v-for="(entry, i) in data" :href="'/sig/'+entry.pagetitle")
-	//- 			p.tb-font-l Name 
-	//- 				span.tb-font-l(v-text="entry.pagetitle")
-	//- 		div.grid-left(v-for="(entry, i) in data" v-if="entry.content[0]")
-	//- 			a.thumbnail.gallery(v-if="entry.content[entry.content.length-1].image !== ''" :href="'/sig/'+entry.pagetitle")
-	//- 				img(:src="entry.content[entry.content.length-1].image", :alt="entry.pagetitle + ranks[entry.content.length-1]+' signature'")
-	//- 
-	//- 			div.grid-right(v-if="entry")
-	//- 				p.tb-font-s by 
-	//- 					span.tb-font-xxs(v-text="entry.publishers[0].username")
-	//- 				p.tb-font-s(v-if="entry.content[entry.content.length-1] !== undefined"
-	//- 					v-html="marked(entry.content[entry.content.length-1].description)")
-	//- 				span &nbsp ...
-	//- 			div.grid-footer
-	//- 
-	//- 		hr
-if (menu === "home")
-	div(v-if="dat && dat.length && Array.isArray(dat[0])" v-for="(ch,n) in dat", v-bind:id="n", v-bind:key="n")
-		div(v-if="ch[0]")
-			div
-				a(v-bind:href="'/menu/'+ch[0].title.ind+'/'+ch[0].chapter.ind+''")
-					header.row.tb-font-l
-						span(v-text="ch[0].chapter.str")
-						span(v-text="' '")
-						span.bd(v-text="(parseInt(ch[0].chapter.ind, 10) + 1)")
+						a(v-bind:href="'/menu/'+data[0].title.ind+'/'+data[0].chapter.ind+''")
+							header.row.tb-font-l 
+								span.bd(v-text="data[0].chapter.str")
+								span(v-text="' '")
+								span(v-text="(parseInt(data[0].chapter.ind, 10) + 1)")
+					
+					section.headline.headrule(
+						v-for="(doc, i) in data",
+						v-bind:id="doc.section.ind", 
+						style="margin-top: 15px; position:relative;")
+						a.accordion(v-on:click="accordion(n,i)", style="pointer-events: auto; width: 100%; height: 100%; position: absolute;display:table-cell;vertical-align:bottom;")
+							div.ui(style="width: 23px; top:35px;position:absolute;display:block;padding-top:5px;")
+								svg(v-bind:style="(accordions[n].indexOf(doc.index) !== -1 ? {transform: 'rotate(180deg)'} : {transform: 'rotate(0deg)'})", xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
+									path(d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z")
+						div.row.spacer.padder(style="position:relative;")
+							div.tb-11-m0(v-if="accordions[n].indexOf(doc.index) !== -1")
+								span(v-html="marked(doc.properties.description)")
+							
+							div.tb-11-m0.tb-07-m1.tb-font-m
+								a.href(v-bind:href="'/list/'+doc._id+'/null'", style="display:block;padding:0 0 0 105px;text-indent:-105px;")
+									span(v-html="doc.section.str")
+									span(v-text="' '")
+									span.bd(v-if="doc.title", v-text="(parseInt(doc.title.ind, 10) + 1)+'.'+(parseInt(doc.chapter.ind, 10) + 1)+'.'+(parseInt(doc.section.ind, 10) + 1)", style="width: 100px;display:inline-block;text-indent:0;")
+									
+							div.tb-11-m0.tb-03-m1
+								div(v-if="doc.properties")
+									a(v-bind:href="'/menu/'+doc.title.ind+'/'+null+''")
+										span.tb-font-xxs(v-bind:style="{display:'inline-block'}", v-text="doc.title.str")
+									span.tb-font-xxs(v-text="' > '")
+									a(v-bind:href="'/menu/'+doc.title.ind+'/'+doc.chapter.ind+''")
+										span.tb-font-xxs(v-text="doc.chapter.str")
+									span.tb-font-xxs(v-text="' > '")
+									a(v-bind:href="'/list/'+doc._id+'/null'")
+										span.tb-font-xxs(v-text="doc.section.str")
+		div.grid-footer
+//- div.grid-right
+//- 	div.tb-u-100
+//- 		a.grid-header(v-for="(entry, i) in data" :href="'/sig/'+entry.pagetitle")
+//- 			p.tb-font-l Name 
+//- 				span.tb-font-l(v-text="entry.pagetitle")
+//- 		div.grid-left(v-for="(entry, i) in data" v-if="entry.content[0]")
+//- 			a.thumbnail.gallery(v-if="entry.content[entry.content.length-1].image !== ''" :href="'/sig/'+entry.pagetitle")
+//- 				img(:src="entry.content[entry.content.length-1].image", :alt="entry.pagetitle + ranks[entry.content.length-1]+' signature'")
+//- 
+//- 			div.grid-right(v-if="entry")
+//- 				p.tb-font-s by 
+//- 					span.tb-font-xxs(v-text="entry.publishers[0].username")
+//- 				p.tb-font-s(v-if="entry.content[entry.content.length-1] !== undefined"
+//- 					v-html="marked(entry.content[entry.content.length-1].description)")
+//- 				span &nbsp ...
+//- 			div.grid-footer
+//- 
+//- 		hr	
 - console.log(menu)
