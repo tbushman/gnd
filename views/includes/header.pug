@@ -14,13 +14,16 @@ else
 		div.blogname(v-text="(doc && doc.section ? (doc.title.str+'.'+doc.chapter.str+'.'+doc.section.str) : '')")
 		div.envel
 			img#img(:style="{'pointer-events':'none',width: (cW + 'px'), height: (cH+'px'), position: 'absolute', 'z-index': -999}", :src="(drawtype==='substrates' ? '/images/substrates/substrates_0.svg' : '/images/filling/filling_0.svg')")
-			canvas#maincanvas.maincanvas.topRight(:style="{cursor: getCursor()}",
-				@mousedown="mouseHandler",
-				@mousemove="mouseHandler",
-				@mouseleave="mouseHandler",
-				@touchstart="touchHandler",
-				@touchmove="touchHandler",
-				@touchend="touchHandler"
-			)
+			keep-alive
+				//v-drawcanvas="can",
+				canvas#maincanvas.topRight(name="canvas", :style="{cursor: getCursor()}",
+					v-bind:is="can",
+					@mousedown="mouseHandler($event)",
+					@mousemove="mouseHandler($event)",
+					@mouseleave="mouseHandler($event)",
+					@touchstart="touchHandler($event)",
+					@touchmove="touchHandler($event)",
+					@touchend="touchHandler($event)"
+				)
 		div.topLeft
 	

@@ -17,6 +17,7 @@ html
 		script(type="text/javascript", src="/scripts/moment-with-locales.min.js")
 		script(type="text/javascript", src="/scripts/leaflet.js")
 		script(type="text/javascript", src="/scripts/Leaflet.Editable.js")
+		//- script(type="text/javascript", src="/scripts/DrawCanvas.js")
 
 	body(style="pointer-events: none;")
 		block page
@@ -33,6 +34,24 @@ html
 			Vue.prototype.marked = marked;
 			Vue.prototype.$ = $;
 			Vue.prototype.DatePicker = DatePicker;
+			//- Vue.directive('drawcanvas', {
+			//- 	inserted(can, binding, vnode)
+			//- 	{
+			//- 		var self = this;
+			//- 		can.width = self.cW;
+			//- 		can.height = self.cH;
+			//- 		//- console.log(can, binding, vnode)
+			//- 		var ctx = can.getContext('2d');
+			//- 			ctx.fillStyle = '#000'
+			//- 		ctx.fill();
+			//- 		//- console.log(self.can)
+			//- 		//- self.can = can
+			//- 	},
+			//- 	update(can, binding, vnode) {
+			//- 
+			//- 	}
+			//- })
+			//- Vue.use(drawcanvas);
 			Vue.use(DatePicker);
 			new Vue({ el: '#select',
 				data() {
@@ -72,6 +91,7 @@ html
 						//- drawCoalesced: false,
 						//- loadedLayer: this.loadedCanvas(),
 						can: null,
+						//document.getElementById('maincanvas'),
 						ctx: null,
 						image: null,
 						cW: window.innerWidth,
@@ -111,9 +131,7 @@ html
 				},
 				mounted() {
 					var self = this;
-					//- if (!self.image && self.doc && self.doc.sig.length) {
-					//- 	self.drawImg();
-					//- }
+					
 					document.addEventListener('keydown', function(event) {
 					  var keyName = event.key;
 						if (keyName === 'Enter') event.preventDefault()
@@ -161,6 +179,7 @@ html
 					if (!self.image) {
 						self.image = $('#img')[0]
 					}
+					if (!self.can) self.can = $('#maincanvas')[0];
 					if (self.doc) {
 						self.loadMap(function(dataLayer){
 							/*if (!map) return;
@@ -175,8 +194,25 @@ html
 							if (dataLayer)
 								self.dataLayer.enableEdit();
 							self.lMarker = L.marker(self.map.getCenter(), {draggable: true}).addTo(self.map);
-							//- self.panZoom();
+							if (!self.image && self.doch) {
+								self.drawImg(function(img){
+									self.img = img;
+								});
+							}//- self.panZoom();
 						})
+					}
+				},
+				//- directives: {
+				//- 
+				//- 		drawCanvas: function(can, binding, vnode)
+				//- 		//- {
+				//- 		//- 
+				//- 		//- 	self.drawTouch2()
+				//- 		//- }
+				
+				watch: {
+					can: function() {
+						console.log("drawTouch changed");
 					}
 				},
 				methods: {
@@ -321,17 +357,16 @@ html
 						var self = this;
 						var img = new Image();
 						img.src = (self.drawtype === 'filling' ? '/images/filling/filling_0.svg' : '/images/substrates/substrates_0.svg')//self.doc.content[self.index].image;
-						cb(img)
-						//- if (self.image.complete && self.image.naturalHeight !== 0) {
-						//- 	cx.drawImage(self.image, 0, 0, self.cW, self.cH);
+						//- var can = $('#maincanvas')[0];
+						//- var cx = can.getContext('2d');
+						//- if (img.complete && img.naturalHeight !== 0) {
+						//- 	cx.drawImage(img, 0, 0, self.cW, self.cH);
 						//- } else {
-						//- 	self.image.onload = function () {
-						//- 		cx.drawImage(self.image, 0, 0, self.cW, self.cH);
+						//- 	img.onload = function () {
+						//- 		cx.drawImage(img, 0, 0, self.cW, self.cH);
 						//- 	}
 						//- }
-						//- this.drawImg = function() {
-						//- 
-						//- }
+						cb(img)
 
 					},
 					setDrawType(drawtype, e) {
@@ -357,6 +392,7 @@ html
 						if (!self.can) {
 							self.can = e.target;
 							self.ctx = can.getContext('2d');
+							if (!self.image) self.image = $('#img')[0];
 						}
 					},
 					endD(e) {
@@ -379,7 +415,7 @@ html
 									(event.type == "mouseup" ? "touchend" : "touchmove"));
 							
 							//- self.image.onload = function() {
-								self.drawTouch(event.target, fakeTouch, eventType, self.image);
+								self.drawTouch(event.target, fakeTouch, eventType);
 								event.preventDefault();
 							//- }
 						}
@@ -391,21 +427,27 @@ html
 						var self = this;
 						event.preventDefault();
 						
-						for (var i = 0; i < event.changedTouches.length; i++) {
-							self.drawTouch(event.target, event.changedTouches[i], event.type, self.image);
+						for (var i = 0; i < event.changedTouches.length - 1; i++) {
+							self.drawTouch(
+								//- event
+								event.target, event.changedTouches[i], event.type
+							);
 						}
 						
 					},
-					drawTouch(eventTarget, touch, eventType, drawThis) {
+					drawTouch2() {
 						var self = this;
+						drawThis = self.image;
 						var drawtype = self.drawtype;//'filling';
 						var layer = 0;
-						self.can = eventTarget;
-						self.can.width = self.cW;
-						self.can.height = self.cH;
-						self.can.style.width = self.cW + 'px'
-						self.can.style.height = self.cH + 'px'
-						self.ctx = self.can.getContext('2d');
+						var can = (!self.can ? $('#maincanvas')[0] : self.can);
+						can.width = self.cW;
+						can.height = self.cH;
+						//- can.style.width = self.cW + 'px'
+						//- can.style.height = self.cH + 'px'
+						//- if (!self.ctx) 
+						var ctx = can.getContext('2d');
+						//- ctx.imageSmoothingEnabled = false;
 						if (eventType === "touchend") {
 							self.rX++;
 							self.rY++;
@@ -418,34 +460,116 @@ html
 							//- $('#erase').val() !== ''
 						) {
 							//- eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+0+'.svg"), grabbing;');
-							self.ctx.fillStyle = 'rgba(0,0,0,1)';
-							self.ctx.globalCompositeOperation = "destination-out";//context.createPattern(pCanvas, 'no-repeat');
-							self.ctx.fill();
+							ctx.fillStyle = 'rgba(0,0,0,1)';
+							ctx.globalCompositeOperation = "destination-out";//context.createPattern(pCanvas, 'no-repeat');
+							//- ctx.fill()
 						} else {
-							self.ctx.globalCompositeOperation = "destination-in";
-							//- eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
-							var pCanvas = document.createElement('canvas');
-							pCanvas.width = self.cW;
-							pCanvas.height = self.cH;
-							pCanvas.style.width = self.cW + 'px';
-							pCanvas.style.height = self.cH + 'px';
-							var pContext = pCanvas.getContext('2d');
-							pContext.drawImage(drawThis, 0, 0, self.cW, self.cH);
-							var pPattern = self.ctx.createPattern(pCanvas, 'repeat');
-							self.ctx.fillStyle = pPattern;
-							//- console.log(self.ctx)
-							self.ctx.fill()
+							//- var c = document.createElement('canvas');
+							//- c.width = self.cW;
+							//- c.height = self.cH;
+							//- c.style.width = self.cW + 'px';
+							//- c.style.height = self.cH + 'px';
+							//- var cx = c.getContext('2d');
+							//- //- ctx.globalCompositeOperation = "source-in";
+							//- //- eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
+							//- var pCanvas = document.createElement('canvas');
+							//- pCanvas.width = self.cW;
+							//- pCanvas.height = self.cH;
+							//- pCanvas.style.width = self.cW + 'px';
+							//- pCanvas.style.height = self.cH + 'px';
+							//- var pContext = pCanvas.getContext('2d');
+							//- pContext.drawImage(drawThis, 0, 0, self.cW, self.cH);
+							//- var pPattern = cx.createPattern(pCanvas, 'repeat');
+							ctx.fillStyle = '#000'
+							//pPattern;
+							//- console.log(ctx)
+							//- ctx.fillStyle = pPattern;
+							//- ctx.fill()
+							//- console.log(ctx)
+						}
+						ctx.beginPath();
+						//- ctx.save();
+						ctx.moveTo(touch.pageX, touch.pageY);
+						//- ctx.translate(touch.pageX, touch.pageY);
+						//- ctx.scale(1, self.rY/self.rX);
+						//- ctx.arc(0, 0, self.rX, 0, 2.0 * Math.PI, false);
+						ctx.arc(touch.pageX, touch.pageY, self.rX, 0, 2.0 * Math.PI, false);
+						//- ctx.fill()
+						//- ctx.closePath();
+						//- ctx.restore();
+						ctx.fill();
+						self.can = can
+					},
+					drawTouch(eventTarget, touch, eventType) {
+						//
+						//- console.log(e)
+						var self = this;
+						//- var eventTarget = e.target, 
+						//- touch = {pageX: e.pageX, pageY: e.pageY}, 
+						//- eventType = e.type, 
+						drawThis = self.image;
+						var drawtype = self.drawtype;//'filling';
+						var layer = 0;
+						//- if (!self.can) self.can = eventTarget;
+						var can = (!eventTarget ? $('#maincanvas')[0] : eventTarget);
+						can.width = self.cW;
+						can.height = self.cH;
+						//- can.style.width = self.cW + 'px'
+						//- can.style.height = self.cH + 'px'
+						//- if (!self.ctx) 
+						var ctx = can.getContext('2d');
+						//- ctx.imageSmoothingEnabled = false;
+						if (eventType === "touchend") {
+							self.rX++;
+							self.rY++;
 							
 						}
-						
-						self.ctx.save();
-						self.ctx.translate(touch.pageX, touch.pageY);
-						self.ctx.scale(1, self.rY/self.rX);
-						self.ctx.beginPath();
-						self.ctx.arc(0, 0, self.rX, 0, 2.0 * Math.PI, false);
-						self.ctx.closePath();
-						self.ctx.restore();
-
+						self.cursor = 'grabbing'
+						//- console.log(self.image)
+						if (
+							self.drawtype === 'substrates'
+							//- $('#erase').val() !== ''
+						) {
+							//- eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+0+'.svg"), grabbing;');
+							ctx.fillStyle = 'rgba(0,0,0,1)';
+							ctx.globalCompositeOperation = "destination-out";//context.createPattern(pCanvas, 'no-repeat');
+							//- ctx.fill()
+						} else {
+							//- var c = document.createElement('canvas');
+							//- c.width = self.cW;
+							//- c.height = self.cH;
+							//- c.style.width = self.cW + 'px';
+							//- c.style.height = self.cH + 'px';
+							//- var cx = c.getContext('2d');
+							//- //- ctx.globalCompositeOperation = "source-in";
+							//- //- eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
+							//- var pCanvas = document.createElement('canvas');
+							//- pCanvas.width = self.cW;
+							//- pCanvas.height = self.cH;
+							//- pCanvas.style.width = self.cW + 'px';
+							//- pCanvas.style.height = self.cH + 'px';
+							//- var pContext = pCanvas.getContext('2d');
+							//- pContext.drawImage(drawThis, 0, 0, self.cW, self.cH);
+							//- var pPattern = cx.createPattern(pCanvas, 'repeat');
+							ctx.fillStyle = '#000'
+							//pPattern;
+							//- console.log(ctx)
+							//- ctx.fillStyle = pPattern;
+							//- ctx.fill()
+							//- console.log(ctx)
+						}
+						ctx.beginPath();
+						//- ctx.save();
+						ctx.moveTo(touch.pageX, touch.pageY);
+						//- ctx.translate(touch.pageX, touch.pageY);
+						//- ctx.scale(1, self.rY/self.rX);
+						//- ctx.arc(0, 0, self.rX, 0, 2.0 * Math.PI, false);
+						ctx.arc(touch.pageX, touch.pageY, self.rX, 0, 2.0 * Math.PI, false);
+						//- ctx.fill()
+						//- ctx.closePath();
+						//- ctx.restore();
+						ctx.fill();
+						self.can = can
 					},
 					getAdjustedRotationAngle(angle) {
 						return angle * Math.PI / 180;
