@@ -17,6 +17,7 @@ html
 		script(type="text/javascript", src="/scripts/moment-with-locales.min.js")
 		script(type="text/javascript", src="/scripts/leaflet.js")
 		script(type="text/javascript", src="/scripts/Leaflet.Editable.js")
+		script(type="text/javascript", src="/scripts/signaturePad.js")
 		//- script(type="text/javascript", src="/scripts/DrawCanvas.js")
 
 	body(style="pointer-events: none;")
@@ -28,14 +29,16 @@ html
 		#map(style="pointer-events: all;")
 		a#publish_logo(href="https://github.com/tbushman/gnd" target="_blank")
 			img(src="/images/publish_logo.svg")
-		
+		//- script(type='text/x-template' id="signaturepad")
+		//- 	<canvas ref="canv"></canvas>
 		script(type="text/javascript").
 			Vue.prototype.moment = moment;
 			Vue.prototype.marked = marked;
 			Vue.prototype.$ = $;
 			Vue.prototype.DatePicker = DatePicker;
+			Vue.prototype.SignaturePad = SignaturePad;
 			//- Vue.directive('drawcanvas', {
-			//- 	inserted(can, binding, vnode)
+			//- 	inserted: function(can, binding, vnode)
 			//- 	{
 			//- 		var self = this;
 			//- 		can.width = self.cW;
@@ -47,7 +50,7 @@ html
 			//- 		//- console.log(self.can)
 			//- 		//- self.can = can
 			//- 	},
-			//- 	update(can, binding, vnode) {
+			//- 	update: function(can, binding, vnode) {
 			//- 
 			//- 	}
 			//- })
@@ -90,8 +93,9 @@ html
 						mousePressed: false,
 						//- drawCoalesced: false,
 						//- loadedLayer: this.loadedCanvas(),
-						can: null,
-						//document.getElementById('maincanvas'),
+						can: 
+						null,
+						//- document.getElementById('maincanvas'),
 						ctx: null,
 						image: null,
 						cW: window.innerWidth,
@@ -119,6 +123,8 @@ html
 						zoom: 6,
 						sliderIndex: 0,
 						n: 0,
+						cursor: this.getCursor(),
+						signatureDataUris: [],
 						accordions: 
 							(
 								this.parseObj(!{JSON.stringify(dat)}) !== '' ?
@@ -128,6 +134,57 @@ html
 								[[]]
 							)
 					}
+				},
+				components: {
+					canvasc: {
+						data: function() {
+							return {
+								signaturePad: null,
+								ctx: null,
+								dataUrl: null,
+								cW: window.innerWidth,
+								cH: window.innerHeight
+							}
+						},
+						mounted: function(){
+							var self = this;
+							self.signaturePad = new SignaturePad(self.$refs.canv, {
+								onEnd: function() {
+									self.dataUrl = self.signaturePad.toDataURL()
+									self.$emit('update', self.dataUrl)
+								}
+							});
+							//- self.signaturePad.minWidth = window.innerWidth;
+							//- self.signaturePad.minHeight = window.innerWidth;
+						},
+						//- props: [
+						//- 	//- 'can', 'cursor', 'mousehandler', 'touchhandler'
+						//- 	'cW', 'cH'
+						//- ],
+						//- inject: ['cW', 'cH'],
+						template: 
+						//- '#signaturepad'
+						`<canvas
+							id="maincanvas"
+							ref="canv"
+						></canvas>`
+						//- class="topRight draw"
+						//- name="canvas"
+						//- :style="{cursor: cursor}"
+						//- @mousedown="mousehandler"
+						//- @mousemove="mousehandler"
+						//- @mouseleave="mousehandler"
+						//- @touchstart="touchhandler"
+						//- @touchmove="touchhandler"
+						//- @touchend="touchhandler"
+					}
+					//- ,
+					//- brush: {
+					//- 	inject: ['can', 'cursor', 'mousehandler', 'touchhandler', 'drawtouch'],
+					//- 	render: function() {
+					//- 		this.drawtouch()
+					//- 	}
+					//- }
 				},
 				mounted() {
 					var self = this;
@@ -179,7 +236,12 @@ html
 					if (!self.image) {
 						self.image = $('#img')[0]
 					}
-					if (!self.can) self.can = $('#maincanvas')[0];
+					if (!self.can) {
+						self.can = $('#maincanvas')[0];
+					}
+					if (self.can && !self.ctx) {
+						self.ctx = self.can.getContext('2d');
+					}
 					if (self.doc) {
 						self.loadMap(function(dataLayer){
 							/*if (!map) return;
@@ -194,7 +256,7 @@ html
 							if (dataLayer)
 								self.dataLayer.enableEdit();
 							self.lMarker = L.marker(self.map.getCenter(), {draggable: true}).addTo(self.map);
-							if (!self.image && self.doch) {
+							if (!self.image && self.doc) {
 								self.drawImg(function(img){
 									self.img = img;
 								});
@@ -202,16 +264,9 @@ html
 						})
 					}
 				},
-				//- directives: {
-				//- 
-				//- 		drawCanvas: function(can, binding, vnode)
-				//- 		//- {
-				//- 		//- 
-				//- 		//- 	self.drawTouch2()
-				//- 		//- }
-				
 				watch: {
-					can: function() {
+					can: function(e) {
+						console.log(e)
 						console.log("drawTouch changed");
 					}
 				},
@@ -384,8 +439,22 @@ html
 						//- 
 						//- }
 					},
-					loadedCanvas() {
-						
+					updateSignature(index, url) {
+						Vue.set(this.signatureDataUris, 0, url);
+						console.log(this.signatureDataUris);
+					},
+					loadedCanvas(can, options) {
+						console.log(url)
+						var self = this;
+						can.width = self.cW;
+						can.height = self.cH;
+						can.style.width = self.cW + 'px';
+						can.style.height = self.cH + 'px';
+						can.style['pointer-events'] = 'auto';
+						var cx = can.getContext('2d');
+						self.image = new Image();
+						self.image.src = this.url;
+
 					},
 					startD(e) {
 						var self = this;
@@ -398,8 +467,9 @@ html
 					endD(e) {
 						
 					},
-					mouseHandler(event) {
+					mousehandler(event) {
 						var self = this;
+						if (!self.ctx) return;
 						if (event.type == "mousedown" && event.button === 0) {
 							self.mousePressed = true;
 						}
@@ -419,11 +489,10 @@ html
 								event.preventDefault();
 							//- }
 						}
-
 						if (event.type == "mouseup")
 							self.mousePressed = false;
 					},
-					touchHandler(event) {
+					touchhandler(event) {
 						var self = this;
 						event.preventDefault();
 						
@@ -435,7 +504,7 @@ html
 						}
 						
 					},
-					drawTouch2() {
+					drawtouch() {
 						var self = this;
 						drawThis = self.image;
 						var drawtype = self.drawtype;//'filling';
@@ -446,7 +515,7 @@ html
 						//- can.style.width = self.cW + 'px'
 						//- can.style.height = self.cH + 'px'
 						//- if (!self.ctx) 
-						var ctx = can.getContext('2d');
+						var ctx = (!self.ctx ? can.getContext('2d') : self.ctx);
 						//- ctx.imageSmoothingEnabled = false;
 						if (eventType === "touchend") {
 							self.rX++;
@@ -511,13 +580,16 @@ html
 						var drawtype = self.drawtype;//'filling';
 						var layer = 0;
 						//- if (!self.can) self.can = eventTarget;
-						var can = (!eventTarget ? $('#maincanvas')[0] : eventTarget);
+						var can = (!self.can ? $('#maincanvas')[0] : self.can);
 						can.width = self.cW;
 						can.height = self.cH;
 						//- can.style.width = self.cW + 'px'
 						//- can.style.height = self.cH + 'px'
 						//- if (!self.ctx) 
-						var ctx = can.getContext('2d');
+						var ctx;
+						if (!self.ctx) ctx = can.getContext('2d');
+						else ctx = self.ctx;
+						//- if = can.getContext('2d');
 						//- ctx.imageSmoothingEnabled = false;
 						if (eventType === "touchend") {
 							self.rX++;
@@ -569,7 +641,7 @@ html
 						//- ctx.closePath();
 						//- ctx.restore();
 						ctx.fill();
-						self.can = can
+						//- self.can = can
 					},
 					getAdjustedRotationAngle(angle) {
 						return angle * Math.PI / 180;
@@ -642,7 +714,6 @@ html
 						$.post('/panzoom/'+self.map.getCenter().lat+'/'+self.map.getCenter().lng+'/'+self.map.getZoom()+'', function(result){
 						})
 					},
-
 					loadMap(cb) { 
 						var self = this, dataLayer, 
 						map = new L.map('map', { 
@@ -823,7 +894,7 @@ html
 						} else { 
 							lat = cd[0]; lng = cd[1]; 
 						}
-					// console.log(lat, lng)
+						// console.log(lat, lng)
 						if (lat && lng) { 
 							let latlng = new L.LatLng(lat, lng), nl;
 							

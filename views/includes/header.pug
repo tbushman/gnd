@@ -12,18 +12,32 @@ else
 
 		div.overtext(v-text="(dat && dat[0][0] && dat[0][0].title.str !== '' ? ((parseInt(dat[0][0].title.ind, 10) + 1) + 'th ' + dat[0][0].title.str) : (doc && doc.section ? (parseInt(doc.title.ind, 10) + 1)+'.'+(parseInt(doc.chapter.ind, 10) + 1)+'.'+(parseInt(doc.section.ind, 10) + 1) :'"+appTitle+"'))")
 		div.blogname(v-text="(doc && doc.section ? (doc.title.str+'.'+doc.chapter.str+'.'+doc.section.str) : '')")
-		div.envel
-			img#img(:style="{'pointer-events':'none',width: (cW + 'px'), height: (cH+'px'), position: 'absolute', 'z-index': -999}", :src="(drawtype==='substrates' ? '/images/substrates/substrates_0.svg' : '/images/filling/filling_0.svg')")
-			keep-alive
-				//v-drawcanvas="can",
-				canvas#maincanvas.topRight(name="canvas", :style="{cursor: getCursor()}",
-					v-bind:is="can",
-					@mousedown="mouseHandler($event)",
-					@mousemove="mouseHandler($event)",
-					@mouseleave="mouseHandler($event)",
-					@touchstart="touchHandler($event)",
-					@touchmove="touchHandler($event)",
-					@touchend="touchHandler($event)"
-				)
+		div.envel(width="100%", height="100%", style="width:100%;height:100%;")
+			//- div.row
+			//- 	p.tb-10-m0.tb-font-l Sign here
+				//- img#img(:style="{'pointer-events':'none',width: (cW + 'px'), height: (cH+'px'), position: 'absolute', 'z-index': -999}", :src="(drawtype==='substrates' ? '/images/substrates/substrates_0.svg' : '/images/filling/filling_0.svg')")
+				//- keep-alive
+					//v-drawcanvas="can",
+					//- :is="can",
+					//- v-model="can",
+					//- "(!can ? $event.target.querySelector('#maincanvas')[0] : can)"
+					//- @update="()"
+					//- v-drawcanvas="can"
+					//- :can="can"
+					//- :cursor="cursor"
+					//- :mousehandler="mousehandler"
+					//- :touchhandler="touchhandler"
+			table(width="100%", height="100%")
+				tr
+					td
+						div.row(style="text-align:center;")
+							p.tb-10.m0 Sign Here
+						canvasc(
+							@update="(val) => updateSignature(0, val)"
+							
+						)
+						//- brush#brush(
+						//- 
+						//- 	)
 		div.topLeft
 	
