@@ -17,7 +17,15 @@ block content
 	div#select(:class="type", style="pointer-events: auto;")
 		include includes/header.pug
 
-		div.grid-container(:class="type", v-if="data")
+		div.grid-container(:class="type" v-if="dat && dat[0]")
+			//- - menu = 'home'
+			include menu.pug
+			div.grid-right(v-for="(data,n) in dat", v-bind:id="n", v-bind:key="n")
+				div(v-if="data[0]")
+					include datagallery.pug
+				div(v-else)
+					p.tb-font-s(v-text="'Signed documents will appear here.'")
+		div.grid-container(:class="type", v-else-if="data && menu !== 'pu'")
 			//- - menu = 'home'
 			include menu.pug
 			include datagallery.pug
@@ -27,18 +35,6 @@ block content
 			include docgallery.pug
 
 		
-		div.grid-container(:class="type" v-else-if="dat && dat[0]")
-			//- - menu = 'home'
-			include menu.pug
-			div(v-for="(data,n) in dat", v-bind:id="n", v-bind:key="n")
-				div(v-if="data[0]")
-					div
-						a(v-bind:href="'/menu/'+data[0].title.ind+'/'+data[0].chapter.ind+''")
-							header.row.tb-font-l
-								span(v-text="data[0].chapter.str")
-								span(v-text="' '")
-								span.bd(v-text="(parseInt(data[0].chapter.ind, 10) + 1)")
-					include datagallery.pug
 		
 		div.grid-container(:class="type" v-else-if="pu && pu.username === loggedin")
 			//- - menu = 'home'
@@ -58,8 +54,10 @@ block content
 				//- if (dat)
 				//- 	- menu = 'home'
 				//- 	include datagallery.pug
-
-
+		div.grid-container(v-else-if="!doc && !data && !dat")
+			include menu.pug
+			div.grid-right(v-if="menu === 'pu'")
+				p.tb-font-s(v-text="'Use the menu to access your profile or home.'")
 	//-
 		initiate map + event listeners
 		

@@ -23,6 +23,8 @@ var helmet = require('helmet');
 var multer = require('multer');
 var csrf = require('csurf');
 var cors = require('cors');
+var publishers = path.join(__dirname, '/../..');
+var mkdirp = require('mkdirp');
 mongoose.Promise = promise;
 dotenv.load();
 
@@ -172,6 +174,86 @@ app.use(function(req, res, next) {
 app.get(/^(\/|\/register$|\/login$|\/api\/new|\/api\/editcontent)/, csrfProtection);
 // ensure multer parses before csrf
 app.post(/^(\/register$|\/login$|\/api\/editcontent)/, upload.array(), parseBody, csrfProtection);
+// var storage = multer.diskStorage({
+// 
+// 	destination: function (req, file, cb) {
+// 		var p, q;
+// 		if (!req.params.type) {
+// 			p = ''+publishers+'/pu/publishers/gnd/signatures/'+req.params.did+'/'+req.params.puid+''
+// 		} else {
+// 			if (req.params.type === 'png') {
+// 				p = ''+publishers+'/pu/publishers/gnd/images/full/'+req.params.index+''
+// 				q = ''+publishers+'/pu/publishers/gnd/images/thumbs/'+req.params.index+''
+// 
+// 			// } else if (req.params.type === 'csv') {
+// 			// 	p = ''+publishers+'/pu/publishers/gnd/csv/'+req.params.id+''
+// 			// 	q = ''+publishers+'/pu/publishers/gnd/csv/thumbs/'+req.params.id+''
+// 			// 
+// 			// } else if (req.params.type === 'txt') {
+// 			// 	p = ''+publishers+'/pu/publishers/gnd/txt'
+// 			// 	q = ''+publishers+'/pu/publishers/gnd/txt/thumbs'
+// 			// } else if (req.params.type === 'doc') {
+// 			// 	var os = require('os');
+// 			// 	p = os.tmpdir() + '/gdoc';
+// 			// 	q = ''+publishers+'/pu/publishers/gnd/tmp';
+// 			// } else if (req.params.type === 'docx') {
+// 			// 	p = ''+publishers+'/pu/publishers/gnd/docx'
+// 			// 	q = null;//''+publishers+'/pu/publishers/gnd/word/thumbs'
+// 			} else {
+// 				p = ''+publishers+'/pu/publishers/gnd/images/full/'+req.params.index+''
+// 				q = ''+publishers+'/pu/publishers/gnd/images/thumbs/'+req.params.index+''
+// 
+// 			}
+// 		}
+// 
+// 		fs.access(p, function(err) {
+// 			if (err && err.code === 'ENOENT') {
+// 				mkdirp(p, function(err){
+// 					if (err) {
+// 						console.log("err", err);
+// 					}
+// 					if (q) {
+// 						fs.access(q, function(err){
+// 							if (err && err.code === 'ENOENT') {
+// 								mkdirp(q, function(err){
+// 									if (err) {
+// 										console.log("err", err);
+// 									}
+// 									cb(null, p)
+// 								})
+// 							} else {
+// 								cb(null, p)
+// 							}
+// 						})
+// 					} else {
+// 						cb(null, p)
+// 					}
+// 
+// 				})
+// 			} else {
+// 				cb(null, p)
+// 			}
+// 		})
+// 
+// 	},
+// 	filename: function (req, file, cb) {
+// 		if (req.params.type === 'png') {
+// 			cb(null, 'img_' + req.params.counter + '.png')
+// 		// } else if (req.params.type === 'csv') {
+// 		// 	cb(null, 'csv_' + req.params.id + '.csv')
+// 		// } else if (req.params.type === 'txt') {
+// 		// 	cb(null, 'txt_' + Date.now() + '.txt')
+// 		// } else if (req.params.type === 'docx') {
+// 		// 	cb(null, 'docx_'+Date.now()+'.docx')
+// 		} else if (req.params.type === 'svg') {
+// 			cb(null, 'docx_'+Date.now()+'.svg')
+// 		}
+//   }
+// });
+// var uploadmedia = multer({ storage: storage/*, limits: { fieldSize: 25 * 1024 * 1024 }*/});
+// app.param('did');
+// app.param('puid');
+// app.post(/^(\/sig\/uploadsignature)/, uploadmedia.single('img'), parseBody, csrfProtection);
 
 app.use('/', routes);
 

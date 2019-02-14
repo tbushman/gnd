@@ -1,8 +1,7 @@
 var mongoose = require('mongoose'),
 		Publisher = require('mongoose-geojson-schema'),
 		Schema = mongoose.Schema,
-		passportLocalMongoose = require('passport-local-mongoose'),
-		Signature = require('./signatures.js');
+		passportLocalMongoose = require('passport-local-mongoose');
 
 var schema = new Schema({
 	username: {
@@ -14,7 +13,7 @@ var schema = new Schema({
 	avatar: String,
 	language: String,
 	email: String,
-	sig: [Signature],
+	sig: [],
 	geometry: Schema.Types.Polygon,
 	admin: Boolean,
 	properties: {

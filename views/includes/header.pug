@@ -2,42 +2,28 @@ if (menu === "register" || menu === "login")
 	div.menu(class="blog")
 		
 		div.topLeft(style="background-image:url('/images/backgrounds/backgrounds_1.svg')")
-		div.canvas.topRight
+		div.canvas.topRight(style="background-image:url('/images/backgrounds/backgrounds_1.svg')")
 			//(style="background-color:#bad80a")
 			div.overtext signature
 			div.blogname Tool
 
 else
 	div.menu(:class="type")
+		div.topLeft(style="background-image:url('/images/backgrounds/backgrounds_1.svg')")
 
-		div.overtext(v-text="(dat && dat[0][0] && dat[0][0].title.str !== '' ? ((parseInt(dat[0][0].title.ind, 10) + 1) + 'th ' + dat[0][0].title.str) : (doc && doc.section ? (parseInt(doc.title.ind, 10) + 1)+'.'+(parseInt(doc.chapter.ind, 10) + 1)+'.'+(parseInt(doc.section.ind, 10) + 1) :'"+appTitle+"'))")
-		div.blogname(v-text="(doc && doc.section ? (doc.title.str+'.'+doc.chapter.str+'.'+doc.section.str) : '')")
-		div.envel(width="100%", height="100%", style="width:100%;height:100%;")
-			//- div.row
-			//- 	p.tb-10-m0.tb-font-l Sign here
-				//- img#img(:style="{'pointer-events':'none',width: (cW + 'px'), height: (cH+'px'), position: 'absolute', 'z-index': -999}", :src="(drawtype==='substrates' ? '/images/substrates/substrates_0.svg' : '/images/filling/filling_0.svg')")
-				//- keep-alive
-					//v-drawcanvas="can",
-					//- :is="can",
-					//- v-model="can",
-					//- "(!can ? $event.target.querySelector('#maincanvas')[0] : can)"
-					//- @update="()"
-					//- v-drawcanvas="can"
-					//- :can="can"
-					//- :cursor="cursor"
-					//- :mousehandler="mousehandler"
-					//- :touchhandler="touchhandler"
-			table(width="100%", height="100%")
-				tr
-					td
-						div.row(style="text-align:center;")
-							p.tb-10.m0 Sign Here
-						canvasc(
-							@update="(val) => updateSignature(0, val)"
-							
-						)
-						//- brush#brush(
-						//- 
-						//- 	)
+		div.canvas.topRight(style="background-image:url('/images/backgrounds/backgrounds_1.svg')")
+			div.overtext(v-text="(dat && dat[0][0] && dat[0][0].title.str !== '' ? ((parseInt(dat[0][0].title.ind, 10) + 1) + 'th ' + dat[0][0].title.str) : (doc && doc.section ? (parseInt(doc.title.ind, 10) + 1)+'.'+(parseInt(doc.chapter.ind, 10) + 1)+'.'+(parseInt(doc.section.ind, 10) + 1) :'"+appTitle+"'))")
+			div.blogname(v-text="(doc && doc.section ? (doc.title.str+'.'+doc.chapter.str+'.'+doc.section.str) : '')")
+			div.envel(width="100%", height="100%", style="width:100%;height:100%;")
+				div.tb-font-l.info#info(v-text="info", style="margin: var(--thumbwidth)")
+				table(width="100%", height="100%", v-if="doc && pu && pu.username === loggedin && type === 'draw'")
+					tr
+						td
+							div.row(style="text-align:center;")
+								p.tb-10.m0 Sign Here
+							canvasc(
+								@update="(val, ts, can) => setSigData(0, val, ts, can)"
+								
+							)
 		div.topLeft
 	

@@ -1,26 +1,19 @@
 - var keys = ["substrates", "filling"]
-//- - var keys = ["draw", "erase"]
-// type = "draw" || "blog"
-div.grid-header.mainHeader
-	//if (drawtype)
-	a.mainmenu(v-if="(doc && doc.properties && type === 'draw' && pu && loggedin === pu.username)", href="#", title="Save", id="save", aria-labelledby="continue", 
-		@click="saveImage()"
-		)
-		img.i(src="/images/icons/check.svg")
-	
-	a.dropdown.mainmenu(v-else :class="(!type ? 'blog' : type)" href="#" title="Menu" @click="dropdown($event)")
-		img.i(src="/images/menu_button.svg")
-	//- a.mainmenu(v-else-if="type === 'draw'" href="#", title="Menu")
-	//- 	img.i(src="/images/menu_button.svg")
-	div.pullquote
-	//- a.tool(v-if="doc && index && doc.properties && type === 'draw'", v-for="(ing, j) in keys", href="#", @click="initBrush(ing)")
-	//- 	//onclick="if(event.preventDefault) event.preventDefault(); else event.returnValue = false; $.post('/api/selectlayer/"+menuData.urltitle+"/"+menuData.pageindex+"/"+index+"/"+drawtype+"/"+layer+"', function(){uiErase('"+menuData.urltitle+"',"+menuData.pageindex+","+index+",'"+drawtype+"',"+layer+");})"
-	//- 	.ui(v-for="(cat, i) in doc.properties[ing]" v-if="cat.unlocked")
-	//- 		img(:src="'/images/icons/'+ing+'_'+i+'.svg'")
-	//- 		span.tb-font-m.translate(v-text="cat.name")
-
-			
 div.grid-left#tl
+	a.mainmenu.img(v-if="(doc && doc.properties && type === 'draw' && pu && loggedin === pu.username)", href="#", title="Save", id="save", aria-labelledby="continue", 
+		@click="saveSignature()"
+		style="background-color:var(--highlight);")
+		//- img.i(src="/images/icons/check.svg")
+		.ui(style="pointer-events: none;width:36px;height:36px;")
+			svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
+				path(d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z")
+
+	a.dropdown.mainmenu.img(v-else :class="(!type ? 'blog' : type)" href="#" title="Menu" @click="dropdown($event)")
+		//- img.i(src="/images/menu_button.svg")
+		.ui(style="pointer-events: none;width:36px;height:36px;")
+			svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
+				path(d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z")
+
 	#wrapper
 		div#tlmodules.dropdown
 			a.module(href="/home", title="home")

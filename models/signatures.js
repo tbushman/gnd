@@ -2,24 +2,22 @@ var mongoose = require('mongoose'),
 	Schema = mongoose.Schema;
 	
 var Signature = new Schema({
-	ts: Date,
-	lat: Number,
-	lng: Number,
+	ts: String,
 	bin: String,
-	pu: String,
+	puid: String,
 	username: String,
 	givenName: String,
 	documentId: String,	
 	index: Number,
-	image: String,
-	image_abs: String,
-	thumb: String,
-	thumb_abs: String,
-	caption: String,
-	postscript: String,
-	url: String,
-	orientation: String
+	image: {
+		type: String,
+		unique: true
+	},
+	image_abs: String
 
-})
-
-module.exports = Signature;
+}, {collection: 'sig'})
+// const Signature = mongoose.model('Signature', signature);
+//const SigSchema = signature;
+module.exports = mongoose.model('Signature', Signature);
+//{Signature, SigSchema};
+// module.exports = Signature;

@@ -1,4 +1,3 @@
-- console.log('this is the menu')
 div.grid-right
 	
 	div.tb-u-100
@@ -21,33 +20,33 @@ div.grid-right
 								span(v-text="(parseInt(data[0].chapter.ind, 10) + 1)")
 					
 					section.headline.headrule(
-						v-for="(doc, i) in data",
-						v-bind:id="doc.section.ind", 
+						v-for="(dc, i) in data",
+						v-bind:id="dc.section.ind", 
 						style="margin-top: 15px; position:relative;")
-						a.accordion(v-on:click="accordion(n,i)", style="pointer-events: auto; width: 100%; height: 100%; position: absolute;display:table-cell;vertical-align:bottom;")
-							div.ui(style="width: 23px; top:35px;position:absolute;display:block;padding-top:5px;")
-								svg(v-bind:style="(accordions[n].indexOf(doc.index) !== -1 ? {transform: 'rotate(180deg)'} : {transform: 'rotate(0deg)'})", xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
+						a.accordion(v-on:click="accordion(n,i)")
+							div.ui
+								svg(v-bind:style="(accordions[n].indexOf(dc.index) !== -1 ? {transform: 'rotate(180deg)'} : {transform: 'rotate(0deg)'})", xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
 									path(d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z")
 						div.row.spacer.padder(style="position:relative;")
-							div.tb-11-m0(v-if="accordions[n].indexOf(doc.index) !== -1")
-								span(v-html="marked(doc.properties.description)")
+							div.tb-11-m0(v-if="accordions[n].indexOf(dc.index) !== -1")
+								span(v-html="marked(dc.properties.description)")
 							
 							div.tb-11-m0.tb-07-m1.tb-font-m
-								a.href(v-bind:href="'/list/'+doc._id+'/null'", style="display:block;padding:0 0 0 105px;text-indent:-105px;")
-									span(v-html="doc.section.str")
+								a.href(v-bind:href="'/list/'+dc._id+'/null'", style="display:block;padding:0 0 0 105px;text-indent:-105px;")
+									span(v-html="dc.section.str")
 									span(v-text="' '")
-									span.bd(v-if="doc.title", v-text="(parseInt(doc.title.ind, 10) + 1)+'.'+(parseInt(doc.chapter.ind, 10) + 1)+'.'+(parseInt(doc.section.ind, 10) + 1)", style="width: 100px;display:inline-block;text-indent:0;")
+									span.bd(v-if="dc.title", v-text="(parseInt(dc.title.ind, 10) + 1)+'.'+(parseInt(dc.chapter.ind, 10) + 1)+'.'+(parseInt(dc.section.ind, 10) + 1)", style="width: 100px;display:inline-block;text-indent:0;")
 									
 							div.tb-11-m0.tb-03-m1
-								div(v-if="doc.properties")
-									a(v-bind:href="'/menu/'+doc.title.ind+'/'+null+''")
-										span.tb-font-xxs(v-bind:style="{display:'inline-block'}", v-text="doc.title.str")
+								div(v-if="dc.properties")
+									a(v-bind:href="'/menu/'+dc.title.ind+'/'+null+''")
+										span.tb-font-xxs(v-bind:style="{display:'inline-block'}", v-text="(parseInt(dc.title.ind, 10) + 1) + 'th '+dc.title.str")
 									span.tb-font-xxs(v-text="' > '")
-									a(v-bind:href="'/menu/'+doc.title.ind+'/'+doc.chapter.ind+''")
-										span.tb-font-xxs(v-text="doc.chapter.str")
+									a(v-bind:href="'/menu/'+dc.title.ind+'/'+dc.chapter.ind+''")
+										span.tb-font-xxs(v-text="dc.chapter.str+' '+(parseInt(dc.chapter.ind, 10) + 1)")
 									span.tb-font-xxs(v-text="' > '")
-									a(v-bind:href="'/list/'+doc._id+'/null'")
-										span.tb-font-xxs(v-text="doc.section.str")
+									a(v-bind:href="'/list/'+dc._id+'/null'")
+										span.tb-font-xxs(v-text="dc.section.str")
 		div.grid-footer
 //- div.grid-right
 //- 	div.tb-u-100
@@ -67,4 +66,3 @@ div.grid-right
 //- 			div.grid-footer
 //- 
 //- 		hr	
-- console.log(menu)

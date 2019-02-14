@@ -1,7 +1,6 @@
 var mongoose = require('mongoose'),
 	Content = require('mongoose-geojson-schema'),
-	Schema = mongoose.Schema,
-	Signatures = require('./signatures.js');
+	Schema = mongoose.Schema;
 var schema = new Schema({
 	type: String,
 	index: Number,
@@ -48,8 +47,7 @@ var schema = new Schema({
 		// 	}
 		// ],
 		footnotes: [ ]
-	},
-	sig: [Signatures]
+	}
 }, { collection: 'content' });
 schema.index({ geometry: '2dsphere' });
 module.exports = mongoose.model('Content', schema);

@@ -30,7 +30,7 @@ div.grid-right
 						p(v-else-if="pu.properties.placetype !== ''")
 							div.tb-u-100.input-field(v-for="(item, i) in Object.keys(rep)", v-if="pu.properties.placetype === item")
 								label.ms-Label(v-text="'The '+item+' you represent'")
-								input.ms-TextField-field(v-if="item === 'ZIP4'", type="text", name="place", id="place", aria-required="true", @blur="checkNameValidity('ZIP4', '\D!@#$%^*()+=[]\\\';,./{}|\<>?:', 'Format ZIP Code as numbers separated by a dash. Example: 00000-1111', $event)", required, 
+								input.ms-TextField-field(v-if="item === 'ZIP4'", type="text", name="place", id="place", aria-required="true", @blur="checkNameValidity('ZIP4', '!@#$%^*()+=[]\\\';,./{}|\<>?:', 'Format ZIP Code as numbers separated by a dash. Example: 00000-1111', $event)", required, 
 									:value="(pu && pu.username === loggedin ? pu.properties.place : '')")
 								input.ms-TextField-field(v-else, :type="'text'", name="place", id="place", aria-required="true", @blur="checkNameValidity('place', '\d!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alphabetic characters only, please', $event)", required, 
 									:value="(pu && pu.username === loggedin ? pu.properties.place : '')")

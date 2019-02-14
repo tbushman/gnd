@@ -10,7 +10,8 @@ html
 		link(rel="stylesheet", href="/stylesheets/leaflet.css")
 		link(rel="stylesheet", href="/stylesheets/leaflet.draw.css")
 		script(type="text/javascript", src="/scripts/jquery.min.js")
-		script(src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js")
+		//- script(src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js")
+		script(type="text/javascript", src="/scripts/vue.min.js")
 		script(type="text/javascript", src="/scripts/vue-pick-a-date.js")
 		script(type="text/javascript", src="/scripts/marked.min.js")
 		script(type="text/javascript", src="/scripts/d3.v3.min.js")
@@ -29,36 +30,17 @@ html
 		#map(style="pointer-events: all;")
 		a#publish_logo(href="https://github.com/tbushman/gnd" target="_blank")
 			img(src="/images/publish_logo.svg")
-		//- script(type='text/x-template' id="signaturepad")
-		//- 	<canvas ref="canv"></canvas>
 		script(type="text/javascript").
 			Vue.prototype.moment = moment;
 			Vue.prototype.marked = marked;
 			Vue.prototype.$ = $;
 			Vue.prototype.DatePicker = DatePicker;
 			Vue.prototype.SignaturePad = SignaturePad;
-			//- Vue.directive('drawcanvas', {
-			//- 	inserted: function(can, binding, vnode)
-			//- 	{
-			//- 		var self = this;
-			//- 		can.width = self.cW;
-			//- 		can.height = self.cH;
-			//- 		//- console.log(can, binding, vnode)
-			//- 		var ctx = can.getContext('2d');
-			//- 			ctx.fillStyle = '#000'
-			//- 		ctx.fill();
-			//- 		//- console.log(self.can)
-			//- 		//- self.can = can
-			//- 	},
-			//- 	update: function(can, binding, vnode) {
-			//- 
-			//- 	}
-			//- })
-			//- Vue.use(drawcanvas);
 			Vue.use(DatePicker);
 			new Vue({ el: '#select',
 				data() {
 					return { 
+						unsigned: this.parseBool(!{JSON.stringify(unsigned)}),
 						months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
 						menu: this.parseObj(!{JSON.stringify(menu)}),
 						pu: this.ifNullThenObj(!{JSON.stringify(pu)}),//{properties: {}},
@@ -67,14 +49,10 @@ html
 						doc: this.parseObj(!{JSON.stringify(doc)}),
 						dids: [],
 						did: (this.parseObj(!{JSON.stringify(doc)}) === '' ? 0 : this.parseObj(!{JSON.stringify(doc)}).index),
-						//- infowindow: this.parseObj(!{JSON.stringify(infowindow)}),
-						//- index: this.parseObj(!{JSON.stringify(index)}),
-						//- pageIndex: this.parseObj(!{JSON.stringify(pageIndex)}),
 						// substrates, filling
 						drawtype: this.parseObj(!{JSON.stringify(drawtype)}),
 						// blog, draw, map
 						type: this.parseStr(!{JSON.stringify(type)}),
-						//- layer: this.parseObj(!{JSON.stringify(layer)}),
 						rep: {
 							// TODO map: ['Community Organizer'],
 							'ZIP4': ['resident', 'landlord', 'Community Organizer'],
@@ -82,34 +60,10 @@ html
 							State: ['House of Representatives', 'Senate'],
 							County: ['Council Member', 'Mayor']
 						},
-						//- pageIndex: null,
-						//- drawtype: null,
-						layer: null,
-						radiusSupported: false,
-						nextCount: 0,
-						touchMap: {},
-						foundRotationAngle: false,
-						scale: 1,
-						mousePressed: false,
-						//- drawCoalesced: false,
-						//- loadedLayer: this.loadedCanvas(),
-						can: 
-						null,
-						//- document.getElementById('maincanvas'),
-						ctx: null,
-						image: null,
-						cW: window.innerWidth,
-						cH: window.innerHeight,
-						rX: 35,
-						rY: 35,
-						// favor drawtype
-						//- erase: false,
-						cursor: 'pointer',
-						//- mode: 'blog',
 						ranks: ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"],
 						keys: ["tools", "filling"],
 						loggedin: this.parseObj(!{JSON.stringify(session.loggedin)}),
-						info: '',
+						info: this.parseObj(!{JSON.stringify(info)}),
 						ff: this.parseObj(!{JSON.stringify(ff)}),
 						uploadchtitle: null,
 						dragind: null,
@@ -124,7 +78,9 @@ html
 						sliderIndex: 0,
 						n: 0,
 						cursor: this.getCursor(),
-						signatureDataUris: [],
+						//- signatureDataUris: [],
+						can: [],
+						ts: [],
 						accordions: 
 							(
 								this.parseObj(!{JSON.stringify(dat)}) !== '' ?
@@ -142,6 +98,7 @@ html
 								signaturePad: null,
 								ctx: null,
 								dataUrl: null,
+								pts: null,
 								cW: window.innerWidth,
 								cH: window.innerHeight
 							}
@@ -149,42 +106,40 @@ html
 						mounted: function(){
 							var self = this;
 							self.signaturePad = new SignaturePad(self.$refs.canv, {
-								onEnd: function() {
+								onEnd: async function() {
+									var ctx = self.$refs.canv.getContext('2d');
+									ctx.font = '12px sans-serif';
+									
+									var ts = ''+moment().utc().format();
+									await ctx.clearRect(23, 132, 300, 32);
+									//- ctx.fillStyle = 'rgba(0,0,0,0)';
+									ctx.beginPath();
+									//- ctx.fillRect(23, 132, 300, 32);
+									//- ctx.fillStyle = '#000';
+									ctx.fillText(ts, 23, 132);
+									ctx.closePath();
 									self.dataUrl = self.signaturePad.toDataURL()
-									self.$emit('update', self.dataUrl)
+									self.pts = self.signaturePad.toData();
+									self.$emit('update', self.dataUrl, ts, self.$refs.canv);
+									
+								},
+								onBegin: function() {
+									
 								}
 							});
-							//- self.signaturePad.minWidth = window.innerWidth;
-							//- self.signaturePad.minHeight = window.innerWidth;
 						},
-						//- props: [
-						//- 	//- 'can', 'cursor', 'mousehandler', 'touchhandler'
-						//- 	'cW', 'cH'
-						//- ],
-						//- inject: ['cW', 'cH'],
 						template: 
 						//- '#signaturepad'
 						`<canvas
 							id="maincanvas"
 							ref="canv"
 						></canvas>`
-						//- class="topRight draw"
-						//- name="canvas"
-						//- :style="{cursor: cursor}"
-						//- @mousedown="mousehandler"
-						//- @mousemove="mousehandler"
-						//- @mouseleave="mousehandler"
-						//- @touchstart="touchhandler"
-						//- @touchmove="touchhandler"
-						//- @touchend="touchhandler"
 					}
-					//- ,
-					//- brush: {
-					//- 	inject: ['can', 'cursor', 'mousehandler', 'touchhandler', 'drawtouch'],
-					//- 	render: function() {
-					//- 		this.drawtouch()
-					//- 	}
-					//- }
+				},
+				updated() {
+					var self = this;
+					//- if (!self.signature) 
+					//- if (!self.signaturePad) self.signaturePad = self.$refs.canv
 				},
 				mounted() {
 					var self = this;
@@ -205,24 +160,24 @@ html
 						$('.selected').removeClass('selected');
 
 					});
-					self.sliderImg();
+					//- self.sliderImg();
 					self.dids = (self.data && self.data !== '' ? self.data.map(function(doc){
 						return doc.index;
 					}) : [(!self.doc || self.doc === '' ? 0 : self.doc.index)] );
 					self.dids.sort();
-					if (!self.doc) {
-						if (self.data) {
-							self.doc = self.data[0]
-							console.log(self.doc)
-						} else {
-							if (self.dat[0]) {
-								self.data = [].concat.apply([], self.dat);
-							}
-						}
-						self.dids = [self.doc.index];
-						self.did = 0;
-						//- self.doc = (!self.data ? (!self.dat ? '': self.dat[0][0]) : self.data[0]);
-					}
+					//- if (!self.doc) {
+					//- 	if (self.data) {
+					//- 		self.doc = self.data[0]
+					//- 		console.log(self.doc)
+					//- 	} else {
+					//- 		if (self.dat[0]) {
+					//- 			self.data = [].concat.apply([], self.dat);
+					//- 		}
+					//- 	}
+					//- 	self.dids = [self.doc.index];
+					//- 	self.did = 0;
+					//- 	//- self.doc = (!self.data ? (!self.dat ? '': self.dat[0][0]) : self.data[0]);
+					//- }
 					if (self.pu && self.pu.properties.time) {
 						self.beginDate = moment(self.pu.properties.time.begin).utc().format();
 						self.endDate = moment(self.pu.properties.time.end).utc().format();
@@ -232,15 +187,6 @@ html
 						self.changePlace({
 							target: {value:self.pu.properties.title}
 						});
-					}
-					if (!self.image) {
-						self.image = $('#img')[0]
-					}
-					if (!self.can) {
-						self.can = $('#maincanvas')[0];
-					}
-					if (self.can && !self.ctx) {
-						self.ctx = self.can.getContext('2d');
 					}
 					if (self.doc) {
 						self.loadMap(function(dataLayer){
@@ -408,253 +354,54 @@ html
 						
 
 					},
-					drawImg(cb) {
+					setSigData(i, val, ts, can) {
 						var self = this;
-						var img = new Image();
-						img.src = (self.drawtype === 'filling' ? '/images/filling/filling_0.svg' : '/images/substrates/substrates_0.svg')//self.doc.content[self.index].image;
-						//- var can = $('#maincanvas')[0];
-						//- var cx = can.getContext('2d');
-						//- if (img.complete && img.naturalHeight !== 0) {
-						//- 	cx.drawImage(img, 0, 0, self.cW, self.cH);
-						//- } else {
-						//- 	img.onload = function () {
-						//- 		cx.drawImage(img, 0, 0, self.cW, self.cH);
-						//- 	}
-						//- }
-						cb(img)
-
-					},
-					setDrawType(drawtype, e) {
-						var self = this;
-						self.drawtype = drawtype;
-						self.menu = 'draw';
-						//- switch(self.menu) {
-						//- 	case 'draw':
-						//- 		break;
-						//- 	case 'blog':
-						//- 		break;
-						//- 	case 'map':
-						//- 		break;
-						//- 	default:
-						//- 
-						//- }
+						Vue.set(self.can, i, can)
+						Vue.set(self.ts, 0, ts)
+						//- self.can = val;
 					},
 					updateSignature(index, url) {
 						Vue.set(this.signatureDataUris, 0, url);
-						console.log(this.signatureDataUris);
+						//- console.log(this.signatureDataUris);
 					},
-					loadedCanvas(can, options) {
-						console.log(url)
+					signatureToBlob(cb) {
 						var self = this;
-						can.width = self.cW;
-						can.height = self.cH;
-						can.style.width = self.cW + 'px';
-						can.style.height = self.cH + 'px';
-						can.style['pointer-events'] = 'auto';
-						var cx = can.getContext('2d');
-						self.image = new Image();
-						self.image.src = this.url;
-
+						//- if (!self.signatureDataUris[0]) return;
+						//- var binStr = atob( self.signatureDataUris[0].split(',')[1].split(';')[0] ),
+						//- len = binStr.length,
+						//- arr = new Uint8Array(len);
+						//- for (var i = 0; i < len; i++ ) {
+						//- 	arr[i] = binStr.charCodeAt(i);
+						//- }
+						//- cb( new Blob( [arr], {type: 'image/png'} ) );
+						console.log(self.can)
+						if (!HTMLCanvasElement.prototype.toBlob) {
+						 Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+							value: function (callback, type, quality) {
+								var binStr = atob( this.toDataURL(type, quality).split(',')[1] ),
+								len = binStr.length,
+								arr = new Uint8Array(len);
+								for (var i = 0; i < len; i++ ) {
+									arr[i] = binStr.charCodeAt(i);
+								}
+								callback( new Blob( [arr], {type: type || 'image/png'} ) );
+							}
+						 });
+						}
+						self.can[0].toBlob(function(blob){
+							console.log(blob)
+							cb(blob);
+						}, 'image/png')
 					},
-					startD(e) {
+					saveSignature(){
 						var self = this;
-						if (!self.can) {
-							self.can = e.target;
-							self.ctx = can.getContext('2d');
-							if (!self.image) self.image = $('#img')[0];
-						}
-					},
-					endD(e) {
-						
-					},
-					mousehandler(event) {
-						var self = this;
-						if (!self.ctx) return;
-						if (event.type == "mousedown" && event.button === 0) {
-							self.mousePressed = true;
-						}
-							
-						if (self.mousePressed && event.button === 0) {
-							var fakeTouch = {
-								identifier : 10,
-								pageX : event.pageX,
-								pageY : event.pageY
-							};
-							//- console.log(fakeTouch)
-							var eventType = (event.type ===  "mousedown" ? "touchstart" :
-									(event.type == "mouseup" ? "touchend" : "touchmove"));
-							
-							//- self.image.onload = function() {
-								self.drawTouch(event.target, fakeTouch, eventType);
-								event.preventDefault();
-							//- }
-						}
-						if (event.type == "mouseup")
-							self.mousePressed = false;
-					},
-					touchhandler(event) {
-						var self = this;
-						event.preventDefault();
-						
-						for (var i = 0; i < event.changedTouches.length - 1; i++) {
-							self.drawTouch(
-								//- event
-								event.target, event.changedTouches[i], event.type
-							);
-						}
-						
-					},
-					drawtouch() {
-						var self = this;
-						drawThis = self.image;
-						var drawtype = self.drawtype;//'filling';
-						var layer = 0;
-						var can = (!self.can ? $('#maincanvas')[0] : self.can);
-						can.width = self.cW;
-						can.height = self.cH;
-						//- can.style.width = self.cW + 'px'
-						//- can.style.height = self.cH + 'px'
-						//- if (!self.ctx) 
-						var ctx = (!self.ctx ? can.getContext('2d') : self.ctx);
-						//- ctx.imageSmoothingEnabled = false;
-						if (eventType === "touchend") {
-							self.rX++;
-							self.rY++;
-							
-						}
-						self.cursor = 'grabbing'
-						//- console.log(self.image)
-						if (
-							self.drawtype === 'substrates'
-							//- $('#erase').val() !== ''
-						) {
-							//- eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+0+'.svg"), grabbing;');
-							ctx.fillStyle = 'rgba(0,0,0,1)';
-							ctx.globalCompositeOperation = "destination-out";//context.createPattern(pCanvas, 'no-repeat');
-							//- ctx.fill()
-						} else {
-							//- var c = document.createElement('canvas');
-							//- c.width = self.cW;
-							//- c.height = self.cH;
-							//- c.style.width = self.cW + 'px';
-							//- c.style.height = self.cH + 'px';
-							//- var cx = c.getContext('2d');
-							//- //- ctx.globalCompositeOperation = "source-in";
-							//- //- eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
-							//- var pCanvas = document.createElement('canvas');
-							//- pCanvas.width = self.cW;
-							//- pCanvas.height = self.cH;
-							//- pCanvas.style.width = self.cW + 'px';
-							//- pCanvas.style.height = self.cH + 'px';
-							//- var pContext = pCanvas.getContext('2d');
-							//- pContext.drawImage(drawThis, 0, 0, self.cW, self.cH);
-							//- var pPattern = cx.createPattern(pCanvas, 'repeat');
-							ctx.fillStyle = '#000'
-							//pPattern;
-							//- console.log(ctx)
-							//- ctx.fillStyle = pPattern;
-							//- ctx.fill()
-							//- console.log(ctx)
-						}
-						ctx.beginPath();
-						//- ctx.save();
-						ctx.moveTo(touch.pageX, touch.pageY);
-						//- ctx.translate(touch.pageX, touch.pageY);
-						//- ctx.scale(1, self.rY/self.rX);
-						//- ctx.arc(0, 0, self.rX, 0, 2.0 * Math.PI, false);
-						ctx.arc(touch.pageX, touch.pageY, self.rX, 0, 2.0 * Math.PI, false);
-						//- ctx.fill()
-						//- ctx.closePath();
-						//- ctx.restore();
-						ctx.fill();
-						self.can = can
-					},
-					drawTouch(eventTarget, touch, eventType) {
-						//
-						//- console.log(e)
-						var self = this;
-						//- var eventTarget = e.target, 
-						//- touch = {pageX: e.pageX, pageY: e.pageY}, 
-						//- eventType = e.type, 
-						drawThis = self.image;
-						var drawtype = self.drawtype;//'filling';
-						var layer = 0;
-						//- if (!self.can) self.can = eventTarget;
-						var can = (!self.can ? $('#maincanvas')[0] : self.can);
-						can.width = self.cW;
-						can.height = self.cH;
-						//- can.style.width = self.cW + 'px'
-						//- can.style.height = self.cH + 'px'
-						//- if (!self.ctx) 
-						var ctx;
-						if (!self.ctx) ctx = can.getContext('2d');
-						else ctx = self.ctx;
-						//- if = can.getContext('2d');
-						//- ctx.imageSmoothingEnabled = false;
-						if (eventType === "touchend") {
-							self.rX++;
-							self.rY++;
-							
-						}
-						self.cursor = 'grabbing'
-						//- console.log(self.image)
-						if (
-							self.drawtype === 'substrates'
-							//- $('#erase').val() !== ''
-						) {
-							//- eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+0+'.svg"), grabbing;');
-							ctx.fillStyle = 'rgba(0,0,0,1)';
-							ctx.globalCompositeOperation = "destination-out";//context.createPattern(pCanvas, 'no-repeat');
-							//- ctx.fill()
-						} else {
-							//- var c = document.createElement('canvas');
-							//- c.width = self.cW;
-							//- c.height = self.cH;
-							//- c.style.width = self.cW + 'px';
-							//- c.style.height = self.cH + 'px';
-							//- var cx = c.getContext('2d');
-							//- //- ctx.globalCompositeOperation = "source-in";
-							//- //- eventTarget.setAttribute('style', 'cursor: url("/images/icons/tools_'+1+'.svg"), grabbing;');
-							//- var pCanvas = document.createElement('canvas');
-							//- pCanvas.width = self.cW;
-							//- pCanvas.height = self.cH;
-							//- pCanvas.style.width = self.cW + 'px';
-							//- pCanvas.style.height = self.cH + 'px';
-							//- var pContext = pCanvas.getContext('2d');
-							//- pContext.drawImage(drawThis, 0, 0, self.cW, self.cH);
-							//- var pPattern = cx.createPattern(pCanvas, 'repeat');
-							ctx.fillStyle = '#000'
-							//pPattern;
-							//- console.log(ctx)
-							//- ctx.fillStyle = pPattern;
-							//- ctx.fill()
-							//- console.log(ctx)
-						}
-						ctx.beginPath();
-						//- ctx.save();
-						ctx.moveTo(touch.pageX, touch.pageY);
-						//- ctx.translate(touch.pageX, touch.pageY);
-						//- ctx.scale(1, self.rY/self.rX);
-						//- ctx.arc(0, 0, self.rX, 0, 2.0 * Math.PI, false);
-						ctx.arc(touch.pageX, touch.pageY, self.rX, 0, 2.0 * Math.PI, false);
-						//- ctx.fill()
-						//- ctx.closePath();
-						//- ctx.restore();
-						ctx.fill();
-						//- self.can = can
-					},
-					getAdjustedRotationAngle(angle) {
-						return angle * Math.PI / 180;
-					},
-					saveImage(){
-						var self = this;
-						self.can.toBlob(function(blob) {
-							var fd = new FormData();
-							fd.append(name, blob);
-							
-							// endpoint uses multer
-							var uploadurl = '/api/uploadmedia/'+self.pageIndex+'/'+self.index+'/'+self.drawtype+'/'+self.layer+'';
-
+						var fd = new FormData();
+						self.signatureToBlob(function(blob){
+							fd.append('img', blob);
+							fd.append('_csrf', '#{csrfToken}');
+							fd.append('ts', self.ts);
+							var uploadurl = '/sig/uploadsignature/'+self.doc._id+'/'+self.pu._id+'';
+							console.log(blob)
 							$.ajax({
 								url: uploadurl,
 								type: 'POST',
@@ -662,52 +409,13 @@ html
 								processData: false,
 								contentType: false,
 								success: function(response) {
-									$('#inputimg').val(response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', ''));
+									//- $('#inputimg').val(response);
 									self.mode = 'blog';
+									console.log(response)
+									window.location.href = response
 								}
 							})
-						}, 'image/png', 0.95);
-					},
-					checkNameValidity(type, aSearchTerm, aMsg, event)
-					{
-						var self = this;
-						var elem = event.target;//document.getElementById(aID);
-						for (var i = 0; i < elem.value.length; i++) {
-							if (aSearchTerm.indexOf(elem.value.charAt(i)) !== -1) {
-								elem.setAttribute("aria-invalid", "true");
-								//- addAlert(aMsg);
-							} else {
-								elem.setAttribute("aria-invalid", "false");
-								//- removeOldAlert();
-							}
-						}
-						var check = elem.value;
-						if (check !== '') {
-							//var check = $(elem).val();
-							var url = check.replace(' ', '_');
-							$.post('/check/'+check).done(function(result){
-								self.avail = (result === 'Available')
-								if (self.avail) {
-									$.post('/reserve/'+check+'');
-									if (self.pu[type]) {
-										self.pu[type] = check;
-									} else if (self.pu.properties[type]) {
-										self.pu.properties[type] = check;
-									}
-								}
-							})
-						}
-					},
-					checkEmailValidity(e)
-					{
-						var elem = e.target;//document.getElementById(aID);
-						//- console.log(aSearchTerm)
-						var rX = new RegExp('/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/')
-						if (rX.test(elem.value)) {
-							elem.setAttribute("aria-invalid", "false");
-						} else {
-							elem.setAttribute("aria-invalid", "true");
-						}
+						})
 					},
 					panZoom: function(){
 						var self = this;
@@ -755,6 +463,47 @@ html
 					},
 
 					/*************** Begin utility and maintenance  scripts ***************/
+					checkNameValidity(type, aSearchTerm, aMsg, event)
+					{
+						var self = this;
+						var elem = event.target;//document.getElementById(aID);
+						for (var i = 0; i < elem.value.length; i++) {
+							if (aSearchTerm.indexOf(elem.value.charAt(i)) !== -1) {
+								elem.setAttribute("aria-invalid", "true");
+								//- addAlert(aMsg);
+							} else {
+								elem.setAttribute("aria-invalid", "false");
+								//- removeOldAlert();
+							}
+						}
+						var check = elem.value;
+						if (check !== '') {
+							//var check = $(elem).val();
+							var url = check.replace(' ', '_');
+							$.post('/check/'+check).done(function(result){
+								self.avail = (result === 'Available')
+								if (self.avail) {
+									$.post('/reserve/'+check+'');
+									if (self.pu[type]) {
+										self.pu[type] = check;
+									} else if (self.pu.properties[type]) {
+										self.pu.properties[type] = check;
+									}
+								}
+							})
+						}
+					},
+					checkEmailValidity(e)
+					{
+						var elem = e.target;//document.getElementById(aID);
+						//- console.log(aSearchTerm)
+						var rX = new RegExp('/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/')
+						if (rX.test(elem.value)) {
+							elem.setAttribute("aria-invalid", "false");
+						} else {
+							elem.setAttribute("aria-invalid", "true");
+						}
+					},
 					rxOrNo(arr) { 
 						// TODO -- better conditional for whole planet
 						return ( arr[0] < arr[1] ? arr.reverse() : arr ) 
@@ -906,219 +655,6 @@ html
 						var self = this;
 						this.edit = (!this.edit ? ind : null);
 					},
-					addMapBlob: function() {
-						var self = this;
-						var ind = self.doc.properties.media.length;
-						$('div.centerallwrap').css('pointer-events', 'auto')
-						self.dataLayer.disableEdit();
-						self.addNewMedia(self.doc._id, ind, function(){
-							//var canvas = document.querySelector('canvas.leaflet-zoom-animated');
-							leafletImage(self.map, function(err, canvas){
-								if (err) {
-									return console.log(err)
-								}
-								$('a[id*=deletemedia]').hide();
-								var im = new Image()
-								im.src = canvas.toDataURL('image/png');
-								im.onload = function(){
-									self.checkImage(im, canvas, im.width, im.height, 1025, 1025, ind, 'map');
-									setTimeout(function(){
-										var img = document.querySelector('img#return'+ind+'');
-										var can = $('#canvas'+ind+'')[0];
-										var w = img.width;
-										var h = img.height;
-										can.width = w;
-										can.height = h;
-										var ctx = can.getContext("2d");
-										ctx.drawImage(img, 0, 0, w, h);
-										self.uploadBlob(img, can, ind, function(){
-											//console.log(canvas)
-											var dataurl = can.toDataURL("image/png", 0.8);
-											self.doc.properties.media[ind].thumb = dataurl.replace(/data:image\/png;base64,/, '');
-										})
-											/**/
-										
-										
-									},2000)
-								}
-								
-							})
-							
-							
-							
-						});
-						
-					},
-					//- addNewSignature(id, index, cb) {
-					//- 	var self = this;
-					//- 	$.post('/api/newsignature/'+id+'/'+index+'', function(res) {
-					//- 		self.doc.properties.sig.push(res);
-					//- 		cb()
-					//- 	})
-					//- },
-					addNewMedia: function(id, index, cb) {
-						var self = this;
-						$.post('/api/newmedia/'+id+'/'+index+'', function(res) {
-							self.doc.properties.media.push(res);
-							cb()
-						})
-					},
-					handleFile: function(did, index) {
-						var self = this;
-						self.did = did;
-						self.file = document.getElementById('media_'+index).files[0];
-						self.processImage(index);
-					},
-					processImage: function(imgindex) {
-						var self = this;
-						var dataurl = null;
-						var file = self.file;
-						if (!file) return;
-						var imagefile = file.type;
-						var imageTypes= ["image/jpeg","image/png","image/jpg","image/svg+xml"];
-						if(imageTypes.indexOf(imagefile) === -1) {
-							$("#info").html("<span class='msg-error'>Please Select A valid Image File</span><br /><span>Only jpeg, jpg, png, and pdf types allowed</span>");
-							return false;
-							
-						} else {
-							var reader = new FileReader();
-							
-							reader.onloadend = function(e) {
-								var img = document.getElementById('return'+imgindex+'');
-								img.src = e.target.result;
-								var type = imagefile.split('image/')[1];
-								img.onload = function() {
-									$('#media').val('');
-									var can = $('#canvas'+imgindex+'')[0];
-									var maxWidth = 1025 ;
-									var maxHeight = 1025 ;
-									var w = img.width;
-									var h = img.height;
-									can.width = w;
-									can.height = h;
-									var ctx = can.getContext("2d");
-									ctx.drawImage(img, 0, 0);
-									self.checkImage(img, can, w, h, maxWidth, maxHeight, imgindex, type);
-								}
-								
-							}
-							reader.readAsDataURL(file);
-						}
-					},
-					checkImage: function(img, can, w, h, maxWidth, maxHeight, imgindex, imgtype) {
-						var self = this;
-						if (h > maxHeight || w > maxWidth) {
-							self.reSize(img, can, w, h, maxWidth, maxHeight, imgindex, imgtype)
-						} else {
-							if (imgtype === 'map') {
-								var im = document.querySelector('img#return'+imgindex+'');
-								im.setAttribute('src', can.toDataURL('image/png'))
-							} else {
-								if (maxHeight === 400) {
-									self.drawThumb(img, can, w, h, imgindex, imgtype)
-								} else {
-									self.drawFull(img, can, w, h, imgindex, imgtype)
-								}
-							}
-						}
-						
-					},
-					reSize: function(img, can, w, h, maxWidth, maxHeight, imgindex, imgtype){
-						can.height = h*0.99;
-						can.width = w*0.99;
-
-						var can2 = document.createElement('canvas');
-						can2.width = w*0.99;
-						can2.height = h*0.99;
-						var ctx2 = can2.getContext('2d');
-						var ctx = can.getContext('2d');
-						ctx2.drawImage(img, 0, 0, w*0.99, h*0.99);
-						ctx.drawImage(can2, 0, 0, w*0.99, h*0.99, 0, 0, w*0.99, h*0.99);
-						w = w*0.99;
-						h = h*0.99;
-						img.width = w;
-						img.height = h;
-						this.checkImage(img, can, w, h, maxWidth, maxHeight, imgindex, imgtype)
-					},
-					uploadBlob: function(img, can, imgindex, cb) {
-						var self = this;
-						var orientation = 'portrait'
-						if (can.width > can.height) { 
-							orientation = 'landscape' 
-						} else { 
-							orientation = 'portrait' 
-						}
-
-						if (!HTMLCanvasElement.prototype.toBlob) {
-						 Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-							value: function (callback, type, quality) {
-								var binStr = atob( this.toDataURL(type, quality).split(',')[1] ),
-								len = binStr.length,
-								arr = new Uint8Array(len);
-								for (var i = 0; i < len; i++ ) {
-									arr[i] = binStr.charCodeAt(i);
-								}
-								callback( new Blob( [arr], {type: type || 'image/png'} ) );
-							}
-						 });
-						}
-						can.toBlob(function(blob) {
-							var fd = new FormData();
-							fd.append("img", blob);
-							var uploadurl = '/api/uploadmedia/'+self.doc.index+'/'+imgindex+'/png';
-							$.ajax({
-								url: uploadurl,
-								type: 'POST',
-								data: fd,
-								processData: false,
-								contentType: false,
-									success: function(response) { 
-									img.onload = function () {
-										self.doc.properties.media[imgindex].image_abs = response;
-										self.doc.properties.media[imgindex].image = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
-										self.doc.properties.media[imgindex].thumb_abs = response;
-										self.doc.properties.media[imgindex].thumb = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
-										self.doc.properties.media[imgindex].orientation = orientation;
-										cb();
-									}
-									img.src = response.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
-								}
-							})
-						}, 'image/png');
-					},
-					drawFull: function(img, can, w, h, imgindex, imgtype) {
-						var self = this;
-						can.height = h;
-						can.width = w;
-						var ctx = can.getContext('2d');
-						console.log(w,h)
-						ctx.drawImage(img, 0, 0, w, h);
-						self.uploadBlob(img, can, imgindex, function(){
-							var can = $('#canvas'+imgindex+'')[0];
-							var maxWidth = 400 ;
-							var maxHeight = 400 ;
-							var w = img.width;
-							var h = img.height;
-
-							self.checkImage(img, can, w, h, maxWidth, maxHeight, imgindex, imgtype);
-						})
-						
-					},
-					drawThumb: function(img, can, w, h, imgindex, imgtype) {
-						var self = this;
-						can.height = h;
-						can.width = w;
-						var ctx = can.getContext('2d');
-						
-						ctx.drawImage(img, 0, 0, w, h);
-						var dataurl = can.toDataURL("image/png", 0.8);
-						setTimeout(function(){
-							self.doc.properties.media[imgindex].thumb = dataurl.replace(/data:image\/png;base64,/, '');
-							//$('#inputthumb'+imgindex+'').val(dataurl.replace(/data:image\/png;base64,/, ''));
-							
-						}, 100);
-					},
-
 				}
 			});
 		
