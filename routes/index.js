@@ -927,7 +927,7 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 					username: pu.username,
 					givenName: pu.properties.givenName,
 					documentId: doc._id,	
-					image: '/publishers/gnd/signatures/'+req.params.did+'/'+req.params.puid+'/'+req.params.did+'_'+req.params.puid+'.png',
+					image: '/publishers/gnd/signatures/'+req.params.did+'/'+req.params.puid+'/img_'+req.params.did+'_'+req.params.puid+'.png',
 					image_abs: req.url
 				});
 				var push = {$push:{}};

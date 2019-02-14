@@ -47,6 +47,8 @@ div.grid-right
 									span.tb-font-xxs(v-text="' > '")
 									a(v-bind:href="'/list/'+dc._id+'/null'")
 										span.tb-font-xxs(v-text="dc.section.str")
+						div.row
+							img(v-for="(sg, k) in pu.sig", v-if="sg.documentId === dc._id", :src="sg.image", style="height:150px;width:auto;")
 		div.grid-footer
 //- div.grid-right
 //- 	div.tb-u-100
