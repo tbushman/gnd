@@ -1,7 +1,7 @@
 var express = require('express');
 var session = require('express-session');
 var dotenv = require('dotenv');
-var MongoDBStore = require('connect-mongodb-session')(session);
+var MongoDBStore = require('connect-mongo')(session);
 var moment = require("moment");
 var mongoose = require('mongoose');
 var marked = require('marked');
@@ -75,22 +75,12 @@ passport.deserializeUser(function(id, done) {
 	});
 });
 
-var store = new MongoDBStore(
-	{
-		mongooseConnection: mongoose.connection,
-		uri: 'mongodb://localhost/session_gnd',
-		collection: 'mySessions'
-	}
-)
-store.on('error', function(error, next){
-	next(error)
-});
 
 var sess = {
 	secret: process.env.SESSIONSECRET,
 	name: 'nodecookie',
-	resave: false,
-	saveUninitialized: false,
+	resave: true,
+	saveUninitialized: true,
 	store: store,
 	cookie: { maxAge: 180 * 60 * 1000 }
 }
@@ -271,9 +261,30 @@ app.use(function (err, req, res) {
 
 var uri = process.env.DEVDB;
 
-var promise = mongoose.connect(uri, { useMongoClient: true }/*, {authMechanism: 'ScramSHA1'}*/);
+var promise = mongoose.connect(uri, { 
+	native_parser:true, 
+	useMongoClient: true, 
+	authSource:'admin', 
+	// authMechanism: 'ScramSHA1'
+});
+var store = new MongoDBStore(
+	{
+		mongooseConnection: mongoose.connection,
+		uri: process.env.STORE,
+		host: '127.0.0.1',
+		port: '12707',
+		db: 'gnd',
+		// db: 'gnd',
+		collection: 'mySessions'
+	}
+)
 promise.then(function(db){
 	db.on('error', console.error.bind(console, 'connection error:'));
+	store.on('error', function(error, next){
+		console.log(error, next)
+		next(error)
+	});
+
 })
 //var db = mongoose.connection;
 

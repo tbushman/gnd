@@ -7,18 +7,18 @@ var schema = new Schema({
 	geometry: Schema.Types.Polygon,
 	// Congress
 	title: {
-		ind: String,
-		str: Number 
+		ind: Number,
+		str: String
 	},
 	// Session
 	chapter: {
-		ind: String,
-		str: Number 
+		ind: Number,
+		str: String 
 	},
 	// i.e Resolution # and status
 	section: {
-		ind: String,
-		str: Number 
+		ind: Number,
+		str: String
 	},
 	properties: {
 		label: String,
