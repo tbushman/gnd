@@ -550,7 +550,7 @@ router.get('/list/:id/:mi', function(req, res, next){
 			}
 			if (req.isAuthenticated()) {
 				// console.log(doc)
-				var l = '/publishers/gnd/signatures/'+doc._id+'/'+req.user._id+'/'+doc._id+'_'+req.user._id+'.png'
+				var l = '/publishers/gnd/signatures/'+doc._id+'/'+req.user._id+'/img_'+doc._id+'_'+req.user._id+'.png'
 				Signature.findOne({image: l}, function(err, pud){
 					if (err) {
 						return next(err)

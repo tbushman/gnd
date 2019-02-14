@@ -8,17 +8,17 @@ var schema = new Schema({
 	// Congress
 	title: {
 		ind: String,
-		str: String 
+		str: Number 
 	},
 	// Session
 	chapter: {
 		ind: String,
-		str: String 
+		str: Number 
 	},
 	// i.e Resolution # and status
 	section: {
 		ind: String,
-		str: String 
+		str: Number 
 	},
 	properties: {
 		label: String,
@@ -32,20 +32,6 @@ var schema = new Schema({
 			begin: Date,
 			end: Date
 		},
-		// media: [
-		// 	{
-		// 		index: Number,
-		// 		name: String,
-		// 		image: String,
-		// 		image_abs: String,
-		// 		thumb: String,
-		// 		thumb_abs: String,
-		// 		caption: String,
-		// 		postscript: String,
-		// 		url: String,
-		// 		orientation: String
-		// 	}
-		// ],
 		footnotes: [ ]
 	}
 }, { collection: 'content' });
