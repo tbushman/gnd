@@ -1,2 +1,2 @@
 # gnd 
-Digital Learning Integration Designer project
+App for gathering signatures in support of government documents
