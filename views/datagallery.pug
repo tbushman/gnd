@@ -1,55 +1,51 @@
-div.grid-right
-	
-	div.tb-u-100
-		//- 		a.grid-header
-		div.grid-mid
-			div.centerall
-				
-				div(v-if="data.length > 0")
-					div
-						a(v-bind:href="'/'")
-							header.row.tb-font-l
-								span.bd(v-text="(parseInt(data[0].title.ind, 10) + 1)+'th'")
-								span(v-text="' '") 
-								span(v-text="data[0].title.str")
+div.grid-mid
+	div.centerall
+		
+		div(v-if="data.length > 0")
+			div
+				a(v-bind:href="'/'")
+					header.row.tb-font-l
+						span.bd(v-text="(parseInt(data[0].title.ind, 10) + 1)+'th'")
+						span(v-text="' '") 
+						span(v-text="data[0].title.str")
 
-						a(v-bind:href="'/menu/'+data[0].title.ind+'/'+data[0].chapter.ind+''")
-							header.row.tb-font-l 
-								span.bd(v-text="data[0].chapter.str")
-								span(v-text="' '")
-								span(v-text="(parseInt(data[0].chapter.ind, 10) + 1)")
+				a(v-bind:href="'/menu/'+data[0].title.ind+'/'+data[0].chapter.ind+''")
+					header.row.tb-font-l 
+						span.bd(v-text="data[0].chapter.str")
+						span(v-text="' '")
+						span(v-text="(parseInt(data[0].chapter.ind, 10) + 1)")
+			
+			section.headline.headrule(
+				v-for="(dc, i) in data",
+				v-bind:id="dc.section.ind", 
+				style="margin-top: 15px; position:relative;")
+				a.accordion(v-on:click="accordion(n,i)")
+					div.ui
+						svg(v-bind:style="(accordions[n].indexOf(dc.index) !== -1 ? {transform: 'rotate(180deg)'} : {transform: 'rotate(0deg)'})", xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
+							path(d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z")
+				div.row.spacer.padder(style="position:relative;")
+					div.tb-11-m0(v-if="accordions[n].indexOf(dc.index) !== -1")
+						span(v-html="marked(dc.properties.description)")
 					
-					section.headline.headrule(
-						v-for="(dc, i) in data",
-						v-bind:id="dc.section.ind", 
-						style="margin-top: 15px; position:relative;")
-						a.accordion(v-on:click="accordion(n,i)")
-							div.ui
-								svg(v-bind:style="(accordions[n].indexOf(dc.index) !== -1 ? {transform: 'rotate(180deg)'} : {transform: 'rotate(0deg)'})", xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
-									path(d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z")
-						div.row.spacer.padder(style="position:relative;")
-							div.tb-11-m0(v-if="accordions[n].indexOf(dc.index) !== -1")
-								span(v-html="marked(dc.properties.description)")
+					div.tb-11-m0.tb-07-m1.tb-font-m
+						a.href(v-bind:href="'/list/'+dc._id+'/null'", style="display:block;padding:0 0 0 105px;text-indent:-105px;")
+							span(v-html="dc.section.str")
+							span(v-text="' '")
+							span.bd(v-if="dc.title", v-text="(parseInt(dc.title.ind, 10) + 1)+'.'+(parseInt(dc.chapter.ind, 10) + 1)+'.'+(parseInt(dc.section.ind, 10) + 1)", style="width: 100px;display:inline-block;text-indent:0;")
 							
-							div.tb-11-m0.tb-07-m1.tb-font-m
-								a.href(v-bind:href="'/list/'+dc._id+'/null'", style="display:block;padding:0 0 0 105px;text-indent:-105px;")
-									span(v-html="dc.section.str")
-									span(v-text="' '")
-									span.bd(v-if="dc.title", v-text="(parseInt(dc.title.ind, 10) + 1)+'.'+(parseInt(dc.chapter.ind, 10) + 1)+'.'+(parseInt(dc.section.ind, 10) + 1)", style="width: 100px;display:inline-block;text-indent:0;")
-									
-							div.tb-11-m0.tb-03-m1
-								div(v-if="dc.properties")
-									a(v-bind:href="'/menu/'+dc.title.ind+'/'+null+''")
-										span.tb-font-xxs(v-bind:style="{display:'inline-block'}", v-text="(parseInt(dc.title.ind, 10) + 1) + 'th '+dc.title.str")
-									span.tb-font-xxs(v-text="' > '")
-									a(v-bind:href="'/menu/'+dc.title.ind+'/'+dc.chapter.ind+''")
-										span.tb-font-xxs(v-text="dc.chapter.str+' '+(parseInt(dc.chapter.ind, 10) + 1)")
-									span.tb-font-xxs(v-text="' > '")
-									a(v-bind:href="'/list/'+dc._id+'/null'")
-										span.tb-font-xxs(v-text="dc.section.str")
-						div.row
-							img(v-for="(sg, k) in pu.sig", v-if="sg.documentId === dc._id", :src="sg.image", style="height:150px;width:auto;")
-		div.grid-footer
+					div.tb-11-m0.tb-03-m1
+						div(v-if="dc.properties")
+							a(v-bind:href="'/menu/'+dc.title.ind+'/'+null+''")
+								span.tb-font-xxs(v-bind:style="{display:'inline-block'}", v-text="(parseInt(dc.title.ind, 10) + 1) + 'th '+dc.title.str")
+							span.tb-font-xxs(v-text="' > '")
+							a(v-bind:href="'/menu/'+dc.title.ind+'/'+dc.chapter.ind+''")
+								span.tb-font-xxs(v-text="dc.chapter.str+' '+(parseInt(dc.chapter.ind, 10) + 1)")
+							span.tb-font-xxs(v-text="' > '")
+							a(v-bind:href="'/list/'+dc._id+'/null'")
+								span.tb-font-xxs(v-text="dc.section.str")
+				div.row
+					img(v-for="(sg, k) in pu.sig", v-if="sg.documentId === dc._id", :src="sg.image", style="height:150px;width:auto;")
+div.grid-footer
 //- div.grid-right
 //- 	div.tb-u-100
 //- 		a.grid-header(v-for="(entry, i) in data" :href="'/sig/'+entry.pagetitle")

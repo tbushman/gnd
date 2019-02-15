@@ -623,6 +623,7 @@ router.get('/menu/:title/:chapter', function(req, res, next){
 		return res.render('publish', {
 			menu: 'data',
 			// dat: [data],
+			type: 'blog',
 			data: data,
 			loggedin: req.session.loggedin,
 			info: req.session.info

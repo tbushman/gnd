@@ -497,7 +497,11 @@ a.accordion:hover .ui path {
 	height: var(--panelheight);
 	/*width: calc(100% - var(--thumbwidth));*/
 	width: 100%;
-	/* overflow-y: scroll; */
+	overflow-y: scroll;
+}
+.grid-left, .grid-right, .grid-mid, .grid-header, .grid-footer {
+	height: auto;
+	overflow-y: hidden;
 }
 .grid-container.draw {
 	height: var(--panelheight);
@@ -904,8 +908,8 @@ div.menu > div.topLeft {
 	left: var(--thumbwidth);
 }
 a.mainmenu {
-	position: absolute;
-	top: -10px;
+	position: fixed;
+	top: calc(15% - 10px);
 	/*top: calc(var(--windowmenu) - 15px);*/
 	left: calc(var(--thumbwidth) / 4);
 	right: auto;
@@ -913,6 +917,7 @@ a.mainmenu {
 	height: auto;
 	pointer-events: auto;
 	z-index: 3;
+	cursor: pointer;
 }
 @supports not(display:grid) {
 	a.mainmenu {
@@ -961,6 +966,7 @@ div.dropdown {
 	margin: 0 auto;
 	height: auto;
 	min-height: var(--thumbwidth);
+	pointer-events: all;
 }
 .module input:focus {
 	display: inline-block;
@@ -1062,6 +1068,9 @@ a.tool span {
 }
 #nomap {
 	z-index:-3;
+}
+#tl {
+	pointer-events: none;
 }
 #tlmonth.block {
 	padding: 0;
