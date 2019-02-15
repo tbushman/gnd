@@ -269,13 +269,10 @@ function ensureAdmin(req, res, next) {
 		}
 		
 		if (pu.admin) {
-			req.publisher = Publisher;
 			req.user = pu;
 			req.session.loggedin = req.user.username;
 			return next();
 		} else {
-			req.publisher = User;
-			req.session.loggedin = null;
 			return res.redirect('/')
 		}
 	})
@@ -307,7 +304,11 @@ router.get('/', function (req, res) {
 		if (req.isAuthenticated()) {
 			req.session.userId = req.user._id;
 			req.session.loggedin = req.user.username;
-			return res.redirect('/api/publish')
+			if (req.user.admin) {
+				return res.redirect('/api/publish')
+			}
+			return res.redirect('/home')
+			
 		} else {
 			return res.redirect('/home');
 		}
@@ -374,6 +375,9 @@ router.post('/register', function(req, res, next) {
 						}
 						req.session.userId = doc._id;
 						req.session.loggedin = doc.username;
+						if (!user.admin) {
+							return res.redirect('/sig/editprofile')
+						}
 						return res.redirect('/api/publish')
 					})
 				});
