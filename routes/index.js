@@ -527,13 +527,13 @@ router.get('/home', getDat, function(req, res, next) {
 				if (data.length === 0) {
 					
 					if (pu && pu.admin) return res.redirect('/api/new/'+0+'');
-					if (!pu) return res.redirect('/register');
+					if (!pu) return res.redirect('/sig/editprofile');
 				}
 				return res.render('publish', {
 					menu: 'home',
 					dat: req.dat,
 					ff: req.distinct,
-					info: 'Hello, this tool collects authenticated signatures.',
+					info: 'This tool collects timestamped signatures.',
 					type: 'blog'
 				})				
 			})

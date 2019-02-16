@@ -144,6 +144,12 @@ html
 					var self = this;
 					//- if (!self.signature) 
 					//- if (!self.signaturePad) self.signaturePad = self.$refs.canv
+					//- if (self.pu && self.pu.properties.title) {
+					//- 
+					//- 	self.changePlace({
+					//- 		target: {value:self.pu.properties.title}
+					//- 	});
+					//- }
 				},
 				mounted() {
 					var self = this;
@@ -186,12 +192,7 @@ html
 						self.beginDate = moment(self.pu.properties.time.begin).utc().format();
 						self.endDate = moment(self.pu.properties.time.end).utc().format();
 					}
-					if (self.pu && self.pu.properties.title) {
-						
-						self.changePlace({
-							target: {value:self.pu.properties.title}
-						});
-					}
+					
 					if (self.doc) {
 						self.loadMap(function(dataLayer){
 							/*if (!map) return;
@@ -331,7 +332,9 @@ html
 							self.pu.properties = {}
 							self.pu.properties.placetype = etargetvalue
 						} else {
-							self.pu.properties.placetype = etargetvalue
+							var place = self.pu.properties.place;
+							self.pu.properties.placetype = etargetvalue;
+							self.pu.properties.place = place;
 						}
 						self.repitem = self.rep[etargetvalue]
 						console.log(self.repitem)
