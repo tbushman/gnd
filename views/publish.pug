@@ -47,7 +47,8 @@ block content
 				
 				//div.grid-mid
 				p.tb-font-s(v-text="'Documents I have signed'")
-				include datagallery.pug
+				div(v-if="data[0]")
+					include datagallery.pug
 				//div.grid-left
 				//- p.tb-font-s(v-text="'All documents'")
 				//- if (dat)

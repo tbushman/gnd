@@ -689,6 +689,16 @@ router.get('/sig/editprofile', function(req, res, next){
 			if (err) {
 				return next(err)
 			}
+			if (pu.sig.length > 0) {
+				var sigs = pu.sig.map(function(s){
+					return s.documentId;
+				})
+				data = data.filter(function(doc){
+					return sigs.indexOf(doc._id) !== -1
+				})
+			} else {
+				data = null
+			}
 			return res.render('publish', {
 				// dat: [data],
 				data: data,
