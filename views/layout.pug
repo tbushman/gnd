@@ -16,6 +16,7 @@ html
 		script(type="text/javascript", src="/scripts/marked.min.js")
 		script(type="text/javascript", src="/scripts/d3.v3.min.js")
 		script(type="text/javascript", src="/scripts/moment-with-locales.min.js")
+		script(type="text/javascript", src="https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=yb2pwtctf7qznwdoo61w3kyj127j61gch5uhhzneop9mfkg7")
 		script(type="text/javascript", src="/scripts/leaflet.js")
 		script(type="text/javascript", src="/scripts/Leaflet.Editable.js")
 		script(type="text/javascript", src="/scripts/signaturePad.js")
@@ -36,6 +37,7 @@ html
 			Vue.prototype.$ = $;
 			Vue.prototype.DatePicker = DatePicker;
 			Vue.prototype.SignaturePad = SignaturePad;
+			Vue.prototype.tinymce = tinymce;
 			Vue.use(DatePicker);
 			new Vue({ el: '#select',
 				data() {
@@ -50,7 +52,7 @@ html
 						doc: this.parseObj(!{JSON.stringify(doc)}),
 						dids: [],
 						did: (this.parseObj(!{JSON.stringify(doc)}) === '' ? 0 : this.parseObj(!{JSON.stringify(doc)}).index),
-						// substrates, filling
+						dfi: 0,
 						drawtype: this.parseObj(!{JSON.stringify(drawtype)}),
 						// blog, draw, map
 						type: this.parseStr(!{JSON.stringify(type)}),
@@ -82,6 +84,7 @@ html
 						//- signatureDataUris: [],
 						can: [],
 						ts: [],
+						tinymce: null,
 						accordions: 
 							(
 								this.parseObj(!{JSON.stringify(dat)}) !== '' ?
@@ -194,6 +197,48 @@ html
 					}
 					
 					if (self.doc) {
+						if (!self.tinymce && $('#description')[0] && tinymce) {
+							console.log('shouldn\'t be')
+							console.log($('#description')[0])
+							self.tinymce = tinymce.init({
+								menubar: false,
+								statusbar: false,
+								theme: 'inlite',
+								inline: true,
+								selector: "#description",
+								plugins: ['lists', 'advlist'],
+								valid_elements: '*[*]',
+								forced_root_block: '',
+								force_br_newlines : false,
+								//- force_p_newlines : false,
+								convert_newlines_to_brs: false,
+								remove_redundant_brs: false,
+								//- fix_list_elements: true,
+								//- setup: function (editor) {
+								//- 	editor.addButton('footnote', {
+								//- 		text: 'Add footnote',
+								//- 		icon: 'link',
+								//- 		onclick: function(){
+								//- 			self.doc.properties.footnotes.push(
+								//- 				''
+								//- 			);
+								//- 			editor.insertContent('<a v-if="doc.properties.footnotes && doc.properties.footnotes['+(self.doc.properties.footnotes.length - 1)+']" href="ftnref'+(self.doc.properties.footnotes.length)+'"><span class="super">'+(self.doc.properties.footnotes.length)+'</span></a>')
+								//- 			//editor.insertContent('<span v-if="doc.properties.footnotes && doc.properties.footnotes['+(self.doc.properties.footnotes.length - 1)+']" class="super">'+(self.doc.properties.footnotes.length)+'</span>')
+								//- 			$('#footnote'+self.doc.properties.footnotes.length - 1).focus()
+								//- 		}
+								//- 	})
+								//- },
+								//custom_ui_selector: '.footnote_button',
+								//- toolbar: 'bold italic underline | bullist numlist | outdent indent',
+								selection_toolbar: 'bold italic | bullist numlist | outdent indent | subscript superscript'
+								//selectiion_toolbar: 'undo redo | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify alignnone | outdent indent blockquote | subscript superscript | bullist numlist | link unlink | table',
+								//table_toolbar: "tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol"
+								
+
+							});
+							
+
+						}
 						self.loadMap(function(dataLayer){
 							/*if (!map) return;
 							self.map = map;
@@ -207,11 +252,12 @@ html
 							if (dataLayer)
 								self.dataLayer.enableEdit();
 							self.lMarker = L.marker(self.map.getCenter(), {draggable: true}).addTo(self.map);
-							if (!self.image && self.doc) {
-								self.drawImg(function(img){
-									self.img = img;
-								});
-							}//- self.panZoom();
+							//- if (!self.image && self.doc) {
+							//- 	self.drawImg(function(img){
+							//- 		self.img = img;
+							//- 	});
+							//- }//- self.panZoom();
+							
 						})
 					}
 				},
@@ -222,6 +268,10 @@ html
 					}
 				},
 				methods: {
+					changeDiff(e) {
+						var self = this;
+						self.dfi = (!isNaN(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : null);
+					},
 					formatDate(date){
 						return moment(date).utc().format();
 					},
@@ -511,9 +561,28 @@ html
 							elem.setAttribute("aria-invalid", "true");
 						}
 					},
+					xrOrNo(arr) {
+						return ( arr[0] > arr[1] ? arr.reverse() : arr )
+					},
 					rxOrNo(arr) { 
 						// TODO -- better conditional for whole planet
 						return ( arr[0] < arr[1] ? arr.reverse() : arr ) 
+					},
+					xrArr(arr) {
+						var self = this;
+						if (!Array.isArray(arr[0])) return self.xrOrNo(arr);
+						var rxa = arr.map(function(ar){ if (!Array.isArray(ar[0])) { 
+							return self.xrOrNo(ar) } else if (Array.isArray(ar)) {
+								return ar.map(function(a){ if (!Array.isArray(a[0])) { 
+									return self.xrOrNo(a) } else if (Array.isArray(a)) {
+										return a.map(function(b){ if (!Array.isArray(b[0])) { 
+											return self.xrOrNo(b) } else if (Array.isArray(b)) {
+												return b.map(function(c){ 
+							if (!Array.isArray(c[0])) {return self.xrOrNo(c) }
+							else {return} })} else {return} })} else {return} })} else {return}
+						});
+						console.log(arr)
+						return arr; 
 					},
 					rxArr(arr) {
 						var self = this;

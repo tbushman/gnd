@@ -28,11 +28,12 @@ block content
 			//- - menu = 'home'
 			include menu.pug
 			include datagallery.pug
-		div.grid-container(:class="type", v-else-if="doc")
-			- console.log('blrg')
+		div.grid-container(:class="type", v-else-if="menu === 'doc'")
 			include menu.pug
 			include docgallery.pug
-
+		div.grid-container(:class="type", v-else-if="menu === 'edit'")
+			include menu.pug
+			include docedit.pug
 		
 		
 		div.grid-container(:class="type" v-else-if="pu && pu.username === loggedin")

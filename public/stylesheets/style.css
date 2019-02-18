@@ -54,7 +54,26 @@ ul {
 ol {
 	list-style-type: decimal;
 }
+ol li ol {
+    list-style-type: upper-latin;
+}
 
+ol li ol li ol {
+    list-style-type: lower-roman;
+}
+ol li ol li ol li ol {
+  list-style-type: lower-latin;
+}
+ins {
+	color: green!important;
+}
+del {
+	color: red!important;
+}
+
+.mce-tinymce, .mce-container {
+	pointer-events: all!important;
+}
 .sticky {
 	position: -webkit-sticky;
   position: -moz-sticky;
@@ -144,6 +163,9 @@ input[type="text"], input[type="email"], input[type="password"], textarea, datal
           box-sizing: content-box;
   -webkit-transition: all 0.3s;
 transition: all 0.3s;
+}
+textarea {
+	min-height: 300px;
 }
 button, a[role="button"], input[type="submit"] {
 	border: 0;
@@ -980,18 +1002,20 @@ div.dropdown {
 	margin: 0 auto;
 	float: left;
 	width: var(--thumbwidth);
+	line-height: 0;
+	height: 2em;
+	
 }
 .module .ui i.fa {
 	width: 100%;
 	text-align: center;
 	font: normal normal normal var(--iconwidth)/1 FontAwesome;
 }
-.module .ui img {
+.module .ui img, a.module > .ui > svg {
 	width: 2em;
 	text-align: center;
 	margin: 0 auto;
 	display: inherit;
-
 }
 .ui img {
 	width: 100%;
@@ -1018,7 +1042,7 @@ div.dropdown {
 	-webkit-text-shadow: 0 0 2px #fff;
 	z-index:1;
 	margin: 0 auto;
-	line-height: var(--thumbwidth);
+	line-height: 2em;
 }
 a.tool {
 	width: calc(var(--thumbwidth)*1.1);
