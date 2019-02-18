@@ -14,19 +14,33 @@ if (menu === 'sign')
 					img(src="/images/filling/tools_0.svg")
 if (menu === 'doc')
 	div.grid-left
+	div.grid-header
+		div.tb-11-m0(v-if="doc.properties.diffs.length > 0")
+			label.tb-11-m0(for="diff", v-text="'Revision timeline'", style="margin-top:20px;")
+			select#diff(style="pointer-events: all;", v-on:change="changeDiff($event)", v-bind:value="dfi")
+				option(value="null", v-text="'Latest'", v-bind:selected="!dfi")
+				option(v-if="doc.properties.diffs", v-for="(date, k) in doc.properties.diffs", :selected="dfi === k", v-bind:value="k", v-text="date.user.username + ' | ' + moment(date.date).format('YYYY-MM-DD mm:ss')")
+
 	div.grid-right(style="padding: 6px 6px 0 0")
 		div.grid-header
 			div.centerall
 				p.tb-font-xl(v-if="doc && doc.properties" v-text="doc.properties.title")
 	
 		div.tb-10-m0.docframe(style="padding: 6px;")
+			div.tb-11-m0(v-if="dfi && doc.properties.diffs[dfi]")
+				span(v-if="doc.properties.diffs[dfi]", v-for="part in doc.properties.diffs[dfi].dif")
+					ins(v-if="part.added", v-html="marked(part.value)", style="color: 'green';")
+					del(v-else-if="part.removed", v-html="marked(part.value)", style="color: 'red';")
+					span(v-else-if="part.value", v-html="marked(part.value)", style="color: 'grey';")
+			
+			span(v-else-if="!dfi", v-html="doc.properties.description")
 
-			span.tb-10-m0(v-html="marked(doc.properties.description)")
 			div.row(v-if="doc.sig && doc.sig.length > 0")
 				div.tb-03-m0(v-for="(sig, s) in doc.sig")
 					//- img(:src="sig.img")
 					span.tb-font-s(v-text="'/'+sig.givenName+'/'")
 	div.grid-footer
+		
 		a.img(@click="initSig", title="Sign", v-if="doc && pu && pu.username === loggedin && unsigned")
 			.ui
 				img(src="/images/icons/edit.svg")

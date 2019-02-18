@@ -26,10 +26,11 @@ var ff = ['General Provisions', 'Concept Plan',  'Sketch Plan', 'Preliminary Sub
 // var juice = require('juice');
 // var HtmlDocx = require('html-docx-js');
 // var mammoth = require('mammoth');
-// var HtmlDiffer = require('html-differ').HtmlDiffer;
-// var htmlDiffer = new HtmlDiffer({
-// 	ignoreAttributes: ['id', 'for', 'class', 'href', 'style']
-// });
+var HtmlDiffer = require('html-differ').HtmlDiffer;
+var htmlDiffer = new HtmlDiffer({
+	ignoreAttributes: ['id', 'for', 'class', 'href', 'style']
+	// ,ignoreEndTags: true
+});
 //var google = require("googleapis"); 
 // var {google} = require('googleapis');
 //var {googleAuth} = require('google-auth-library');
@@ -39,6 +40,49 @@ var csrfProtection = csrf({ cookie: true });
 var geolocation = require ('google-geolocation') ({
 	key: process.env.GOOGLE_KEY
 });
+marked.setOptions({
+	gfm: true,
+	smartLists: true,
+	smartypants: true,
+	// xhtml: true,
+	sanitize: true/*,
+	breaks: true*/
+})
+
+
+var curly = function(str){
+	//console.log(/\\n/g.test(str))
+	//console.log(str.match(/\s/g))
+	//console.log(str.match(/\"/g))
+	if (!str){
+		return ''
+	} else {
+		return str
+		.replace(/(\s)'(\w)/g,'$1&lsquo;$2')
+		.replace(/(\w)'(\s)/g,'$1&rsquo;$2')
+		.replace(/(\s)"(\w)/g,'$1&ldquo;$2')
+		.replace(/(\w)"(\s)/g,'$1&rdquo;$2')
+		//.replace(/'\b/g, "&lsquo;")     // Opening singles
+		//.replace(/\b'/g, "&rsquo;")     // Closing singles
+		//.replace(/"\b/g, "&ldquo;")     // Opening doubles
+		//.replace(/\b"/g, "&rdquo;")     // Closing doubles
+		.replace(/(\w\.)"/g, "$1&rdquo;")     // Closing doubles
+		.replace(/\u2018/g, "&lsquo;")
+		.replace(/\u2019/g, "&rsquo;")
+		.replace(/\u201c/g, "&ldquo;")
+		.replace(/\u201d/g, "&rdquo;")
+		.replace(/[“]/g, "&ldquo;")
+		.replace(/[”]/g, "&rdquo;")
+		.replace(/[’]/g, "&rsquo;")
+		.replace(/[‘]/g, "&lsquo;")
+		//.replace(/([a-z])'([a-z])/ig, '$1&rsquo$2')     // Apostrophe
+		//
+		//.replace(/(\d\s*)&rdquo/g, '$1\"')
+		//.replace(/(\d\s*)&rsquo/g, "$1\'")
+		.replace(/([a-z])&lsquo([a-z])/ig, '$1&rsquo;$2')
+	}
+}
+
 
 function geoLocate(ip, zoom, cb) {
 	// console.log(ip)
@@ -248,7 +292,7 @@ function getDat(req, res, next){
 }
 
 function ensureAuthenticated(req, res, next) {
-	console.log(req.isAuthenticated())
+	// console.log(req.isAuthenticated())
 	if (req.isAuthenticated()) {
 		req.session.userId = req.user._id;
 		req.session.loggedin = req.user.username;
@@ -683,18 +727,19 @@ router.get('/sig/publish/:id', function(req, res, next){
 })
 
 router.get('/sig/editprofile', function(req, res, next){
-	Content.find({}).sort({'properties.time.end': 1}).lean().exec(function(err, data){
+	Content.find({}).lean().sort({'properties.time.end': 1}).exec(function(err, data){
 		if (err) {return next(err)}
-		Publisher.findOne({_id: req.session.userId}, function(err, pu){
+		Publisher.findOne({_id: req.session.userId}, async function(err, pu){
 			if (err) {
 				return next(err)
 			}
 			if (pu.sig.length > 0) {
-				var sigs = pu.sig.map(function(s){
+				var sigs = await pu.sig.map(function(s){
 					return s.documentId;
-				})
-				data = data.filter(function(doc){
-					return sigs.indexOf(doc._id) !== -1
+				});
+				data = await data.filter(function(doc){
+					var s = sigs.join('.')
+					return (new RegExp(doc._id).test(s))
 				})
 			} else {
 				data = null
@@ -842,11 +887,54 @@ router.get('/api/new/:chind', async function(req, res, next){
 			return;
 		}
 	});
+	const sanitize = require('sanitize-html');
 	// console.log(multiPolygon)
 	//if (!multiPolygon) return res.redirect('/logout')
 	var hRes = //await JSON.stringify(
 		//require(
-			await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/html/gnd.html', 'utf8')
+			await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/txt/gnd.txt', 'utf8');
+	const desc = sanitize(hRes, {
+		allowedTags: [
+			'a',
+			'b',
+			'p',
+			'i',
+			'em',
+			'strong',
+			'blockquote',
+			'big',
+			'small',
+			'div',
+			'h1',
+			'h2',
+			'h3',
+			'h4',
+			'h5',
+			'h6',
+			'hr',
+			'li',
+			'ol',
+			'ul',
+			'table',
+			'tbody',
+			'thead',
+			'td',
+			'th',
+			'tr',
+			'caption'
+			// ,
+			// 'span'
+		]
+		// ,
+		// allowedAttributes: {
+		// 	'a': ['href', 'id', 'target'],
+		// 	'span': ['id'],
+		// 	'h1': ['id'],
+		// 	'h2': ['id'],
+		// 	'h3': ['id'],
+		// 	'h4': ['id']
+		// }
+	});
 	//)
 	//console.log(outputPath)
 	// var csrf = req.csrfToken();
@@ -884,7 +972,7 @@ router.get('/api/new/:chind', async function(req, res, next){
 					// 'Edit Subtitle',
 					title: (chunk.length === 0 ? 'Recognizing the duty of the Federal Government to create a Green New Deal.' : chunk[0].properties.title),
 					place: (chunk.length === 0 ? 'United States' : 'Edit Place'),
-					description: marked(hRes),
+					description: marked(desc),
 					// current: false,
 					time: {
 						begin: moment().utc().format(),
@@ -903,7 +991,7 @@ router.get('/api/new/:chind', async function(req, res, next){
 					//))
 				}
 			});
-			console.log(content.geometry)
+			// console.log(content.geometry)
 			content.save(function(err){
 				if (err) {
 					console.log(err)
@@ -937,7 +1025,7 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 			if (!new RegExp(req.params.puid).test(pu._id)) return res.redirect('/login');
 			geoLocate(req.ip, 6, function(position){
 				var signature = new Signature({
-					ts: ''+position.lat+','+position.lng+'G'+req.body.ts+'/'+ pu.properties.givenName+'/'+position.zoom+'',//new Date(),
+					ts: ''+position.lat+','+position.lng+'G'+req.body.ts+'',//new Date(),
 					puid: pu._id,
 					username: pu.username,
 					givenName: pu.properties.givenName,
@@ -984,6 +1072,27 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 // 	return res.status(200).send(req.file.path)
 // 
 // });
+router.get('/api/editcontent/:id', function(req, res, next){
+	Content.findOne({_id: req.params.id}).lean().exec(function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		Content.find({}).lean().sort( { index: 1 } ).exec(function(err, data){
+			if (err) {
+				return next(err)
+			}
+			return res.render('publish', {
+				csrfToken: req.csrfToken(),
+				pu: req.user,
+				type: 'blog',
+				menu: 'edit',
+				loggedin: req.session.loggedin,
+				doc: doc,
+				info: req.session.info
+			})
+		});
+	});
+})
 
 router.post('/api/editcontent/:id', function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
@@ -995,34 +1104,119 @@ router.post('/api/editcontent/:id', function(req, res, next){
 	if (!body.description){
 		body.description = ''
 	}
+	// console.log(body)
 	asynk.waterfall([
-		function(next){
+		function(cb){
 			
 			Content.findOne({_id: req.params.id},function(err, doc) {
 				if (err) {
-					return next(err)
+					cb(err)
 				}
 				var pu = req.user //&& req.user.admin;
 				if (!pu) {
 					return res.redirect('/')
 				}
-				next(null, doc, body, keys, pu)
+				cb(null, doc, body, keys, pu)
 				
 			})
 		},
-		function(doc, body, pu, count, next) {
-			console.log(footnotes)
-			var straight = function(str) {
-				return str.replace(/(\d\s*)&rdquo;/g, '$1\"').replace(/(\d\s*)&rsquo;/g, "$1'")
-			}
-			var desc = //removeExtras(
+		function(doc, body, keys, pu, cb) {
+		// ,
+		// function(doc, body, keys, pu, next) {
+		// 	var footnotes = [];
+		// 	var count = 0;
+		// 	for (var k = 0; k < keys.length; k++) {
+		// 
+		// 		var thatkey = 'footnote'+count+''
+		// 		if (keys[k] === thatkey) {
+		// 			console.log(body[thatkey])
+		// 			if (body[thatkey]) {
+		// 				footnotes.push(body[thatkey])
+		// 				count++;
+		// 			}
+		// 		}
+		// 
+		// 	}
+		// 	next(null, doc, footnotes, body, pu, count)
+		// },
+		// function(doc, footnotes, body, pu, count, next) {
+			// console.log(footnotes)
+			// var straight = function(str) {
+			// 	return str.replace(/(\d\s*)&rdquo;/g, '$1\"').replace(/(\d\s*)&rsquo;/g, "$1'")
+			// }
+			const sanitize = require('sanitize-html');
+			var descc = //removeExtras(
 				body.description
 			//);
+			
+			const desc = sanitize(descc, {
+				allowedTags: [
+					'a',
+					'b',
+					'p',
+					'i',
+					'em',
+					'strong',
+					'blockquote',
+					'big',
+					'small',
+					'div',
+					'h1',
+					'h2',
+					'h3',
+					'h4',
+					'h5',
+					'h6',
+					'hr',
+					'li',
+					'ol',
+					'ul',
+					'table',
+					'tbody',
+					'thead',
+					'td',
+					'th',
+					'tr',
+					'caption'
+					// ,
+					// 'span'
+				]
+				// ,
+				// allowedAttributes: {
+				// 	'a': ['href', 'id', 'target'],
+				// 	'span': ['id'],
+				// 	'h1': ['id'],
+				// 	'h2': ['id'],
+				// 	'h3': ['id'],
+				// 	'h4': ['id']
+				// }
+			});
+			var isEqual = htmlDiffer.isEqual((!doc.properties.description ? '' : /*marked(*/doc.properties.description), /*marked*/(!desc ? '' : desc)/*/*)*/)
+			var diffss = [], newdiff = null;
+			if (!isEqual) {
+				var diff = htmlDiffer.diffHtml((!doc.properties.description ? '' : doc.properties.description), (!desc ? '' : desc)/*)/*)*/);
+				// console.log(isEqual, diff)
+				diff.forEach(function(dif){
+					//console.log(dif)
+					diffss.push({
+						count: dif.count,
+						value: dif.value,
+						added: dif.added,
+						removed: dif.removed
+					})
+				})
+				newdiff = {
+					date: new Date(),
+					user: {
+						_id: pu._id,
+						username: pu.username,
+						avatar: pu.avatar
+					},
+					dif: diffss,
+					str: desc
+				};
+			}
 
-			// var newdate = new Date();
-			// var sig = (body.signature ? doc.properties.sig.push() : doc.properties.sig)//pu.admin ? 
-			//console.log(desc, body.description);
-			// Publisher.findOne({_id: req}$project: {sig:1}])
 			var entry = {
 				_id: doc._id,
 				type: "Feature",
@@ -1044,17 +1238,18 @@ router.post('/api/editcontent/:id', function(req, res, next){
 					title: (!body.title ? doc.properties.title : marked(body.title).replace(/(<p>|<\/p>)/g,'')),
 					// label: body.label ? body.label : doc.properties.label,
 					place: body.place ? body.place : doc.properties.place,
-					description: desc ? marked(desc) : doc.properties.description,
+					description: desc ? desc : doc.properties.description,
 					time: {
 						begin: new Date(body.datebegin),
 						end: moment().utc().format()
 					},
 					// media: [],
-					footnotes: footnotes
+					footnotes: doc.properties.footnotes,
+					diffs: doc.properties.diffs
 				},
 				geometry: {
 					type: "Polygon",
-					coordinates: JSON.parse(JSON.stringify(body.latlng))
+					coordinates: JSON.parse(body.latlng)
 				},
 				sig: doc.properties.sig
 			}
@@ -1074,9 +1269,9 @@ router.post('/api/editcontent/:id', function(req, res, next){
 			var set3 = {$set: {}};
 			set3.$set['geometry'] = entry.geometry;
 
-			// var set4 = {$push: {}};
-			// var key4 = 'properties.diffs'
-			// set4.$push[key4] = newdiff;
+			var set4 = {$push: {}};
+			var key4 = 'properties.diffs'
+			set4.$push[key4] = newdiff;
 			
 			var set5 = {$set:{}}
 			var key5 = 'section.str'
@@ -1085,32 +1280,32 @@ router.post('/api/editcontent/:id', function(req, res, next){
 			var options = {safe: true, new: true, upsert: false};
 			Content.findOneAndUpdate({_id: doc._id}, set1, options, function(err, docc) {
 				if (err) {
-					next(err) 
+					cb(err) 
 				}
 				// Content.findOneAndUpdate({_id: doc._id}, set2, options, function(errr, doc) {
 				// 	if (errr) {
 				// 		next(errr)
 				// 	}
-					Content.findOneAndUpdate({_id: doc._id}, set3, options, function(errr, doc) {
+					Content.findOneAndUpdate({_id: doc._id}, set3, options, function(errr, docc) {
 						if (errr) {
-							next(errr)
+							cb(errr)
 						}
-						Content.findOneAndUpdate({_id: doc._id}, set5, options, function(errr, doc) {
+						Content.findOneAndUpdate({_id: doc._id}, set5, options, function(errr, docc) {
 							if (err) {
-								return next(errr)
+								cb(errr)
 							}
-							// if (!newdiff) {
-							// 	next(null)
-							// } else {
-							// 	Content.findOneAndUpdate({_id: doc._id}, set4, options, function(errr, doc) {
-							// 		if (errr) {
-							// 			next(errr)
-							// 		} else {
-							// 			next(null)
-							// 		}
-							// 	})
-							// }
-							next(null)
+							else if (!newdiff) {
+								cb(null)
+							} else {
+								Content.findOneAndUpdate({_id: doc._id}, set4, options, function(errr, docc) {
+									if (errr) {
+										cb(errr)
+									} else {
+										cb(null)
+									}
+								})
+							}
+							// next(null)
 						})
 						
 						

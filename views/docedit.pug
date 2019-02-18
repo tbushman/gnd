@@ -1,21 +1,26 @@
-p#info.tb-font-s(width="100%")
-//(style="float: left;")
-form#form.tb-u-100(
+form#form.grid-right(
 	v-if="doc && doc.properties"
 	enctype="multipart/form-data", method="POST", 
-	:action="'/api/editcontent/'+doc.urltitle+'/'+doc.pageindex+'/'+index+'/'+drawtype+'/'+doc.properties.level", style="margin-bottom: 50px")
-					
-	div.tb-u-100
+	:action="'/api/editcontent/'+doc._id", style="margin-bottom: 50px")
+	input(type="hidden", name="_csrf", value= csrfToken)
+				
+	div.grid-mid.tb-10-m0.docframe
 		label.ms-Label Description 
-		textarea.ms-TextField-field#inputtext(type="text", name="description", v-text="doc.properties.description", :placeholder="doc.properties.description")
-	div.tb-u-100
-		span.tb-font-s#previewtext.translate(v-text="doc.properties.description")
-	input(type="hidden", id="title", name="title", :value="doc.properties.title")
-	input(type="hidden", id="inputimg", name="image")
-	input.tb-u-100.block.spacer(id="submit", type="submit", value="Save" ariaDescription="Save this signature")
+		div#description(type="text", name="description", style="margin: 0 20px 0 0", v-html="doc.properties.description")
+		div.tb-u-100(v-if="doc.properties.footnotes", v-for="(foot, k) in doc.properties.footnotes")
+			label(v-bind:for="'footnote'+k+''", v-text="'Footnote #'+ (k+1)")
+			input.tb-font-s(type="text", v-bind:name="'footnote'+k+''", v-bind:id="'footnote'+k+''", v-bind:value="foot")
 
-div.tb-u-33
-	a.ms-Button.tb-u-100.secondary(href="/", role="button")
+		//- div.tb-u-100
+		//- 	span.tb-font-s#previewtext.translate(v-text="doc.properties.description")
+		input(type="hidden", id="title", name="title", :value="doc.properties.title")
+		input(type="hidden", id="inputimg", name="image")
+		input.block#latlng(v-bind:value="JSON.stringify(xrArr(doc.geometry.coordinates))", name="latlng", style="width: 100%", type="hidden")
+
+		input.tb-u-100.block.spacer(id="submit", type="submit", value="Save" ariaDescription="Save this signature")
+
+div.grid-footer
+	a.ms-Button.tb-u-33.secondary(href="/", role="button")
 		span.ms-Button-label.tb-u-100 Cancel
 
 p.tb-font-xs#info

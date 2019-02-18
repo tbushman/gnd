@@ -1,6 +1,7 @@
 var mongoose = require('mongoose'),
+	Schema = mongoose.Schema,
 	Content = require('mongoose-geojson-schema'),
-	Schema = mongoose.Schema;
+	Diffs = require('./diffs.js');
 var schema = new Schema({
 	type: String,
 	index: Number,
@@ -32,6 +33,7 @@ var schema = new Schema({
 			begin: Date,
 			end: Date
 		},
+		diffs: [Diffs],
 		footnotes: [ ]
 	}
 }, { collection: 'content' });
