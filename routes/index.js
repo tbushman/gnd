@@ -432,7 +432,7 @@ router.post('/register', function(req, res, next) {
 });
 
 router.get('/login', function(req, res, next){
-
+	
 	return res.render('login', { 
 		user: req.user,
 		csrfToken: req.csrfToken(),
@@ -443,7 +443,9 @@ router.get('/login', function(req, res, next){
 router.post('/login', passport.authenticate('local', {
 	failureRedirect: '/register'
 }), function(req, res, next) {
-
+	if (!req.user.admin && process.env.ADMIN.split(',').indexOf(req.user.username) !== -1) {
+		return res.redirect('/sig/admin')
+	}
 	req.session.userId = req.user._id;
 	req.session.loggedin = req.user.username;
 	res.redirect('/');		
@@ -704,6 +706,17 @@ router.get('/profile/:username', function(req, res, next) {
 router.all('/api/*', ensureAuthenticated, ensureAdmin)
 
 router.all('/sig/*', ensureAuthenticated)
+
+router.get('/sig/admin', function(req, res, next) {
+	if (process.env.ADMIN.split(',').indexOf(req.session.loggedin) !== -1) {
+		Publisher.findOneAndUpdate({_id: req.session.userId}, {$set:{admin: true}}, function(err, pu){
+			if (err) {
+				return next(err)
+			}
+			return res.redirect('/api/publish')
+		})
+	}
+});
 
 router.get('/sig/publish/:id', function(req, res, next){
 	Content.find({}).sort({'properties.time.end': 1}).lean().exec(function(err, data){
