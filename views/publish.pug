@@ -17,7 +17,7 @@ block content
 	div#select(:class="type", style="pointer-events: auto;")
 		include includes/header.pug
 
-		div.grid-container(:class="type" v-if="dat && dat[0]")
+		div.grid-container(:class="type" v-if="dat && dat[0] && dat[0][0]")
 			//- - menu = 'home'
 			include menu.pug
 			div.grid-right(v-for="(data,n) in dat", v-bind:id="n", v-bind:key="n", v-if="data[0]")
@@ -43,7 +43,6 @@ block content
 			//- if (pu)
 			//- 	- menu = 'data'
 			div.grid-right(v-if="menu === 'pu'")
-				p.tb-font-s(v-text="'My Information'")
 				include includes/puedit.pug
 				
 				//div.grid-mid

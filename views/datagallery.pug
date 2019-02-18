@@ -28,7 +28,7 @@ div.grid-mid
 						span(v-html="marked(dc.properties.description)")
 					
 					div.tb-11-m0.tb-07-m1.tb-font-m
-						a.href(v-bind:href="'/list/'+dc._id+'/null'", style="display:block;padding:0 0 0 105px;text-indent:-105px;")
+						a.href(v-bind:href="'/list/'+dc._id+'/null'", style="display:block;margin-left:50px;")
 							span(v-html="dc.section.str")
 							span(v-text="' '")
 							span.bd(v-if="dc.title", v-text="(parseInt(dc.title.ind, 10) + 1)+'.'+(parseInt(dc.chapter.ind, 10) + 1)+'.'+(parseInt(dc.section.ind, 10) + 1)", style="width: 100px;display:inline-block;text-indent:0;")

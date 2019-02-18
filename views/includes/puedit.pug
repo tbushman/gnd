@@ -1,7 +1,7 @@
 div.grid-right
 	div.tb-u-100
 		p.tb-font-xl Your Information:
-		div#registersection
+		div#registersection(style="height:auto;overflow-y:hidden;")
 			form#form(enctype="multipart/form-data", method="POST", :action="(menu === 'register' ? '/register' : (pu && pu.username !== loggedin ? '/sig/editprofile' : null))", style="margin-bottom: 50px")
 				input(type="hidden", name="_csrf", value= csrfToken)
 				input#svgurl(type="hidden", name="svg")

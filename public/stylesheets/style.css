@@ -242,20 +242,23 @@ a.accordion {
 	/* height: 100%;  */
 	position: absolute;display:table-cell;vertical-align:bottom;
 	/* margin:40px auto; */
+	z-index: 0;
 }
 a.accordion .ui {
 	width: 23px;
-	right: 0;
+	right: auto;
 	top: 0;
-	left: auto;
+	left: 0;
 	bottom: 0;
-	float: right;
+	float: left;
 	height: auto;
 }
 a.accordion .ui path {
 	fill: #e9e9e9;
 }
-
+a.accordion.mainmenu .ui path {
+	fill: #000;
+}
 a.accordion:hover .ui path {
 	fill: tomato;
 }

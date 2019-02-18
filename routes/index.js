@@ -578,7 +578,8 @@ router.get('/home', getDat, function(req, res, next) {
 					dat: req.dat,
 					ff: req.distinct,
 					info: 'This tool collects timestamped signatures.',
-					type: 'blog'
+					type: 'blog',
+					pu: pu
 				})				
 			})
 			
