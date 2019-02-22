@@ -785,16 +785,18 @@ router.post('/sig/editprofile', function(req, res, next){
 			var imgurl = ''+publishers+'/publishers/'+ req.user.username +'/images/avatar/'+ req.user.username + '.png';
 			if (body.avatar.substring(0,1) !== "/") {
 				var imgbuf = new Buffer(body.avatar, 'base64'); // decode
+				var pd = (process.env.NODE_ENV === 'production' ? process.env.pd.toString() :  process.env.devpd.toString())
 
 				fs.writeFile(imgurl, imgbuf, function(err) {
 					if (err) {
 						console.log("err", err);
 					}
-					imgurl = imgurl.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '')
+					
+					imgurl = imgurl.replace(pd, '')
 					next(null, imgurl, body)
 				})
 			} else {
-				imgurl = imgurl.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '')
+				imgurl = imgurl.replace(pd, '')
 				next(null, imgurl, body)
 			}
 			
@@ -1467,8 +1469,8 @@ router.post('/api/deletemedia/:id/:index', function(req, res, next) {
 					}
 					media[i].image_abs = newImgPath;
 					media[i].thumb_abs = newThumbPath;
-					media[i].image = newImgPath.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '');
-					media[i].thumb = newThumbPath.replace('/var/www/pu', '').replace('/Users/traceybushman/Documents/pu.bli.sh/pu', '')
+					media[i].image = newImgPath.replace(pd, '');
+					media[i].thumb = newThumbPath.replace(pd, '');
 					media[i].index -= 1;
 				}
 			}

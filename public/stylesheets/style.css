@@ -1426,9 +1426,6 @@ form#form {
 	}*/
 }
 @media (min-width: 640px) and (orientation: landscape) {
-	.module > span {
-		display: none;
-	}
 
 }
 @media (min-width: 1024px) and (orientation: landscape) {
