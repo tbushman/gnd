@@ -785,7 +785,7 @@ router.post('/sig/editprofile', function(req, res, next){
 			var imgurl = ''+publishers+'/publishers/'+ req.user.username +'/images/avatar/'+ req.user.username + '.png';
 			if (body.avatar.substring(0,1) !== "/") {
 				var imgbuf = new Buffer(body.avatar, 'base64'); // decode
-				var pd = (process.env.NODE_ENV === 'production' ? process.env.pd.toString() :  process.env.devpd.toString())
+				var pd = (process.env.NODE_ENV === 'production' ? process.env.PD.toString() :  process.env.DEVPD.toString())
 
 				fs.writeFile(imgurl, imgbuf, function(err) {
 					if (err) {
