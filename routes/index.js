@@ -23,8 +23,8 @@ var Signature = require('../models/signatures.js');
 var publishers = path.join(__dirname, '/../../..');
 var ff = ['General Provisions', 'Concept Plan',  'Sketch Plan', 'Preliminary Subdivision Applications', 'Final Subdivision Applications', 'Vacating or Amending a Recorded Final Subdivision Plat, Street or Alley Final', 'Subdivision Ordinance Amendments', 'Noticing Requirements', 'Appeals', 'Special Excepetions', 'Design and Construction Standards', 'Guarantees for Subdivision Improvements, Facilities, and Amenities', 'Definitions']
 // var InDesign = require('async-indesign-script');
-// var juice = require('juice');
-// var HtmlDocx = require('html-docx-js');
+var juice = require('juice');
+var HtmlDocx = require('html-docx-js');
 // var mammoth = require('mammoth');
 var HtmlDiffer = require('html-differ').HtmlDiffer;
 var htmlDiffer = new HtmlDiffer({
@@ -196,6 +196,25 @@ var storage = multer.diskStorage({
   }
 });
 var uploadmedia = multer({ storage: storage/*, limits: { fieldSize: 25 * 1024 * 1024 }*/});
+
+function getDocxBlob(now, doc, sig, cb){
+	var pugpath = path.join(__dirname, '../views/exportword.pug');
+	sig.forEach(function(si){
+		var imageAsBase64 = fs.readFileSync(''+publishers+'/pu'+si.image, 'base64')
+		si.image = 'data:image/png;base64,'+imageAsBase64
+	})
+	var str = pug.renderFile(pugpath, {
+		md: require('marked'),
+		moment: require('moment'),
+		doctype: 'strict',
+		hrf: '/publishers/gnd/word/'+now+'.docx',
+		doc: doc,
+		sig: sig
+	});
+	var docx = 
+	HtmlDocx.asBlob(str);
+  cb(docx)
+}
 
 // https://gist.github.com/liangzan/807712/8fb16263cb39e8472d17aea760b6b1492c465af2
 function emptyDirs(index, next) {
@@ -880,6 +899,48 @@ router.get('/api/publish', getDat, function(req, res, next) {
 			type: 'blog'
 		})
 	})
+})
+
+router.get('/api/exportword/:id', function(req, res, next){
+	Content.findOne({_id: req.params.id}, async function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		Signature.find({documentId: doc._id}, function(err, sig){
+			if (err) {
+				return next(err)
+			}
+			if (doc) {
+				var now = Date.now();
+
+				getDocxBlob(now, doc, sig, async function(docx){
+					var p = ''+publishers+'/pu/publishers/gnd/word';
+							
+					await fs.access(p, async function(err) {
+						if (err && err.code === 'ENOENT') {
+							await mkdirp(p, function(err){
+								if (err) {
+									console.log("err", err);
+								}
+							})
+						}
+					});
+					
+					var pathh = path.join(p, '/'+now+'.docx');
+					fs.writeFile(pathh, docx, function(err){
+						if (err) {
+							return next(err)
+						}
+						
+						//res.send(viewstr)
+						return res.redirect('/publishers/gnd/word/'+now+'.docx');
+					});
+				})
+			}
+		})
+		
+	})
+	
 })
 
 router.get('/api/new/:chind', async function(req, res, next){

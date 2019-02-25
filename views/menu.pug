@@ -40,7 +40,10 @@ div.grid-left#tl
 						path(style="fill: #36616c; fill:var(--highlight);" d="M21.892-13.419l1.286-1.286c0-0.002,0.282-0.254,0.855-0.254c0.644,0,1.738,0.324,3.296,1.884c2.812,2.809,1.688,4.139,1.637,4.191l-1.273,1.273L21.892-13.419z")
 				span.tb-font-l(v-text="'Edit'")
 
-			
+			a.module(v-if="doc && pu && pu.admin", :href="'/api/exportword/'+doc._id")
+				.ui
+					img(src="/images/external.svg")
+				span.tb-font-l(v-text="'Export'")
 			a.module(v-if="pu && loggedin === pu.username", href="/sig/editprofile", title="View and edit your profile")
 				.ui
 					img(src="/images/icons/profile.svg")

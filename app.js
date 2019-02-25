@@ -142,7 +142,9 @@ var store = new MongoDBStore(
 	{
 		mongooseConnection: mongoose.connection,
 		uri: process.env.DEVDB,
-		collection: 'gndSession'
+		collection: 'gndSession',
+		autoRemove: 'interval',     
+		autoRemoveInterval: 3600
 	}
 )
 promise.then(function(db){
