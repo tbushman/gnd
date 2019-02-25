@@ -26,7 +26,7 @@ if (menu === 'doc')
 			div.centerall
 				p.tb-font-xl(v-if="doc && doc.properties" v-text="doc.properties.title")
 	
-		div.tb-10-m0.docframe(style="padding: 6px;")
+		div.tb-10-m0.docframe(style="padding: 6px 0;")
 			div.tb-11-m0(v-if="dfi && doc.properties.diffs[dfi]")
 				span(v-if="doc.properties.diffs[dfi-1]", v-html="htmldiff(doc.properties.diffs[dfi-1].str, doc.properties.diffs[dfi].str)")
 				span(v-else-if="doc.properties.diffs[dfi].str && doc.properties.description", v-html="htmldiff(doc.properties.description, doc.properties.diffs[dfi].str)")

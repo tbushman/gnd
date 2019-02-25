@@ -286,7 +286,7 @@ function getDat(req, res, next){
 		}
 		req.dat = dat;
 		req.distinct = distinct;
-		console.log(req.dat, req.distinct)
+		// console.log(req.dat, req.distinct)
 		return next()
 	})
 }
@@ -622,7 +622,7 @@ router.get('/list/:id/:mi', function(req, res, next){
 					})
 				})
 			} else {
-				console.log('not authenticated!')
+				// console.log('not authenticated!')
 				return res.render('publish', {
 					menu: 'doc',
 					type: 'blog',

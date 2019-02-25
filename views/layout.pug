@@ -91,6 +91,8 @@ html
 						can: [],
 						ts: [],
 						tinymce: null,
+						
+						dd: false,
 						accordions: 
 							(
 								this.parseObj(!{JSON.stringify(dat)}) !== '' ?
@@ -170,14 +172,6 @@ html
 					});
 					$(document).on('click', '.href', function(e){
 						e.stopPropagation();
-					});
-					$(document).ready(function(){
-
-						$('.dropdown').not('.mainmenu').slideUp(100);
-						$('.drop').slideUp(100);
-						
-						$('.selected').removeClass('selected');
-
 					});
 					//- self.sliderImg();
 					self.dids = (self.data && self.data !== '' ? self.data.map(function(doc){
@@ -330,37 +324,10 @@ html
 						}
 					},
 					dropdown(e) {
+						// TODO convert all to Vue
 						var self = this;
 						//e.preventDefault();
-						console.log(e.target)
-						var that, main;
-						if ($(e.target).hasClass('mainmenu')) {
-							that = $('#tlmodules.dropdown');
-							main = true;
-						} else {
-							that = e.target;
-							main = false;
-						}
-						console.log(that, main)
-						if ($(that).hasClass('selected')) {
-							if (main && $('div.menu').hasClass('blog')) {
-								$(that).slideUp(100);
-								$(that).removeClass("selected");
-							} else {
-								if ($('div.menu').hasClass('blog')) {
-									$(that).next('.drop').slideUp(100);
-									
-								}
-							}
-						} else {
-							if (main && $('div.menu').hasClass('blog')) {
-								$(that).slideDown(200);
-								$(that).addClass('selected');
-							} else {
-								self.type = 'blog';
-								$(that).next('.drop').slideDown(200);
-							}
-						}
+						self.dd = !self.dd;
 					},
 					setBegin(e) {
 						var self = this;

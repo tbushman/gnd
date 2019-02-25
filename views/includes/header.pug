@@ -13,7 +13,7 @@ else
 
 		div.canvas.topRight(style="background-image:url('/images/backgrounds/backgrounds_1.svg')")
 			div.overtext(v-text="(dat && dat[0] && dat[0][0] && dat[0][0].title.str !== '' ? ((parseInt(dat[0][0].title.ind, 10) + 1) + 'th ' + dat[0][0].title.str) : (doc && doc.section ? (parseInt(doc.title.ind, 10) + 1)+'.'+(parseInt(doc.chapter.ind, 10) + 1)+'.'+(parseInt(doc.section.ind, 10) + 1) :'"+appTitle+"'))")
-			div.blogname(v-text="(doc && doc.section ? (doc.title.str+'.'+doc.chapter.str+'.'+doc.section.str) : '')")
+			div.blogname(v-html="(doc && doc.section ? (doc.title.str+'<br>'+doc.chapter.str+' '+ (doc.chapter.ind+1)+'<br>'+doc.section.str) : '')")
 			div.envel(width="100%", height="100%", style="width:100%;height:100%;")
 				div.tb-font-m.info#info(v-text="info", style="margin: calc(var(--thumbwidth) / 2) 0 0 var(--thumbwidth)")
 				table(width="100%", height="100%", v-if="doc && pu && pu.username === loggedin && type === 'draw'")

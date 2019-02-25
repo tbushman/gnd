@@ -5,17 +5,27 @@ div.grid-left#tl
 		style="background-color:var(--highlight);")
 		//- img.i(src="/images/icons/check.svg")
 		.ui(style="pointer-events: none;width:36px;height:36px;")
-			svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
-				path(d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z")
+			
+			svg(version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve")
+				polygon(points="90.991,34.149 82.271,25.428 42.738,64.961 17.73,39.953 9.008,48.674 42.714,82.38 ")
 
-	a.dropdown.mainmenu.img.accordion(v-else :class="(!type ? 'blog' : type)" href="#" title="Menu" @click="dropdown($event)")
+	a.dropdown.mainmenu.img.accordion(v-else href="#" title="Menu" @click="dropdown($event)" :class="(dd ? 'selected ' + (!type ? 'blog' : type) : (!type ? 'blog' : type))")
 		//- img.i(src="/images/menu_button.svg")
-		.ui(style="pointer-events: none;width:36px;height:36px;")
+		.ui(v-if="dd" style="pointer-events: none;width:36px;height:36px;")
+			
 			svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
 				path(d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z")
+		
+		.ui(v-else-if="!dd" style="pointer-events: none;width:30px;height:30px;margin: 0 3px;")
+			svg(version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 30.1 28" enable-background="new 0 0 30.1 28" xml:space="preserve")
+				path(d="M1.103,4.464c-0.605,0-1.1-0.493-1.1-1.1v-2.3c0-0.606,0.493-1.1,1.1-1.1h27.894c0.606,0,1.1,0.494,1.1,1.1v2.3c0,0.606-0.492,1.1-1.1,1.1H1.103z")
+				path(d="M1.103,16.464c-0.605,0-1.1-0.493-1.1-1.1v-2.3c0-0.606,0.493-1.101,1.1-1.101h27.894c0.606,0,1.1,0.494,1.1,1.101v2.3c0,0.606-0.492,1.1-1.1,1.1H1.103z")
+				path(d="M1.103,27.962c-0.605,0-1.1-0.494-1.1-1.101v-2.301c0-0.604,0.493-1.1,1.1-1.1h27.894c0.606,0,1.1,0.494,1.1,1.1v2.301c0,0.605-0.492,1.101-1.1,1.101H1.103z")
+			//- svg(xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
+			//- 	path(d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z")
 
 	#wrapper
-		div#tlmodules.dropdown
+		div#tlmodules.dropdown(:class="(dd ? 'selected ' + (!type ? 'blog' : type) : (!type ? 'blog' : type))")
 			a.module(href="/home", title="home")
 				.ui
 					img(src="/images/icons/home.svg")
