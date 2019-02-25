@@ -932,7 +932,6 @@ router.get('/api/exportword/:id', function(req, res, next){
 							return next(err)
 						}
 						
-						//res.send(viewstr)
 						return res.redirect('/publishers/gnd/word/'+now+'.docx');
 					});
 				})
