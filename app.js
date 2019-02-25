@@ -16,7 +16,6 @@ var bodyParser = require('body-parser');
 var http = require('http');
 var routes = require('./routes/index');
 var Publisher = require('./models/publishers');
-var Page = require('./models/pages');
 var async = require('async');
 var favicon = require('serve-favicon');
 var helmet = require('helmet');
@@ -108,53 +107,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '../../pu/publishers')));
 app.use('/publishers', express.static(path.join(__dirname, '../../pu/publishers')));
-/*app.use('/publishers/gnd', express.static(path.join(__dirname, '../../pu/publishers/gnd')));
-app.use('/publishers/gnd/:urltitle', function(req, res, next) {
-	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
-		if (err) {
-			return next(err)
-		}
-		return express.static(path.join(__dirname, '../../pu/publishers/gnd/'+req.params.urltitle+'')).apply(this, arguments);
-	})
-	
-});
-
-app.use('/publishers/gnd/:urltitle/:index', function(req, res, next) {
-	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
-		if (err) {
-			return next(err)
-		}
-		return express.static(path.join(__dirname, '../../pu/publishers/gnd/'+req.params.urltitle+'/'+req.params.index+'')).apply(this, arguments);
-	})
-});
-
-app.use('/publishers/gnd/:urltitle/:index/images', function(req, res, next) {
-	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
-		if (err) {
-			return next(err)
-		}
-		return express.static(path.join(__dirname, '../../pu/publishers/gnd/'+req.params.urltitle+'/'+req.params.index+'/images')).apply(this, arguments);
-	})
-});
-
-app.use('/publishers/gnd/:urltitle/:index/images/:drawtype', function(req, res, next) {
-	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
-		if (err) {
-			return next(err)
-		}
-		console.log('static: '+req.params.drawtype)
-		return express.static(path.join(__dirname, '../../pu/publishers/gnd/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'')).apply(this, arguments);
-	})
-});
-
-app.use('/publishers/gnd/:urltitle/:index/images/:drawtype/:file', function(req, res, next) {
-	Page.findOne({urltitle: req.params.urltitle}, function(err, doc){
-		if (err) {
-			return next(err)
-		}
-		return express.static(path.join(__dirname, '../../pu/publishers/gnd/'+req.params.urltitle+'/'+req.params.index+'/images/'+req.params.drawtype+'/'+req.params.file+'')).apply(this, arguments);
-	})
-});*/
 
 app.use(function(req, res, next) {
 	
@@ -164,86 +116,6 @@ app.use(function(req, res, next) {
 app.get(/^(\/|\/register$|\/login$|\/api\/new|\/api\/editcontent)/, csrfProtection);
 // ensure multer parses before csrf
 app.post(/^(\/register$|\/login$|\/api\/editcontent)/, upload.array(), parseBody, csrfProtection);
-// var storage = multer.diskStorage({
-// 
-// 	destination: function (req, file, cb) {
-// 		var p, q;
-// 		if (!req.params.type) {
-// 			p = ''+publishers+'/pu/publishers/gnd/signatures/'+req.params.did+'/'+req.params.puid+''
-// 		} else {
-// 			if (req.params.type === 'png') {
-// 				p = ''+publishers+'/pu/publishers/gnd/images/full/'+req.params.index+''
-// 				q = ''+publishers+'/pu/publishers/gnd/images/thumbs/'+req.params.index+''
-// 
-// 			// } else if (req.params.type === 'csv') {
-// 			// 	p = ''+publishers+'/pu/publishers/gnd/csv/'+req.params.id+''
-// 			// 	q = ''+publishers+'/pu/publishers/gnd/csv/thumbs/'+req.params.id+''
-// 			// 
-// 			// } else if (req.params.type === 'txt') {
-// 			// 	p = ''+publishers+'/pu/publishers/gnd/txt'
-// 			// 	q = ''+publishers+'/pu/publishers/gnd/txt/thumbs'
-// 			// } else if (req.params.type === 'doc') {
-// 			// 	var os = require('os');
-// 			// 	p = os.tmpdir() + '/gdoc';
-// 			// 	q = ''+publishers+'/pu/publishers/gnd/tmp';
-// 			// } else if (req.params.type === 'docx') {
-// 			// 	p = ''+publishers+'/pu/publishers/gnd/docx'
-// 			// 	q = null;//''+publishers+'/pu/publishers/gnd/word/thumbs'
-// 			} else {
-// 				p = ''+publishers+'/pu/publishers/gnd/images/full/'+req.params.index+''
-// 				q = ''+publishers+'/pu/publishers/gnd/images/thumbs/'+req.params.index+''
-// 
-// 			}
-// 		}
-// 
-// 		fs.access(p, function(err) {
-// 			if (err && err.code === 'ENOENT') {
-// 				mkdirp(p, function(err){
-// 					if (err) {
-// 						console.log("err", err);
-// 					}
-// 					if (q) {
-// 						fs.access(q, function(err){
-// 							if (err && err.code === 'ENOENT') {
-// 								mkdirp(q, function(err){
-// 									if (err) {
-// 										console.log("err", err);
-// 									}
-// 									cb(null, p)
-// 								})
-// 							} else {
-// 								cb(null, p)
-// 							}
-// 						})
-// 					} else {
-// 						cb(null, p)
-// 					}
-// 
-// 				})
-// 			} else {
-// 				cb(null, p)
-// 			}
-// 		})
-// 
-// 	},
-// 	filename: function (req, file, cb) {
-// 		if (req.params.type === 'png') {
-// 			cb(null, 'img_' + req.params.counter + '.png')
-// 		// } else if (req.params.type === 'csv') {
-// 		// 	cb(null, 'csv_' + req.params.id + '.csv')
-// 		// } else if (req.params.type === 'txt') {
-// 		// 	cb(null, 'txt_' + Date.now() + '.txt')
-// 		// } else if (req.params.type === 'docx') {
-// 		// 	cb(null, 'docx_'+Date.now()+'.docx')
-// 		} else if (req.params.type === 'svg') {
-// 			cb(null, 'docx_'+Date.now()+'.svg')
-// 		}
-//   }
-// });
-// var uploadmedia = multer({ storage: storage/*, limits: { fieldSize: 25 * 1024 * 1024 }*/});
-// app.param('did');
-// app.param('puid');
-// app.post(/^(\/sig\/uploadsignature)/, uploadmedia.single('img'), parseBody, csrfProtection);
 
 app.use('/', routes);
 
@@ -263,19 +135,14 @@ var uri = process.env.DEVDB;
 
 var promise = mongoose.connect(uri, { 
 	native_parser:true, 
-	useMongoClient: true, 
-	authSource:'admin', 
+	useMongoClient: true
 	// authMechanism: 'ScramSHA1'
 });
 var store = new MongoDBStore(
 	{
 		mongooseConnection: mongoose.connection,
-		uri: process.env.STORE,
-		host: '127.0.0.1',
-		port: '12707',
-		db: 'gnd',
-		// db: 'gnd',
-		collection: 'mySessions'
+		uri: process.env.DEVDB,
+		collection: 'gndSession'
 	}
 )
 promise.then(function(db){
