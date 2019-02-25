@@ -20,6 +20,7 @@ html
 		script(type="text/javascript", src="/scripts/leaflet.js")
 		script(type="text/javascript", src="/scripts/Leaflet.Editable.js")
 		script(type="text/javascript", src="/scripts/signaturePad.js")
+		script(type="text/javascript", src="/scripts/htmldiff.js")
 		//- script(type="text/javascript", src="/scripts/DrawCanvas.js")
 
 	body(style="pointer-events: none;")
@@ -42,6 +43,7 @@ html
 			Vue.prototype.DatePicker = DatePicker;
 			Vue.prototype.SignaturePad = SignaturePad;
 			Vue.prototype.tinymce = tinymce;
+			Vue.prototype.htmldiff = htmldiff;
 			Vue.use(DatePicker);
 			new Vue({ el: '#select',
 				data() {
