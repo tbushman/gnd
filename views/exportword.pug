@@ -45,7 +45,9 @@ html(xmlns:v="urn:schemas-microsoft-com:vml", xmlns:o='urn:schemas-microsoft-com
 									each si, s in sig
 										div.img.tb-03-m0(style="margin-top:10px;")
 											img(src= si.image)
-											p.tb-font-xxs #{si.ts}
+											p.tb-font-xxs(style="font-size:0.1vw;") #{si.ts}
+							td(style="padding:0;")
+								p.tb-font-xxs &nbsp
 
 			div#f1(style="mso-element:footer;")
 				p.MsoFooter

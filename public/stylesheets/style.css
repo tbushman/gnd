@@ -52,9 +52,11 @@ p.MsoFooter {
 	font-family: 'Merriweather', serif;
 }
 .primary {
+	background-color: #BAD80A;
 	background-color: var(--primary);
 }
 .secondary {
+	background-color: #C5E3F7!important;
 	background-color: var(--secondary)!important;
 }
 maintitle {
@@ -213,6 +215,7 @@ button, a[role="button"], input[type="submit"] {
   text-transform: inherit;
 	background: none;
 	cursor: pointer;
+	background-color: #BAD80A;
 	background-color: var(--primary);
 	padding: 8px;
 }
@@ -222,8 +225,11 @@ circle {
 	cursor: grab;
 }
 i, .i {
+	width: calc(70px/2);
 	width: calc(var(--thumbwidth)/2);
+	height: calc(70px/2);
 	height: calc(var(--thumbwidth)/2);
+	font-size: calc(70px/2);
 	font-size: calc(var(--thumbwidth)/2);
 	float: left;
 	margin: 0 auto;
@@ -231,8 +237,10 @@ i, .i {
 #alert {
 	position: absolute;
 	margin: 0 auto;
+	left: 70px;
 	left: var(--thumbwidth);
 	right: 10px;
+	bottom: calc(70px/2);
 	bottom: calc(var(--thumbwidth)/2);
 	top: auto;
 	display: inline-block;
@@ -247,11 +255,13 @@ i, .i {
 	margin: 0 auto;
 	left: 0;
 	right: 0;
+	bottom: calc(50% - 70px);
 	bottom: calc(50% - var(--thumbwidth));
 	top: auto;
 	display: inline-block;
 	z-index: 2;
 	background: #fff;
+	padding: calc(70px/2);
 	padding: calc(var(--thumbwidth)/2);
 
 }
@@ -269,7 +279,9 @@ i, .i {
 	width: 100px;
 }
 .ui {
+	width: 70px;
 	width: var(--thumbwidth);
+	height: 70px;
 	height: var(--thumbwidth);
 }
 section:hover {
@@ -320,44 +332,53 @@ a.accordion:hover .ui path, a.accordion:hover .ui polygon {
 }
 .tb-font-xxxs {
 	font-family: var(--fontname), sans-serif!important;
+	font-size: calc(70px / 7);
 	font-size: calc(var(--thumbwidth) / 7);
 	font-weight: 200;
 }
 
 .tb-font-xxs {
 	font-family: var(--fontname), sans-serif!important;
+	font-size: calc(70px / 6);
 	font-size: calc(var(--thumbwidth) / 6);
+	color: #C5E3F7;
 	color: var(--secondary);
 	text-transform: uppercase;
 	font-weight: 600;
 }
 .tb-font-xs {
 	font-family: var(--fontname), sans-serif!important;
+	font-size: calc(70px / 4.8);
 	font-size: calc(var(--thumbwidth) / 4.8);
 	font-weight: 600;
 }
 .tb-font-s {
 	font-family: var(--fontname), sans-serif!important;
+	font-size: calc((70px) / 4.5);
 	font-size: calc(var(--thumbwidth) / 4.5);
 	font-weight: 300;
 }
 .tb-font-m {
 	font-family: var(--fontname), sans-serif!important;
+	font-size: calc(70px / 4);
 	font-size: calc(var(--thumbwidth) / 4);
 	font-weight: 300;
 }
 .tb-font-l {
 	font-family: var(--fontname), sans-serif!important;
+	font-size: calc(70px / 3.5);
 	font-size: calc(var(--thumbwidth) / 3.5);
 	font-weight: 300;
 }
 .tb-font-xl {
 	font-family: var(--fontname), sans-serif!important;
+	font-size: calc(70px / 3);
 	font-size: calc(var(--thumbwidth) / 3);
 	font-weight: 300;
 }
 .tb-font-xxl {
 	font-family: var(--fontname), sans-serif!important;
+	font-size: calc(70px / 2.3);
 	font-size: calc(var(--thumbwidth) / 2.3);
 	font-weight: 300;
 }
@@ -371,6 +392,7 @@ i.fa {
 }
 
 i.fa.active {
+	color: #BAD80A;
 	color: var(--primary);
 }
 
@@ -447,6 +469,7 @@ breadcrumbs {
 	z-index: 999999999999;
 	padding: 3px;
 	width: 100%;
+	background-color: #BAD80A;
 	background-color: var(--primary);
 	text-align: right;
 	float: right;
@@ -498,6 +521,7 @@ a.accordion:hover .ui path, a.accordion:hover .ui polygon {
 	z-index:1;
 }
 .pullquote > .tool > .ui > img {
+	height: calc(70px/1.5);
 	height: calc(var(--thumbwidth)/1.5);
 }
 .pullquote >  span.translate {
@@ -505,12 +529,14 @@ a.accordion:hover .ui path, a.accordion:hover .ui polygon {
 }
 @supports not (display:grid) {
 	.pullquote {
+		left: 70px;
 		left: var(--thumbwidth);
 	}
 }
 .pullquote > a > .over {
 	font-weight: 200;
 	pointer-events: auto;
+	color: #C5E3F7;
 	color: var(--secondary);
 
 }
@@ -540,6 +566,7 @@ a.accordion:hover .ui path, a.accordion:hover .ui polygon {
 	display: grid;
 	grid-template-columns: auto minmax(-webkit-max-content, 0px) minmax(100%, 180px);
 	grid-template-columns: auto minmax(max-content, 0px) minmax(100%, 180px);
+	grid-template-rows: minmax(-webkit-max-content, 70px) minmax(-webkit-max-content, 100%) 70px;
 	grid-template-rows: minmax(-webkit-max-content, var(--thumbwidth)) minmax(-webkit-max-content, 100%) var(--thumbwidth);
 	grid-template-rows: minmax(max-content, var(--thumbwidth)) minmax(max-content, 100%) calc(var(--thumbwidth) * 1.5);
 	background-color: rgba(255,255,255,0);
@@ -551,6 +578,7 @@ a.accordion:hover .ui path, a.accordion:hover .ui polygon {
 		"sideleft footer footer";
 	position: -webkit-sticky;
 	position: sticky;
+	bottom: calc(70px - 85%);
 	bottom: calc(var(--thumbwidth) - var(--windowmenu));
 	top: auto;
 	min-height: var(--panelheight);
@@ -603,6 +631,7 @@ a.accordion:hover .ui path, a.accordion:hover .ui polygon {
 
 .grid-container.inner {
 	height: auto;
+	grid-template-columns: 70px auto minmax(100%, 180px);
 	grid-template-columns: var(--thumbwidth) auto minmax(100%, 180px);
 	grid-template-rows: var(--thumbwidth) auto auto;
 	background-image: none;
@@ -633,6 +662,7 @@ a.accordion:hover .ui path, a.accordion:hover .ui polygon {
 	background-color: rgba(255,255,255,0.5);
 	height: auto;
 	max-height: 220px;
+	max-width: calc(100% - 70px);
 	max-width: calc(100% - var(--thumbwidth));
 }
 @supports not (display:grid) {
@@ -678,6 +708,7 @@ a.accordion:hover .ui path, a.accordion:hover .ui polygon {
 	}
 }
 a.grid-header:hover {
+	color: #C5E3F7;
 	color: var(--secondary);
 }
 .grid-left {
@@ -685,11 +716,13 @@ a.grid-header:hover {
 	grid-area: sideleft;
 	overflow: hidden;
 	pointer-events: none;
+	min-width: 70px;
 	min-width: var(--thumbwidth);
 }
 @supports not (display:grid) {
 	.grid-left, #tl {
 		display: inline-block;
+		max-width: 70px;
 		max-width: var(--thumbwidth);
 		float: left;
 	}
@@ -733,11 +766,13 @@ a.grid-header:hover {
 	line-height: calc(var(--thumbheight)/3);
 	min-height: calc(var(--panelheight) - 220px);
 	max-height: 100%;
+	max-width: calc(100% - calc(70px * 1.5));
 	max-width: calc(100% - calc(var(--thumbwidth) * 1.5));
 	min-width: 0;
 	
 }
 .grid-container.inner > .grid-right {
+	width: calc(100% - 70px);
 	width: calc(100% - var(--thumbwidth));
 	background-color: rgba(255,255,255,0);
 	min-height: 250px;
@@ -748,6 +783,7 @@ a.grid-header:hover {
 }
 @supports not (display:grid) {
 	.grid-right {
+		width: calc(100% - 70px);
 		width: calc(100% - var(--thumbwidth));
 		display: inline-block;
 		float: right;
@@ -759,6 +795,7 @@ a.grid-header:hover {
 }
 @supports not (position:sticky) {
 	.grid-right {
+		width: calc(100% - 70px);
 		width: calc(100% - var(--thumbwidth));
 		position: relative;
 		display: inline-block;
@@ -773,6 +810,7 @@ a.grid-header:hover {
 	background-color: #fff;
 	height: auto;
 	white-space: normal;
+	max-width: calc(100% - 70px);
 	max-width: calc(100% - var(--thumbwidth));
 }
 @supports not (display:grid) {
@@ -801,6 +839,7 @@ div.blogname {
 	font-weight: 300;
 	text-transform: none;
 	letter-spacing: 0;
+	color: #BAD80A!important;
 	color: var(--primary)!important;
 	white-space: nowrap;
 	margin-top: 0;
@@ -821,6 +860,7 @@ div.dashboard {
 	pointer-events: none;
 }
 div.menu {
+	-webkit-mask-image: radial-gradient(circle at calc(70px / 2) 100%, rgba(255, 255, 255, 0) calc(70px / 2.5), rgba(255, 255, 255, 1) calc(70px / 2.5));
 	-webkit-mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 100%, rgba(255, 255, 255, 0) calc(var(--thumbwidth) / 2.5), rgba(255, 255, 255, 1) calc(var(--thumbwidth) / 2.5));
 	mask-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 100%, rgba(255, 255, 255, 0) calc(var(--thumbwidth) / 2.5), rgba(255, 255, 255, 1) calc(var(--thumbwidth) / 2.5));
 	display: block;
@@ -835,6 +875,7 @@ div.menu {
 	display: inline-block;
 	pointer-events: none;
 	width: 100%;
+	height: 70px;
 	height: var(--thumbwidth);
 	overflow: hidden;	
 	-webkit-mask-image: radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0) 20px, rgba(255, 255, 255, 1) 19px);
@@ -878,6 +919,7 @@ div.dashboard .menu {
 	left: 0;
 	right: 0;
 	bottom: 0;
+	color: #C5E3F7;
 	color: var(--secondary);
 	padding: 0 25px 25px 0;
 	background-color: rgba(255,255,255,0);
@@ -903,6 +945,7 @@ div.dashboard .menu {
 }
 .maincanvas.topRight {
 	display: block;
+	background-color: #BAD80A;
 	background-color: var(--primary);
 	/* background-attachment: fixed;
 	background-image:url('');
@@ -944,6 +987,7 @@ div.menu > div.topLeft {
 	right: auto;
 	position: fixed;
 	height: 100%;
+	width: 70px;
 	width: var(--thumbwidth);
 	background-color: rgba(255,255,255,0);
 	background-attachment: fixed;
@@ -962,18 +1006,24 @@ div.menu > div.topLeft {
 
 .overtext {
 	position: fixed;
+	top: calc(70px/6);
 	top: calc(var(--thumbwidth)/6);
+	left: 70px;
 	left: var(--thumbwidth);
 }
 .blogname {
 	position: fixed;
+	top: calc(70px/2.5);
 	top: calc(var(--thumbwidth)/2.5);
+	left: 70px;
 	left: var(--thumbwidth);
 }
 a.mainmenu {
 	position: fixed;
 	top: calc(15% - 10px);
+	/*top: calc(85% - 15px);*/
 	/*top: calc(var(--windowmenu) - 15px);*/
+	left: calc(70px / 4);
 	left: calc(var(--thumbwidth) / 4);
 	right: auto;
 	bottom: auto;
@@ -989,6 +1039,7 @@ a.mainmenu {
 @supports not(display:grid) {
 	a.mainmenu {
 		position: fixed;
+		/*left: calc( 70px * 0.5);*/
 		/*left: calc( var(--thumbwidth) * 0.5);*/
 		top: var(--nowindowmenu);
 	}
@@ -999,6 +1050,7 @@ a.mainmenu {
 @supports not(position:sticky) {
 	a.mainmenu {
 		position: fixed;
+		/*left: calc( 70px * 0.5);*/
 		/*left: calc( var(--thumbwidth) * 0.5);*/
 		top: var(--nowindowmenu);
 	}
@@ -1019,6 +1071,7 @@ div.dropdown.selected {
 }
 @supports not(display:grid){
 	/*div.dropdown {
+		left: 70px;
 		left: var(--thumbwidth);
 	}*/
 }
@@ -1026,6 +1079,7 @@ div.dropdown.selected {
 	width: 100%;
 	float: left;
 	right: 0;
+	min-width: 70px;
 	min-width: var(--thumbwidth);
 	-webkit-box-sizing: border-box;
 	        box-sizing: border-box;
@@ -1034,6 +1088,7 @@ div.dropdown.selected {
 	display: inline-block;
 	margin: 0 auto;
 	height: auto;
+	min-height: 70px;
 	min-height: var(--thumbwidth);
 	pointer-events: all;
 	padding: 8px 0;
@@ -1045,6 +1100,7 @@ div.dropdown.selected {
 	display: inline-block;
 	margin: 0 auto;
 	float: left;
+	width: 70px;
 	width: var(--thumbwidth);
 	line-height: 0;
 	height: 2em;
@@ -1066,9 +1122,11 @@ div.dropdown.selected {
 	height: 100%;
 }
 .module:hover .ui i.fa, .module:focus .ui i.fa {
+	color: #BAD80A;
 	color: var(--primary);
 }
 .module.active .ui i.fa {
+	color: #BAD80A;
 	color: var(--primary);
 }
 
@@ -1089,11 +1147,13 @@ div.dropdown.selected {
 	line-height: 2em;
 }
 a.tool {
+	width: calc(70px*1.1);
 	width: calc(var(--thumbwidth)*1.1);
 	margin: 0 auto;
 	display: inline-block;
 }
 a.tool .ui {
+	width: 70px;
 	width: var(--thumbwidth);
 	position: relative;
 	margin: 0 auto;
@@ -1101,7 +1161,9 @@ a.tool .ui {
 }
 
 a.tool > .ui > img {
+	/*width: calc(70px/1.25);*/
 	/*width: calc(var(--thumbwidth)/1.25);*/
+	height: calc(70px/2.5);
 	height: calc(var(--thumbwidth)/2.5);
 	left: 50%;
 	top: 50%;
@@ -1114,6 +1176,7 @@ a.tool > .ui > img {
 	text-align: center;
 }
 a.tool span {
+	font-size: calc(70px/6.5);
 	font-size: calc(var(--thumbwidth)/6.5);
 	text-align: center;
 	margin: 0 auto;
@@ -1136,6 +1199,7 @@ a.tool span {
 	left: 0;
 	right: 0;
 	z-index:-2;
+	background-color: #C5E3F7;
 	background-color: var(--secondary);
 }
 #nomap {
@@ -1171,6 +1235,7 @@ a.tool span {
 	min-height: 100%;
 	position: absolute;
 	width: auto;
+	min-width: 70px;
 	min-width: var(--thumbwidth);
 	max-width: 100%;
 	/*cursor: -webkit-grab;
@@ -1183,6 +1248,7 @@ a.tool span {
 #tlmodules {
 	min-height: 1px;
 	width: 250px;
+	/* width: 70px; */
 	/* width: var(--thumbwidth); */
 	-webkit-box-sizing: border-box;
 	        box-sizing: border-box;
@@ -1267,6 +1333,7 @@ a.tool span {
 .year {
 	position: absolute;
 	float: left;
+	width: 70px;
 	width: var(--thumbwidth);
 	z-index: 1;
 }
@@ -1286,7 +1353,9 @@ a.tool span {
 	pointer-events: auto;
 	float: left;
 	position: relative;
+	width: 70px;
 	width: var(--thumbwidth);
+	height: 70px;
 	height: var(--thumbwidth);
 	overflow: hidden;
 	margin-left: 0;
@@ -1317,6 +1386,7 @@ a.tool span {
 }
 .actions .tb-font-xxs {
 	letter-spacing: 0.1em;
+	line-height: calc(70px/2.5);
 	line-height: calc(var(--thumbwidth)/2.5);
 }
 #closepanel {
@@ -1394,6 +1464,7 @@ a.tool span {
 	height: 100%;
 	z-index:1;
 	margin: 0 auto;
+	width: 70px;
 	width: var(--thumbwidth);
 }
 
@@ -1402,6 +1473,7 @@ a.tool span {
 	color: rgba(205, 206, 207, 1);
 	font-size:40px;
 	display:block;
+	width: 70px;
 	width: var(--thumbwidth);
 	position: fixed;
 	z-index: 5;
@@ -1411,6 +1483,7 @@ a.tool span {
 }
 .reverse {
 	float: left;
+	margin-top: calc(70px / 2);
 	margin-top: calc(var(--thumbwidth) / 2);
 	max-height: 50%;
 	top: 0;
