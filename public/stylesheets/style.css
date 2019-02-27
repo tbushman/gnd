@@ -219,7 +219,9 @@ button, a[role="button"], input[type="submit"] {
 	background-color: var(--primary);
 	padding: 8px;
 }
-
+a.leaflet-control-zoom-in, a.leaflet-control-zoom-out {
+	padding: 0;
+}
 circle {
 	pointer-events: auto;
 	cursor: grab;
@@ -942,6 +944,7 @@ div.dashboard .menu {
 
 	background-color: rgb(238, 244, 222);
 	margin: 0 auto;
+	border: 1px dotted #555;
 }
 .maincanvas.topRight {
 	display: block;
