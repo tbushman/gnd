@@ -367,10 +367,10 @@ router.get('/', function (req, res) {
 		if (req.isAuthenticated()) {
 			req.session.userId = req.user._id;
 			req.session.loggedin = req.user.username;
-			if (req.user.admin) {
-				return res.redirect('/api/publish')
-			}
-			return res.redirect('/home')
+			// if (req.user.admin) {
+			// 	return res.redirect('/api/publish')
+			// }
+			return res.redirect('/sig/editprofile')
 			
 		} else {
 			return res.redirect('/home');
