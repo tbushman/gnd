@@ -67,7 +67,7 @@ passport.use(new SlackStrategy({
 	// passReqToCallback: true
 },
 function(accessToken, refreshToken, profile, done) {
-	console.log(accessToken, refreshToken, profile)
+	// console.log(accessToken, refreshToken, profile)
 	Publisher.find({}, function(err, data){
 		if (err) {
 			return done(err)
@@ -94,7 +94,7 @@ function(accessToken, refreshToken, profile, done) {
 						
 					} else {
 						user = new Publisher({
-							admin: false,
+							admin: (profile.team.domain === 'saltlakedsa'),
 							sig: [],
 							username: profile.displayName.replace(/\s/g, '_'),
 							email: profile.user.email,
