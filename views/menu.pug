@@ -1,13 +1,13 @@
 - var keys = ["substrates", "filling"]
 div.grid-left#tl
-	a.mainmenu.img.accordion(v-if="(doc && doc.properties && type === 'draw' && pu && loggedin === pu.username)", href="#", title="Save", id="save", aria-labelledby="continue", 
+	a.mainmenu.img.accordion.ui(v-if="(doc && doc.properties && type === 'draw' && pu && loggedin === pu.username)", href="#", title="Save", id="save", aria-labelledby="continue", 
 		@click="saveSignature()"
-		style="background-color:var(--highlight);")
+		style="background-color:var(--highlight);width: 60px;height: 60px;margin-top: -30px;margin-left: -12px;")
 		//- img.i(src="/images/icons/check.svg")
-		.ui(style="pointer-events: none;width:36px;height:36px;")
+		//- (style="pointer-events: none;width: 60px;height: 60px;top: -20px;margin-top: -25px;margin-left: -12px;")
 			
-			svg(version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve")
-				polygon(points="90.991,34.149 82.271,25.428 42.738,64.961 17.73,39.953 9.008,48.674 42.714,82.38 ")
+		svg(version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve")
+			polygon(points="90.991,34.149 82.271,25.428 42.738,64.961 17.73,39.953 9.008,48.674 42.714,82.38 ")
 
 	a.dropdown.mainmenu.img.accordion(v-else href="#" title="Menu" @click="dropdown($event)" :class="(dd ? 'selected ' + (!type ? 'blog' : type) : (!type ? 'blog' : type))")
 		//- img.i(src="/images/menu_button.svg")

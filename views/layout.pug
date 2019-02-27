@@ -123,7 +123,7 @@ html
 							self.signaturePad = new SignaturePad(self.$refs.canv, {
 								onEnd: async function() {
 									var ctx = self.$refs.canv.getContext('2d');
-									ctx.font = '12px sans-serif';
+									ctx.font = '13px sans-serif';
 									
 									var ts = '/'+self.pu.properties.givenName+'/'+moment().utc().format();
 									await ctx.clearRect(23, 132, 300, 32);
@@ -464,7 +464,7 @@ html
 								//- 	(!self.doc.geometry.coordinates[0] ? -111.8910 : self.doc.geometry.coordinates[0])
 								//- ]
 															//- ).getCenter(),
-							zoomControl: false, 
+							//- zoomControl: false, 
 							zoom: 6,//(!self.position ? 6 : self.position.zoom), 
 							minZoom: 4,	maxZoom: 18,
 							editable: true,//(self.pu && self.pu.admin),
@@ -472,7 +472,7 @@ html
 							preferCanvas: true
 						});
 						//- console.log(map)
-						L.control.zoom({ position:'bottomleft' }).addTo(map);
+						//- L.control.zoom({ position:'bottomleft' }).addTo(map);
 						var opts = { 
 							attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
 							renderer: L.canvas({padding:0.5}),

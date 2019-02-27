@@ -510,6 +510,15 @@ router.get('/logout', function(req, res, next) {
 	})	
 });
 
+router.get('/auth/slack', passport.authenticate('slack'));
+ 
+router.get('/auth/slack/callback',
+  passport.authenticate('slack', { failureRedirect: '/login' }),
+  (req, res) => {
+		req.session.userId = req.user._id;
+		req.session.loggedin = req.user.username;
+		res.redirect('/');
+});
 
 router.post('/reserve/:givenName', function(req, res, next){
 	req.session.givenName = decodeURIComponent(req.params.givenName);

@@ -16,6 +16,9 @@ var schema = new Schema({
 	sig: [],
 	geometry: Schema.Types.Polygon,
 	admin: Boolean,
+	slack: {
+		oauthID: String
+	},
 	properties: {
 		place: String,
 		placetype: String,
