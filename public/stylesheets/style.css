@@ -10,7 +10,7 @@
 	--windowmenu: 85%; 
 	--nowindowmenu: 15%; 
 } 
-
+[v-cloak] {display: none}
 @page { 
 	margin: 0.5in 0.75in 0.5in 0.75in; 
 	mso-page-orientation: portrait; 
