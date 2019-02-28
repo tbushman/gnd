@@ -1307,7 +1307,10 @@ a.tool span {
 .module.dropdown:hover, .module.dropdown:focus {
 	background-color: #fff;
 }
-
+.module:hover span, .module:hover path, .module:hover polygon {
+	font-weight: 500;
+	fill: tomato;
+}
 #tllabels {
 	height: 100%;
 }

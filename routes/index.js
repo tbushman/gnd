@@ -111,6 +111,7 @@ function geoLocate(ip, zoom, cb) {
 			position = {lat: 34.0723, lng: -118.2437, zoom: zoom };
 		} else {
 			position = { lng: data.location.lng, lat: data.location.lat, zoom: zoom };	
+			console.log(position)
 		}
 		cb(position);
 	

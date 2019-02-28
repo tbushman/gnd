@@ -1,7 +1,7 @@
 div.grid-right
 	div.tb-u-100
-		p.tb-font-xl Connect using Slack:
-		a(href="/auth/slack", ariaDescription="Sign in with Slack", style="display:block;height:auto;")
+		p.tb-font-xl(v-if="!pu") Connect using Slack:
+		a.tb-font-xl(v-if="!pu", href="/auth/slack", ariaDescription="Sign in with Slack", style="display:block;height:auto;")
 			img(src="https://api.slack.com/img/sign_in_with_slack.png")
 		p &nbsp
 		p.tb-font-xl Your information:

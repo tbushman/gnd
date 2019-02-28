@@ -24,10 +24,13 @@ block content
 				include datagallery.pug
 			div(v-else)
 				p.tb-font-s(v-text="'Signed documents will appear here.'")
-		div.grid-container(:class="type", v-else-if="data && menu !== 'pu'")
+		div.grid-container(:class="type", v-else-if="data && menu !== 'pu' && data[0]")
 			//- - menu = 'home'
 			include menu.pug
 			include datagallery.pug
+		div.grid-container(:class="type", v-else-if="data && menu !== 'pu' && !data[0]")
+			include menu.pug
+			p.tb-font-s(v-text="'Signed documents will appear here.'")
 		div.grid-container(:class="type", v-else-if="menu === 'doc'")
 			include menu.pug
 			include docgallery.pug
