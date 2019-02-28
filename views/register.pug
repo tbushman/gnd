@@ -8,5 +8,12 @@ block content
 		include includes/header.pug
 		div.grid-container(class="blog", v-cloak)
 			include menu.pug
+			div.grid-header
+				p.tb-font-xl Connect using Slack:
+				p &nbsp
+				a.tb-font-xl(href="/auth/slack", ariaDescription="Sign in with Slack", style="display:block;height:auto;")
+					img(src="https://api.slack.com/img/sign_in_with_slack.png")
+				p &nbsp
+
 			include includes/puedit.pug
 			#response

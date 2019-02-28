@@ -1,9 +1,5 @@
 div.grid-right
 	div.tb-u-100
-		p.tb-font-xl(v-if="!pu") Connect using Slack:
-		a.tb-font-xl(v-if="!pu", href="/auth/slack", ariaDescription="Sign in with Slack", style="display:block;height:auto;")
-			img(src="https://api.slack.com/img/sign_in_with_slack.png")
-		p &nbsp
 		p.tb-font-xl Your information:
 		div#registersection(style="height:auto;overflow-y:hidden;")
 			form#form(enctype="multipart/form-data", method="POST", :action="(menu === 'register' ? '/register' : (pu && pu.username !== loggedin ? '/sig/editprofile' : null))", style="margin-bottom: 50px")
