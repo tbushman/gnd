@@ -122,6 +122,7 @@ html
 							var self = this;
 							self.signaturePad = new SignaturePad(self.$refs.canv, {
 								onEnd: async function() {
+									self.$refs.canv.style['letter-spacing'] = '0px'
 									var ctx = self.$refs.canv.getContext('2d');
 									ctx.font = '12px serif';
 									
