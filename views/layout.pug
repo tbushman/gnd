@@ -123,7 +123,7 @@ html
 							self.signaturePad = new SignaturePad(self.$refs.canv, {
 								onEnd: async function() {
 									var ctx = self.$refs.canv.getContext('2d');
-									ctx.font = '13px sans-serif';
+									ctx.font = '12px serif';
 									
 									var ts = '/'+self.pu.properties.givenName+'/'+moment().utc().format();
 									await ctx.clearRect(23, 132, 300, 32);
