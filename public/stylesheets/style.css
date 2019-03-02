@@ -568,8 +568,9 @@ a.accordion:hover .ui path, a.accordion:hover .ui polygon {
 	display: grid;
 	grid-template-columns: auto minmax(-webkit-max-content, 0px) minmax(100%, 180px);
 	grid-template-columns: auto minmax(max-content, 0px) minmax(100%, 180px);
-	grid-template-rows: minmax(-webkit-max-content, 70px) minmax(-webkit-max-content, 100%) 70px;
-	grid-template-rows: minmax(-webkit-max-content, var(--thumbwidth)) minmax(-webkit-max-content, 100%) var(--thumbwidth);
+	grid-template-rows: 70px calc(100% - 140px) calc(70px * 1.5);
+	grid-template-rows: minmax(-webkit-max-content, 70px) minmax(-webkit-max-content, 100%) calc(70px * 1.5);
+	grid-template-rows: minmax(-webkit-max-content, var(--thumbwidth)) minmax(-webkit-max-content, 100%) calc(var(--thumbwidth) * 1.5);
 	grid-template-rows: minmax(max-content, var(--thumbwidth)) minmax(max-content, 100%) calc(var(--thumbwidth) * 1.5);
 	background-color: rgba(255,255,255,0);
 	background-image: radial-gradient(circle at calc(var(--thumbwidth) / 2) 0, rgba(255, 255, 255, 0) calc(var(--thumbwidth) / 2.5), rgba(255, 255, 255, 0.9) calc(var(--thumbwidth) / 2.5));
@@ -808,6 +809,7 @@ a.grid-header:hover {
 	margin-top: 0;
 }
 .grid-footer {
+	display: grid;
 	grid-area: footer;
 	background-color: #fff;
 	height: auto;
@@ -817,8 +819,11 @@ a.grid-header:hover {
 }
 @supports not (display:grid) {
 	.grid-footer {
-		display: inline-block;
+		display: block;
 		width: 100%;
+		position: fixed;
+		bottom: 0;
+		top:auto;
 	}
 }
 
@@ -1066,7 +1071,7 @@ div.dropdown {
 	background-color: #fbfdf0;
 	width: 180px;
 	z-index: 2;
-	position: absolute;
+	position: fixed;
 	display: none;
 }
 div.dropdown.selected {

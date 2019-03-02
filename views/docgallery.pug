@@ -21,12 +21,12 @@ if (menu === 'doc')
 				option(value="null", v-text="'Latest'", v-bind:selected="!dfi")
 				option(v-if="doc.properties.diffs", v-for="(date, k) in doc.properties.diffs", :selected="dfi === k", v-bind:value="k", v-text="date.user.username + ' | ' + moment(date.date).format('YYYY-MM-DD mm:ss')")
 
-	div.grid-right(style="padding: 6px 6px 0 0")
+	div.grid-right(style="padding: 6px 6px 0 0; height: calc(100% - 70px); position:absolute;")
 		div.grid-header
 			div.centerall
 				p.tb-font-xl(v-if="doc && doc.properties" v-text="doc.properties.title")
 	
-		div.tb-10-m0.docframe(style="padding: 6px 0;")
+		div.tb-10-m0.docframe(style="padding: 6px 0;overflow-y:auto;")
 			div.tb-11-m0(v-if="dfi && doc.properties.diffs[dfi]")
 				span(v-if="doc.properties.diffs[dfi-1]", v-html="htmldiff(doc.properties.diffs[dfi-1].str, doc.properties.diffs[dfi].str)")
 				span(v-else-if="doc.properties.diffs[dfi].str && doc.properties.description", v-html="htmldiff(doc.properties.description, doc.properties.diffs[dfi].str)")
