@@ -185,6 +185,20 @@ app.use(function(req, res, next) {
 	res.locals.session = req.session;
 	next();
 });
+// app.use(multer({ 
+// 	onFileUploadComplete: async function (file) {
+// 		console.log(file.fieldname + ' uploaded to  ' + file.path);
+// 		// Encrypt file.
+// 		var CryptoJS = require('crypto-js');
+// 		const secret = process.env.CJSPW;
+// 		const hash = await CryptoJS.AES.encrypt(file, secret);
+// 
+// 		encryptor.encryptFile(file, 'encryptedFile.dat', key, function(err) {
+// 			// Encryption complete.remove original file
+//        fs.unlink(file);
+//      });
+//    }
+// }));
 app.get(/^(\/|\/register$|\/login$|\/api\/new|\/api\/editcontent)/, csrfProtection);
 // ensure multer parses before csrf
 app.post(/^(\/register$|\/login$|\/api\/editcontent)/, upload.array(), parseBody, csrfProtection);

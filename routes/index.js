@@ -1102,7 +1102,7 @@ router.get('/api/new/:chind', async function(req, res, next){
 	});
 });
 
-router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img')/*, csrfProtection*/, function(req, res, next){
+router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfProtection, function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath, req.file)
 	Content.findOne({_id: req.params.did}, function(err, doc){

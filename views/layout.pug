@@ -430,6 +430,7 @@ html
 						var self = this;
 						var fd = new FormData();
 						self.signatureToBlob(function(blob){
+							
 							fd.append('img', blob);
 							fd.append('_csrf', '#{csrfToken}');
 							fd.append('ts', self.ts);
