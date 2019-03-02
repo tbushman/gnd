@@ -37,6 +37,7 @@ var htmlDiffer = new HtmlDiffer({
 dotenv.load();
 var upload = multer();
 var csrfProtection = csrf({ cookie: true });
+
 var geolocation = require ('google-geolocation') ({
 	key: process.env.GOOGLE_KEY
 });
@@ -450,6 +451,10 @@ router.post('/register', function(req, res, next) {
 	// })
 
 });
+
+router.get('/publishers/*', function(req, res, next){
+	return res.redirect('/login');
+})
 
 router.get('/login', function(req, res, next){
 	
@@ -1097,7 +1102,7 @@ router.get('/api/new/:chind', async function(req, res, next){
 	});
 });
 
-router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfProtection, function(req, res, next){
+router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img')/*, csrfProtection*/, function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath, req.file)
 	Content.findOne({_id: req.params.did}, function(err, doc){

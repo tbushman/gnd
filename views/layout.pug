@@ -11,6 +11,7 @@ html
 		link(rel="stylesheet", href="/stylesheets/leaflet.draw.css")
 		script(type="text/javascript", src="/scripts/jquery.min.js")
 		//- script(src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js")
+		script(src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js")
 		script(type="text/javascript", src="/scripts/vue.min.js")
 		script(type="text/javascript", src="/scripts/vue-pick-a-date.js")
 		script(type="text/javascript", src="/scripts/marked.min.js")
@@ -44,6 +45,7 @@ html
 			Vue.prototype.SignaturePad = SignaturePad;
 			Vue.prototype.tinymce = tinymce;
 			Vue.prototype.htmldiff = htmldiff;
+			Vue.prototype.CryptoJS = CryptoJS;
 			Vue.use(DatePicker);
 			new Vue({ el: '#select',
 				data() {
