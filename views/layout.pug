@@ -129,7 +129,6 @@ html
 									ctx.font = '12px serif';
 									
 									var ts = '/'+self.pu.properties.givenName+'/'+moment().utc().format();
-									await ctx.clearRect(23, 132, 300, 32);
 									//- ctx.fillStyle = 'rgba(0,0,0,0)';
 									ctx.beginPath();
 									//- ctx.fillRect(23, 132, 300, 32);
@@ -142,16 +141,32 @@ html
 									
 								},
 								onBegin: function() {
-									
+									// clear timestamp only
+									var ctx = self.$refs.canv.getContext('2d');
+									ctx.clearRect(23, 123, 277, 32);
+
 								}
 							});
 						},
+						methods: {
+							clearCanv(){
+								var self = this;
+								var ctx = self.$refs.canv.getContext('2d');
+								ctx.clearRect(0, 0, 300, 150);
+								
+							}
+						},
 						template: 
 						//- '#signaturepad'
-						`<canvas
+						`
+						<div class="row" style="text-align: center;">
+						<canvas
 							id="maincanvas"
 							ref="canv"
-						></canvas>`
+						></canvas>
+						<a role="button" @click="clearCanv" title="Clear signature" v-text="'Clear signature'"></a>
+						</div>
+						`
 					}
 				},
 				updated() {
@@ -194,6 +209,7 @@ html
 					//- 	self.did = 0;
 					//- 	//- self.doc = (!self.data ? (!self.dat ? '': self.dat[0][0]) : self.data[0]);
 					//- }
+					//- console.log(self.$components.canvasc.$refs.canv)
 					if (self.pu && self.pu.properties.time) {
 						self.beginDate = moment(self.pu.properties.time.begin).utc().format();
 						self.endDate = moment(self.pu.properties.time.end).utc().format();
