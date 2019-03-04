@@ -241,7 +241,7 @@ function ensureContent(req, res, next) {
 			return next(err)
 		}
 		if (data.length === 0) {
-			return res.redirect('/api/new/'+0+'')
+			return res.redirect('/api/new/All/'+115+'/'+0+'')
 		} else {
 			return next()
 		}
@@ -606,7 +606,7 @@ router.get('/home', getDat, function(req, res, next) {
 				}
 				if (data.length === 0) {
 					
-					if (pu && pu.admin) return res.redirect('/api/new/'+0+'');
+					if (pu && pu.admin) return res.redirect('/api/new/All/'+115+'/'+0+'');
 					if (!pu) return res.redirect('/sig/editprofile');
 				}
 				return res.render('publish', {
@@ -957,30 +957,15 @@ router.get('/api/exportword/:id', function(req, res, next){
 	
 })
 
-router.get('/api/new/:chind', async function(req, res, next){
+router.get('/api/new/:state/:tiind/:chind', async function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
-	var coastlines = //await //JSON.stringify(
-		require(''+path.join(__dirname, '/..')+'/public/json/coastlines.json').features
-	//);
-	// console.log(coastlines)
-	var keys = await Object.keys(coastlines[0])
-	// var multiPolygon = [
-	// 	[[ -153.5, 18 ], [ -153.5, 21 ], [ -157, 21 ], [ -157, 18 ], [ -153.5, 18 ]]
-	// ]
-	// console.log(keys);
-	var multiPolygon = await coastlines.map(function(ft) {
-		if (Array.isArray(ft.geometry.coordinates)) {
-			// console.log(ft.geometry.coordinates)
-			return ft.geometry.coordinates			
-		} else {
-			console.log('doh')
-			console.log(ft)
-			return;
-		}
-	});
+	var usstates = //await //JSON.stringify(
+		require(''+path.join(__dirname, '/..')+'/public/json/usstates.json').features;
+	var multiPolygon = usstates.filter(function(p){
+		return p.properties.name === req.params.state
+	})[0];
+	
 	const sanitize = require('sanitize-html');
-	// console.log(multiPolygon)
-	//if (!multiPolygon) return res.redirect('/logout')
 	var hRes = //await JSON.stringify(
 		//require(
 			await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/txt/gnd.txt', 'utf8');
@@ -1033,36 +1018,60 @@ router.get('/api/new/:chind', async function(req, res, next){
 		if (err) {
 			return next(err)
 		}
-		Content.find({'chapter.ind': parseInt(req.params.chind)}, async function(err, chunk){
+		Content.find({'title.ind': parseInt(req.params.tiind, 10)}, async function(err, chunk){
 			if (err) {
 				return next(err)
 			}
-			if (chunk.length) return res.redirect('/');
+			// if (chunk.length) return res.redirect('/');
+			var chind = parseInt(req.params.chind, 10),
+			tiind = parseInt(req.params.tiind, 10); 
+			var title, place, titleind, titlestr, chapterind, chapterstr, sectionind, sectionstr;
+			if (isNaN(tiind)) {
+				titleind = 99999;
+				titlestr = 'Petition';
+				chapterind = chunk.length;
+				chapterstr = 'Document';
+				sectionind = 0;
+				sectionstr = '';
+				title = 'Edit petition title';
+				place = req.params.state;
+				
+			} else {
+				titleind = (115 + chunk.length);
+				titlestr = 'United States Congress';
+				chapterind = (chunk.length === 0 ? 0 : chunk[0].chapter.ind );
+				chapterstr = (chunk.length === 0 ? 'Session' : chunk[0].chapter.str );
+				sectionind = (chunk.length === 0 ? 108 : (108 + chunk.length));
+				sectionstr = (chunk.length === 0 ? 'H. RES.' : chunk[0].section.str);
+				title = (chunk.length === 0 ? 'Recognizing the duty of the Federal Government to create a Green New Deal.' : chunk[0].properties.title);
+				place = (chunk.length === 0 ? 'United States' : 'Edit Place')
+			}
 			await fs.copySync(''+path.join(__dirname, '/..')+'/public/images/publish_logo_sq.svg', ''+publishers+'/pu/publishers/gnd/images/thumbs/'+(data.length)+'/thumb_0.png')
 			await fs.copySync(''+path.join(__dirname, '/..')+'/public/images/publish_logo_sq.svg', ''+publishers+'/pu/publishers/gnd/images/full/'+(data.length)+'/img_0.png')
+			
 			var content = await new Content({
 				type: 'Feature',
 				index: data.length,
 				// db
 				title: {
-					ind: (115 + chunk.length),
-					str: 'United States Congress' 
+					ind: titleind,
+					str: titlestr 
 				},
 				chapter: {
-					ind: (chunk.length === 0 ? 0 : chunk[0].chapter.ind ),
-					str: (chunk.length === 0 ? 'Session' : chunk[0].chapter.str )
+					ind: chapterind,
+					str: chapterstr
 				},
 				section: {
-					ind: (chunk.length === 0 ? 108 : (108 + chunk.length)),
-					str: (chunk.length === 0 ? 'H. RES.' : chunk[0].section.str) 
+					ind: sectionind,
+					str: sectionstr 
 				},
 				properties: {
-					section: (115 + chunk.length)+'.'+(chunk.length === 0 ? '109' : (108 + chunk.length)),
+					section: (titleind+'.'+sectionind),
 					published: true,
 					// label: (chunk.length === 0 ? 'Recognizing the duty of the Federal Government to create a Green New Deal.' : chunk[0].properties.label)
 					// 'Edit Subtitle',
-					title: (chunk.length === 0 ? 'Recognizing the duty of the Federal Government to create a Green New Deal.' : chunk[0].properties.title),
-					place: (chunk.length === 0 ? 'United States' : 'Edit Place'),
+					title: title,
+					place: place,
 					description: marked(desc),
 					// current: false,
 					time: {
@@ -1072,14 +1081,8 @@ router.get('/api/new/:chind', async function(req, res, next){
 				},
 				geometry: {
 					type: 'Polygon',
-					coordinates: 
-						// JSON.stringify(
-						// sample data TODO United States polygon
-							[[[ -153.5, 18 ], [ -153.5, 21 ], [ -157, 21 ], [ -157, 18 ], [ -153.5, 18 ]]]
-						// )
-					//JSON.parse(JSON.stringify(
-						//multiPolygon
-					//))
+					coordinates: multiPolygon.geometry.coordinates
+						
 				}
 			});
 			// console.log(content.geometry)
