@@ -813,26 +813,32 @@ router.get('/sig/editprofile', function(req, res, next){
 router.post('/sig/editprofile', function(req, res, next){
 	var body = req.body;
 	var username = req.user.username;
-	//console.log(Object.keys(body))
+	
 	asynk.waterfall([
 		function(next) {
 			var imgurl = ''+publishers+'/publishers/'+ req.user.username +'/images/avatar/'+ req.user.username + '.png';
-			if (body.avatar.substring(0,1) !== "/") {
-				var imgbuf = new Buffer(body.avatar, 'base64'); // decode
-				var pd = (process.env.NODE_ENV === 'production' ? process.env.PD.toString() :  process.env.DEVPD.toString())
+			var pd = (process.env.NODE_ENV === 'production' ? process.env.PD.toString() :  process.env.DEVPD.toString())
+			if (body.avatar) {
+				if (body.avatar.substring(0,1) !== "/") {
+					var imgbuf = new Buffer(body.avatar, 'base64'); // decode
 
-				fs.writeFile(imgurl, imgbuf, function(err) {
-					if (err) {
-						console.log("err", err);
-					}
-					
+					fs.writeFile(imgurl, imgbuf, function(err) {
+						if (err) {
+							console.log("err", err);
+						}
+						
+						imgurl = imgurl.replace(pd, '')
+						next(null, imgurl, body)
+					})
+				} else {
 					imgurl = imgurl.replace(pd, '')
 					next(null, imgurl, body)
-				})
+				}
 			} else {
 				imgurl = imgurl.replace(pd, '')
 				next(null, imgurl, body)
 			}
+			
 			
 		},
 		function(imgurl, body, next) {
