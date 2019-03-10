@@ -22,6 +22,9 @@ html(xmlns:v="urn:schemas-microsoft-com:vml", xmlns:o='urn:schemas-microsoft-com
 					
 					table(cellspacing="0px", style="width: 100%;table-layout: fixed;overflow:hidden;")
 						tr#chapter
+							th &nbsp 
+							th &nbsp 
+						tr
 							td(style="padding: 0;")
 								div(style="clear:both!important;")
 									h2
@@ -35,8 +38,9 @@ html(xmlns:v="urn:schemas-microsoft-com:vml", xmlns:o='urn:schemas-microsoft-com
 											span #{(doc.section.ind + 1)}
 										span &nbsp
 											span.bd #{doc.section.str}
+							td &nbsp 
 						tr#chapter
-							td(style="padding: 0;")
+							td(style="padding: 0;", colspan="2")
 								p !{doc.properties.description}
 					
 						tr#chapter
