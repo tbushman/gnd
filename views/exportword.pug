@@ -22,10 +22,11 @@ html(xmlns:v="urn:schemas-microsoft-com:vml", xmlns:o='urn:schemas-microsoft-com
 					
 					table(cellspacing="0px", style="width: 100%;table-layout: fixed;overflow:hidden;")
 						tr#chapter
-							th &nbsp 
-							th &nbsp 
+							th(scope="col") &nbsp 
+							th(scope="col") &nbsp 
+							th(scope="col") &nbsp 
 						tr
-							td(style="padding: 0;")
+							td(style="padding: 0;", colspan="3")
 								div(style="clear:both!important;")
 									h2
 										span.bd #{(doc.title.ind + 1)}
@@ -38,20 +39,17 @@ html(xmlns:v="urn:schemas-microsoft-com:vml", xmlns:o='urn:schemas-microsoft-com
 											span #{(doc.section.ind + 1)}
 										span &nbsp
 											span.bd #{doc.section.str}
-							td &nbsp 
-						tr#chapter
-							td(style="padding: 0;", colspan="2")
+						tr
+							td(style="padding: 0;", colspan="3")
 								p !{doc.properties.description}
 					
-						tr#chapter
-							td(style="padding: 0;")
+						tr
+							td(style="padding: 0;", colspan="1")
 								if (sig && sig.length > 0)
 									each si, s in sig
 										div.img.tb-02-m0(style="margin-top:10px;")
 											img(src= si.image)
 											p(style="color:black;font-size:5pt;") #{si.ts}
-							td(style="padding:0;")
-								p.tb-font-xxs &nbsp
 
 			div#f1(style="mso-element:footer;")
 				p.MsoFooter
