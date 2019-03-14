@@ -30,7 +30,41 @@ div.grid-left#tl
 				.ui
 					img(src="/images/icons/home.svg")
 				span.tb-font-l Documents
-			
+			// :href="'/api/new/'+doc._id"
+			a.module.dropdown(v-if="pu && pu.admin", @click="toggleMenu($event)")
+				.ui
+					img(src="/images/icons/add.svg")
+				span.tb-font-l Add
+			div.slidedown.row(v-if="placemenu")
+				//http://localhost:7878/api/new//json/usstates.json/[object%20Object]/99999/null/Test%20Petition%20title%20here.
+				form.tb-10-m0(
+					enctype="multipart/form-data", method="POST", 
+					:action="'/api/new/'+newDoc.placetype+'/'+newDoc.place+'/'+newDoc.tiind+'/'+newDoc.chind+'/'+encodeURIComponent(newDoc.chtitle)+''", 
+					style="margin-bottom: 50px"
+				)
+					label(for="placetype") Type of jurisdiction
+					//- input(id="placetype", v-model="newDoc.placetype", name="placetype")
+					//@change="changePlaceType($event)", 
+					//v-model="newDoc.placetype", 
+					select#placetype(style="pointer-events: all;", name="placetype",@change="changePlaceType($event)")
+						option(value="null", v-text="'None'", v-bind:selected="!newDoc.placetype")
+						option(v-for="(pl, p) in placetypes", v-text="pl.name", :value="pl.url")
+					label(for="placetype") Jurisdiction
+					//v-model="newDoc.place.id",
+					select#place(style="pointer-events: all;", @change="changePlaceNew($event)", name="place")
+						option(value="null", v-text="'None'", v-bind:selected="!newDoc.tempGeo || !newDoc.tempGeo[0]")
+						option(v-if="newDoc.tempGeo[0]", v-for="(geo, i) in newDoc.tempGeo", v-text="geo.properties.name", :value="geo.id")
+
+					//- input(id="place", v-model="newDoc.place")
+					input(type="hidden", v-model="newDoc.tiind")
+					input(type="hidden", v-model="newDoc.chind")
+					label(for="placetype") Petition Title
+					input(id="chtitle", v-model="newDoc.chtitle")
+					button(role="submit") Create
+					//- a.module(:href="'/api/new/'+newDoc.placetype+'/'+newDoc.place+'/'+newDoc.tiind+'/'+newDoc.chind+'/'+newDoc.chtitle+''", title="home")
+					//- 	.ui
+					//- 		img(src="/images/icons/new.svg")
+					//- 	span.tb-font-l Documents
 			a.module(v-if="doc && pu && pu.admin", :href="'/api/editcontent/'+doc._id")
 				.ui
 					svg(version="1.1" id="Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"

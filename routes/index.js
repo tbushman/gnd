@@ -241,7 +241,7 @@ function ensureContent(req, res, next) {
 			return next(err)
 		}
 		if (data.length === 0) {
-			return res.redirect('/api/new/All/'+115+'/'+0+'')
+			return res.redirect('/api/new/Nation/'+0+'/'+115+'/'+0+'/Session')
 		} else {
 			return next()
 		}
@@ -606,7 +606,7 @@ router.get('/home', getDat, function(req, res, next) {
 				}
 				if (data.length === 0) {
 					
-					if (pu && pu.admin) return res.redirect('/api/new/All/'+115+'/'+0+'');
+					if (pu && pu.admin) return res.redirect('/api/new/Nation/'+0+'/'+115+'/'+0+'/Session');
 					if (!pu) return res.redirect('/sig/editprofile');
 				}
 				return res.render('publish', {
@@ -963,19 +963,40 @@ router.get('/api/exportword/:id', function(req, res, next){
 	
 })
 
-router.get('/api/new/:state/:tiind/:chind', async function(req, res, next){
+
+router.all('/api/new/:placetype/:place/:tiind/:chind/:chtitle', async function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
 	var usstates = //await //JSON.stringify(
 		require(''+path.join(__dirname, '/..')+'/public/json/usstates.json').features;
-	var multiPolygon = usstates.filter(function(p){
-		return p.properties.name === req.params.state
-	})[0];
+	// var uscounties = 
+	// 	require(''+path.join(__dirname, '/..')+'/public/json/uscounties.json').features;
+	var us = 
+		require(''+path.join(__dirname, '/..')+'/public/json/us.json').features;
+	var places;
+	switch(req.params.placetype) {
+		case 'Nation':
+			places = us;
+			break;
+		case 'State':
+			places = usstates;
+			break;
+		case 'County':
+			places = uscounties;
+			break;
+		default:
+			places = usstates;
+	}
+	var placeind = parseInt(req.params.place, 10)
+	var multipolygon = places[placeind];
+	// var multiPolygon = places.filter(function(p){
+	// 	return p.properties.name === req.params.place
+	// })[0];
 	
 	const sanitize = require('sanitize-html');
 	var hRes = //await JSON.stringify(
 		//require(
 			await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/txt/gnd.txt', 'utf8');
-	const desc = sanitize(hRes, {
+	var desc = sanitize(hRes, {
 		allowedTags: [
 			'a',
 			'b',
@@ -1032,16 +1053,17 @@ router.get('/api/new/:state/:tiind/:chind', async function(req, res, next){
 			var chind = parseInt(req.params.chind, 10),
 			tiind = parseInt(req.params.tiind, 10); 
 			var title, place, titleind, titlestr, chapterind, chapterstr, sectionind, sectionstr;
-			if (isNaN(tiind)) {
-				titleind = 99999;
+			console.log(tiind)
+			if (tiind >= 99999) {
+				titleind = tiind;
 				titlestr = 'Petition';
 				chapterind = chunk.length;
-				chapterstr = 'Document';
+				chapterstr = req.params.chtitle;
 				sectionind = 0;
 				sectionstr = '';
 				title = 'Edit petition title';
-				place = req.params.state;
-				
+				place = multipolygon.properties.name;
+				desc = 'Edit petition text'
 			} else {
 				titleind = (115 + chunk.length);
 				titlestr = 'United States Congress';
@@ -1087,7 +1109,7 @@ router.get('/api/new/:state/:tiind/:chind', async function(req, res, next){
 				},
 				geometry: {
 					type: 'Polygon',
-					coordinates: multiPolygon.geometry.coordinates
+					coordinates: multipolygon.geometry.coordinates
 						
 				}
 			});
@@ -1101,7 +1123,7 @@ router.get('/api/new/:state/:tiind/:chind', async function(req, res, next){
 					if (err) {
 						return next(err)
 					}
-					return res.redirect('/')
+					return res.redirect('/home')
 				});
 			});
 			
@@ -1418,7 +1440,7 @@ router.post('/api/editcontent/:id', function(req, res, next){
 		if (err) {
 			return next(err)
 		}
-		return res.redirect('/');
+		return res.redirect('/home');
 	})
 	
 });

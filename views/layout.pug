@@ -102,7 +102,22 @@ html
 									this.parseObj(!{JSON.stringify(dat)}).map(function(data){return []})
 								] :
 								[[]]
-							)
+							),
+						newDoc: {},
+						placemenu: false,
+						placetypes: [{
+							name: 'Nation',
+							url: '/json/us.json'
+						},
+						{
+							name: 'State',
+							url: '/json/usstates.json'
+						}/*,
+						{
+							name: 'County',
+							url: '/json/uscounties.json'
+						}*/],
+						
 					}
 				},
 				components: {
@@ -214,7 +229,18 @@ html
 						self.beginDate = moment(self.pu.properties.time.begin).utc().format();
 						self.endDate = moment(self.pu.properties.time.end).utc().format();
 					}
-					
+					if (!self.newDoc.tiind) {
+						self.newDoc = {
+							tiind: 99999,
+							titlestr: 'Petition',
+							chind: null,
+							chtitle: 'Edit Petition Title',
+							placetype: null,
+							place: '',
+							tempGeo: []
+						}
+					}
+					console.log(self.accordions)
 					if (self.doc) {
 						if (!self.tinymce && $('#description')[0] && tinymce) {
 							console.log('shouldn\'t be')
@@ -287,6 +313,26 @@ html
 					}
 				},
 				methods: {
+					toggleMenu(e) {
+						var self= this;
+						self.placemenu = !self.placemenu;
+					},
+					changePlaceType(e) {
+						var self = this;
+						var url = e.target.value;
+						var type = (e.target.value === '/json/usstates.json' ? 'State' : (e.target.value === '/json/us.json' ? 'Nation' : null));
+						$.getJSON(url).then(function(json){
+							console.log(json)
+							self.newDoc.placetype = type;
+							self.newDoc.tempGeo = json.features;
+						})
+						.catch((err)=>console.log(err))
+					},
+					changePlaceNew(e) {
+						var self = this;
+						var ind = parseInt(e.target.value, 10);
+						self.newDoc.place = (!self.newDoc.tempGeo[ind] ? (!self.newDoc.tempGeo[self.newDoc.tempGeo.length-1] ? null : self.newDoc.tempGeo.length-1) : ind )
+					},
 					changeDiff(e) {
 						var self = this;
 						self.dfi = (!isNaN(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : null);
@@ -383,12 +429,17 @@ html
 					},
 					accordion: function(n, ind) {
 						var self = this;
-						if (self.accordions[n].indexOf(ind) === -1) {
-							self.accordions[n].push(ind);
-							self.accordions[n].sort();
+						ind = parseInt(ind, 10);
+						n = parseInt(n, 10);
+						var cAccordions = self.accordions[n];
+						console.log(n,ind, console.log(cAccordions.indexOf(ind)))
+						if (cAccordions.indexOf(ind) === -1) {
+							cAccordions.push(ind);
+							cAccordions.sort();
 						} else {
-							self.accordions[n].splice(self.accordions[n].indexOf(ind), 1);
+							cAccordions.splice(cAccordions.indexOf(ind), 1);
 						}
+						self.accordions[n] = cAccordions;
 					},
 					getCursor() {
 						var self = this;

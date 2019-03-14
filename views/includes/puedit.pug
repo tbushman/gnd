@@ -35,7 +35,7 @@ div.grid-right
 								input.ms-TextField-field(v-else, :type="'text'", name="place", id="place", aria-required="true", @blur="checkNameValidity('place', '\d!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alphabetic characters only, please', $event)", required, 
 									:value="(pu && pu.properties ? pu.properties.place : '')")
 								p &nbsp
-							p(v-if="repitem.length > 0")
+							p(v-if="repitem && repitem.length > 0")
 								label.ms-Label Title
 								select(name="title", @change="changeTitle($event)")
 									option(disabled, value="", :selected="(!pu.properties.title || pu.properties.title === '')", v-html="'Title'")
