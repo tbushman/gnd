@@ -35,7 +35,7 @@ if (menu === 'doc')
 				//- 	del(v-else-if="part.removed", v-html="marked(part.value)", style="color: 'red';")
 				//- 	span(v-else-if="part.value", v-html="marked(part.value)", style="color: 'grey';")
 			
-			span(v-else-if="!dfi", v-html="doc.properties.description")
+			span(v-else-if="!dfi", v-html="marked(doc.properties.description)")
 
 			div.row(v-if="doc.sig && doc.sig.length > 0")
 				div.tb-03-m0(v-for="(sig, s) in doc.sig")

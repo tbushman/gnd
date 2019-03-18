@@ -53,7 +53,7 @@ div.grid-left#tl
 					//v-model="newDoc.place.id",
 					select#place(style="pointer-events: all;", @change="changePlaceNew($event)", name="place")
 						option(value="null", v-text="'None'", v-bind:selected="!newDoc.tempGeo || !newDoc.tempGeo[0]")
-						option(v-if="newDoc.tempGeo[0]", v-for="(geo, i) in newDoc.tempGeo", v-text="geo.properties.name", :value="geo.id")
+						option(v-if="newDoc.tempGeo[0]", v-for="(geo, i) in newDoc.tempGeo", v-text="geo.properties.name", :value="i")
 
 					//- input(id="place", v-model="newDoc.place")
 					input(type="hidden", v-model="newDoc.tiind")

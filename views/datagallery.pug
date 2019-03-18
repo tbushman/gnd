@@ -3,17 +3,17 @@ div.grid-mid
 		
 		div(v-if="data.length > 0")
 			div
-				a(v-bind:href="'/'")
-					header.row.tb-font-l
-						span.bd(v-text="(parseInt(data[0].title.ind, 10) + 1)+'th'")
-						span(v-text="' '") 
-						span(v-text="data[0].title.str")
-
-				a(v-bind:href="'/menu/'+data[0].title.ind+'/'+data[0].chapter.ind+''")
-					header.row.tb-font-l 
-						span.bd(v-text="data[0].chapter.str")
-						span(v-text="' '")
-						span(v-text="(parseInt(data[0].chapter.ind, 10) + 1)")
+				//- a(v-bind:href="'/'")
+				//- 	header.row.tb-font-l
+				//- 		span.bd(v-text="(parseInt(data[0].title.ind, 10) + 1)+'th'")
+				//- 		span(v-text="' '") 
+				//- 		span(v-text="data[0].title.str")
+				//- 
+				//- a(v-bind:href="'/menu/'+data[0].title.ind+'/'+data[0].chapter.ind+''")
+				//- 	header.row.tb-font-l 
+				//- 		span.bd(v-text="data[0].chapter.str")
+				//- 		span(v-text="' '")
+				//- 		span(v-text="(parseInt(data[0].chapter.ind, 10) + 1)")
 			
 			section.headline.headrule(
 				v-for="(dc, i) in data",
@@ -21,15 +21,15 @@ div.grid-mid
 				style="margin-top: 15px; position:relative;")
 				a.accordion(v-on:click="accordion(n,i)")
 					div.ui
-						svg(v-bind:style="(accordions[n].indexOf(i) !== -1 ? {transform: 'rotate(180deg)'} : {transform: 'rotate(0deg)'})", xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
+						svg(v-bind:style="(accordions[n] !== undefined && accordions[n].indexOf(i) !== -1 ? {transform: 'rotate(180deg)'} : {transform: 'rotate(0deg)'})", xmlns="http://www.w3.org/2000/svg", viewBox="0 0 448 512")
 							path(d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z")
 				div.row.spacer.padder(style="position:relative;")
-					div.tb-11-m0(v-if="accordions[n].indexOf(i) !== -1")
+					div.tb-11-m0(v-if="accordions[n] !== undefined && accordions[n].indexOf(i) !== -1")
 						span(v-html="marked(dc.properties.description)")
 					
 					div.tb-11-m0.tb-07-m1.tb-font-m
 						a.href(v-bind:href="'/list/'+dc._id+'/null'", style="display:block;margin-left:50px;")
-							span(v-html="dc.section.str")
+							span(v-html="dc.chapter.str")
 							span(v-text="' '")
 							span.bd(v-if="dc.title", v-text="(parseInt(dc.title.ind, 10) + 1)+'.'+(parseInt(dc.chapter.ind, 10) + 1)+'.'+(parseInt(dc.section.ind, 10) + 1)", style="width: 100px;display:inline-block;text-indent:0;")
 							

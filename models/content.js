@@ -5,7 +5,7 @@ var mongoose = require('mongoose'),
 var schema = new Schema({
 	type: String,
 	index: Number,
-	geometry: Schema.Types.Polygon,
+	geometry: Schema.Types.GeoJSON,
 	// Congress
 	title: {
 		ind: Number,

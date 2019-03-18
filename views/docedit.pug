@@ -6,7 +6,7 @@ form#form.grid-right(
 				
 	div.grid-mid.tb-10-m0.docframe
 		label.ms-Label Description 
-		div#description(type="text", name="description", style="margin: 0 20px 0 0", v-html="doc.properties.description")
+		div#description(type="text", name="description", style="margin: 0 20px 0 0", v-html="marked(doc.properties.description)")
 		div.tb-u-100(v-if="doc.properties.footnotes", v-for="(foot, k) in doc.properties.footnotes")
 			label(v-bind:for="'footnote'+k+''", v-text="'Footnote #'+ (k+1)")
 			input.tb-font-s(type="text", v-bind:name="'footnote'+k+''", v-bind:id="'footnote'+k+''", v-bind:value="foot")

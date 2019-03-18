@@ -970,12 +970,12 @@ router.all('/api/new/:placetype/:place/:tiind/:chind/:chtitle', async function(r
 		require(''+path.join(__dirname, '/..')+'/public/json/usstates.json').features;
 	// var uscounties = 
 	// 	require(''+path.join(__dirname, '/..')+'/public/json/uscounties.json').features;
-	var us = 
-		require(''+path.join(__dirname, '/..')+'/public/json/us.json').features;
+	// var us = 
+	// 	require(''+path.join(__dirname, '/..')+'/public/json/us.json').features;
 	var places;
 	switch(req.params.placetype) {
 		case 'Nation':
-			places = us;
+			places = usstates;
 			break;
 		case 'State':
 			places = usstates;
@@ -988,6 +988,7 @@ router.all('/api/new/:placetype/:place/:tiind/:chind/:chtitle', async function(r
 	}
 	var placeind = parseInt(req.params.place, 10)
 	var multipolygon = places[placeind];
+	console.log(places[placeind])
 	// var multiPolygon = places.filter(function(p){
 	// 	return p.properties.name === req.params.place
 	// })[0];
@@ -1053,7 +1054,7 @@ router.all('/api/new/:placetype/:place/:tiind/:chind/:chtitle', async function(r
 			var chind = parseInt(req.params.chind, 10),
 			tiind = parseInt(req.params.tiind, 10); 
 			var title, place, titleind, titlestr, chapterind, chapterstr, sectionind, sectionstr;
-			console.log(tiind)
+			// console.log(tiind)
 			if (tiind >= 99999) {
 				titleind = tiind;
 				titlestr = 'Petition';
@@ -1108,7 +1109,7 @@ router.all('/api/new/:placetype/:place/:tiind/:chind/:chtitle', async function(r
 					}	
 				},
 				geometry: {
-					type: 'Polygon',
+					type: (placeind === 0 ? 'MultiPolygon' : 'Polygon'),
 					coordinates: multipolygon.geometry.coordinates
 						
 				}
@@ -1268,7 +1269,9 @@ router.post('/api/editcontent/:id', function(req, res, next){
 			// }
 			const sanitize = require('sanitize-html');
 			var descc = //removeExtras(
-				body.description
+				// marked(
+					body.description
+				// )
 			//);
 			
 			const desc = sanitize(descc, {
@@ -1359,8 +1362,8 @@ router.post('/api/editcontent/:id', function(req, res, next){
 					published: (!body.published ? false : true),
 					title: (!body.title ? doc.properties.title : marked(body.title).replace(/(<p>|<\/p>)/g,'')),
 					// label: body.label ? body.label : doc.properties.label,
-					place: body.place ? body.place : doc.properties.place,
-					description: desc ? desc : doc.properties.description,
+					place: (body.place ? body.place : doc.properties.place),
+					description: (!desc ?  doc.properties.description : marked(desc)),
 					time: {
 						begin: new Date(body.datebegin),
 						end: moment().utc().format()
