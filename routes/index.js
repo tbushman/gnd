@@ -371,17 +371,13 @@ router.get('/', function (req, res) {
 			req.session.loggedin = req.user.username;
 			// if (req.user.admin) {
 			// 	return res.redirect('/api/publish')
-			// }
-			return res.redirect('/sig/editprofile')
-			
-		} else {
-			return res.redirect('/home');
+			// }			
 		}
 
 
-	} else {
-		return res.redirect('/home')
 	}
+	return res.redirect('/home')
+	
 });
 
 
@@ -469,7 +465,7 @@ router.post('/login', passport.authenticate('local', {
 	failureRedirect: '/register'
 }), function(req, res, next) {
 	if (!req.user.admin && process.env.ADMIN.split(',').indexOf(req.user.username) !== -1) {
-		return res.redirect('/sig/admin')
+		return res.redirect('/api/publish')
 	}
 	req.session.userId = req.user._id;
 	req.session.loggedin = req.user.username;

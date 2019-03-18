@@ -29,9 +29,11 @@ div.grid-mid
 					
 					div.tb-11-m0.tb-07-m1.tb-font-m
 						a.href(v-bind:href="'/list/'+dc._id+'/null'", style="display:block;margin-left:50px;")
+							span(v-html="((/(Edit\ petition\ title)/g).test(dc.properties.title) ? '' : dc.properties.title)")
+							span(v-text="' '")
 							span(v-html="dc.chapter.str")
 							span(v-text="' '")
-							span.bd(v-if="dc.title", v-text="(parseInt(dc.title.ind, 10) + 1)+'.'+(parseInt(dc.chapter.ind, 10) + 1)+'.'+(parseInt(dc.section.ind, 10) + 1)", style="width: 100px;display:inline-block;text-indent:0;")
+							span.bd(v-if="dc.title && dc.title.ind < 99999", v-text="(parseInt(dc.title.ind, 10) + 1)+'.'+(parseInt(dc.chapter.ind, 10) + 1)+'.'+(parseInt(dc.section.ind, 10) + 1)", style="width: 100px;display:inline-block;text-indent:0;")
 							
 					div.tb-11-m0.tb-03-m1
 						div(v-if="dc.properties")

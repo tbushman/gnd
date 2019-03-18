@@ -24,7 +24,7 @@ if (menu === 'doc')
 	div.grid-right(style="padding: 6px 6px 0 0; height: calc(100% - 70px); position:absolute;")
 		div.grid-header
 			div.centerall
-				p.tb-font-xl(v-if="doc && doc.properties" v-text="doc.properties.title")
+				p.tb-font-xl(v-if="doc && doc.properties" v-text="((/(Edit\ petition\ title)/g).test(doc.properties.title) ? '' : doc.properties.title)")
 	
 		div.tb-10-m0.docframe(style="padding: 6px 0;overflow-y:auto;")
 			div.tb-11-m0(v-if="dfi && doc.properties.diffs[dfi]")
