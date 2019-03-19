@@ -1302,7 +1302,8 @@ router.post('/api/editcontent/:id', function(req, res, next){
 					'br'
 					// ,
 					// 'span'
-				]
+				],
+				selfClosing: ['br']
 				// ,
 				// allowedAttributes: {
 				// 	'a': ['href', 'id', 'target'],
@@ -1360,7 +1361,7 @@ router.post('/api/editcontent/:id', function(req, res, next){
 					title: (!body.title ? doc.properties.title : marked(body.title).replace(/(<p>|<\/p>)/g,'')),
 					// label: body.label ? body.label : doc.properties.label,
 					place: (body.place ? body.place : doc.properties.place),
-					description: (!desc ?  doc.properties.description : marked(desc)),
+					description: (!desc ?  doc.properties.description : desc),
 					time: {
 						begin: new Date(body.datebegin),
 						end: moment().utc().format()
