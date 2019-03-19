@@ -1298,7 +1298,8 @@ router.post('/api/editcontent/:id', function(req, res, next){
 					'td',
 					'th',
 					'tr',
-					'caption'
+					'caption',
+					'br'
 					// ,
 					// 'span'
 				]
