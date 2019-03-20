@@ -1149,14 +1149,14 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 			if (!new RegExp(req.params.puid).test(pu._id)) return res.redirect('/login');
 			// console.log(req.ip)
 			var reqIp;
-			if (cf.check(req)) //CF
-			{
-				reqIp = cf.get(req);
-			}
-				else //not CF
-			{	
+			// if (cf.check(req)) //CF
+			// {
+			// 	reqIp = cf.get(req);
+			// }
+			// 	else //not CF
+			// {	
 				reqIp = req.ip;
-			}
+			// }
 
 			geoLocate(reqIp, 6, function(position){
 				// console.log(posiiton)
