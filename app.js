@@ -38,7 +38,7 @@ var csrfProtection = csrf({ cookie: true });
 
 var app = express();
 if (app.get('env') === 'production') {
-	app.set('trust proxy', 1); // trust first proxy	
+	app.set('trust proxy', true); // trust first proxy	
 	app.use(cors());
 	app.options('*', cors());
 	app.use(function(req, res, next) {
@@ -146,6 +146,19 @@ passport.deserializeUser(function(id, done) {
 	});
 });
 
+var store = new MongoDBStore(
+	{
+		mongooseConnection: mongoose.connection,
+		uri: process.env.DEVDB,
+		collection: 'gndSession',
+		autoRemove: 'interval',     
+		autoRemoveInterval: 3600
+	}
+)
+store.on('error', function(error, next){
+	console.log(error, next)
+	next(error)
+});
 
 var sess = {
 	secret: process.env.SESSIONSECRET,
@@ -224,21 +237,9 @@ var promise = mongoose.connect(uri, {
 	useMongoClient: true
 	// authMechanism: 'ScramSHA1'
 });
-var store = new MongoDBStore(
-	{
-		mongooseConnection: mongoose.connection,
-		uri: process.env.DEVDB,
-		collection: 'gndSession',
-		autoRemove: 'interval',     
-		autoRemoveInterval: 3600
-	}
-)
 promise.then(function(db){
 	db.on('error', console.error.bind(console, 'connection error:'));
-	store.on('error', function(error, next){
-		console.log(error, next)
-		next(error)
-	});
+	
 
 })
 //var db = mongoose.connection;
