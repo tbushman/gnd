@@ -110,11 +110,12 @@ function geoLocate(ip, zoom, cb) {
 		if (err) {
 			console.log(err)
 			position = {lat: 34.0723, lng: -118.2437, zoom: zoom };
+			cb(position);
 		} else {
 			position = { lng: data.location.lng, lat: data.location.lat, zoom: zoom };	
 			console.log(position)
+			cb(position);
 		}
-		cb(position);
 	
 	})
 }
@@ -1142,7 +1143,9 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 				return next(err)
 			}
 			if (!new RegExp(req.params.puid).test(pu._id)) return res.redirect('/login');
+			// console.log(req.ip)
 			geoLocate(req.ip, 6, function(position){
+				// console.log(posiiton)
 				var signature = new Signature({
 					ts: ''+position.lat+','+position.lng+'G'+req.body.ts+'',//new Date(),
 					puid: pu._id,
