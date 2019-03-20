@@ -186,14 +186,6 @@ html
 				},
 				updated() {
 					var self = this;
-					//- if (!self.signature) 
-					//- if (!self.signaturePad) self.signaturePad = self.$refs.canv
-					//- if (self.pu && self.pu.properties.title) {
-					//- 
-					//- 	self.changePlace({
-					//- 		target: {value:self.pu.properties.title}
-					//- 	});
-					//- }
 				},
 				mounted() {
 					var self = this;
@@ -211,20 +203,6 @@ html
 						return doc.index;
 					}) : [(!self.doc || self.doc === '' ? 0 : self.doc.index)] );
 					self.dids.sort();
-					//- if (!self.doc) {
-					//- 	if (self.data) {
-					//- 		self.doc = self.data[0]
-					//- 		console.log(self.doc)
-					//- 	} else {
-					//- 		if (self.dat[0]) {
-					//- 			self.data = [].concat.apply([], self.dat);
-					//- 		}
-					//- 	}
-					//- 	self.dids = [self.doc.index];
-					//- 	self.did = 0;
-					//- 	//- self.doc = (!self.data ? (!self.dat ? '': self.dat[0][0]) : self.data[0]);
-					//- }
-					//- console.log(self.$components.canvasc.$refs.canv)
 					if (self.pu && self.pu.properties.time) {
 						self.beginDate = moment(self.pu.properties.time.begin).utc().format();
 						self.endDate = moment(self.pu.properties.time.end).utc().format();
@@ -255,29 +233,9 @@ html
 								valid_elements: '*[*]',
 								forced_root_block: '',
 								force_br_newlines : false,
-								//- force_p_newlines : false,
 								convert_newlines_to_brs: false,
 								remove_redundant_brs: false,
-								//- fix_list_elements: true,
-								//- setup: function (editor) {
-								//- 	editor.addButton('footnote', {
-								//- 		text: 'Add footnote',
-								//- 		icon: 'link',
-								//- 		onclick: function(){
-								//- 			self.doc.properties.footnotes.push(
-								//- 				''
-								//- 			);
-								//- 			editor.insertContent('<a v-if="doc.properties.footnotes && doc.properties.footnotes['+(self.doc.properties.footnotes.length - 1)+']" href="ftnref'+(self.doc.properties.footnotes.length)+'"><span class="super">'+(self.doc.properties.footnotes.length)+'</span></a>')
-								//- 			//editor.insertContent('<span v-if="doc.properties.footnotes && doc.properties.footnotes['+(self.doc.properties.footnotes.length - 1)+']" class="super">'+(self.doc.properties.footnotes.length)+'</span>')
-								//- 			$('#footnote'+self.doc.properties.footnotes.length - 1).focus()
-								//- 		}
-								//- 	})
-								//- },
-								//custom_ui_selector: '.footnote_button',
-								//- toolbar: 'bold italic underline | bullist numlist | outdent indent',
 								selection_toolbar: 'bold italic | bullist numlist | outdent indent | subscript superscript'
-								//selectiion_toolbar: 'undo redo | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify alignnone | outdent indent blockquote | subscript superscript | bullist numlist | link unlink | table',
-								//table_toolbar: "tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol"
 								
 
 							});
@@ -293,15 +251,10 @@ html
 							//- var point = self.map.latLngToLayerPoint(new L.LatLng(self.doc.geometry.coordinates[0], self.doc.geometry.coordinates[1]))
 							var bounds = self.dataLayer.getBounds();
 							self.map.fitBounds(bounds);
-							console.log(dataLayer)
+							//- console.log(dataLayer)
 							if (dataLayer)
 								self.dataLayer.enableEdit();
 							self.lMarker = L.marker(self.map.getCenter(), {draggable: true}).addTo(self.map);
-							//- if (!self.image && self.doc) {
-							//- 	self.drawImg(function(img){
-							//- 		self.img = img;
-							//- 	});
-							//- }//- self.panZoom();
 							
 						})
 					}
@@ -460,6 +413,7 @@ html
 						Vue.set(self.can, i, can)
 						Vue.set(self.ts, 0, ts)
 						//- self.can = val;
+						//- console.log(self.ts, self.can)
 					},
 					updateSignature(index, url) {
 						Vue.set(this.signatureDataUris, 0, url);
@@ -502,6 +456,8 @@ html
 							fd.append('img', blob);
 							fd.append('_csrf', '#{csrfToken}');
 							fd.append('ts', self.ts);
+							//- console.log(self.ts, self.can)
+
 							var uploadurl = '/sig/uploadsignature/'+self.doc._id+'/'+self.pu._id+'';
 							console.log(blob)
 							$.ajax({

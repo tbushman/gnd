@@ -38,6 +38,7 @@ var csrfProtection = csrf({ cookie: true });
 
 var app = express();
 if (app.get('env') === 'production') {
+	app.enable('trust proxy');
 	app.set('trust proxy', true); // trust first proxy	
 	app.use(cors());
 	app.options('*', cors());

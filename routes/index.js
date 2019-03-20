@@ -16,6 +16,7 @@ var spawn = require("child_process").exec;
 var dotenv = require('dotenv');
 var marked = require('marked');
 var pug = require('pug');
+var cf = require('node_cloudflare');
 var Publisher = require('../models/publishers.js');
 var Content = require('../models/content.js');
 var Signature = require('../models/signatures.js');
@@ -1144,7 +1145,17 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 			}
 			if (!new RegExp(req.params.puid).test(pu._id)) return res.redirect('/login');
 			// console.log(req.ip)
-			geoLocate(req.ip, 6, function(position){
+			var reqIp;
+			if (cf.check(req)) //CF
+			{
+				reqIp = cf.get(req);
+			}
+				else //not CF
+			{	
+				reqIp = req.ip;
+			}
+
+			geoLocate(reqIp, 6, function(position){
 				// console.log(posiiton)
 				var signature = new Signature({
 					ts: ''+position.lat+','+position.lng+'G'+req.body.ts+'',//new Date(),
