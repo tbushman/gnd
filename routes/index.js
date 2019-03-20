@@ -178,6 +178,9 @@ var storage = multer.diskStorage({
 					
 				})
 			} else {
+				if (err)
+					console.log('eaccess err')
+					console.log(err)
 				cb(null, p)
 			}
 		})
