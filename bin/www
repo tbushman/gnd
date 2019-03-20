@@ -20,16 +20,16 @@ app.set('port', port);
 
 var server = http.createServer(app);
 /* Cloudflare check */
-// var cf = require('node_cloudflare');
-// cf.load(function (error, fs_error)
-// {
-// 	if (fs_error)
-// 	{
-// 		throw new Error(fs_error);
-// 	}
+var cf = require('node_cloudflare');
+cf.load(function (error, fs_error)
+{
+	if (fs_error)
+	{
+		throw new Error(fs_error);
+	}
   server.listen(port);
 	console.log('Server running.');
-// });
+});
 
 /**
 * Listen on provided port, on all network interfaces.

@@ -16,6 +16,7 @@ var spawn = require("child_process").exec;
 var dotenv = require('dotenv');
 var marked = require('marked');
 var pug = require('pug');
+var cf = require('node_cloudflare');
 var Publisher = require('../models/publishers.js');
 var Content = require('../models/content.js');
 var Signature = require('../models/signatures.js');
@@ -1148,14 +1149,14 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 			if (!new RegExp(req.params.puid).test(pu._id)) return res.redirect('/login');
 			// console.log(req.ip)
 			var reqIp;
-			// if (cf.check(req)) //CF
-			// {
-			// 	reqIp = cf.get(req);
-			// }
-			// 	else //not CF
-			// {	
+			if (cf.check(req)) //CF
+			{
+				reqIp = cf.get(req);
+			}
+				else //not CF
+			{	
 				reqIp = req.ip;
-			// }
+			}
 
 			geoLocate(reqIp, 6, function(position){
 				// console.log(posiiton)
@@ -1617,6 +1618,5 @@ router.post('/api/deletemedia/:id/:index', function(req, res, next) {
 		})	
 	})
 });
-// var cf = require('node_cloudflare');
 
 module.exports = router;
