@@ -16,7 +16,6 @@ var spawn = require("child_process").exec;
 var dotenv = require('dotenv');
 var marked = require('marked');
 var pug = require('pug');
-var requestIp = require('request-ip');
 var Publisher = require('../models/publishers.js');
 var Content = require('../models/content.js');
 var Signature = require('../models/signatures.js');
