@@ -16,7 +16,6 @@ var spawn = require("child_process").exec;
 var dotenv = require('dotenv');
 var marked = require('marked');
 var pug = require('pug');
-var cf = require('node_cloudflare');
 var Publisher = require('../models/publishers.js');
 var Content = require('../models/content.js');
 var Signature = require('../models/signatures.js');
@@ -1618,5 +1617,6 @@ router.post('/api/deletemedia/:id/:index', function(req, res, next) {
 		})	
 	})
 });
+var cf = require('node_cloudflare');
 
 module.exports = router;
