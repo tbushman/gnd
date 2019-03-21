@@ -97,7 +97,7 @@ async function geoLocate(ip, zoom, cb) {
 	var exec = util.promisify(spawn);
 	// var arp = 
 	const {stdout, stderr} = await exec('ip -6 neigh');
-	var mac;
+	var mac, dat;
 	// await arp.stdout.on('data', function(dat){
 		// dat += '';
 		// dat = dat.split('\n');
