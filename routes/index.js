@@ -96,7 +96,7 @@ async function geoLocate(ip, zoom, cb) {
 	const util = require('util');
 	var exec = util.promisify(spawn);
 	// var arp = 
-	const {stdout, stderr} = await exec('ip', ['-6', 'neigh']))
+	const {stdout, stderr} = await exec('ip', ['-6', 'neigh']);
 	var mac;
 	// await arp.stdout.on('data', function(dat){
 		// dat += '';
