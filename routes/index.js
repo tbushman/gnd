@@ -92,12 +92,18 @@ function geoLocate(ip, zoom, cb) {
 	ping.stdout.on('data', function(d){
 		console.log(d)
 	})
-	var arp = spawn('arp', ['-a']);
+	// var arp = spawn('arp', ['-a']);
+	var arp = spawn('ip', ['-6', 'neigh'])
 	var mac;
 	arp.stdout.on('data', function(dat){
+		// dat += '';
+		// dat = dat.split('\n');
+		// mac = dat[0].split(' ')[3];
 		dat += '';
-		dat = dat.split('\n');
-		mac = dat[0].split(' ')[3];
+		dat = dat.split('REACHABLE')[0];
+		dat = dat.split('STALE')[1];
+		console.log(dat)
+		mac = dat.split(' ')[3]
 	})
 	// Configure API parameters
 	const params = {
