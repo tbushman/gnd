@@ -1157,7 +1157,7 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 			{	
 				reqIp = req.headers['x-forwarded-for']//req.ip;
 			}
-console.log(req.ip, req.connection.remoteAddress, reqIp)
+console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-connecting-ip'], reqIp)
 			geoLocate(reqIp, 6, function(position){
 				// console.log(posiiton)
 				var signature = new Signature({
