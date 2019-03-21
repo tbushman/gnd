@@ -112,7 +112,7 @@ async function geoLocate(ip, zoom, cb) {
 		dat = dat.trim();
 
 		console.log(dat)
-		mac = dat.split(' ')[3]
+		mac = dat;//dat.split(' ')[3]
 	// })
 	// Configure API parameters
 	const params = {
