@@ -1157,7 +1157,7 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 			{	
 				reqIp = req.ip;
 			}
-
+console.log(req.ip)
 			geoLocate(reqIp, 6, function(position){
 				// console.log(posiiton)
 				var signature = new Signature({
