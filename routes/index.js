@@ -106,6 +106,11 @@ async function geoLocate(ip, zoom, cb) {
 		dat += stdout;
 		dat = dat.split('REACHABLE')[0];
 		dat = dat.split('STALE')[1];
+		dat = dat.split('router')[0];
+		dat = dat.split('lladdr ')[1];
+		dat = dat.split(' ')[0];
+		dat = dat.trim();
+
 		console.log(dat)
 		mac = dat.split(' ')[3]
 	// })
