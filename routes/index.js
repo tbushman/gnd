@@ -1185,15 +1185,15 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 			geoLocate(reqIp, 6, async function(position){
 				// console.log(posiiton)  
 				
-				var zipcodes = await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/json/us_zcta.json', 'utf8').features;
-console.log(zipcodes)
-				if (position.lat === 37.09024) {
-					var zipcode = zipcodes.filter(function(zip){
-						return (zip.properties.ZCTA5CE10 === pu.properties.place)
-					});
-					position.lat = parseFloat(zipcode[0].properties["INTPTLAT10"]);
-					position.lng = parseFloat(zipcode[0].properties["INTPTLON10"]);
-				}
+// 				var zipcodes = await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/json/us_zcta.json', 'utf8').features;
+// console.log(zipcodes)
+// 				if (position.lat === 37.09024) {
+// 					var zipcode = zipcodes.filter(function(zip){
+// 						return (zip.properties.ZCTA5CE10 === pu.properties.place)
+// 					});
+// 					position.lat = parseFloat(zipcode[0].properties["INTPTLAT10"]);
+// 					position.lng = parseFloat(zipcode[0].properties["INTPTLON10"]);
+// 				}
 				var signature = new Signature({
 					ts: ''+position.lat+','+position.lng+'G'+req.body.ts+'',//new Date(),
 					puid: pu._id,
