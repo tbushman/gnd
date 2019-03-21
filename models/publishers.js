@@ -14,7 +14,7 @@ var schema = new Schema({
 	language: String,
 	email: String,
 	sig: [],
-	geometry: Schema.Types.Polygon,
+	geometry: Schema.Types.GeoJSON,
 	admin: Boolean,
 	slack: {
 		oauthID: String

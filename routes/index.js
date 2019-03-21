@@ -96,7 +96,13 @@ async function geoLocate(ip, zoom, cb) {
 	const util = require('util');
 	var exec = util.promisify(spawn);
 	// var arp = 
-	const {stdout, stderr} = await exec('ip -6 neigh');
+	var command;
+	if (process.env.NODE_ENV === 'production') {
+		command = 'ip -6 neigh'
+	} else {
+		command = '/usr/local/Cellar/iproute2mac/1.2.2/bin/ip -6 neigh'
+	}
+	const {stdout, stderr} = await exec(command);
 	var mac, dat;
 	// await arp.stdout.on('data', function(dat){
 		// dat += '';
@@ -104,14 +110,17 @@ async function geoLocate(ip, zoom, cb) {
 		// mac = dat[0].split(' ')[3];
 		dat += '';
 		dat += stdout;
-		dat = dat.split('REACHABLE')[0];
-		dat = dat.split('STALE')[1];
-		dat = dat.split('router')[0];
-		dat = dat.split('lladdr ')[1];
-		dat = dat.split(' ')[0];
-		dat = dat.trim();
+		if (!dat) {
+			
+		} else {
+			dat = dat.split('REACHABLE')[0];
+			dat = (!dat.split('STALE')[1] ? dat : dat.split('STALE')[1]);
+			dat = dat.split('router')[0];
+			dat = (!dat.split('lladdr ')[1]  ? dat : dat.split('lladdr ')[1]);
+			dat = dat.split(' ')[0];
+			dat = dat.trim();
+		}
 
-		console.log(dat)
 		mac = dat;//dat.split(' ')[3]
 	// })
 	// Configure API parameters
@@ -1172,9 +1181,19 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 			{	
 				reqIp = req.headers['x-forwarded-for']//req.ip;
 			}
-console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-connecting-ip'], reqIp)
-			geoLocate(reqIp, 6, function(position){
-				// console.log(posiiton)
+// console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-connecting-ip'], reqIp)
+			geoLocate(reqIp, 6, async function(position){
+				// console.log(posiiton)  
+				
+				var zipcodes = await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/json/us_zcta.json', 'utf8').features;
+console.log(zipcodes)
+				if (position.lat === 37.09024) {
+					var zipcode = zipcodes.filter(function(zip){
+						return (zip.properties.ZCTA5CE10 === pu.properties.place)
+					});
+					position.lat = parseFloat(zipcode[0].properties["INTPTLAT10"]);
+					position.lng = parseFloat(zipcode[0].properties["INTPTLON10"]);
+				}
 				var signature = new Signature({
 					ts: ''+position.lat+','+position.lng+'G'+req.body.ts+'',//new Date(),
 					puid: pu._id,
