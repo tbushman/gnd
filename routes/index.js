@@ -1173,14 +1173,14 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 			if (!new RegExp(req.params.puid).test(pu._id)) return res.redirect('/login');
 			// console.log(req.ip)
 			var reqIp;
-			if (cf.check(req)) //CF
+			/*if (cf.check(req)) //CF
 			{
 				reqIp = cf.get(req);
 			}
 				else //not CF
-			{	
+			{	*/
 				reqIp = req.headers['x-forwarded-for']//req.ip;
-			}
+			// }
 // console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-connecting-ip'], reqIp)
 			geoLocate(reqIp, 6, async function(position){
 				// console.log(posiiton)  
