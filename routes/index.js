@@ -240,8 +240,11 @@ async function ensureGndIsUs(req, res, next) {
 		return g.properties.name === 'us'
 	});
 	var set = {$set: {}};
-	var key = 'geometry.coordinates';
-	set.$set[key] = geo[0].geometry.coordinates;
+	var key = 'geometry';
+	set.$set[key] = {
+		type: 'MultiPolygon',
+		coordinates: geo[0].geometry.coordinates
+	};
 	Content.findOne({'title.ind': 115}, function(err, doc){
 		if (err) {
 			return next(err)
