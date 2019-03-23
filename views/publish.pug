@@ -15,6 +15,10 @@ block page
 block content
 	
 	div#select(:class="type", style="pointer-events: auto;")
+		div#modal(:style="{display: (!modal.msg ? 'none' : 'block')}")
+			p.tb-font-s(v-text="modal.msg")
+			input(:id="modal.id", v-model="modal.zip")
+			button(@click="submitZip($event)", v-text="'submit'")
 		include includes/header.pug
 
 		div.grid-container(:class="type" v-if="dat && dat[0] && dat[0][0]")

@@ -1159,6 +1159,79 @@ router.all('/api/new/:placetype/:place/:tiind/:chind/:chtitle', async function(r
 	});
 });
 
+router.get('/sig/geo/:did/:puid/:ts', function(req, res, next){
+	console.log('huzzah')
+	Publisher.findOne({_id: req.params.puid}, function(err, pu){
+		if (err){
+			return next(err)
+		}
+		if (!new RegExp(req.params.puid).test(req.session.userId)) return res.redirect('/login');
+		Content.findOne({_id: req.params.did}, function(err, doc){
+			if (err) {
+				return next(err)
+			}
+			return res.render('publish', {
+				doc: doc,
+				pu: pu,
+				ts: [req.params.ts],
+				type: 'blog', //'blog' //'map'
+				menu: 'doc' //home, login, register, data, doc, pu?
+			})
+		})
+	})
+})
+
+router.post('/sig/geo/:did/:puid/:lat/:lng/:ts/:zip', async function(req, res, next){
+	var outputPath = url.parse(req.url).pathname;
+	console.log(outputPath)
+	var lat = req.params.lat;
+	var lng = req.params.lng;
+	var puid = ''+req.params.puid+'';
+	var did = req.params.did;
+	if (!lat || lat === 'null') {
+		var zipcodes = await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/json/us_zcta.json', 'utf8');
+		var zipcode = JSON.parse(zipcodes).features.filter(function(zip){
+			return (parseInt(zip.properties['ZCTA5CE10'], 10) === parseInt(req.params.zip, 10))
+		});
+		if (zipcode.length === 0) return res.redirect('/sig/geo/'+did+'/'+puid+'/'+req.params.ts+'');
+		lat = parseFloat(zipcode[0].properties["INTPTLAT10"]);
+		lng = parseFloat(zipcode[0].properties["INTPTLON10"]);
+	}
+	console.log(puid)
+	Publisher.findOne({_id: puid}).lean().exec(function(err, pu){
+		if (err) {
+			return next(err)
+		}
+		// console.log(pu)
+		var signature = new Signature({
+			ts: ''+lat+','+lng+'G/'+pu.properties.givenName+'/'+req.params.ts+'',//new Date(),
+			puid: puid,
+			username: pu.username,
+			givenName: pu.properties.givenName,
+			documentId: did,	
+			image: '/publishers/gnd/signatures/'+did+'/'+puid+'/img_'+did+'_'+puid+'.png',
+			image_abs: ''+publishers+'/pu/publishers/gnd/signatures/'+did+'/'+puid+'/img_'+did+'_'+puid+'.png'
+		});
+		var push = {$push:{}};
+		var key = 'sig';
+		push.$push[key] = JSON.parse(JSON.stringify(signature))
+		signature.save(function(err){
+			if (err) {
+				if (err.code === 11000) req.session.info = 'Unable to save signature.'
+				else return next(err)
+			} 
+			Publisher.findOneAndUpdate({_id: pu._id}, push, {safe: true, new:true}, function(err, pu){
+				if (err){
+					return next(err)
+				}
+				return res.status(200).send('/list/'+did+'/'+null+'')
+			})
+			
+		})
+	})
+	
+})
+
 router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfProtection, function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath, req.file)
@@ -1181,19 +1254,15 @@ router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfPr
 			{	*/
 				reqIp = req.headers['x-forwarded-for']//req.ip;
 			// }
-// console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-connecting-ip'], reqIp)
+console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-connecting-ip'], reqIp)
+			// if (!reqIp) {
+			// 	console.log(req.ip)
+			// 	return res.redirect('/sig/geo/'+doc._id+'/'+pu._id+'/'+req.body.ts+'');
+			// }
 			geoLocate(reqIp, 6, async function(position){
-				// console.log(posiiton)  
-				
-// 				var zipcodes = await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/json/us_zcta.json', 'utf8').features;
-// console.log(zipcodes)
-// 				if (position.lat === 37.09024) {
-// 					var zipcode = zipcodes.filter(function(zip){
-// 						return (zip.properties.ZCTA5CE10 === pu.properties.place)
-// 					});
-// 					position.lat = parseFloat(zipcode[0].properties["INTPTLAT10"]);
-// 					position.lng = parseFloat(zipcode[0].properties["INTPTLON10"]);
-// 				}
+				if (position.lat === 37.09024) {
+					return res.status(200).send('/sig/geo/'+doc._id+'/'+pu._id+'/'+req.body.ts.split('/')[req.body.ts.split('/').length-1]+'')
+				}
 				var signature = new Signature({
 					ts: ''+position.lat+','+position.lng+'G'+req.body.ts+'',//new Date(),
 					puid: pu._id,

@@ -260,7 +260,7 @@ i, .i {
 	bottom: calc(50% - 70px);
 	bottom: calc(50% - var(--thumbwidth));
 	top: auto;
-	display: inline-block;
+	/* display: inline-block; */
 	z-index: 2;
 	background: #fff;
 	padding: calc(70px/2);
