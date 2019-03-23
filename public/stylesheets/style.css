@@ -265,7 +265,8 @@ i, .i {
 	background: #fff;
 	padding: calc(70px/2);
 	padding: calc(var(--thumbwidth)/2);
-
+	-webkit-box-shadow: 0 0 2px #000;
+	box-shadow: 0 0 2px #000;
 }
 .avatar {
 	max-width: 250px;

@@ -53,9 +53,6 @@ marked.setOptions({
 
 
 var curly = function(str){
-	//console.log(/\\n/g.test(str))
-	//console.log(str.match(/\s/g))
-	//console.log(str.match(/\"/g))
 	if (!str){
 		return ''
 	} else {
@@ -87,15 +84,12 @@ var curly = function(str){
 
 
 async function geoLocate(ip, zoom, cb) {
-	// console.log(ip)
-	var ping = spawn('ping', [ip]);
+	const util = require('util');
+	var exec = util.promisify(spawn);
+	var ping = await exec('ping', [ip]);
 	ping.stdout.on('data', function(d){
 		console.log(d)
 	})
-	// var arp = spawn('arp', ['-a']);
-	const util = require('util');
-	var exec = util.promisify(spawn);
-	// var arp = 
 	var command;
 	if (process.env.NODE_ENV === 'production') {
 		command = 'ip -6 neigh'
@@ -104,10 +98,6 @@ async function geoLocate(ip, zoom, cb) {
 	}
 	const {stdout, stderr} = await exec(command);
 	var mac, dat;
-	// await arp.stdout.on('data', function(dat){
-		// dat += '';
-		// dat = dat.split('\n');
-		// mac = dat[0].split(' ')[3];
 		dat += '';
 		dat += stdout;
 		if (!dat) {
@@ -134,7 +124,7 @@ async function geoLocate(ip, zoom, cb) {
 	geolocation(params, function(err, data) {
 		if (err) {
 			console.log(err)
-			position = {lat: 34.0723, lng: -118.2437, zoom: zoom };
+			position = {lat: 37.09024, lng: -95.712891, zoom: zoom };
 			cb(position);
 		} else {
 			position = { lng: data.location.lng, lat: data.location.lat, zoom: zoom };	
@@ -155,21 +145,6 @@ var storage = multer.diskStorage({
 			if (req.params.type === 'png') {
 				p = ''+publishers+'/pu/publishers/gnd/images/full/'+req.params.index+''
 				q = ''+publishers+'/pu/publishers/gnd/images/thumbs/'+req.params.index+''
-
-			// } else if (req.params.type === 'csv') {
-			// 	p = ''+publishers+'/pu/publishers/gnd/csv/'+req.params.id+''
-			// 	q = ''+publishers+'/pu/publishers/gnd/csv/thumbs/'+req.params.id+''
-			// 
-			// } else if (req.params.type === 'txt') {
-			// 	p = ''+publishers+'/pu/publishers/gnd/txt'
-			// 	q = ''+publishers+'/pu/publishers/gnd/txt/thumbs'
-			// } else if (req.params.type === 'doc') {
-			// 	var os = require('os');
-			// 	p = os.tmpdir() + '/gdoc';
-			// 	q = ''+publishers+'/pu/publishers/gnd/tmp';
-			// } else if (req.params.type === 'docx') {
-			// 	p = ''+publishers+'/pu/publishers/gnd/docx'
-			// 	q = null;//''+publishers+'/pu/publishers/gnd/word/thumbs'
 			} else {
 				p = ''+publishers+'/pu/publishers/gnd/images/full/'+req.params.index+''
 				q = ''+publishers+'/pu/publishers/gnd/images/thumbs/'+req.params.index+''
@@ -213,12 +188,7 @@ var storage = multer.diskStorage({
 	filename: function (req, file, cb) {
 		if (req.params.type === 'png') {
 			cb(null, 'img_' + req.params.counter + '.png')
-		// } else if (req.params.type === 'csv') {
-		// 	cb(null, 'csv_' + req.params.id + '.csv')
-		// } else if (req.params.type === 'txt') {
-		// 	cb(null, 'txt_' + Date.now() + '.txt')
-		// } else if (req.params.type === 'docx') {
-		// 	cb(null, 'docx_'+Date.now()+'.docx')
+
 		} else if (req.params.type === 'svg') {
 			cb(null, 'docx_'+Date.now()+'.svg')
 		} else {
@@ -262,6 +232,33 @@ function emptyDirs(index, next) {
 			next()
 		})
 	})
+}
+
+async function ensureGndIsUs(req, res, next) {
+	var us = await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/json/usstates.json', 'utf8');
+	var geo = await JSON.parse(us).features.filter(function(g){
+		return g.properties.name === 'us'
+	});
+	var set = {$set: {}};
+	var key = 'geometry.coordinates';
+	set.$set[key] = geo[0].geometry.coordinates;
+	Content.findOne({'title.ind': 115}, function(err, doc){
+		if (err) {
+			return next(err)
+		}
+		if (!Array.isArray(doc.geometry.coordinates[0][0][0]) || doc.geometry.coordinates[0][0][0][0] !== geo[0].geometry.coordinates[0][0][0][0]) {
+			Content.findOneAndUpdate({'title.ind': 115}, set, {new: true, safe:true}, function(err, doc){
+				if (err) {
+					return next(err)
+				}
+				return next()
+			})
+		} else {
+			return next()
+		}
+		
+	})
+	
 }
 
 function ensureContent(req, res, next) {
@@ -392,7 +389,7 @@ function mkdirpIfNeeded(p, cb){
 
 //if logged in, go to your own profile
 //if not, go to global profile (home)
-router.get('/', function (req, res) {
+router.get('/', ensureGndIsUs, function (req, res) {
 	if (!req.session.info) req.session.info = '';
 	if (req.session.loggedin) {
 		if (req.isAuthenticated()) {
@@ -607,18 +604,6 @@ router.post('/panzoom/:lat/:lng/:zoom', function(req, res, next){
 	
 });
 
-// router.get('/api/init', function(req, res, next){
-// 	Publisher.findOne({_id: req.session.userId, admin: true}, function(err, pu){
-// 		if (err) {
-// 			cb(err);
-// 		}
-// 		if (!pu) {
-// 			return res.redirect('/')
-// 		}
-// 
-// 	})
-// })
-
 //dat
 router.get('/home', getDat, function(req, res, next) {
 	Content.find({}).sort( { index: 1 } ).exec(function(err, data){
@@ -649,7 +634,6 @@ router.get('/home', getDat, function(req, res, next) {
 
 // doc
 router.get('/list/:id/:mi', function(req, res, next){
-	// req.session.importgdrive = false;
 	Content.findOne({_id: req.params.id}).lean().exec(function(err, doc){
 		if (err) {
 			return next(err)
@@ -659,15 +643,11 @@ router.get('/list/:id/:mi', function(req, res, next){
 				return next(err)
 			}
 			if (req.isAuthenticated()) {
-				// console.log(doc)
 				var l = '/publishers/gnd/signatures/'+doc._id+'/'+req.user._id+'/img_'+doc._id+'_'+req.user._id+'.png'
 				Signature.findOne({image: l}, function(err, pud){
 					if (err) {
 						return next(err)
 					}
-					// if (!pud) console.log('blag!')
-					// else console.log('signed')
-					// console.log(pud)
 					return res.render('publish', {
 						unsigned: (!pud ? true : false),
 						csrfToken: req.csrfToken(),
@@ -681,7 +661,6 @@ router.get('/list/:id/:mi', function(req, res, next){
 					})
 				})
 			} else {
-				// console.log('not authenticated!')
 				return res.render('publish', {
 					menu: 'doc',
 					type: 'blog',
@@ -716,9 +695,6 @@ router.get('/menu/:title/:chapter', function(req, res, next){
 		
 	}
 	find[key] = val;
-	/*if (key2) {
-		find[key2] = val2;
-	}*/
 	Content.find(find).sort( { index: 1 } ).lean().exec(function(err, data){
 		if (err) {
 			return next(err)
@@ -732,7 +708,6 @@ router.get('/menu/:title/:chapter', function(req, res, next){
 		})
 		return res.render('publish', {
 			menu: 'data',
-			// dat: [data],
 			type: 'blog',
 			data: data,
 			loggedin: req.session.loggedin,
@@ -777,27 +752,27 @@ router.get('/sig/admin', function(req, res, next) {
 	}
 });
 
-router.get('/sig/publish/:id', function(req, res, next){
-	Content.find({}).sort({'properties.time.end': 1}).lean().exec(function(err, data){
-		if (err) {return next(err)}
-		Content.findOne({_id: req.params.id}, function(err, doc){
-			if (err) {return next(err)}
-			Publisher.findOne({_id: req.session.userId}, function(err, pu){
-				if (err) {
-					return next(err)
-				}
-				return res.render('publish', {
-					// data: data,
-					doc: doc,
-					pu: pu,
-					type: 'draw', //'blog' //'map'
-					drawtype: 'filling', //'substrates',
-					menu: 'sign'
-				})
-			})
-		})
-	})
-})
+// router.get('/sig/publish/:id', function(req, res, next){
+// 	Content.find({}).sort({'properties.time.end': 1}).lean().exec(function(err, data){
+// 		if (err) {return next(err)}
+// 		Content.findOne({_id: req.params.id}, function(err, doc){
+// 			if (err) {return next(err)}
+// 			Publisher.findOne({_id: req.session.userId}, function(err, pu){
+// 				if (err) {
+// 					return next(err)
+// 				}
+// 				return res.render('publish', {
+// 					// data: data,
+// 					doc: doc,
+// 					pu: pu,
+// 					type: 'draw', //'blog' //'map'
+// 					drawtype: 'filling', //'substrates',
+// 					menu: 'sign'
+// 				})
+// 			})
+// 		})
+// 	})
+// })
 
 router.get('/sig/editprofile', function(req, res, next){
 	Content.find({}).lean().sort({'properties.time.end': 1}).exec(function(err, data){
@@ -818,13 +793,10 @@ router.get('/sig/editprofile', function(req, res, next){
 				data = null
 			}
 			return res.render('publish', {
-				// dat: [data],
 				data: data,
-				// doc: doc,
 				loggedin: req.session.loggedin,
 				pu: pu,
 				type: 'blog', //'blog' //'map'
-				// drawtype: 'filling', //'substrates',
 				menu: 'pu', //home, login, register, data, doc, pu?
 				csrfToken: req.csrfToken()
 				// ,
@@ -1024,44 +996,12 @@ router.all('/api/new/:placetype/:place/:tiind/:chind/:chtitle', async function(r
 			await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/txt/gnd.txt', 'utf8');
 	var desc = sanitize(hRes, {
 		allowedTags: [
-			'a',
-			'b',
-			'p',
-			'i',
-			'em',
-			'strong',
-			'blockquote',
-			'big',
-			'small',
-			'div',
-			'h1',
-			'h2',
-			'h3',
-			'h4',
-			'h5',
-			'h6',
-			'hr',
-			'li',
-			'ol',
-			'ul',
-			'table',
-			'tbody',
-			'thead',
-			'td',
-			'th',
-			'tr',
-			'caption'
+			'a', 'b', 'p', 'i', 'em', 'strong', 'blockquote', 'big', 'small', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'li', 'ol', 'ul', 'table', 'tbody', 'thead', 'td', 'th', 'tr', 'caption'
 			// ,
 			// 'span'
-		]
-		// ,
+		],
 		// allowedAttributes: {
-		// 	'a': ['href', 'id', 'target'],
-		// 	'span': ['id'],
-		// 	'h1': ['id'],
-		// 	'h2': ['id'],
-		// 	'h3': ['id'],
-		// 	'h4': ['id']
+		// 	'a': ['href', 'id', 'target'], 'span': ['id'], 'h1': ['id'], 'h2': ['id'], 'h3': ['id'], 'h4': ['id']
 		// }
 	});
 	//)
@@ -1232,7 +1172,7 @@ router.post('/sig/geo/:did/:puid/:lat/:lng/:ts/:zip', async function(req, res, n
 	
 })
 
-router.post('/sig/uploadsignature/:did/:puid', uploadmedia.single('img'), csrfProtection, function(req, res, next){
+router.post('/sig/uploadsignature/:did/:puid'/*, rmFile*/, uploadmedia.single('img'), csrfProtection, function(req, res, next){
 	var outputPath = url.parse(req.url).pathname;
 	console.log(outputPath, req.file)
 	Content.findOne({_id: req.params.did}, function(err, doc){
@@ -1260,7 +1200,7 @@ console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-conne
 			// 	return res.redirect('/sig/geo/'+doc._id+'/'+pu._id+'/'+req.body.ts+'');
 			// }
 			geoLocate(reqIp, 6, async function(position){
-				if (position.lat === 37.09024) {
+				if (position.lat === 37.09024 || !reqIp) {
 					return res.status(200).send('/sig/geo/'+doc._id+'/'+pu._id+'/'+req.body.ts.split('/')[req.body.ts.split('/').length-1]+'')
 				}
 				var signature = new Signature({
@@ -1284,18 +1224,6 @@ console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-conne
 						if (err){
 							return next(err)
 						}
-						// console.log(pu)
-				
-						// return res.render('publish', {
-						// 	doc: doc,
-						// 	info: info,
-						// 	pu: pu,
-						// 	menu: 'doc'
-						// })
-						// return res.redirect('/list/'+doc._id+'/'+null+'');
-						
-						// TODO gts 
-						// ''+lat+','+lng+'G"\/'+pu.givenName+'\/"'+moment().utc().format()
 						return res.status(200).send('/list/'+doc._id+'/'+null+'')
 					})
 					
@@ -1305,12 +1233,6 @@ console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-conne
 	})
 });
 
-// router.post('/api/uploadmedia/:index/:counter/:type', rmFile, uploadmedia.single('img'), function(req, res, next){
-// 	var outputPath = url.parse(req.url).pathname;
-// 	console.log(outputPath, req.file)
-// 	return res.status(200).send(req.file.path)
-// 
-// });
 router.get('/api/editcontent/:id', function(req, res, next){
 	Content.findOne({_id: req.params.id}).lean().exec(function(err, doc){
 		if (err) {
@@ -1339,11 +1261,9 @@ router.post('/api/editcontent/:id', function(req, res, next){
 	var id = req.params.id;
 	var body = req.body;
 	var keys = Object.keys(body);
-	//console.log(body.lat, body.lng)
 	if (!body.description){
 		body.description = ''
 	}
-	// console.log(body)
 	asynk.waterfall([
 		function(cb){
 			
@@ -1392,34 +1312,7 @@ router.post('/api/editcontent/:id', function(req, res, next){
 			
 			const desc = sanitize(descc, {
 				allowedTags: [
-					'a',
-					'b',
-					'p',
-					'i',
-					'em',
-					'strong',
-					'blockquote',
-					'big',
-					'small',
-					'div',
-					'h1',
-					'h2',
-					'h3',
-					'h4',
-					'h5',
-					'h6',
-					'hr',
-					'li',
-					'ol',
-					'ul',
-					'table',
-					'tbody',
-					'thead',
-					'td',
-					'th',
-					'tr',
-					'caption',
-					'br'
+					'a', 'b', 'p', 'i', 'em', 'strong', 'blockquote', 'big', 'small', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'li', 'ol', 'ul', 'table', 'tbody', 'thead', 'td', 'th', 'tr', 'caption', 'br'
 					// ,
 					// 'span'
 				],
