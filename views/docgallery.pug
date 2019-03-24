@@ -43,7 +43,7 @@ if (menu === 'doc')
 					span.tb-font-s(v-text="'/'+sig.givenName+'/'")
 	div.grid-footer
 		
-		a.img(@click="initSig", title="Sign", v-if="doc && pu && pu.username === loggedin && unsigned", style="position:absolute;")
+		a.img(@click="initSig", title="Sign", v-if="signable && doc && pu && pu.username === loggedin && unsigned", style="position:absolute;")
 			.ui
 				img(src="/images/icons/edit.svg")
 			p.tb-font-xxxs.hideoverlap(v-text="'Sign to indicate support'")

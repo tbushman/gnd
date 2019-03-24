@@ -86,10 +86,12 @@ var curly = function(str){
 async function geoLocate(ip, zoom, cb) {
 	const util = require('util');
 	var exec = util.promisify(spawn);
-	var ping = await exec('ping', [ip]);
-	ping.stdout.on('data', function(d){
-		console.log(d)
-	})
+	var ping = exec('ping', -4, ip);
+	if (await ping.stdout) {
+		ping.stdout.on('data', function(d){
+			console.log(d)
+		})
+	}
 	var command;
 	if (process.env.NODE_ENV === 'production') {
 		command = 'ip -6 neigh'
@@ -635,6 +637,53 @@ router.get('/home', getDat, function(req, res, next) {
 		});
 });
 
+async function isJurisdiction(doc, pu) {
+	// var inside = require('point-in-polygon');
+	var lat, lng;
+	Publisher.findOne({_id: pu._id}).lean().exec(async function(err, pu){
+		if (err) {
+			return next(err)
+		}
+		console.log(pu)
+		//.then((pu)=>pu).catch((err)=>console.log(err));
+		// const sig = (!pu.sig[pu.sig.length-1] ? null : pu.sig[pu.sig.length-1])
+		if (!pu.sig[pu.sig.length-1]) {
+			if (pu.properties.placetype && !isNaN(parseInt(pu.properties.place, 10))) {
+				var zipcodes = await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/json/us_zcta.json', 'utf8');
+				var zipcode = JSON.parse(zipcodes).features.filter(function(zip){
+					return (parseInt(zip.properties['ZCTA5CE10'], 10) === parseInt(pu.properties.place, 10))
+				});
+				if (zipcode.length === 0) return res.redirect('/sig/geo/'+did+'/'+puid+'/'+req.params.ts+'');
+				lat = parseFloat(zipcode[0].properties["INTPTLAT10"]);
+				lng = parseFloat(zipcode[0].properties["INTPTLON10"]);
+			}
+		} else {
+			var ts = pu.sig[pu.sig.length-1].ts;
+			console.log(ts)
+			var pos = ts.split('G/')[0];
+			pos = pos.split(',');
+			pos.forEach(function(l){
+				return parseFloat(l)
+			})
+			lat = pos[0];
+			lng = pos[1];
+		}
+		// console.log(lat, lng)
+		// console.log(inside([lng,lat], doc.geometry.coordinates))
+		// return inside([lat,lng], doc.geometry.coordinates)
+		Content.findOne({_id: doc._id, geometry: {$geoIntersects: {$geometry: {type: 'Point', coordinates: [lng, lat]}}}}).lean().exec(function(err, doc){
+			if (err) {
+				return next(err)
+			}
+			if (!err && !doc) {
+				return false;
+			} else {
+				return true;
+			}
+		})
+	})
+	
+}
 // doc
 router.get('/list/:id/:mi', function(req, res, next){
 	Content.findOne({_id: req.params.id}).lean().exec(function(err, doc){
@@ -659,6 +708,7 @@ router.get('/list/:id/:mi', function(req, res, next){
 						menu: 'doc',
 						loggedin: req.session.loggedin,
 						doc: doc,
+						signable: isJurisdiction(doc, req.user),
 						mi: (!isNaN(parseInt(req.params.mi, 10)) ? parseInt(req.params.mi, 10) : null),
 						info: req.session.info
 					})
@@ -1203,6 +1253,7 @@ console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-conne
 			// 	return res.redirect('/sig/geo/'+doc._id+'/'+pu._id+'/'+req.body.ts+'');
 			// }
 			geoLocate(reqIp, 6, async function(position){
+				console.log(position)
 				if (position.lat === 37.09024 || !reqIp) {
 					return res.status(200).send('/sig/geo/'+doc._id+'/'+pu._id+'/'+req.body.ts.split('/')[req.body.ts.split('/').length-1]+'')
 				}
