@@ -18,21 +18,25 @@ div.grid-right
 					div.input-field#response(style="margin: 0 0 20px 0;")
 						span(v-text="(avail ? 'Available' : '')")
 				
+				div.tb-u-100.input-field
+					label.ms-Label(v-text="'The ZIP code you vote from'")
+					input.ms-TextField-field(type="number", name="zip", id="zip", aria-required="true", required, 
+						:value="(pu && pu.properties ? pu.properties.zip : '')")
+				div.tb-u-100.input-field
 					//div.tb-u-100.input-field
 					label.ms-Label I represent a 
-					select(@change="changePlace($event)", name="placetype", required)
+					select(@change="changePlace($event)", name="placetype")
 						option(disabled, value= "", :selected="(pu.properties.placetype === '')", v-html="'Place type'")
 						option(v-for="(item, i) in Object.keys(rep)", :value="item", :selected="(pu.properties && pu.properties.placetype === item ? 'selected' : false)", v-html="item")
 				
 					p(v-if="avail")
 						p(v-if="!pu.properties")
-
 						p(v-else-if="pu.properties.placetype !== ''")
 							div.tb-u-100.input-field(v-for="(item, i) in Object.keys(rep)", v-if="pu.properties.placetype === item")
 								label.ms-Label(v-text="'The '+item+' you represent'")
-								input.ms-TextField-field(v-if="item === 'ZIP4'", type="text", name="place", id="place", aria-required="true", @blur="checkNameValidity('ZIP4', '!@#$%^*()+=[]\\\';,./{}|\<>?:', 'Format ZIP Code as numbers separated by a dash. Example: 00000-1111', $event)", required, 
+								input.ms-TextField-field(v-if="item === 'ZIP4'", type="text", name="place", id="place", @blur="checkNameValidity('ZIP4', '!@#$%^*()+=[]\\\';,./{}|\<>?:', 'Format ZIP Code as numbers separated by a dash. Example: 00000-1111', $event)", 
 									:value="(pu && pu.properties ? pu.properties.place : '')")
-								input.ms-TextField-field(v-else, :type="'text'", name="place", id="place", aria-required="true", @blur="checkNameValidity('place', '\d!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alphabetic characters only, please', $event)", required, 
+								input.ms-TextField-field(v-else, :type="'text'", name="place", id="place", @blur="checkNameValidity('place', '\d!@#$%^*()+=-[]\\\';,./{}|\<>?:', 'Alphabetic characters only, please', $event)", 
 									:value="(pu && pu.properties ? pu.properties.place : '')")
 								p &nbsp
 							p(v-if="repitem && repitem.length > 0")

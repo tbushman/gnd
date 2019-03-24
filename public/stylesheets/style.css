@@ -184,7 +184,7 @@ form {
 form label, label {
 	color: #666;
 }
-input[type="text"], input[type="email"], input[type="password"], textarea, datalist, select {
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], textarea, datalist, select {
 	line-height: normal;
 	background-color: transparent;
 	border: none;

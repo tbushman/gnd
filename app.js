@@ -215,7 +215,7 @@ app.use(function(req, res, next) {
 // }));
 app.get(/^(\/|\/register$|\/login$|\/api\/new|\/api\/editcontent)/, csrfProtection);
 // ensure multer parses before csrf
-app.post(/^(\/register$|\/login$|\/api\/editcontent)/, upload.array(), parseBody, csrfProtection);
+app.post(/^(\/register$|\/login$|\/api\/editcontent|\/sig\/editprofile)/, upload.array(), parseBody, csrfProtection);
 
 app.use('/', routes);
 

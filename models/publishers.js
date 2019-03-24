@@ -20,6 +20,7 @@ var schema = new Schema({
 		oauthID: String
 	},
 	properties: {
+		zip: Number,
 		place: String,
 		placetype: String,
 		title: String,
