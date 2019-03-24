@@ -24,10 +24,14 @@ block content
 		div.grid-container(:class="type" v-if="dat && dat[0] && dat[0][0]")
 			//- - menu = 'home'
 			include menu.pug
-			div.grid-right(v-for="(data,n) in dat", v-bind:id="n", v-bind:key="n", v-if="data[0]")
-				include datagallery.pug
-			div(v-else)
-				p.tb-font-s(v-text="'Signed documents will appear here.'")
+			table.grid-right(cellspacing="0px", style="width: 100%;table-layout: fixed;overflow:hidden;")
+				tr(v-for="(data,n) in dat", v-bind:id="n", v-bind:key="n", v-if="data[0]", colnum="1", style="min-height:calc(var(--thumbw) * 2);max-height:100%;width:100%;")
+					td
+						include datagallery.pug
+				//div.grid-list(v-for="(data,n) in dat", v-bind:id="n", v-bind:key="n", v-if="data[0]", style="min-height:calc(var(--thumbw) * 2);max-height:100%; width:100%;")
+					//- include datagallery.pug
+				tr(v-else)
+					td.tb-font-s(v-text="'Signed documents will appear here.'")
 		div.grid-container(:class="type", v-else-if="data && menu !== 'pu' && data[0]")
 			//- - menu = 'home'
 			include menu.pug

@@ -683,6 +683,14 @@ a.accordion:hover .ui path, a.accordion:hover .ui polygon {
 		right:0;
 	}
 }
+.grid-list {
+	grid-area: mid;
+	height: auto;
+	max-height: 220px;
+	max-width: calc(100% - 70px);
+	max-width: calc(100% - var(--thumbwidth));
+	
+}
 @supports not (position:sticky){
 	.grid-header {
 		display:inline-block;

@@ -57,6 +57,7 @@
     "passport-local-mongoose": "^4.5.0",
     "passport-slack": "0.0.7",
     "passport-twitter": "^1.0.4",
+    "point-in-polygon": "^1.0.1",
     "promise": "^7.3.1",
     "pug": "^2.0.3",
     "request": "^2.88.0",

@@ -637,29 +637,31 @@ router.get('/home', getDat, function(req, res, next) {
 		});
 });
 
-async function isJurisdiction(doc, pu) {
+var isJurisdiction = async function isJurisdiction(doc, pu, cb) {
 	// var inside = require('point-in-polygon');
 	var lat, lng;
+	
 	Publisher.findOne({_id: pu._id}).lean().exec(async function(err, pu){
 		if (err) {
 			return next(err)
 		}
-		console.log(pu)
+		// console.log(pu)
 		//.then((pu)=>pu).catch((err)=>console.log(err));
 		// const sig = (!pu.sig[pu.sig.length-1] ? null : pu.sig[pu.sig.length-1])
 		if (!pu.sig[pu.sig.length-1]) {
-			if (pu.properties.placetype && !isNaN(parseInt(pu.properties.place, 10))) {
+			if (pu.properties.place && !isNaN(parseInt(pu.properties.place, 10))) {
 				var zipcodes = await fs.readFileSync(''+path.join(__dirname, '/..')+'/public/json/us_zcta.json', 'utf8');
 				var zipcode = JSON.parse(zipcodes).features.filter(function(zip){
 					return (parseInt(zip.properties['ZCTA5CE10'], 10) === parseInt(pu.properties.place, 10))
 				});
+				//prompt geolocate
 				if (zipcode.length === 0) return res.redirect('/sig/geo/'+did+'/'+puid+'/'+req.params.ts+'');
 				lat = parseFloat(zipcode[0].properties["INTPTLAT10"]);
 				lng = parseFloat(zipcode[0].properties["INTPTLON10"]);
 			}
 		} else {
 			var ts = pu.sig[pu.sig.length-1].ts;
-			console.log(ts)
+			// console.log(ts)
 			var pos = ts.split('G/')[0];
 			pos = pos.split(',');
 			pos.forEach(function(l){
@@ -670,17 +672,29 @@ async function isJurisdiction(doc, pu) {
 		}
 		// console.log(lat, lng)
 		// console.log(inside([lng,lat], doc.geometry.coordinates))
-		// return inside([lat,lng], doc.geometry.coordinates)
+		// console.log(lat,lng, doc.geometry.coordinates)
+		// var match = false;
+		// var fC = await doc.geometry.coordinates.filter(function(coord){
+		// 	console.log(inside([lng,lat], coord), inside([lat,lng], coord))
+		// 	return inside([lng,lat], coord)
+		// })
+		// console.log(fC)
+		// if (fC.length > 0 ) {
+		// 	match = true;
+		// }
+		// console.log(match)
+		// cb(match);
 		Content.findOne({_id: doc._id, geometry: {$geoIntersects: {$geometry: {type: 'Point', coordinates: [lng, lat]}}}}).lean().exec(function(err, doc){
 			if (err) {
 				return next(err)
 			}
 			if (!err && !doc) {
-				return false;
+				cb(false);
 			} else {
-				return true;
+				cb(true);
 			}
 		})
+		
 	})
 	
 }
@@ -700,18 +714,21 @@ router.get('/list/:id/:mi', function(req, res, next){
 					if (err) {
 						return next(err)
 					}
-					return res.render('publish', {
-						unsigned: (!pud ? true : false),
-						csrfToken: req.csrfToken(),
-						pu: req.user,
-						type: 'blog',
-						menu: 'doc',
-						loggedin: req.session.loggedin,
-						doc: doc,
-						signable: isJurisdiction(doc, req.user),
-						mi: (!isNaN(parseInt(req.params.mi, 10)) ? parseInt(req.params.mi, 10) : null),
-						info: req.session.info
+					isJurisdiction(doc, req.user, function(signable){
+						return res.render('publish', {
+							unsigned: (!pud ? true : false),
+							csrfToken: req.csrfToken(),
+							pu: req.user,
+							type: 'blog',
+							menu: 'doc',
+							loggedin: req.session.loggedin,
+							doc: doc,
+							signable: signable,
+							mi: (!isNaN(parseInt(req.params.mi, 10)) ? parseInt(req.params.mi, 10) : null),
+							info: req.session.info
+						})
 					})
+					
 				})
 			} else {
 				return res.render('publish', {

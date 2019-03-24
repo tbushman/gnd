@@ -353,8 +353,8 @@ html
 						if (!ob) return {properties: {placetype:'', title:'', time: {begin:moment().utc().format(), end: moment().utc().format()}}};
 						return ob;
 					},
-					parseBool: function(item) {
-						if (!item) return false;
+					parseBool(item) {
+						if (!item || item === false || item === 'false') return false;
 						return true;
 					},
 					parseStr(item) {
