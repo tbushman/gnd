@@ -455,7 +455,7 @@ router.post('/register', function(req, res, next) {
 			} else {
 				admin = false;
 			}
-			Publisher.register(new Publisher({ username : req.body.username, avatar: '/images/publish_logo_sq.svg', language: req.body.languages, admin: admin, email: req.body.email, properties: { givenName: req.body.givenName, title: req.body.title, zip: parseInt(req.body.zip, 10), place: req.body.place, placetype: req.body.placetype, time: { begin: req.body.datebegin, end: req.body.dateend } } }), req.body.password, function(err, user) {
+			Publisher.register(new Publisher({ username : req.body.username, avatar: '/images/publish_logo_sq.svg', language: req.body.languages, admin: admin, email: req.body.email, properties: { givenName: req.body.givenName, title: req.body.title, zip: req.body.zip, place: req.body.place, placetype: req.body.placetype, time: { begin: req.body.datebegin, end: req.body.dateend } } }), req.body.password, function(err, user) {
 				if (err) {
 					return res.render('register', {info: "Sorry. That Name already exists. Try again.", languages: langs});
 				}
@@ -1224,7 +1224,7 @@ router.get('/api/exportword/:id', async function(req, res, next){
 						//this doesnt work on server:
 						// return res.redirect('/publishers/gnd/word/'+now+'.docx');
 						//need to use:
-						var pugpath = path.join(__dirname, '../views/includes/exportwordview.pug');
+						var pugpath = path.join(__dirname, '../views/exportwordview.pug');
 						var str = pug.renderFile(pugpath, {
 							md: require('marked'),
 							moment: require('moment'),
