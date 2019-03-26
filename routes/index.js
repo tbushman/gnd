@@ -610,7 +610,7 @@ router.post('/panzoom/:lat/:lng/:zoom', function(req, res, next){
 });
 
 //dat
-router.get('/home', getDat, function(req, res, next) {
+router.get('/home', ensureZipIsString, getDat, function(req, res, next) {
 	Content.find({}).sort( { index: 1 } ).exec(function(err, data){
 			if (err) {
 				return next(err)
@@ -681,7 +681,15 @@ var isJurisdiction = async function isJurisdiction(doc, pu, cb) {
 			
 			}
 			var zipcode = await JSON.parse(zipcodes).features.filter(function(zip){
-				return (parseInt(zip.properties['ZCTA5CE10'], 10) === parseInt(zipcoden, 10))
+				return (
+					// parseInt(
+					zip.properties['ZCTA5CE10']
+					// , 10) 
+					=== 
+					// parseInt(
+						zipcoden
+						// , 10)
+					)
 			});
 			//  else {
 			// 	// return res.redirect('/sig/geo/'+doc._id+'/'+pu._id+'/'+null+'');
@@ -729,9 +737,9 @@ var isJurisdiction = async function isJurisdiction(doc, pu, cb) {
 	
 }
 
-router.get('/ensureZipIsString', ensureZipIsString, function(req, res, next){
-	
-})
+// router.get('/ensureZipIsString', ensureZipIsString, function(req, res, next){
+// 
+// })
 
 router.get('/sig/loggeo/:lat/')
 // doc
