@@ -637,6 +637,25 @@ router.get('/home', getDat, function(req, res, next) {
 		});
 });
 
+async function ensureZipIsString(req, res, next){
+	Publisher.find({}).lean().exec(async function(err, pubs){
+		if (err) {
+			return next(err)
+		}
+		pubs.forEach(function(pu){
+			Publisher.updateMany({}, {$set:{'properties.zip': (!pu.properties.zip ? '' : ''+pu.properties.zip+'' ) }}, {safe:true, new:true,multi:true}, function(err, pu){
+				if (err) {
+					console.log(err)// return next(err)
+				} else {
+					
+				}
+			})
+		})
+		return next()
+	})
+	
+}
+
 var isJurisdiction = async function isJurisdiction(doc, pu, cb) {
 	// var inside = require('point-in-polygon');
 	var lat, lng;
@@ -661,7 +680,7 @@ var isJurisdiction = async function isJurisdiction(doc, pu, cb) {
 				
 			
 			}
-			var zipcode = JSON.parse(zipcodes).features.filter(function(zip){
+			var zipcode = await JSON.parse(zipcodes).features.filter(function(zip){
 				return (parseInt(zip.properties['ZCTA5CE10'], 10) === parseInt(zipcoden, 10))
 			});
 			//  else {
@@ -709,6 +728,10 @@ var isJurisdiction = async function isJurisdiction(doc, pu, cb) {
 	})
 	
 }
+
+router.get('/ensureZipIsString', ensureZipIsString, function(req, res, next){
+	
+})
 
 router.get('/sig/loggeo/:lat/')
 // doc
@@ -1036,7 +1059,7 @@ router.post('/sig/editprofile', function(req, res, next){
 				if (err) {
 					return next(err)
 				}
-				var imgurl = ''+publishers+'/publishers/'+ pu.username +'/images/avatar/'+ pu.username + '.png';
+				var imgurl = ''+publishers+'/publishers/gnd/images/avatar/'+ pu.username + '.png';
 				var pd = (process.env.NODE_ENV === 'production' ? process.env.PD.toString() :  process.env.DEVPD.toString())
 				if (body.avatar) {
 					if (body.avatar.substring(0,1) !== "/") {
@@ -1075,38 +1098,44 @@ router.post('/sig/editprofile', function(req, res, next){
 				//console.log(keys)
 				var puKeys = Object.keys(pu);
 				console.log(keys, puKeys)
-				for (var i in keys) {
-					body[keys[i]] = (!isNaN(parseInt(body[keys[i]], 10)) ? parseInt(body[keys[i]],10) : body[keys[i]]);
+				for (var j in puKeys) {
 					var set = {$set:{}};
 					var key;
-					for (var j in puKeys) {
+					for (var i in keys) {
+						body[keys[i]] = (!isNaN(parseInt(body[keys[i]], 10)) ? ''+body[keys[i]] +'' : body[keys[i]] );
 						if (puKeys[j] === 'properties') {
-							var propKeys = Object.keys(pu.properties);
+							var propKeys = await Object.keys(pu.properties);
 							for (var k in propKeys) {
 								if (propKeys[k] === keys[i]) {
 									console.log(propKeys[k], keys[i])
 									// pu.properties[keys[i]] = body[keys[i]]
-									key = 'properties.'+ keys[i]
+									key = 'properties.'+ keys[i];
+									set.$set[key] = body[keys[i]];
 								}
 							}
+						} else if (keys[i] === 'zip') {
+							// pu.properties.zip = body[keys[i]]
+							key = 'properties.zip'
+							set.$set[key] = body[keys[i]];
+
+						
+							
 						} else {
 							if (puKeys[j] === keys[i]) {
 								// pu[keys[i]] = body[keys[i]]
 								key = keys[i]
+								set.$set[key] = body[keys[i]];
 							} else {
 								
 							}
 						}
 					}
-					if (keys[i] === 'zip') {
-						// pu.properties.zip = body[keys[i]]
-						key = 'properties.zip'
+					await Publisher.findOneAndUpdate({_id: pu._id}, set, {safe: true, upsert:false, new:true}).then((pu)=>{}).catch((err)=>{
+						console.log('mongoerr')
+						console.log(err)
+						// next(err)
+					});
 
-					}
-					if (key) {
-						set.$set[key] = body[keys[i]]
-						await Publisher.findOneAndUpdate({_id: pu._id}, set, {safe: true, upsert:false, new:true}).then((pu)=>{}).catch((err)=>next(err));
-					}
 				}
 				next(null, pu)
 			})
@@ -1154,12 +1183,12 @@ router.get('/api/publish', getDat, function(req, res, next) {
 	})
 })
 
-router.get('/api/exportword/:id', function(req, res, next){
+router.get('/api/exportword/:id', async function(req, res, next){
 	Content.findOne({_id: req.params.id}, async function(err, doc){
 		if (err) {
 			return next(err)
 		}
-		Signature.find({documentId: doc._id}, function(err, sig){
+		Signature.find({documentId: doc._id}, async function(err, sig){
 			if (err) {
 				return next(err)
 			}
@@ -1179,13 +1208,24 @@ router.get('/api/exportword/:id', function(req, res, next){
 						}
 					});
 					
-					var pathh = path.join(p, '/'+now+'.docx');
+					var pathh = await path.join(p, '/'+now+'.docx');
 					fs.writeFile(pathh, docx, function(err){
 						if (err) {
 							return next(err)
 						}
-						
-						return res.redirect('/publishers/gnd/word/'+now+'.docx');
+						//this doesnt work on server:
+						// return res.redirect('/publishers/gnd/word/'+now+'.docx');
+						//need to use:
+						var pugpath = path.join(__dirname, '../views/includes/exportwordview.pug');
+						var str = pug.renderFile(pugpath, {
+							md: require('marked'),
+							moment: require('moment'),
+							doctype: 'strict',
+							hrf: '/publishers/gnd/word/'+now+'.docx',
+							doc: doc,
+							sig: sig
+						});
+						res.send(str)
 					});
 				})
 			}

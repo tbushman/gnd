@@ -1,0 +1,69 @@
+doctype strict
+html(xmlns:v="urn:schemas-microsoft-com:vml", xmlns:o='urn:schemas-microsoft-com:office:office', xmlns:w='urn:schemas-microsoft-com:office:word')
+	head
+		meta(charset="utf-8")
+		meta(http-equiv="Content-Type", content="text/html; charset=utf-8")
+		link(rel="File-List", href="exportword/filelist.xml")
+		title #{appTitle}
+		//
+			&nbsp
+		style(type="text/css")
+			include ../public/stylesheets/style.css
+
+		
+	body
+		a.tb-06-m0.block.success(role="button", href= hrf, title="Download Word File", style="color:#fff;z-index:9;position:fixed;font-family:'arial',sans-serif;") Click here to download Word File
+		
+		div.Section1.WordSection1
+			
+			div.centerallwrap(style="visibility:visible;background-color: #fff; background-color: var(--primary); pointer-events:all;")
+				
+				div.centerall
+					
+					
+					table(cellspacing="0px", style="width: 100%;table-layout: fixed;overflow:hidden;")
+						tr#chapter
+							th(scope="col") &nbsp 
+							th(scope="col") &nbsp 
+							th(scope="col") &nbsp 
+						tr
+							td(style="padding: 0;", colspan="3")
+								div(style="clear:both!important;")
+									h2
+										span.bd #{(doc.title.ind + 1)}
+											span th
+											span #{doc.title.str}
+											span  | 
+											span #{doc.chapter.str}
+											span #{(doc.chapter.ind + 1)}
+											span . H. Res.
+											span #{(doc.section.ind + 1)}
+										span &nbsp
+											span.bd #{doc.section.str}
+						tr
+							td(style="padding: 0;", colspan="3")
+								p !{doc.properties.description}
+					
+						tr
+							each si, s in sig
+								td(style="padding: 0;", colspan="1")
+									if (sig && sig.length > 0)
+									
+										div.img.tb-02-m0(style="margin-top:10px;")
+											img(src= si.image)
+											p(style="color:black;font-size:5pt;") #{si.ts}
+
+			div#f1(style="mso-element:footer;")
+				p.MsoFooter
+					table(width="100%", border="0", cellspacing="0", cellpadding="0")
+						tr.tb-font-xxs
+							td(width="80%")
+								span.tb-font-xxs(style="color:#999;") #{doc.title.str}
+								span.tb-font-xxs(style="color:#999;") | 
+								span.tb-font-xxs(style="color:#555;") #{doc.section.str}
+							td(align="right", width="20%")
+								
+								span(class="MsoPageNumber")
+									
+									span.tb-font-xs(style='mso-field-code: " PAGE " ')
+			
