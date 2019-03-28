@@ -86,7 +86,7 @@ var curly = function(str){
 async function geoLocate(ip, zoom, cb) {
 	const util = require('util');
 	var exec = util.promisify(spawn);
-	var ping = exec('ping', -4, ip);
+	var ping = exec('ping', -4, ''+ip+'');
 	if (await ping.stdout) {
 		ping.stdout.on('data', function(d){
 			console.log(d)
@@ -959,14 +959,14 @@ router.post('/sig/uploadsignature/:did/:puid'/*, rmFile*/, uploadmedia.single('i
 			}
 				else //not CF
 			{	*/
-				reqIp = req.headers['x-forwarded-for']//req.ip;
+				reqIp = req.headers['x-forwarded-for'];//req.ip;
 			// }
-console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-connecting-ip'], reqIp)
+console.log(req.ip, req.ips, req.connection.remoteAddress, req.headers['cf-connecting-ip'], reqIp);
 			// if (!reqIp) {
 			// 	console.log(req.ip)
 			// 	return res.redirect('/sig/geo/'+doc._id+'/'+pu._id+'/'+req.body.ts+'');
 			// }
-			geoLocate(reqIp, 6, async function(position){
+			geoLocate(reqIp, 6, function(position){
 				console.log(position)
 				if (position.lat === 37.09024 || !reqIp) {
 					return res.status(200).send('/sig/geo/'+doc._id+'/'+pu._id+'/'+req.body.ts.split('/')[req.body.ts.split('/').length-1]+'')
