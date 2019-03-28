@@ -948,7 +948,7 @@ a.mainmenu {
 div.dropdown {
 	margin: 35px 0;
 	background-color: #fbfdf0;
-	width: 180px;
+	/* width: 180px; */
 	z-index: 2;
 	position: fixed;
 	display: none;
@@ -1033,6 +1033,7 @@ div.dropdown.selected {
 	z-index:1;
 	margin: 0 auto;
 	line-height: 2em;
+	width: calc(100% - calc(var(--thumbwidth) * 2));
 }
 a.tool {
 	width: calc(70px*1.1);

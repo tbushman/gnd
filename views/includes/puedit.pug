@@ -19,9 +19,29 @@ div.grid-right
 						span(v-text="(avail ? 'Available' : '')")
 				
 				div.tb-u-100.input-field
+					//div.tb-u-100.input-field
+					label.ms-Label Address 1
+					input.ms-TextField-field(type="text", name="address1", id="address1", :value="(pu && pu.properties ? pu.properties.address1 : '')")
+				
+				div.tb-u-100.input-field
+					//div.tb-u-100.input-field
+					label.ms-Label Address 2
+					input.ms-TextField-field(type="text", name="address2", id="address2", :value="(pu && pu.properties ? pu.properties.address2 : '')")
+				
+				div.tb-u-100.input-field
+					//div.tb-u-100.input-field
+					label.ms-Label City
+					input.ms-TextField-field(type="text", name="city", id="city", :value="(pu && pu.properties ? pu.properties.city : '')")
+				div.tb-u-100.input-field
+					//div.tb-u-100.input-field
+					label.ms-Label State
+					input.ms-TextField-field(type="text", name="state", id="state", :value="(pu && pu.properties ? pu.properties.state : '')")
+				div.tb-u-100.input-field
 					label.ms-Label(v-text="'The ZIP code you vote from'")
 					input.ms-TextField-field(type="number", name="zip", id="zip", aria-required="true", required, 
 						:value="(pu && pu.properties ? pu.properties.zip : '')")
+				
+
 				div.tb-u-100.input-field
 					//div.tb-u-100.input-field
 					label.ms-Label I represent a 

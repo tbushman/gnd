@@ -331,6 +331,7 @@ html
 					},
 					changeDiff(e) {
 						var self = this;
+						console.log(e.target.value)
 						self.dfi = (!isNaN(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : null);
 					},
 					formatDate(date){

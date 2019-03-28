@@ -1104,30 +1104,20 @@ router.post('/sig/editprofile', function(req, res, next){
 				var keys = Object.keys(body);
 				keys.splice(Object.keys(body).indexOf('avatar'), 1);
 				//console.log(keys)
-				var puKeys = Object.keys(pu);
+				var puKeys = Object.keys(Publisher.schema.paths);
 				console.log(keys, puKeys)
 				for (var j in puKeys) {
 					var set = {$set:{}};
 					var key;
 					for (var i in keys) {
 						body[keys[i]] = (!isNaN(parseInt(body[keys[i]], 10)) ? ''+body[keys[i]] +'' : body[keys[i]] );
-						if (puKeys[j] === 'properties') {
-							var propKeys = await Object.keys(pu.properties);
-							for (var k in propKeys) {
-								if (propKeys[k] === keys[i]) {
-									console.log(propKeys[k], keys[i])
-									// pu.properties[keys[i]] = body[keys[i]]
-									key = 'properties.'+ keys[i];
-									set.$set[key] = body[keys[i]];
-								}
+						if (puKeys[j].split('.')[0] === 'properties') {
+							// var propKeys = await Object.keys(pu.properties);
+							if (puKeys[j].split('.')[1] === keys[i]) {
+								// pu.properties[keys[i]] = body[keys[i]]
+								key = 'properties.'+ keys[i];
+								set.$set[key] = body[keys[i]];
 							}
-						} else if (keys[i] === 'zip') {
-							// pu.properties.zip = body[keys[i]]
-							key = 'properties.zip'
-							set.$set[key] = body[keys[i]];
-
-						
-							
 						} else {
 							if (puKeys[j] === keys[i]) {
 								// pu[keys[i]] = body[keys[i]]
@@ -1138,11 +1128,13 @@ router.post('/sig/editprofile', function(req, res, next){
 							}
 						}
 					}
-					await Publisher.findOneAndUpdate({_id: pu._id}, set, {safe: true, upsert:false, new:true}).then((pu)=>{}).catch((err)=>{
-						console.log('mongoerr')
-						console.log(err)
-						// next(err)
-					});
+					if (key) {
+						await Publisher.findOneAndUpdate({_id: pu._id}, set, {safe: true, upsert:false, new:true}).then((pu)=>{}).catch((err)=>{
+							console.log('mongoerr')
+							console.log(err)
+							// next(err)
+						});
+					}
 
 				}
 				next(null, pu)
@@ -1479,17 +1471,17 @@ router.post('/api/editcontent/:id', function(req, res, next){
 			var isEqual = htmlDiffer.isEqual((!doc.properties.description ? '' : /*marked(*/doc.properties.description), /*marked*/(!desc ? '' : desc)/*/*)*/)
 			var diffss = [], newdiff = null;
 			if (!isEqual) {
-				var diff = htmlDiffer.diffHtml((!doc.properties.description ? '' : doc.properties.description), (!desc ? '' : desc)/*)/*)*/);
-				// console.log(isEqual, diff)
-				diff.forEach(function(dif){
-					//console.log(dif)
-					diffss.push({
-						count: dif.count,
-						value: dif.value,
-						added: dif.added,
-						removed: dif.removed
-					})
-				})
+				// var diff = htmlDiffer.diffHtml((!doc.properties.description ? '' : doc.properties.description), (!desc ? '' : desc)/*)/*)*/);
+				// // console.log(isEqual, diff)
+				// diff.forEach(function(dif){
+				// 	//console.log(dif)
+				// 	diffss.push({
+				// 		count: dif.count,
+				// 		value: dif.value,
+				// 		added: dif.added,
+				// 		removed: dif.removed
+				// 	})
+				// })
 				newdiff = {
 					date: new Date(),
 					user: {
@@ -1497,7 +1489,7 @@ router.post('/api/editcontent/:id', function(req, res, next){
 						username: pu.username,
 						avatar: pu.avatar
 					},
-					dif: diffss,
+					// dif: diffss,
 					str: desc
 				};
 			}

@@ -20,6 +20,10 @@ var schema = new Schema({
 		oauthID: String
 	},
 	properties: {
+		address1: String,
+		address2: String,
+		city: String,
+		state: String,
 		zip: String,
 		place: String,
 		placetype: String,
