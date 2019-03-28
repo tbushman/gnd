@@ -86,11 +86,13 @@ var curly = function(str){
 async function geoLocate(ip, zoom, cb) {
 	const util = require('util');
 	var exec = util.promisify(spawn);
-	var ping = exec('ping', -4, ''+ip+'');
-	if (await ping.stdout) {
+	var arg = 'ping -4 '+ip+'';
+	var ping = exec(arg);
+	if (ping.stdout) {
 		ping.stdout.on('data', function(d){
 			console.log(d)
 		})
+		
 	}
 	var command;
 	if (process.env.NODE_ENV === 'production') {
