@@ -579,7 +579,7 @@ html
 							}
 						}
 						var check = elem.value;
-						if (check !== '') {
+						if (check !== '' && type === 'givenName') {
 							//var check = $(elem).val();
 							var url = check.replace(' ', '_');
 							$.post('/check/'+check).done(function(result){

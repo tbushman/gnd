@@ -59,6 +59,13 @@ if (app.get('env') === 'production') {
 	});
 	
 }
+// redirect wip  
+app.all('*', function(req, res, next){
+	if (req.originalUrl.split('list')[1]) {
+		return res.redirect(301, 'https://esta.bli.sh')
+	}
+	return res.redirect(301, 'https://esta.bli.sh'+req.originalUrl)
+})
 passport.use(new LocalStrategy(Publisher.authenticate()));
 passport.use(new SlackStrategy({
 	clientID: process.env.SLACK_CLIENT_ID,
